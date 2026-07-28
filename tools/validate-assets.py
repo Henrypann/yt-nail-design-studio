@@ -5,15 +5,15 @@
 （无 reason 的不建议关系禁止入库——§5.5 / §9 红线）。
 
 检查项（对应 §5.8）：
-  1. 每套模板 6 个图案 SVG 的 viewBox 一致（本库进一步要求全库 60 个一致）
+  1. 每套模板所有已适配甲型的图案 SVG viewBox 一致
   2. 图案不溢出甲型轮廓（静态近似检查：必须内嵌 nail-clip clipPath 且
      全部 artwork 位于 clip 组内 + 数值坐标不超出 viewBox 容差范围；
      正式的像素级溢出检查由预览 Pipeline 执行）
   3. 缩略图存在且为合法 PNG
   4. manifest.json 引用的文件全部存在
   5. shape_compatibility 不含不存在的甲型 ID；not_recommended 必有非空 reason；
-     每模板三档覆盖全部 6 甲型且不重复
-  6. 6 甲型 × 4 长度 = 24 个轮廓 SVG 全部存在且可解析（预览全组合前置条件）
+     每模板三档覆盖全部 templates=complete 甲型且不重复
+  6. 所有已注册几何 × 4 长度的轮廓 SVG 全部存在且可解析
 
 附加资产检查（§4.8）：
   - 手部双视图 SVG + hands/manifest.json + slots 双 JSON（10 锚点、字段合法、
@@ -30,13 +30,13 @@ import json
 import re
 import sys
 import xml.etree.ElementTree as ET
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LIB = ROOT / "material-library"
 ASSETS = ROOT / "assets"
 
-SHAPE_IDS = {"almond", "coffin", "squoval", "round", "square", "stiletto"}
 LENGTH_IDS = {"short", "medium", "long", "extra-long"}
 FINISH_IDS = {"gloss", "matte", "pearl"}
 STYLE_TAGS = {"trending", "sweet", "minimal", "cool", "retro", "luxe", "holiday"}
@@ -63,6 +63,80 @@ def load_json(path: Path):
         return None
 
 
+@lru_cache(maxsize=1)
+def shape_sets() -> tuple[set[str], set[str], set[str]]:
+    """返回（产品注册、已有几何、模板完整）甲型集合，并校验非几何能力门禁。"""
+    registry = load_json(LIB / "shapes" / "shape-capabilities.json")
+    if not registry:
+        return set(), set(), set()
+    items = registry.get("shapes", [])
+    if not (10 <= len(items) <= 15):
+        err(f"shape-capabilities 注册数量 = {len(items)}，应为 10–15")
+
+    ids = [item.get("id") for item in items]
+    registered = set(ids)
+    if len(registered) != len(ids):
+        err("shape-capabilities 存在重复 id")
+    tier_one = [item for item in items if item.get("tier") == 1]
+    tier_two = [item for item in items if item.get("tier") == 2]
+    if len(tier_one) != 5:
+        err(f"Tier 1 数量 = {len(tier_one)}，应为 5")
+    if len(tier_two) != len(items) - 5:
+        err("除 Tier 1 外的甲型必须全部属于 Tier 2")
+    for tier in (tier_one, tier_two):
+        orders = [item.get("order") for item in tier]
+        if len(set(orders)) != len(orders) or not all(isinstance(order, int) and order > 0 for order in orders):
+            err(f"Tier {tier[0].get('tier') if tier else '?'} order 必须为不重复的正整数")
+
+    geometry_ids: set[str] = set()
+    template_ids: set[str] = set()
+    aliases: set[str] = set()
+    for item in items:
+        sid = item.get("id", "<missing>")
+        caps = item.get("capabilities", {})
+        geometry_id = item.get("geometry_id")
+        geometry_status = caps.get("geometry")
+        item_aliases = item.get("aliases", [])
+        if not isinstance(item_aliases, list):
+            err(f"{sid}: aliases 必须是数组")
+            item_aliases = []
+        for alias in item_aliases:
+            if alias in registered or alias in aliases:
+                err(f"{sid}: alias 重复或与正式 id 冲突: {alias}")
+            aliases.add(alias)
+
+        if geometry_status == "placeholder":
+            if geometry_id is not None:
+                err(f"{sid}: placeholder 不得绑定 geometry_id")
+        else:
+            if geometry_id != sid:
+                err(f"{sid}: 当前几何就绪项 geometry_id 必须与产品 id 一致")
+            geometry_ids.add(sid)
+        if caps.get("templates") == "complete":
+            template_ids.add(sid)
+        if caps.get("wizard") == "enabled":
+            required = {
+                "geometry": "signed_off",
+                "templates": "complete",
+                "styles": "complete",
+            }
+            for key, expected in required.items():
+                if caps.get(key) != expected:
+                    err(f"{sid}: wizard enabled 但 {key}={caps.get(key)}，应为 {expected}")
+            if geometry_id is None:
+                err(f"{sid}: wizard enabled 但 geometry_id 为空")
+
+    generated = ROOT / "src" / "generated" / "shape-types.ts"
+    if not generated.exists():
+        err("缺少生成类型 src/generated/shape-types.ts")
+    else:
+        match = re.search(r"NAIL_SHAPE_IDS\s*=\s*(\[[\s\S]*?\])\s+as const", generated.read_text(encoding="utf-8"))
+        if not match or json.loads(match.group(1)) != ids:
+            err("shape-types.ts 与 shape-capabilities.json 不同步，请运行 npm run generate:shape-types")
+
+    return registered, geometry_ids, template_ids
+
+
 def parse_svg(path: Path) -> ET.Element | None:
     try:
         return ET.parse(path).getroot()
@@ -72,9 +146,15 @@ def parse_svg(path: Path) -> ET.Element | None:
 
 
 def check_templates() -> None:
+    _, _, template_shape_ids = shape_sets()
     index = load_json(LIB / "index.json")
     if not index:
         return
+    if set(index.get("shape_ids", [])) != template_shape_ids:
+        err(
+            "index.json shape_ids 必须等于 shape-capabilities 中 templates=complete 的集合: "
+            f"{sorted(template_shape_ids)}"
+        )
     templates = index.get("templates", [])
     if len(templates) != EXPECTED_TEMPLATE_COUNT:
         err(f"index.json 模板数量 = {len(templates)}，应为 {EXPECTED_TEMPLATE_COUNT}")
@@ -98,7 +178,7 @@ def check_templates() -> None:
                 err(f"{tid}: {bucket} 必须是数组")
                 continue
             for sid in ids:
-                if sid not in SHAPE_IDS:
+                if sid not in template_shape_ids:
                     err(f"{tid}: {bucket} 含不存在的甲型 ID: {sid}")
                 covered.append(sid)
         nr = compat.get("not_recommended", {})
@@ -106,13 +186,13 @@ def check_templates() -> None:
             err(f"{tid}: not_recommended 必须是对象（shape → reason），无 reason 的不建议关系禁止入库")
             nr = {}
         for sid, reason in nr.items():
-            if sid not in SHAPE_IDS:
+            if sid not in template_shape_ids:
                 err(f"{tid}: not_recommended 含不存在的甲型 ID: {sid}")
             if not isinstance(reason, str) or not reason.strip():
                 err(f"{tid}: not_recommended.{sid} 缺少人类可读 reason（入库红线）")
             covered.append(sid)
-        if sorted(covered) != sorted(SHAPE_IDS):
-            err(f"{tid}: 三档适配未完整覆盖 6 甲型或存在重复: {sorted(covered)}")
+        if sorted(covered) != sorted(template_shape_ids):
+            err(f"{tid}: 三档适配未完整覆盖模板就绪甲型或存在重复: {sorted(covered)}")
 
         # 风格标签
         tags = t.get("style_tags", [])
@@ -134,8 +214,8 @@ def check_templates() -> None:
         if manifest is None:
             continue
         patterns = manifest.get("patterns", {})
-        if set(patterns.keys()) != SHAPE_IDS:
-            err(f"{tid}: manifest.patterns 未覆盖 6 甲型: {sorted(patterns.keys())}")
+        if set(patterns.keys()) != template_shape_ids:
+            err(f"{tid}: manifest.patterns 未覆盖模板就绪甲型: {sorted(patterns.keys())}")
         viewboxes: set[str] = set()
         for sid, rel in patterns.items():
             fpath = mpath.parent / rel
@@ -160,9 +240,9 @@ def check_templates() -> None:
             if nums and (max(nums) > 260 or min(nums) < -260):
                 err(f"{tid}/{sid}: 图案坐标超出合理范围（§5.8-2）")
 
-        # ---- §5.8-1 6 个 SVG viewBox 一致
+        # ---- §5.8-1 已适配甲型 SVG viewBox 一致
         if len(viewboxes) > 1:
-            err(f"{tid}: 6 个图案 SVG viewBox 不一致: {sorted(viewboxes)} (§5.8-1)")
+            err(f"{tid}: 图案 SVG viewBox 不一致: {sorted(viewboxes)} (§5.8-1)")
 
         # ---- §5.8-3 缩略图存在且可加载
         thumbs = manifest.get("thumbnails", {})
@@ -191,15 +271,23 @@ def check_templates() -> None:
 
 
 def check_shapes() -> None:
+    _, geometry_shape_ids, _ = shape_sets()
     params = load_json(LIB / "shapes" / "shape-params.json")
     if not params:
         return
-    if set(params.get("shapes", {}).keys()) != SHAPE_IDS:
+    if set(params.get("shapes", {}).keys()) != geometry_shape_ids:
         err(f"shape-params.json 甲型集合非法: {sorted(params.get('shapes', {}))}")
     if set(params.get("lengths", {}).keys()) != LENGTH_IDS:
         err(f"shape-params.json 长度集合非法: {sorted(params.get('lengths', {}))}")
-    # ---- §5.8-6 6 甲型 × 4 长度全组合存在且可解析
-    for sid in sorted(SHAPE_IDS):
+    registry = load_json(LIB / "shapes" / "shape-capabilities.json") or {}
+    by_id = {item.get("id"): item for item in registry.get("shapes", [])}
+    for sid in sorted(geometry_shape_ids):
+        status = by_id.get(sid, {}).get("capabilities", {}).get("geometry")
+        signed_off_at = params.get("shapes", {}).get(sid, {}).get("signed_off_at")
+        if status == "signed_off" and not signed_off_at:
+            err(f"{sid}: geometry=signed_off 但 shape-params 缺少 signed_off_at")
+    # ---- §5.8-6 已注册几何 × 4 长度全组合存在且可解析
+    for sid in sorted(geometry_shape_ids):
         for lid in sorted(LENGTH_IDS):
             fpath = LIB / "shapes" / "silhouettes" / f"{sid}_{lid.replace('-', '_')}.svg"
             if not fpath.exists():
@@ -301,6 +389,7 @@ def check_illustrations_stl() -> None:
 
 
 def main() -> int:
+    registered_shape_ids, geometry_shape_ids, template_shape_ids = shape_sets()
     check_templates()
     check_shapes()
     check_palette_finishes()
@@ -316,8 +405,18 @@ def main() -> int:
             print(f"  FAIL  {e}")
         return 1
     print("[validate-assets] PASS · §5.8 六项检查 + §4.8 资产检查全部通过")
-    print(f"  - {EXPECTED_TEMPLATE_COUNT} 模板 × 6 甲型 = {EXPECTED_TEMPLATE_COUNT * 6} 图案 SVG（viewBox 全库一致、nail-clip 齐备、引用文件齐全）")
-    print("  - 6 甲型 × 4 长度 = 24 轮廓 SVG；色板 8 色；质感 3 项")
+    print(
+        f"  - {len(registered_shape_ids)} 个产品甲型注册；Tier 1 = 5；"
+        f"Wizard enabled = {sum(1 for item in (load_json(LIB / 'shapes' / 'shape-capabilities.json') or {}).get('shapes', []) if item.get('capabilities', {}).get('wizard') == 'enabled')}"
+    )
+    print(
+        f"  - {EXPECTED_TEMPLATE_COUNT} 模板 × {len(template_shape_ids)} 个模板就绪甲型 = "
+        f"{EXPECTED_TEMPLATE_COUNT * len(template_shape_ids)} 图案 SVG（viewBox 全库一致、nail-clip 齐备、引用文件齐全）"
+    )
+    print(
+        f"  - {len(geometry_shape_ids)} 个几何甲型 × {len(LENGTH_IDS)} 长度 = "
+        f"{len(geometry_shape_ids) * len(LENGTH_IDS)} 轮廓 SVG；色板 8 色；质感 3 项"
+    )
     print("  - 手部双视图 + 20 NailSlot 锚点；4 附件（heightMm ≤ 0.30）；4 插画；STL MOCK_PENDING_ALGO")
     return 0
 

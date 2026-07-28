@@ -171,14 +171,8 @@ export function lengthName(length: NailLength): string {
   return LENGTH_LABELS[length];
 }
 
-export const SHAPES: readonly NailShape[] = [
-  'almond',
-  'coffin',
-  'squoval',
-  'round',
-  'square',
-  'stiletto',
-];
+/** Editor 只暴露已有几何资产的甲型；产品占位目录由 shape-capabilities 管理。 */
+export const SHAPES: readonly NailShape[] = Object.keys(shapeParams?.shapes ?? {}) as NailShape[];
 export const LENGTHS: readonly NailLength[] = ['short', 'medium', 'long', 'extra-long'];
 
 export function templateById(id: string): TemplateIndexEntry | undefined {

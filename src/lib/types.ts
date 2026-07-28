@@ -17,8 +17,9 @@ export const FINGER_CODES: readonly FingerCode[] = [
   'R1', 'R2', 'R3', 'R4', 'R5',
 ] as const;
 
-/** 六甲型 */
-export type NailShape = 'almond' | 'coffin' | 'squoval' | 'round' | 'square' | 'stiletto';
+/** 产品甲型目录；由非几何能力注册表生成，轮廓参数仍只认 shape-params.json */
+export type { NailShape } from '@/generated/shape-types';
+import type { NailShape } from '@/generated/shape-types';
 
 /** 四档长度 */
 export type NailLength = 'short' | 'medium' | 'long' | 'extra-long';

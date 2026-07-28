@@ -67,6 +67,22 @@ try {
   await page.getByText('应用 → 预览十指').waitFor();
   step('Wizard 客户选择器', true);
 
+  /* 4b. 能力注册表 UI：Tier 1 常驻 5 个，Tier 2 折叠 10 个；Oval 阶段 2 仍受模板门禁 */
+  const tierOneShapes = page.locator('[data-shape-tier="1"]');
+  await tierOneShapes.first().waitFor({ timeout: 10000 });
+  const tierOneCount = await tierOneShapes.count();
+  const ovalCard = page.locator('[data-shape-id="oval"]');
+  await ovalCard.waitFor({ timeout: 10000 });
+  const ovalDisabled = (await ovalCard.getAttribute('aria-disabled')) === 'true';
+  await page.getByRole('button', { name: '更多甲型（10）' }).click();
+  const tierTwoCount = await page.locator('[data-shape-tier="2"]').count();
+  step(
+    '甲型能力目录 = Tier 1 五个 + Tier 2 十个',
+    tierOneCount === 5 && tierTwoCount === 10 && ovalDisabled,
+    `Tier1=${tierOneCount}, Tier2=${tierTwoCount}, Oval门禁=${ovalDisabled}`,
+  );
+  await page.getByRole('button', { name: '更多甲型（10）' }).click();
+
   /* 5. STEP 1：选甲型 + 长度 → 应用（v1.3.0：先弹风格推荐） */
   await page.getByRole('button', { name: /杏仁形/ }).first().click();
   await page.getByRole('button', { name: /^中/ }).first().click();
@@ -235,8 +251,8 @@ try {
 
   /* 10b. 桥接保真：Editor 十指平铺出现解锁标记（v2 桥接修复：逐指覆写不丢失） */
   await page.getByRole('button', { name: '十指平铺预览' }).click();
-  await page.locator('span[title="已解锁"]').first().waitFor({ timeout: 5000 });
-  const unlockBadges = await page.locator('span[title="已解锁"]').count();
+  await page.locator('span[title="已解锁独立编辑"]').first().waitFor({ timeout: 5000 });
+  const unlockBadges = await page.locator('span[title="已解锁独立编辑"]').count();
   step('桥接后逐指覆写保留（Editor 解锁指）', unlockBadges === 1, `🔓 数量=${unlockBadges}`);
   await page.getByRole('button', { name: '返回单甲' }).click();
 

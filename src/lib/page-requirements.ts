@@ -50,9 +50,9 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
       {
         debugId: 'studio.wizard.step1.shape-length-picker',
         name: '甲型 + 长度选择（STEP 1）',
-        requirements: ['六甲型 × 四档长度（14/18/22/26mm）选择', 'MVP 仅 almond 可点，其余置灰「即将推出」'],
+        requirements: ['Tier 1 五甲型平铺、Tier 2 十甲型折叠 × 四档长度（14/18/22/26mm）', '能力未就绪甲型按规划中/校准中/模板适配中置灰'],
         interactions: ['[应用 → 预览十指] 触发风格推荐弹窗（每个设计一次），选用/跳过后进入 STEP 2'],
-        logic: ['置灰是 UI 门禁（MVP_ENABLED_SHAPES），开放新甲型 = 曲线签收 + 白名单加名', '未选满甲型+长度时按钮禁用'],
+        logic: ['置灰门禁读取 shape-capabilities；开放甲型必须同时满足几何签收、模板完整、风格完整与 Wizard enabled', '未选满甲型+长度时按钮禁用'],
       },
       {
         debugId: 'studio.wizard.style-recommend-modal',

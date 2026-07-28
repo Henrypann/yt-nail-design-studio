@@ -57,8 +57,38 @@ export interface FinishMeta {
 }
 
 export interface ShapeParams {
-  shapes: Record<NailShape, { name: string; name_en: string }>;
+  shapes: Partial<Record<NailShape, { name: string; name_en: string }>>;
   lengths: Record<NailLength, { name: string; lengthMm: number; widthMm: number }>;
+}
+
+export type ShapeGeometryStatus = 'placeholder' | 'generated' | 'in_review' | 'signed_off';
+export type ShapeFeatureStatus = 'disabled' | 'experimental' | 'enabled';
+export type ShapeAssetStatus = 'missing' | 'in_progress' | 'complete';
+
+export interface ShapeCapability {
+  id: NailShape;
+  label: string;
+  label_en: string;
+  tier: 1 | 2;
+  order: number;
+  family: string;
+  aliases: string[];
+  /** 指向 shape-params 的几何 ID；null 表示只有产品占位，不存在轮廓资产。 */
+  geometry_id: NailShape | null;
+  capabilities: {
+    geometry: ShapeGeometryStatus;
+    editor: ShapeFeatureStatus;
+    templates: ShapeAssetStatus;
+    styles: ShapeAssetStatus;
+    wizard: ShapeFeatureStatus;
+  };
+}
+
+export interface ShapeCapabilitiesRegistry {
+  version: number;
+  updated_at: string;
+  comment: string;
+  shapes: ShapeCapability[];
 }
 
 /* ── 加载（缓存 + 失败失效） ── */
@@ -80,6 +110,7 @@ const indexCache: { p: Promise<LibraryIndex> | null } = { p: null };
 const paletteCache: { p: Promise<{ colors: PaletteColor[] }> | null } = { p: null };
 const finishesCache: { p: Promise<{ finishes: FinishMeta[] }> | null } = { p: null };
 const shapeParamsCache: { p: Promise<ShapeParams> | null } = { p: null };
+const shapeCapabilitiesCache: { p: Promise<ShapeCapabilitiesRegistry> | null } = { p: null };
 
 export function loadLibraryIndex(): Promise<LibraryIndex> {
   return cachedJson(indexCache, '/material-library/index.json');
@@ -97,6 +128,31 @@ export async function loadFinishes(): Promise<FinishMeta[]> {
 
 export function loadShapeParams(): Promise<ShapeParams> {
   return cachedJson(shapeParamsCache, '/material-library/shapes/shape-params.json');
+}
+
+export function loadShapeCapabilities(): Promise<ShapeCapabilitiesRegistry> {
+  return cachedJson(shapeCapabilitiesCache, '/material-library/shapes/shape-capabilities.json');
+}
+
+/** Wizard 门禁：注册可见不等于可编辑；四项资产/签收条件缺一不可。 */
+export function isWizardShapeEnabled(shape: ShapeCapability): boolean {
+  return (
+    shape.capabilities.wizard === 'enabled' &&
+    shape.capabilities.geometry === 'signed_off' &&
+    shape.capabilities.templates === 'complete' &&
+    shape.capabilities.styles === 'complete' &&
+    shape.geometry_id !== null
+  );
+}
+
+export function shapeAvailabilityLabel(shape: ShapeCapability): string {
+  if (isWizardShapeEnabled(shape)) return '可用';
+  if (shape.capabilities.geometry === 'placeholder') return '规划中';
+  if (shape.capabilities.geometry !== 'signed_off') return '校准中';
+  if (shape.capabilities.templates !== 'complete' || shape.capabilities.styles !== 'complete') {
+    return '模板适配中';
+  }
+  return '即将推出';
 }
 
 /* ── 甲型 × 风格映射（§5.3 方向 A：纯前端排序规则） ── */

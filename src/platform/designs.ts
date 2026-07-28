@@ -8,6 +8,7 @@
 
 import { readData, StorageKeys } from '@/lib/storage';
 import type { DesignSummary, NailShape } from '@/lib/types';
+import { NAIL_SHAPE_LABELS } from '@/generated/shape-types';
 
 export function readAllDesigns(): DesignSummary[] {
   const data = readData<DesignSummary[]>(StorageKeys.designs);
@@ -45,11 +46,4 @@ export function favoriteShape(customerId: string): NailShape | null {
 }
 
 /** 甲型展示名（展示层映射，素材数据仍以 material-library 为准） */
-export const SHAPE_LABEL: Record<NailShape, string> = {
-  almond: '杏仁形',
-  coffin: '梯形',
-  squoval: '方圆形',
-  round: '圆形',
-  square: '方形',
-  stiletto: '尖形',
-};
+export const SHAPE_LABEL: Record<NailShape, string> = NAIL_SHAPE_LABELS;

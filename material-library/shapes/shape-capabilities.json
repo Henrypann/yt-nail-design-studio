@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-28T00:00:00Z",
+  "comment": "非几何性质的甲型能力注册表。只描述产品展示、资产就绪度与功能门禁；轮廓参数唯一来源仍为 shape-params.json。",
+  "shapes": [
+    {
+      "id": "almond",
+      "label": "杏仁形",
+      "label_en": "Almond",
+      "tier": 1,
+      "order": 1,
+      "family": "tapered",
+      "aliases": [],
+      "geometry_id": "almond",
+      "capabilities": {
+        "geometry": "signed_off",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "complete",
+        "wizard": "enabled"
+      }
+    },
+    {
+      "id": "oval",
+      "label": "椭圆形",
+      "label_en": "Oval",
+      "tier": 1,
+      "order": 2,
+      "family": "rounded",
+      "aliases": [],
+      "geometry_id": "oval",
+      "capabilities": {
+        "geometry": "signed_off",
+        "editor": "experimental",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "square",
+      "label": "方形",
+      "label_en": "Square",
+      "tier": 1,
+      "order": 3,
+      "family": "square",
+      "aliases": [],
+      "geometry_id": "square",
+      "capabilities": {
+        "geometry": "generated",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "round",
+      "label": "圆形",
+      "label_en": "Round",
+      "tier": 1,
+      "order": 4,
+      "family": "rounded",
+      "aliases": [],
+      "geometry_id": "round",
+      "capabilities": {
+        "geometry": "generated",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "coffin",
+      "label": "棺材形",
+      "label_en": "Coffin",
+      "tier": 1,
+      "order": 5,
+      "family": "tapered-square",
+      "aliases": [],
+      "geometry_id": "coffin",
+      "capabilities": {
+        "geometry": "generated",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "squoval",
+      "label": "方圆形",
+      "label_en": "Squoval",
+      "tier": 2,
+      "order": 1,
+      "family": "square",
+      "aliases": [],
+      "geometry_id": "squoval",
+      "capabilities": {
+        "geometry": "generated",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "stiletto",
+      "label": "细高跟形",
+      "label_en": "Stiletto",
+      "tier": 2,
+      "order": 2,
+      "family": "pointed",
+      "aliases": [],
+      "geometry_id": "stiletto",
+      "capabilities": {
+        "geometry": "generated",
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "soft-square",
+      "label": "柔方形",
+      "label_en": "Soft Square",
+      "tier": 2,
+      "order": 3,
+      "family": "square",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "tapered-square",
+      "label": "收窄方形",
+      "label_en": "Tapered Square",
+      "tier": 2,
+      "order": 4,
+      "family": "tapered-square",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "ballerina",
+      "label": "芭蕾形",
+      "label_en": "Ballerina",
+      "tier": 2,
+      "order": 5,
+      "family": "tapered-square",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "lipstick",
+      "label": "口红形",
+      "label_en": "Lipstick",
+      "tier": 2,
+      "order": 6,
+      "family": "asymmetric",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "flare",
+      "label": "外扩形",
+      "label_en": "Flare",
+      "tier": 2,
+      "order": 7,
+      "family": "flared",
+      "aliases": ["duck"],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "mountain-peak",
+      "label": "山峰形",
+      "label_en": "Mountain Peak",
+      "tier": 2,
+      "order": 8,
+      "family": "pointed",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "edge",
+      "label": "棱线形",
+      "label_en": "Edge",
+      "tier": 2,
+      "order": 9,
+      "family": "pointed",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    },
+    {
+      "id": "arrowhead",
+      "label": "箭头形",
+      "label_en": "Arrowhead",
+      "tier": 2,
+      "order": 10,
+      "family": "pointed",
+      "aliases": [],
+      "geometry_id": null,
+      "capabilities": {
+        "geometry": "placeholder",
+        "editor": "disabled",
+        "templates": "missing",
+        "styles": "missing",
+        "wizard": "disabled"
+      }
+    }
+  ]
+}

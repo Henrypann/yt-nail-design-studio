@@ -7,12 +7,14 @@
 
 ```
 material-library/
-├── index.json                    ← 模板索引（10 套，§5.1 模型 + §5.4 映射表 + 六类风格标签 legend）
+├── index.json                    ← 模板索引（12 套，§5.1 模型 + §5.4 映射表 + 风格标签 legend）
 ├── templates/
 │   └── t_*/                      ← 每套模板：manifest.json + patterns/（6 甲型 SVG）+ thumbnails/
 ├── shapes/
-│   ├── shape-params.json         ← 前后端唯一参数源（红线：禁止第二参数源）
-│   └── silhouettes/              ← 6 甲型 × 4 长度 = 24 轮廓 SVG（脚本生成，勿手改）
+│   ├── shape-capabilities.json   ← 15 个产品甲型的 Tier / 资产状态 / 功能门禁（不含几何）
+│   ├── shape-params.json         ← 已有几何甲型的唯一参数源（红线：禁止第二参数源）
+│   ├── silhouettes/              ← 7 几何甲型 × 4 长度 = 28 轮廓 SVG（脚本生成，勿手改）
+│   └── review/                   ← 甲型签收对照板
 ├── colors/palette.json           ← 8 色色板
 └── finishes/finishes.json        ← gloss / matte / pearl 元数据（原型期仅参数记录）
 ```
@@ -21,7 +23,9 @@ material-library/
 
 | 约定 | 值 |
 |---|---|
-| 甲型 ID | `almond` `coffin` `squoval` `round` `square` `stiletto` |
+| 产品甲型 ID | 以 `shape-capabilities.json` 为准；Tier 只控制展示优先级，不代表几何已完成 |
+| 几何甲型 ID | 以 `shape-params.json` 为准；当前为 `almond` `oval` `coffin` `squoval` `round` `square` `stiletto` |
+| 模板就绪甲型 | 以 capability 的 `templates=complete` 为准；未完成甲型不得静默复用纯底色 |
 | 长度 ID | `short` `medium` `long` `extra-long`（轮廓文件名中 `-` → `_`） |
 | 坐标系 | 0.1mm 单位；原点 = 甲根中心；甲尖在负 y；`rotationDeg` = 生长轴相对 12 点顺时针角度 |
 | 轮廓 SVG | viewBox 随长度变化；内含 `<clipPath id="nail-clip">` + `stroke="currentColor"` 可见轮廓 |
@@ -45,8 +49,10 @@ back：图左=左手；palm：图左=右手（Palm 显示层反向 xPalm=1-xMode
 改 `shape-params.json` 或图案设计后，按序重跑：
 
 ```bash
-python3 tools/generate-nail-shapes.py       # 24 轮廓
-python3 tools/generate-template-patterns.py # 60 图案 + manifest + 缩略图
+node tools/generate-shape-types.mjs         # 从非几何注册表生成 NailShape 类型
+python3 tools/generate-nail-shapes.py       # 当前 28 轮廓
+python3 tools/generate-oval-review.py       # Almond / Oval / Round 签收板
+python3 tools/generate-template-patterns.py # 仅生成 templates=complete 甲型图案
 python3 tools/generate-mock-stl.py          # Mock STL + 占位清单
 python3 tools/validate-assets.py            # §5.8 六项 + §4.8 检查（入库强制）
 ```

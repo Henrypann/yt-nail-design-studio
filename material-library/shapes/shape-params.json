@@ -35,7 +35,7 @@
       },
       "cuticle-seat": {
         "type": "cuticle-seat",
-        "summary": "v3：分段显式 Bézier（S1 cuticle arc / S2 flare / S3 taper），G1 连续。推翻「最宽处=甲根」。almond 已于 2026-07-24 签收。",
+        "summary": "v3：分段显式 Bézier（S1 cuticle arc / S2 flare / S3 taper），G1 连续。推翻「最宽处=甲根」。almond 与 oval 使用；通过分长度 tipRadius 区分软尖与圆钝甲尖。",
         "fields": {
           "curveModel": "必须为 cuticle-seat",
           "rootWidthRatio": "甲根有效宽 / 最大宽（0.84–0.90）",
@@ -65,6 +65,24 @@
       "cCurve": 0.42,
       "signed_off_at": "2026-07-24",
       "signed_off_note": "cuticle-seat 研究稿人工签收；替代 v2 width-profile almond"
+    },
+    "oval": {
+      "name": "椭圆形",
+      "name_en": "Oval",
+      "curveModel": "cuticle-seat",
+      "rootWidthRatio": 0.87,
+      "cuticleDepthRatio": 0.1,
+      "maxWidthT": 0.17,
+      "taperE1": 0.3,
+      "tipRadiusMmByLength": {
+        "14": 3.5,
+        "18": 3.2,
+        "22": 2.9,
+        "26": 2.7
+      },
+      "cCurve": 0.4,
+      "signed_off_at": "2026-07-28",
+      "signed_off_note": "Almond / Oval / Round 四长度对照签收；Oval 从中上段持续收窄，圆钝甲尖，与 Round 短圆帽及 Almond 软尖保持可辨差异"
     },
     "coffin": {
       "name": "芭蕾/棺材形",

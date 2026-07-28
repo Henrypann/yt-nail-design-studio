@@ -52,7 +52,7 @@ export default function WizardPage() {
     loadShapeParams()
       .then((p) =>
         setSummaryLabel(
-          `${p.shapes[s.appliedShape!].name} · ${p.lengths[s.appliedLength!].name}（${p.lengths[s.appliedLength!].lengthMm}mm）`,
+          `${p.shapes[s.appliedShape!]?.name ?? s.appliedShape!} · ${p.lengths[s.appliedLength!].name}（${p.lengths[s.appliedLength!].lengthMm}mm）`,
         ),
       )
       .catch(() => undefined);

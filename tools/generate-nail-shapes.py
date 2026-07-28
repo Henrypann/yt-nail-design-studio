@@ -18,6 +18,7 @@ CLI 行为与输出路径与 v1 完全一致：`python tools/generate-nail-shape
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -40,12 +41,31 @@ outline_path_d = _gen.outline_path_d
 outline_points = _gen.outline_points
 build_svg = _gen.build_svg
 silhouette_viewbox = _gen.silhouette_viewbox
-SHAPE_IDS = _gen.SHAPE_IDS
-LENGTH_IDS = _gen.LENGTH_IDS
+
+# 生成集合来自项目唯一参数源，不再受外部 skill 内的历史六甲型列表限制。
+# 几何计算仍 100% 复用 skill 的 outline/build 函数，本文件只负责遍历与落盘。
+_params_doc = json.loads(PARAMS_PATH.read_text(encoding="utf-8"))
+SHAPE_IDS = list(_params_doc["shapes"].keys())
+LENGTH_IDS = list(_params_doc["lengths"].keys())
 
 
 def main() -> None:
-    count = _gen.generate(PARAMS_PATH, OUT_DIR)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for shape_id in SHAPE_IDS:
+        shape_params = _params_doc["shapes"][shape_id]
+        for length_id in LENGTH_IDS:
+            length_params = _params_doc["lengths"][length_id]
+            svg = build_svg(
+                shape_id,
+                length_id,
+                length_params["lengthMm"],
+                length_params["widthMm"],
+                shape_params,
+            )
+            filename = f"{shape_id}_{length_id.replace('-', '_')}.svg"
+            (OUT_DIR / filename).write_text(svg, encoding="utf-8")
+            count += 1
     print(f"[generate-nail-shapes] wrote {count} silhouette SVGs -> {OUT_DIR.relative_to(ROOT)}")
 
 
