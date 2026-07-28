@@ -33,9 +33,14 @@ function serializePreview(): string {
   return markup;
 }
 
-/** 预览 svg → PNG Blob（scale=2 高清导出） */
-export async function renderPreviewPng(scale = 2): Promise<Blob> {
-  const markup = serializePreview();
+/** 预览 svg → 栅格化 Blob（内部公共实现） */
+async function rasterizePreview(
+  markup: string,
+  width: number,
+  height: number,
+  type: 'image/png' | 'image/jpeg',
+  quality?: number,
+): Promise<Blob> {
   const svgUrl = URL.createObjectURL(new Blob([markup], { type: 'image/svg+xml;charset=utf-8' }));
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -45,25 +50,34 @@ export async function renderPreviewPng(scale = 2): Promise<Blob> {
       el.src = svgUrl;
     });
     const canvas = document.createElement('canvas');
-    canvas.width = 1200 * scale;
-    canvas.height = 900 * scale;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('画布初始化失败');
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     return await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('PNG 编码失败'))), 'image/png');
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('图像编码失败'))), type, quality);
     });
   } finally {
     URL.revokeObjectURL(svgUrl);
   }
 }
 
-/** 生成设计列表缩略图（dataURL，失败时返回 undefined，不阻断保存） */
+/** 预览 svg → PNG Blob（scale=2 高清导出，顾客确认展示载体） */
+export async function renderPreviewPng(scale = 2): Promise<Blob> {
+  return rasterizePreview(serializePreview(), 1200 * scale, 900 * scale, 'image/png');
+}
+
+/**
+ * 生成设计列表缩略图（dataURL，失败时返回 undefined，不阻断保存）。
+ * 320×240 JPEG(q0.72)：单条 dataURL 约 15–40KB（原 480×360 PNG 可达数百 KB），
+ * 避免设计列表缩略图快速耗尽 localStorage 配额。
+ */
 export async function renderThumbnailDataUrl(): Promise<string | undefined> {
   try {
-    const blob = await renderPreviewPng(0.4);
+    const blob = await rasterizePreview(serializePreview(), 320, 240, 'image/jpeg', 0.72);
     return await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);

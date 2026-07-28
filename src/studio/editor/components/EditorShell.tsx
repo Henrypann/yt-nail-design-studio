@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, Box, ScanSearch } from 'lucide-react';
+import { ShieldAlert, ScanSearch } from 'lucide-react';
 import { Button } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { NailCanvas } from './NailCanvas';
@@ -16,7 +16,6 @@ import { LayerPanel } from './LayerPanel';
 import { FingerPanel } from './FingerPanel';
 import { EditorTopBar } from './EditorTopBar';
 import { TiledPreview } from './TiledPreview';
-import { Nail3DCheck } from './Nail3DCheck';
 import { RiskScreen } from './RiskScreen';
 import { useEditorStore } from '../store';
 
@@ -30,7 +29,6 @@ export function EditorShell() {
   const setTool = useEditorStore((s) => s.setTool);
 
   const [tiledOpen, setTiledOpen] = useState(false);
-  const [threeDOpen, setThreeDOpen] = useState(false);
   const [riskOpen, setRiskOpen] = useState(false);
 
   /* 快捷键：⌘Z / ⌘⇧Z / B / E */
@@ -91,14 +89,10 @@ export function EditorShell() {
           <LayerPanel />
           <FingerPanel />
 
-          {/* 检查区：3D 单甲检查（只读）+ P0 风险筛查（Mock） */}
+          {/* 检查区：P0 风险筛查（Mock）。固定半椭球假 3D 检查入口已移除（源文件 Nail3DCheck.tsx 保留） */}
           <section className="rounded-panel border border-gray-200 bg-white p-3">
             <h3 className="mb-2 text-xs font-semibold text-gray-800">检查</h3>
             <div className="flex flex-col gap-1.5">
-              <Button size="sm" variant="secondary" onClick={() => setThreeDOpen(true)}>
-                <Box size={13} />
-                3D 单甲检查（只读）
-              </Button>
               <Button size="sm" variant="secondary" onClick={() => setRiskOpen(true)}>
                 <ScanSearch size={13} />
                 P0 风险筛查 · MOCK
@@ -109,7 +103,6 @@ export function EditorShell() {
       </div>
 
       {tiledOpen && <TiledPreview onClose={() => setTiledOpen(false)} />}
-      {threeDOpen && <Nail3DCheck onClose={() => setThreeDOpen(false)} />}
       <RiskScreen open={riskOpen} onClose={() => setRiskOpen(false)} />
     </div>
   );
