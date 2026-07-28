@@ -1,0 +1,847 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-28T08:49:55.125Z",
+  "comment": "Editor 画笔品牌色板（120色 · OPI/CND/Essie），异步懒加载",
+  "colors": [
+    {
+      "id": "bp_opi_01",
+      "name": "OPI 1",
+      "hex": "#704343",
+      "brand": "OPI",
+      "sort_order": 1
+    },
+    {
+      "id": "bp_opi_02",
+      "name": "OPI 2",
+      "hex": "#7a4238",
+      "brand": "OPI",
+      "sort_order": 2
+    },
+    {
+      "id": "bp_opi_03",
+      "name": "OPI 3",
+      "hex": "#85482e",
+      "brand": "OPI",
+      "sort_order": 3
+    },
+    {
+      "id": "bp_opi_04",
+      "name": "OPI 4",
+      "hex": "#905423",
+      "brand": "OPI",
+      "sort_order": 4
+    },
+    {
+      "id": "bp_opi_05",
+      "name": "OPI 5",
+      "hex": "#9a6618",
+      "brand": "OPI",
+      "sort_order": 5
+    },
+    {
+      "id": "bp_opi_06",
+      "name": "OPI 6",
+      "hex": "#897b52",
+      "brand": "OPI",
+      "sort_order": 6
+    },
+    {
+      "id": "bp_opi_07",
+      "name": "OPI 7",
+      "hex": "#968e45",
+      "brand": "OPI",
+      "sort_order": 7
+    },
+    {
+      "id": "bp_opi_08",
+      "name": "OPI 8",
+      "hex": "#9ea338",
+      "brand": "OPI",
+      "sort_order": 8
+    },
+    {
+      "id": "bp_opi_09",
+      "name": "OPI 9",
+      "hex": "#96b12b",
+      "brand": "OPI",
+      "sort_order": 9
+    },
+    {
+      "id": "bp_opi_10",
+      "name": "OPI 10",
+      "hex": "#86be1e",
+      "brand": "OPI",
+      "sort_order": 10
+    },
+    {
+      "id": "bp_opi_11",
+      "name": "OPI 11",
+      "hex": "#82a163",
+      "brand": "OPI",
+      "sort_order": 11
+    },
+    {
+      "id": "bp_opi_12",
+      "name": "OPI 12",
+      "hex": "#74b054",
+      "brand": "OPI",
+      "sort_order": 12
+    },
+    {
+      "id": "bp_opi_13",
+      "name": "OPI 13",
+      "hex": "#5dbf45",
+      "brand": "OPI",
+      "sort_order": 13
+    },
+    {
+      "id": "bp_opi_14",
+      "name": "OPI 14",
+      "hex": "#3dce36",
+      "brand": "OPI",
+      "sort_order": 14
+    },
+    {
+      "id": "bp_opi_15",
+      "name": "OPI 15",
+      "hex": "#27dd39",
+      "brand": "OPI",
+      "sort_order": 15
+    },
+    {
+      "id": "bp_opi_16",
+      "name": "OPI 16",
+      "hex": "#7cb189",
+      "brand": "OPI",
+      "sort_order": 16
+    },
+    {
+      "id": "bp_opi_17",
+      "name": "OPI 17",
+      "hex": "#70bd8f",
+      "brand": "OPI",
+      "sort_order": 17
+    },
+    {
+      "id": "bp_opi_18",
+      "name": "OPI 18",
+      "hex": "#63ca9c",
+      "brand": "OPI",
+      "sort_order": 18
+    },
+    {
+      "id": "bp_opi_19",
+      "name": "OPI 19",
+      "hex": "#57d6b0",
+      "brand": "OPI",
+      "sort_order": 19
+    },
+    {
+      "id": "bp_opi_20",
+      "name": "OPI 20",
+      "hex": "#4ae3cc",
+      "brand": "OPI",
+      "sort_order": 20
+    },
+    {
+      "id": "bp_opi_21",
+      "name": "OPI 21",
+      "hex": "#96c0c0",
+      "brand": "OPI",
+      "sort_order": 21
+    },
+    {
+      "id": "bp_opi_22",
+      "name": "OPI 22",
+      "hex": "#8cc1ca",
+      "brand": "OPI",
+      "sort_order": 22
+    },
+    {
+      "id": "bp_opi_23",
+      "name": "OPI 23",
+      "hex": "#82bbd4",
+      "brand": "OPI",
+      "sort_order": 23
+    },
+    {
+      "id": "bp_opi_24",
+      "name": "OPI 24",
+      "hex": "#78b0de",
+      "brand": "OPI",
+      "sort_order": 24
+    },
+    {
+      "id": "bp_opi_25",
+      "name": "OPI 25",
+      "hex": "#6d9fe8",
+      "brand": "OPI",
+      "sort_order": 25
+    },
+    {
+      "id": "bp_opi_26",
+      "name": "OPI 26",
+      "hex": "#afb7cf",
+      "brand": "OPI",
+      "sort_order": 26
+    },
+    {
+      "id": "bp_opi_27",
+      "name": "OPI 27",
+      "hex": "#a8acd7",
+      "brand": "OPI",
+      "sort_order": 27
+    },
+    {
+      "id": "bp_opi_28",
+      "name": "OPI 28",
+      "hex": "#a3a0de",
+      "brand": "OPI",
+      "sort_order": 28
+    },
+    {
+      "id": "bp_opi_29",
+      "name": "OPI 29",
+      "hex": "#a898e6",
+      "brand": "OPI",
+      "sort_order": 29
+    },
+    {
+      "id": "bp_opi_30",
+      "name": "OPI 30",
+      "hex": "#b191ee",
+      "brand": "OPI",
+      "sort_order": 30
+    },
+    {
+      "id": "bp_opi_31",
+      "name": "OPI 31",
+      "hex": "#594370",
+      "brand": "OPI",
+      "sort_order": 31
+    },
+    {
+      "id": "bp_opi_32",
+      "name": "OPI 32",
+      "hex": "#63387a",
+      "brand": "OPI",
+      "sort_order": 32
+    },
+    {
+      "id": "bp_opi_33",
+      "name": "OPI 33",
+      "hex": "#732e85",
+      "brand": "OPI",
+      "sort_order": 33
+    },
+    {
+      "id": "bp_opi_34",
+      "name": "OPI 34",
+      "hex": "#8a2390",
+      "brand": "OPI",
+      "sort_order": 34
+    },
+    {
+      "id": "bp_opi_35",
+      "name": "OPI 35",
+      "hex": "#9a188d",
+      "brand": "OPI",
+      "sort_order": 35
+    },
+    {
+      "id": "bp_opi_36",
+      "name": "OPI 36",
+      "hex": "#89527b",
+      "brand": "OPI",
+      "sort_order": 36
+    },
+    {
+      "id": "bp_opi_37",
+      "name": "OPI 37",
+      "hex": "#964576",
+      "brand": "OPI",
+      "sort_order": 37
+    },
+    {
+      "id": "bp_opi_38",
+      "name": "OPI 38",
+      "hex": "#a33868",
+      "brand": "OPI",
+      "sort_order": 38
+    },
+    {
+      "id": "bp_opi_39",
+      "name": "OPI 39",
+      "hex": "#b12b53",
+      "brand": "OPI",
+      "sort_order": 39
+    },
+    {
+      "id": "bp_opi_40",
+      "name": "OPI 40",
+      "hex": "#be1e36",
+      "brand": "OPI",
+      "sort_order": 40
+    },
+    {
+      "id": "bp_cnd_01",
+      "name": "CND 1",
+      "hex": "#705943",
+      "brand": "CND",
+      "sort_order": 41
+    },
+    {
+      "id": "bp_cnd_02",
+      "name": "CND 2",
+      "hex": "#7a6338",
+      "brand": "CND",
+      "sort_order": 42
+    },
+    {
+      "id": "bp_cnd_03",
+      "name": "CND 3",
+      "hex": "#85732e",
+      "brand": "CND",
+      "sort_order": 43
+    },
+    {
+      "id": "bp_cnd_04",
+      "name": "CND 4",
+      "hex": "#908a23",
+      "brand": "CND",
+      "sort_order": 44
+    },
+    {
+      "id": "bp_cnd_05",
+      "name": "CND 5",
+      "hex": "#8d9a18",
+      "brand": "CND",
+      "sort_order": 45
+    },
+    {
+      "id": "bp_cnd_06",
+      "name": "CND 6",
+      "hex": "#7b8952",
+      "brand": "CND",
+      "sort_order": 46
+    },
+    {
+      "id": "bp_cnd_07",
+      "name": "CND 7",
+      "hex": "#769645",
+      "brand": "CND",
+      "sort_order": 47
+    },
+    {
+      "id": "bp_cnd_08",
+      "name": "CND 8",
+      "hex": "#68a338",
+      "brand": "CND",
+      "sort_order": 48
+    },
+    {
+      "id": "bp_cnd_09",
+      "name": "CND 9",
+      "hex": "#53b12b",
+      "brand": "CND",
+      "sort_order": 49
+    },
+    {
+      "id": "bp_cnd_10",
+      "name": "CND 10",
+      "hex": "#36be1e",
+      "brand": "CND",
+      "sort_order": 50
+    },
+    {
+      "id": "bp_cnd_11",
+      "name": "CND 11",
+      "hex": "#63a163",
+      "brand": "CND",
+      "sort_order": 51
+    },
+    {
+      "id": "bp_cnd_12",
+      "name": "CND 12",
+      "hex": "#54b062",
+      "brand": "CND",
+      "sort_order": 52
+    },
+    {
+      "id": "bp_cnd_13",
+      "name": "CND 13",
+      "hex": "#45bf6a",
+      "brand": "CND",
+      "sort_order": 53
+    },
+    {
+      "id": "bp_cnd_14",
+      "name": "CND 14",
+      "hex": "#36ce7a",
+      "brand": "CND",
+      "sort_order": 54
+    },
+    {
+      "id": "bp_cnd_15",
+      "name": "CND 15",
+      "hex": "#27dd94",
+      "brand": "CND",
+      "sort_order": 55
+    },
+    {
+      "id": "bp_cnd_16",
+      "name": "CND 16",
+      "hex": "#7cb1a4",
+      "brand": "CND",
+      "sort_order": 56
+    },
+    {
+      "id": "bp_cnd_17",
+      "name": "CND 17",
+      "hex": "#70bdb5",
+      "brand": "CND",
+      "sort_order": 57
+    },
+    {
+      "id": "bp_cnd_18",
+      "name": "CND 18",
+      "hex": "#63c5ca",
+      "brand": "CND",
+      "sort_order": 58
+    },
+    {
+      "id": "bp_cnd_19",
+      "name": "CND 19",
+      "hex": "#57bdd6",
+      "brand": "CND",
+      "sort_order": 59
+    },
+    {
+      "id": "bp_cnd_20",
+      "name": "CND 20",
+      "hex": "#4aade3",
+      "brand": "CND",
+      "sort_order": 60
+    },
+    {
+      "id": "bp_cnd_21",
+      "name": "CND 21",
+      "hex": "#96abc0",
+      "brand": "CND",
+      "sort_order": 61
+    },
+    {
+      "id": "bp_cnd_22",
+      "name": "CND 22",
+      "hex": "#8ca2ca",
+      "brand": "CND",
+      "sort_order": 62
+    },
+    {
+      "id": "bp_cnd_23",
+      "name": "CND 23",
+      "hex": "#8292d4",
+      "brand": "CND",
+      "sort_order": 63
+    },
+    {
+      "id": "bp_cnd_24",
+      "name": "CND 24",
+      "hex": "#787dde",
+      "brand": "CND",
+      "sort_order": 64
+    },
+    {
+      "id": "bp_cnd_25",
+      "name": "CND 25",
+      "hex": "#7a6de8",
+      "brand": "CND",
+      "sort_order": 65
+    },
+    {
+      "id": "bp_cnd_26",
+      "name": "CND 26",
+      "hex": "#b7afcf",
+      "brand": "CND",
+      "sort_order": 66
+    },
+    {
+      "id": "bp_cnd_27",
+      "name": "CND 27",
+      "hex": "#bba8d7",
+      "brand": "CND",
+      "sort_order": 67
+    },
+    {
+      "id": "bp_cnd_28",
+      "name": "CND 28",
+      "hex": "#c2a0de",
+      "brand": "CND",
+      "sort_order": 68
+    },
+    {
+      "id": "bp_cnd_29",
+      "name": "CND 29",
+      "hex": "#cf98e6",
+      "brand": "CND",
+      "sort_order": 69
+    },
+    {
+      "id": "bp_cnd_30",
+      "name": "CND 30",
+      "hex": "#e091ee",
+      "brand": "CND",
+      "sort_order": 70
+    },
+    {
+      "id": "bp_cnd_31",
+      "name": "CND 31",
+      "hex": "#704370",
+      "brand": "CND",
+      "sort_order": 71
+    },
+    {
+      "id": "bp_cnd_32",
+      "name": "CND 32",
+      "hex": "#7a3870",
+      "brand": "CND",
+      "sort_order": 72
+    },
+    {
+      "id": "bp_cnd_33",
+      "name": "CND 33",
+      "hex": "#852e6b",
+      "brand": "CND",
+      "sort_order": 73
+    },
+    {
+      "id": "bp_cnd_34",
+      "name": "CND 34",
+      "hex": "#90235f",
+      "brand": "CND",
+      "sort_order": 74
+    },
+    {
+      "id": "bp_cnd_35",
+      "name": "CND 35",
+      "hex": "#9a184c",
+      "brand": "CND",
+      "sort_order": 75
+    },
+    {
+      "id": "bp_cnd_36",
+      "name": "CND 36",
+      "hex": "#895260",
+      "brand": "CND",
+      "sort_order": 76
+    },
+    {
+      "id": "bp_cnd_37",
+      "name": "CND 37",
+      "hex": "#96454d",
+      "brand": "CND",
+      "sort_order": 77
+    },
+    {
+      "id": "bp_cnd_38",
+      "name": "CND 38",
+      "hex": "#a33d38",
+      "brand": "CND",
+      "sort_order": 78
+    },
+    {
+      "id": "bp_cnd_39",
+      "name": "CND 39",
+      "hex": "#b1462b",
+      "brand": "CND",
+      "sort_order": 79
+    },
+    {
+      "id": "bp_cnd_40",
+      "name": "CND 40",
+      "hex": "#be561e",
+      "brand": "CND",
+      "sort_order": 80
+    },
+    {
+      "id": "bp_essie_01",
+      "name": "Essie 1",
+      "hex": "#707043",
+      "brand": "Essie",
+      "sort_order": 81
+    },
+    {
+      "id": "bp_essie_02",
+      "name": "Essie 2",
+      "hex": "#707a38",
+      "brand": "Essie",
+      "sort_order": 82
+    },
+    {
+      "id": "bp_essie_03",
+      "name": "Essie 3",
+      "hex": "#6b852e",
+      "brand": "Essie",
+      "sort_order": 83
+    },
+    {
+      "id": "bp_essie_04",
+      "name": "Essie 4",
+      "hex": "#5f9023",
+      "brand": "Essie",
+      "sort_order": 84
+    },
+    {
+      "id": "bp_essie_05",
+      "name": "Essie 5",
+      "hex": "#4c9a18",
+      "brand": "Essie",
+      "sort_order": 85
+    },
+    {
+      "id": "bp_essie_06",
+      "name": "Essie 6",
+      "hex": "#608952",
+      "brand": "Essie",
+      "sort_order": 86
+    },
+    {
+      "id": "bp_essie_07",
+      "name": "Essie 7",
+      "hex": "#4d9645",
+      "brand": "Essie",
+      "sort_order": 87
+    },
+    {
+      "id": "bp_essie_08",
+      "name": "Essie 8",
+      "hex": "#38a33d",
+      "brand": "Essie",
+      "sort_order": 88
+    },
+    {
+      "id": "bp_essie_09",
+      "name": "Essie 9",
+      "hex": "#2bb146",
+      "brand": "Essie",
+      "sort_order": 89
+    },
+    {
+      "id": "bp_essie_10",
+      "name": "Essie 10",
+      "hex": "#1ebe56",
+      "brand": "Essie",
+      "sort_order": 90
+    },
+    {
+      "id": "bp_essie_11",
+      "name": "Essie 11",
+      "hex": "#63a182",
+      "brand": "Essie",
+      "sort_order": 91
+    },
+    {
+      "id": "bp_essie_12",
+      "name": "Essie 12",
+      "hex": "#54b090",
+      "brand": "Essie",
+      "sort_order": 92
+    },
+    {
+      "id": "bp_essie_13",
+      "name": "Essie 13",
+      "hex": "#45bfa7",
+      "brand": "Essie",
+      "sort_order": 93
+    },
+    {
+      "id": "bp_essie_14",
+      "name": "Essie 14",
+      "hex": "#36cec7",
+      "brand": "Essie",
+      "sort_order": 94
+    },
+    {
+      "id": "bp_essie_15",
+      "name": "Essie 15",
+      "hex": "#27cbdd",
+      "brand": "Essie",
+      "sort_order": 95
+    },
+    {
+      "id": "bp_essie_16",
+      "name": "Essie 16",
+      "hex": "#7ca4b1",
+      "brand": "Essie",
+      "sort_order": 96
+    },
+    {
+      "id": "bp_essie_17",
+      "name": "Essie 17",
+      "hex": "#709ebd",
+      "brand": "Essie",
+      "sort_order": 97
+    },
+    {
+      "id": "bp_essie_18",
+      "name": "Essie 18",
+      "hex": "#6391ca",
+      "brand": "Essie",
+      "sort_order": 98
+    },
+    {
+      "id": "bp_essie_19",
+      "name": "Essie 19",
+      "hex": "#577dd6",
+      "brand": "Essie",
+      "sort_order": 99
+    },
+    {
+      "id": "bp_essie_20",
+      "name": "Essie 20",
+      "hex": "#4a61e3",
+      "brand": "Essie",
+      "sort_order": 100
+    },
+    {
+      "id": "bp_essie_21",
+      "name": "Essie 21",
+      "hex": "#9696c0",
+      "brand": "Essie",
+      "sort_order": 101
+    },
+    {
+      "id": "bp_essie_22",
+      "name": "Essie 22",
+      "hex": "#958cca",
+      "brand": "Essie",
+      "sort_order": 102
+    },
+    {
+      "id": "bp_essie_23",
+      "name": "Essie 23",
+      "hex": "#9a82d4",
+      "brand": "Essie",
+      "sort_order": 103
+    },
+    {
+      "id": "bp_essie_24",
+      "name": "Essie 24",
+      "hex": "#a678de",
+      "brand": "Essie",
+      "sort_order": 104
+    },
+    {
+      "id": "bp_essie_25",
+      "name": "Essie 25",
+      "hex": "#b76de8",
+      "brand": "Essie",
+      "sort_order": 105
+    },
+    {
+      "id": "bp_essie_26",
+      "name": "Essie 26",
+      "hex": "#c7afcf",
+      "brand": "Essie",
+      "sort_order": 106
+    },
+    {
+      "id": "bp_essie_27",
+      "name": "Essie 27",
+      "hex": "#d2a8d7",
+      "brand": "Essie",
+      "sort_order": 107
+    },
+    {
+      "id": "bp_essie_28",
+      "name": "Essie 28",
+      "hex": "#dea0db",
+      "brand": "Essie",
+      "sort_order": 108
+    },
+    {
+      "id": "bp_essie_29",
+      "name": "Essie 29",
+      "hex": "#e698d7",
+      "brand": "Essie",
+      "sort_order": 109
+    },
+    {
+      "id": "bp_essie_30",
+      "name": "Essie 30",
+      "hex": "#ee91cd",
+      "brand": "Essie",
+      "sort_order": 110
+    },
+    {
+      "id": "bp_essie_31",
+      "name": "Essie 31",
+      "hex": "#704359",
+      "brand": "Essie",
+      "sort_order": 111
+    },
+    {
+      "id": "bp_essie_32",
+      "name": "Essie 32",
+      "hex": "#7a384f",
+      "brand": "Essie",
+      "sort_order": 112
+    },
+    {
+      "id": "bp_essie_33",
+      "name": "Essie 33",
+      "hex": "#852e3f",
+      "brand": "Essie",
+      "sort_order": 113
+    },
+    {
+      "id": "bp_essie_34",
+      "name": "Essie 34",
+      "hex": "#902328",
+      "brand": "Essie",
+      "sort_order": 114
+    },
+    {
+      "id": "bp_essie_35",
+      "name": "Essie 35",
+      "hex": "#9a2518",
+      "brand": "Essie",
+      "sort_order": 115
+    },
+    {
+      "id": "bp_essie_36",
+      "name": "Essie 36",
+      "hex": "#896052",
+      "brand": "Essie",
+      "sort_order": 116
+    },
+    {
+      "id": "bp_essie_37",
+      "name": "Essie 37",
+      "hex": "#966645",
+      "brand": "Essie",
+      "sort_order": 117
+    },
+    {
+      "id": "bp_essie_38",
+      "name": "Essie 38",
+      "hex": "#a37338",
+      "brand": "Essie",
+      "sort_order": 118
+    },
+    {
+      "id": "bp_essie_39",
+      "name": "Essie 39",
+      "hex": "#b1882b",
+      "brand": "Essie",
+      "sort_order": 119
+    },
+    {
+      "id": "bp_essie_40",
+      "name": "Essie 40",
+      "hex": "#bea61e",
+      "brand": "Essie",
+      "sort_order": 120
+    }
+  ]
+}

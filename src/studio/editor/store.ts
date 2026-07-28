@@ -17,16 +17,31 @@ import {
   writeCanvasEnvelope,
 } from './lib/repo';
 import { composeNailSvg, svgToPngDataUrl } from './lib/render';
+import {
+  LEFT_FINGERS,
+  mirrorFingerData,
+  oppositeFinger,
+  type MirrorMode,
+} from './lib/mirror';
+import { ensureSession, recordMirror, recordUndo } from './lib/session-metrics';
 
 export type EditorTool = 'brush' | 'eraser';
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error';
+export type BrushPreset = 'fine' | 'standard' | 'thick';
+
+/** 线宽（0.1mm 单位）：细 0.5mm / 标准 1.2mm / 粗 2.5mm */
+export const BRUSH_PRESET_SIZES: Record<BrushPreset, number> = {
+  fine: 5,
+  standard: 12,
+  thick: 25,
+};
 
 export interface ElementRef {
   layer: 'pattern' | 'attachment';
   id: string;
 }
 
-const HISTORY_LIMIT = 50;
+const HISTORY_LIMIT = 200;
 
 interface EditorState {
   designId: string | null;
@@ -38,6 +53,7 @@ interface EditorState {
   tool: EditorTool;
   brushColor: string;
   brushSize: number;
+  brushPreset: BrushPreset;
   brushOpacity: number;
   eraserSize: number;
 
@@ -61,7 +77,11 @@ interface EditorState {
 
   setTool: (tool: EditorTool) => void;
   setBrush: (opts: Partial<{ color: string; size: number; opacity: number }>) => void;
+  setBrushPreset: (preset: BrushPreset) => void;
   setEraserSize: (size: number) => void;
+
+  mirrorToOpposite: (mode: MirrorMode) => void;
+  mirrorLeftHandToRight: (mode: MirrorMode) => void;
   setView: (view: Partial<{ zoom: number; panX: number; panY: number }>) => void;
   setCurrentFinger: (finger: FingerCode) => void;
   setSelection: (sel: ElementRef | null) => void;
@@ -95,7 +115,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   currentFinger: 'R4',
   tool: 'brush',
   brushColor: '#C2497A',
-  brushSize: 6,
+  brushSize: BRUSH_PRESET_SIZES.standard,
+  brushPreset: 'standard',
   brushOpacity: 1,
   eraserSize: 18,
 
@@ -127,6 +148,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       future: [],
       saveState: 'saved',
     });
+    ensureSession();
     return 'ok';
   },
 
@@ -160,6 +182,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   undo: () => {
     const { doc, history, future, readOnly } = get();
     if (!doc || readOnly || history.length === 0) return;
+    recordUndo();
     const prev = history[history.length - 1];
     set({
       doc: prev,
@@ -190,7 +213,51 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       brushSize: opts.size ?? s.brushSize,
       brushOpacity: opts.opacity ?? s.brushOpacity,
     })),
+  setBrushPreset: (preset) =>
+    set({
+      brushPreset: preset,
+      brushSize: BRUSH_PRESET_SIZES[preset],
+    }),
   setEraserSize: (size) => set({ eraserSize: size }),
+
+  mirrorToOpposite: (mode) => {
+    const { doc, currentFinger, readOnly } = get();
+    if (!doc || readOnly) return;
+    const target = oppositeFinger(currentFinger);
+    const sourceData = resolveFingerData(doc, currentFinger);
+    get().commit((draft) => {
+      const fallbackBase =
+        draft.fingerLocks[target]?.baseColor ?? draft.baseColor;
+      draft.fingerLocks[target] = mirrorFingerData(
+        sourceData,
+        target,
+        mode,
+        fallbackBase,
+      );
+    });
+    recordMirror();
+    set({ currentFinger: target, selection: null });
+  },
+
+  mirrorLeftHandToRight: (mode) => {
+    const { doc, readOnly } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      for (const lf of LEFT_FINGERS) {
+        const rf = oppositeFinger(lf);
+        const sourceData = resolveFingerData(draft, lf);
+        const fallbackBase =
+          draft.fingerLocks[rf]?.baseColor ?? draft.baseColor;
+        draft.fingerLocks[rf] = mirrorFingerData(
+          sourceData,
+          rf,
+          mode,
+          fallbackBase,
+        );
+      }
+    });
+    recordMirror();
+  },
   setView: (view) =>
     set((s) => ({
       zoom: Math.min(4, Math.max(0.5, view.zoom ?? s.zoom)),

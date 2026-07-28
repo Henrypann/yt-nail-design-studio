@@ -1,18 +1,25 @@
 /**
- * 左侧工具栏（模块 4 · PRD §13.4，MVP 收敛为 画笔 / 橡皮 / 导入 PNG 三工具）
- * 附：画笔参数（颜色/粗细/透明度）、橡皮粗细、甲型·长度切换（画布轮廓变换，图案按甲型自动适配）。
+ * 左侧工具栏（模块 4 · PRD §13.4）
+ * 画笔 / 橡皮 / 导入 + 品牌色板（120色）+ 线宽三档 + 甲型长度。
  */
 
-import { useRef } from 'react';
-import { Brush, Eraser, ImagePlus } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Brush, Eraser, ImagePlus, Palette } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
-import { LENGTHS, PALETTE, SHAPES, lengthName, shapeName } from '../lib/material';
+import { LENGTHS, loadRecentColors, PALETTE, SHAPES, lengthName, pushRecentColor, shapeName } from '../lib/material';
 import { genId } from '../lib/model';
-import { useEditorStore, type EditorTool } from '../store';
+import { useEditorStore, type BrushPreset, type EditorTool } from '../store';
+import { BrandPalettePopover } from './BrandPalettePopover';
 
 const TOOLS: { key: EditorTool; label: string; icon: typeof Brush; hotkey: string }[] = [
   { key: 'brush', label: '画笔', icon: Brush, hotkey: 'B' },
   { key: 'eraser', label: '橡皮', icon: Eraser, hotkey: 'E' },
+];
+
+const PRESETS: { key: BrushPreset; label: string }[] = [
+  { key: 'fine', label: '细' },
+  { key: 'standard', label: '标' },
+  { key: 'thick', label: '粗' },
 ];
 
 export function ToolPanel() {
@@ -20,9 +27,11 @@ export function ToolPanel() {
   const setTool = useEditorStore((s) => s.setTool);
   const brushColor = useEditorStore((s) => s.brushColor);
   const brushSize = useEditorStore((s) => s.brushSize);
+  const brushPreset = useEditorStore((s) => s.brushPreset);
   const brushOpacity = useEditorStore((s) => s.brushOpacity);
   const eraserSize = useEditorStore((s) => s.eraserSize);
   const setBrush = useEditorStore((s) => s.setBrush);
+  const setBrushPreset = useEditorStore((s) => s.setBrushPreset);
   const setEraserSize = useEditorStore((s) => s.setEraserSize);
   const doc = useEditorStore((s) => s.doc);
   const commit = useEditorStore((s) => s.commit);
@@ -30,6 +39,8 @@ export function ToolPanel() {
   const readOnly = useEditorStore((s) => s.readOnly);
   const toast = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const recentColors = loadRecentColors();
 
   const onImportFile = (file: File) => {
     if (!file.type.includes('png') && !file.type.includes('jpeg') && !file.type.includes('svg')) {
@@ -62,7 +73,7 @@ export function ToolPanel() {
   };
 
   return (
-    <div className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3">
+    <div className="relative flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3">
       {TOOLS.map((t) => (
         <button
           key={t.key}
@@ -103,27 +114,79 @@ export function ToolPanel() {
 
       <div className="my-2 h-px w-8 bg-gray-200" />
 
-      {/* 上下文参数区 */}
       {tool === 'brush' && !readOnly && (
         <div className="flex w-full flex-col items-center gap-2 px-1">
-          <div className="grid grid-cols-2 gap-1">
-            {PALETTE.map((c) => (
+          {/* 线宽三档 */}
+          <div className="flex w-full gap-0.5">
+            {PRESETS.map((p) => (
               <button
-                key={c.id}
-                title={c.name}
-                onClick={() => setBrush({ color: c.hex })}
+                key={p.key}
+                type="button"
+                title={`${p.label}线`}
+                onClick={() => setBrushPreset(p.key)}
+                className={cx(
+                  'flex-1 rounded-button py-0.5 text-[9px] font-medium',
+                  brushPreset === p.key
+                    ? 'bg-primary-soft text-primary'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 快捷 8 色 + 最近 */}
+          <div className="grid grid-cols-2 gap-1">
+            {(recentColors.length > 0
+              ? recentColors.slice(0, 4)
+              : PALETTE.slice(0, 4).map((c) => c.hex)
+            ).map((hex, i) => (
+              <button
+                key={`recent-${i}-${hex}`}
+                type="button"
+                title={hex}
+                onClick={() => {
+                  setBrush({ color: hex });
+                  pushRecentColor(hex);
+                }}
                 className={cx(
                   'h-5 w-5 rounded-full border transition-transform duration-fast hover:scale-110',
-                  brushColor === c.hex ? 'ring-2 ring-primary ring-offset-1' : 'border-gray-300',
+                  brushColor.toLowerCase() === hex.toLowerCase()
+                    ? 'ring-2 ring-primary ring-offset-1'
+                    : 'border-gray-300',
                 )}
-                style={{ backgroundColor: c.hex }}
+                style={{ backgroundColor: hex }}
               />
             ))}
           </div>
+
+          <div className="relative w-full">
+            <button
+              type="button"
+              onClick={() => setPaletteOpen((v) => !v)}
+              title="打开 120 色品牌色板"
+              className={cx(
+                'flex w-full items-center justify-center gap-1 rounded-button border py-1 text-[9px]',
+                paletteOpen
+                  ? 'border-primary bg-primary-soft text-primary'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50',
+              )}
+            >
+              <Palette size={11} />
+              120色
+            </button>
+            {paletteOpen && <BrandPalettePopover onClose={() => setPaletteOpen(false)} />}
+          </div>
+
           <input
             type="color"
             value={brushColor}
-            onChange={(e) => setBrush({ color: e.target.value })}
+            onChange={(e) => {
+              const hex = e.target.value;
+              setBrush({ color: hex });
+              pushRecentColor(hex);
+            }}
             className="h-6 w-10 cursor-pointer"
             title="自定义颜色"
           />
@@ -132,7 +195,7 @@ export function ToolPanel() {
             <input
               type="range"
               min={2}
-              max={20}
+              max={30}
               value={brushSize}
               onChange={(e) => setBrush({ size: Number(e.target.value) })}
               className="w-full accent-[#C2497A]"
@@ -167,7 +230,6 @@ export function ToolPanel() {
 
       <div className="my-2 h-px w-8 bg-gray-200" />
 
-      {/* 甲型 / 长度（PRD §15.2：Editor 内可调，画布轮廓变换 + 图案自动适配） */}
       {doc && (
         <div className="flex w-full flex-col items-center gap-1.5 px-1">
           <select

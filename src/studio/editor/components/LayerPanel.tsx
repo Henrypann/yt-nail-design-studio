@@ -98,15 +98,16 @@ export function LayerPanel() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* 底色层（锁定：只能选色/换质感，不能画） */}
+    <div className="flex flex-col gap-3" data-testid="layer-panel">
+      {/* ① 底色层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
+            <span className="text-[10px] font-normal text-gray-400">①</span>
             底色
             <Lock size={11} className="text-gray-400" />
           </h3>
-          <span className="text-[10px] text-gray-400">UV 喷绘 · 底色通道 · 只能选色</span>
+          <span className="text-[10px] text-gray-400">只能选色 · 不可手绘</span>
         </header>
         <div className="flex flex-wrap items-center gap-1.5">
           {PALETTE.map((c) => (
@@ -141,11 +142,14 @@ export function LayerPanel() {
         </div>
       </section>
 
-      {/* 图案层 */}
+      {/* ② 图案层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-gray-800">图案</h3>
-          <span className="text-[10px] text-gray-400">UV 喷绘 · 图案通道 · 可手绘/导入</span>
+          <h3 className="text-xs font-semibold text-gray-800">
+            <span className="mr-1 text-[10px] font-normal text-gray-400">②</span>
+            图案
+          </h3>
+          <span className="text-[10px] text-gray-400">模板 + 手绘 + 导入 · 可擦</span>
         </header>
         {data.pattern.length === 0 ? (
           <p className="text-[11px] text-gray-400">空图层 — 用画笔绘制或导入图片</p>
@@ -196,11 +200,14 @@ export function LayerPanel() {
         )}
       </section>
 
-      {/* 附件层（禁透明度控制；heightMm 唯一立体高度通路） */}
+      {/* ③ 附件层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-gray-800">附件</h3>
-          <span className="text-[10px] text-gray-400">Pipeline 路由 · 不提供透明度控制</span>
+          <h3 className="text-xs font-semibold text-gray-800">
+            <span className="mr-1 text-[10px] font-normal text-gray-400">③</span>
+            附件
+          </h3>
+          <span className="text-[10px] text-gray-400">预制组件 · 高度 0.05–0.30mm</span>
         </header>
         {data.attachments.length === 0 ? (
           <p className="mb-1 text-[11px] text-gray-400">空图层 — 拖入预制组件</p>
@@ -306,13 +313,13 @@ export function LayerPanel() {
       </section>
 
       {/* 封层（选质感，不可画） */}
-      <section className="rounded-panel border border-gray-200 bg-white p-3">
+      <section className="rounded-panel border border-dashed border-gray-200 bg-gray-50/50 p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
             封层
             <Lock size={11} className="text-gray-400" />
           </h3>
-          <span className="text-[10px] text-gray-400">封层工艺 · 选质感</span>
+          <span className="text-[10px] text-gray-400"> gloss / matte / pearl</span>
         </header>
         <div className="flex gap-1.5">
           {FINISHES.map((f) => (

@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "slot-calibrator": "npx --yes serve -p 7788 .",
-    "test:slots": "node tools/slot-calibrator/test-slot-math.mjs"
+    "test:slots": "node tools/slot-calibrator/test-slot-math.mjs",
+    "test:mirror": "node tools/test-handdraw.mjs",
+    "test:render-brush": "node tools/test-handdraw.mjs",
+    "test:handdraw": "node tools/test-handdraw.mjs"
   },
   "dependencies": {
     "immer": "^10.1.1",

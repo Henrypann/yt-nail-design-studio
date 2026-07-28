@@ -4,11 +4,13 @@
  */
 
 import { useState } from 'react';
-import { Heart, Lock, LockOpen, RotateCcw } from 'lucide-react';
-import { Button, Modal, cx } from '@/design-system';
+import { FlipHorizontal2, Heart, Lock, LockOpen, RotateCcw } from 'lucide-react';
+import { Button, Modal, cx, useToast } from '@/design-system';
 import type { FingerCode } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
 import { isFingerUnlocked } from '../lib/model';
+import type { MirrorMode } from '../lib/mirror';
+import { oppositeFinger } from '../lib/mirror';
 import { useEditorStore } from '../store';
 
 const FINGER_LABEL: Record<FingerCode, string> = {
@@ -25,8 +27,13 @@ export function FingerPanel() {
   const lockFinger = useEditorStore((s) => s.lockFinger);
   const resetAllLocks = useEditorStore((s) => s.resetAllLocks);
   const setMasterFinger = useEditorStore((s) => s.setMasterFinger);
+  const mirrorToOpposite = useEditorStore((s) => s.mirrorToOpposite);
+  const mirrorLeftHandToRight = useEditorStore((s) => s.mirrorLeftHandToRight);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmLock, setConfirmLock] = useState<FingerCode | null>(null);
+  const [mirrorConfirm, setMirrorConfirm] = useState<'opposite' | 'leftToRight' | null>(null);
+  const [mirrorMode, setMirrorMode] = useState<MirrorMode>('pattern-only');
+  const toast = useToast();
 
   if (!doc) return null;
   const unlocked = FINGER_CODES.filter((f) => isFingerUnlocked(doc, f));
@@ -76,6 +83,24 @@ export function FingerPanel() {
 
       {!readOnly && (
         <div className="mt-2 flex flex-wrap gap-1.5">
+          <Button
+            size="sm"
+            variant="secondary"
+            title={`镜像 ${currentFinger} → ${oppositeFinger(currentFinger)}`}
+            onClick={() => setMirrorConfirm('opposite')}
+          >
+            <FlipHorizontal2 size={12} />
+            镜像对侧
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            title="左手 L1–L5 批量镜像到右手"
+            onClick={() => setMirrorConfirm('leftToRight')}
+          >
+            <FlipHorizontal2 size={12} />
+            左手→右手
+          </Button>
           {isFingerUnlocked(doc, currentFinger) ? (
             <Button size="sm" variant="secondary" onClick={() => setConfirmLock(currentFinger)}>
               <Lock size={12} />
@@ -150,6 +175,64 @@ export function FingerPanel() {
         <p className="text-sm text-gray-600">
           将清除 {unlocked.length} 个解锁指的独立数据，全部手指回到主视觉指同步数据。此操作可通过撤销（⌘Z）恢复。
         </p>
+      </Modal>
+
+      {/* 对称映射确认 */}
+      <Modal
+        open={mirrorConfirm !== null}
+        onClose={() => setMirrorConfirm(null)}
+        title={
+          mirrorConfirm === 'leftToRight'
+            ? '镜像整手到右手？'
+            : `镜像到对侧指 ${oppositeFinger(currentFinger)}？`
+        }
+        footer={
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setMirrorConfirm(null)}>
+              取消
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                if (mirrorConfirm === 'opposite') {
+                  mirrorToOpposite(mirrorMode);
+                  toast.success(`已镜像到 ${oppositeFinger(currentFinger)}`);
+                } else if (mirrorConfirm === 'leftToRight') {
+                  mirrorLeftHandToRight(mirrorMode);
+                  toast.success('左手五指已镜像到右手');
+                }
+                setMirrorConfirm(null);
+              }}
+            >
+              确认镜像
+            </Button>
+          </>
+        }
+      >
+        <p className="mb-3 text-sm text-gray-600">
+          将覆盖目标指的图案层内容。拇指 L1/R1 会自动做角度补偿。
+        </p>
+        <div className="flex flex-col gap-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+            <input
+              type="radio"
+              name="mirrorMode"
+              checked={mirrorMode === 'pattern-only'}
+              onChange={() => setMirrorMode('pattern-only')}
+            />
+            仅图案层（底色不变）
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+            <input
+              type="radio"
+              name="mirrorMode"
+              checked={mirrorMode === 'include-base'}
+              onChange={() => setMirrorMode('include-base')}
+            />
+            含底色（图案 + 底色一并复制）
+          </label>
+        </div>
       </Modal>
     </section>
   );

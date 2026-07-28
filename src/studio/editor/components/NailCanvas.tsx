@@ -10,9 +10,12 @@ import { Hand } from 'lucide-react';
 import { getSilhouette } from '../lib/material';
 import { nailContentSvg } from '../lib/render';
 import { genId, resolveFingerData, type BrushElement, type EraserElement } from '../lib/model';
+import { recordStroke } from '../lib/session-metrics';
 import { useEditorStore } from '../store';
 
 const PAD = 24; // viewBox 外扩（0.1mm 单位），避免描边被裁
+/** 点距节流：小于此距离（0.1mm）不追加采样点 */
+const MIN_POINT_DIST_SQ = 1.5 * 1.5;
 
 export function NailCanvas() {
   const doc = useEditorStore((s) => s.doc);
@@ -152,10 +155,25 @@ export function NailCanvas() {
     if (!drawing.current) return;
     const p = toSvgPoint(e.clientX, e.clientY);
     if (!p) return;
+    const appendIfFar = (
+      prev: { x: number; y: number }[],
+      next: { x: number; y: number },
+    ): { x: number; y: number }[] => {
+      const last = prev[prev.length - 1];
+      if (!last) return [next];
+      const dx = next.x - last.x;
+      const dy = next.y - last.y;
+      if (dx * dx + dy * dy < MIN_POINT_DIST_SQ) return prev;
+      return [...prev, next];
+    };
     if (tool === 'brush') {
-      setLiveStroke((s) => (s ? { ...s, points: [...s.points, p] } : s));
+      setLiveStroke((s) =>
+        s ? { ...s, points: appendIfFar(s.points, p) } : s,
+      );
     } else {
-      setLiveEraser((s) => (s ? { ...s, points: [...s.points, p] } : s));
+      setLiveEraser((s) =>
+        s ? { ...s, points: appendIfFar(s.points, p) } : s,
+      );
     }
   };
 
@@ -174,6 +192,7 @@ export function NailCanvas() {
       editCurrentFingerData((d) => {
         d.pattern.push(stroke);
       });
+      recordStroke();
     } else if (eraser && eraser.points.length > 1) {
       editCurrentFingerData((d) => {
         d.pattern.push(eraser);

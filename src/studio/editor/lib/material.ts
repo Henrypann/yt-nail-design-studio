@@ -76,6 +76,50 @@ export interface PaletteColor {
   sort_order?: number;
 }
 
+export interface BrandPaletteColor extends PaletteColor {
+  brand: 'OPI' | 'CND' | 'Essie';
+}
+
+interface BrandPaletteFile {
+  colors: BrandPaletteColor[];
+}
+
+let brandPaletteCache: BrandPaletteColor[] | null = null;
+
+/** 画笔品牌色板（120 色）异步懒加载 */
+export async function loadBrandPalette(): Promise<BrandPaletteColor[]> {
+  if (brandPaletteCache) return brandPaletteCache;
+  const mod = await import('../../../../material-library/colors/brand-palette.json');
+  const file = (mod.default ?? mod) as BrandPaletteFile;
+  brandPaletteCache = (file.colors ?? [])
+    .slice()
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  return brandPaletteCache;
+}
+
+export const RECENT_COLORS_KEY = 'editor.brush.recentColors';
+export const RECENT_COLORS_MAX = 8;
+
+export function loadRecentColors(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_COLORS_KEY);
+    if (raw) return JSON.parse(raw) as string[];
+  } catch {
+    /* ignore */
+  }
+  return [];
+}
+
+export function pushRecentColor(hex: string): void {
+  const list = loadRecentColors().filter((c) => c.toLowerCase() !== hex.toLowerCase());
+  list.unshift(hex);
+  try {
+    localStorage.setItem(RECENT_COLORS_KEY, JSON.stringify(list.slice(0, RECENT_COLORS_MAX)));
+  } catch {
+    /* ignore */
+  }
+}
+
 export interface FinishMeta {
   id: Finish;
   name: string;

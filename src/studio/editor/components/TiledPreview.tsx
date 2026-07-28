@@ -12,7 +12,7 @@ import { FINGER_CODES } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { getSilhouette } from '../lib/material';
 import { nailContentSvg, composeTiledSvg, downloadDataUrl, svgToPngDataUrl } from '../lib/render';
-import { resolveFingerData } from '../lib/model';
+import { resolveFingerData, isFingerUnlocked } from '../lib/model';
 import { useEditorStore } from '../store';
 
 export function TiledPreview(props: { onClose: () => void }) {
@@ -55,6 +55,12 @@ export function TiledPreview(props: { onClose: () => void }) {
   }, [doc, sil, failAll, degradeFinger, reloadTick]);
 
   if (!doc || !sil) return null;
+
+  const unlockedCount = FINGER_CODES.filter((f) => isFingerUnlocked(doc, f)).length;
+  const syncMode = unlockedCount === 0;
+  const hasBrush = FINGER_CODES.some((f) =>
+    resolveFingerData(doc, f).pattern.some((el) => el.kind === 'brush'),
+  );
 
   const exportPng = async () => {
     if (!doc) return;
@@ -113,15 +119,21 @@ export function TiledPreview(props: { onClose: () => void }) {
             {cells.map(({ finger, html }) => {
               const isCurrent = currentFinger === finger;
               const isMaster = doc.masterFinger === finger;
-              const isUnlocked = doc.fingerLocks[finger] !== undefined;
+              const isUnlocked = isFingerUnlocked(doc, finger);
+              const hasStroke = resolveFingerData(doc, finger).pattern.some(
+                (el) => el.kind === 'brush',
+              );
               return (
                 <button
                   key={finger}
-                  onClick={() => setCurrentFinger(finger)}
+                  onClick={() => {
+                    setCurrentFinger(finger);
+                    onClose();
+                  }}
                   className={cx(
                     'flex flex-col items-center gap-1 rounded-card border bg-white p-2 transition-all duration-fast',
                     isCurrent
-                      ? 'border-primary shadow-float'
+                      ? 'border-primary shadow-float ring-2 ring-primary/30'
                       : 'border-gray-200 hover:border-gray-300 hover:shadow-float',
                   )}
                 >
@@ -137,10 +149,15 @@ export function TiledPreview(props: { onClose: () => void }) {
                       dangerouslySetInnerHTML={{ __html: html }}
                     />
                   )}
-                  <span className="flex items-center gap-1 text-[10px] text-gray-500">
+                  <span className="flex flex-wrap items-center justify-center gap-1 text-[10px] text-gray-500">
                     <span className="font-medium tnum">{finger}</span>
                     {isMaster && <span title="主视觉指">💗</span>}
-                    {isUnlocked && <span title="已解锁">🔓</span>}
+                    {isUnlocked ? (
+                      <span title="已解锁独立编辑">🔓</span>
+                    ) : syncMode ? (
+                      <span title="十指同步">🔗</span>
+                    ) : null}
+                    {hasStroke && <span title="含手绘">✏️</span>}
                   </span>
                 </button>
               );
@@ -149,8 +166,18 @@ export function TiledPreview(props: { onClose: () => void }) {
         )}
       </main>
 
-      <footer className="flex h-10 shrink-0 items-center justify-center border-t border-gray-200 bg-white text-[11px] text-gray-400">
-        点击指位切换当前编辑指（编辑作用于当前指；十指同步模式下改一指 = 十指同步）
+      <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-[11px] text-gray-500">
+        <span>
+          点击指位切换编辑指并返回单甲画布
+          {hasBrush && ' · 导出 PNG 含手绘笔画'}
+        </span>
+        <span className="text-[10px] text-gray-400">
+          {syncMode
+            ? '● 十指同步模式'
+            : `○ 逐指解锁（${unlockedCount} 指独立）`}
+          {' · '}
+          当前 {currentFinger}
+        </span>
       </footer>
     </div>
   );
