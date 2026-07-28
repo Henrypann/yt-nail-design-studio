@@ -231,9 +231,6 @@ export function ParamsPanel() {
             )}
           </div>
         )}
-        <Button variant="secondary" disabled title="即将推出">
-          3D 预览 · 即将推出
-        </Button>
       </section>
 
       {/* 顾客已确认 · 二次确认弹窗（线下场景：无线上确认功能） */}

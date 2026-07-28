@@ -1,6 +1,6 @@
 /**
  * 十指平铺预览（模块 4 · PRD §13.6，简版 5×2 网格）
- * Back / Palm 双视图（Palm 反向仅作用显示层 xPalm = 1 - xModel，不写入历史）；
+ * Back 单视图（Palm 镜像切换器 UI 入口已按 MVP 收敛决策移除，镜像代码路径保留）；
  * 单指失败降级（Mock）：该指灰甲型 + ⚠️，其余 9 指正常；
  * 整体失败（Mock）：错误态 + [刷新]。点击指位切换当前编辑指。
  */
@@ -24,7 +24,8 @@ export function TiledPreview(props: { onClose: () => void }) {
   const failFinger = useMockScenarios((s) => s.failFinger);
   const toast = useToast();
 
-  const [view, setView] = useState<'back' | 'palm'>('back');
+  /* Back 单视图（Palm 镜像切换器 UI 入口已移除；镜像渲染路径保留在源文件中） */
+  const view = 'back' as const;
   const [reloadTick, setReloadTick] = useState(0);
   const [exporting, setExporting] = useState(false);
 
@@ -76,23 +77,7 @@ export function TiledPreview(props: { onClose: () => void }) {
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-gray-900">十指平铺预览</h2>
-          <div className="flex rounded-button border border-gray-200 p-0.5">
-            {(['back', 'palm'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={cx(
-                  'rounded-button px-2.5 py-1 text-xs transition-colors duration-fast',
-                  view === v ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:text-gray-800',
-                )}
-              >
-                {v === 'back' ? 'Back 手背' : 'Palm 掌心'}
-              </button>
-            ))}
-          </div>
-          {view === 'palm' && (
-            <span className="text-[10px] text-gray-400">Palm 为显示层镜像，不影响业务数据</span>
-          )}
+          <span className="text-[10px] text-gray-400">Back 手背</span>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="secondary" loading={exporting} onClick={exportPng}>
@@ -149,7 +134,6 @@ export function TiledPreview(props: { onClose: () => void }) {
                     <svg
                       viewBox={sil.viewBox}
                       className="h-44 w-auto"
-                      style={view === 'palm' ? { transform: 'scaleX(-1)' } : undefined}
                       dangerouslySetInnerHTML={{ __html: html }}
                     />
                   )}
