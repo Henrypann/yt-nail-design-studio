@@ -125,6 +125,14 @@ try {
   await tiledGrid.waitFor({ timeout: 5000 });
   step('Esc 返回十指平铺', true);
 
+  /* 7d. 顾客展示模式：全屏只读 + Esc 退出（v2 新增） */
+  await page.getByRole('button', { name: /顾客展示/ }).click();
+  await page.locator('[data-debug-id="studio.wizard.presentation"]').waitFor({ timeout: 5000 });
+  step('顾客展示模式打开（全屏只读）', true);
+  await page.keyboard.press('Escape');
+  const presentGone = (await page.locator('[data-debug-id="studio.wizard.presentation"]').count()) === 0;
+  step('Esc 退出顾客展示模式', presentGone);
+
   /* 8. 手动保存 → 💾 已保存 */
   await page.getByRole('button', { name: /^保存$/ }).click();
   await page.getByText('💾 已保存').waitFor({ timeout: 10000 });

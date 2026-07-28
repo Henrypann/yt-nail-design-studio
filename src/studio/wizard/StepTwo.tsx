@@ -12,6 +12,7 @@
  */
 
 import { Button, useToast, cx } from '@/design-system';
+import { Presentation } from 'lucide-react';
 import { TenFingerPreview } from '@/studio/preview/TenFingerPreview';
 import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
 import { SingleNailView } from '@/studio/preview/SingleNailView';
@@ -24,6 +25,7 @@ import { ShapeLengthPicker } from './ShapeLengthPicker';
 import { TemplateGallery } from './TemplateGallery';
 import { ParamsPanel } from './ParamsPanel';
 import { FingerDetailPanel } from './FingerDetailPanel';
+import { PresentationMode } from './PresentationMode';
 
 const VIEW_TABS: { key: WizardViewMode; label: string }[] = [
   { key: 'ensemble', label: '整体搭配 · Back 手背' },
@@ -37,6 +39,7 @@ export function StepTwo() {
   const readOnly = s.status !== 'draft';
   const [shapeNames, setShapeNames] = useState<{ shape: string; length: string; mm: number } | null>(null);
   const [bridging, setBridging] = useState(false);
+  const [presentOpen, setPresentOpen] = useState(false);
 
   /* 已桥接判定：EditorDoc 存在即该设计已转入自由画布（PRD §15 不可逆） */
   const bridged = getEditorDoc(s.designId) !== undefined;
@@ -172,7 +175,13 @@ export function StepTwo() {
                     </button>
                   ))}
                 </div>
-                <span className="text-[10px] text-gray-400">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
+                <div className="flex items-center gap-3">
+                  <span className="hidden text-[10px] text-gray-400 xl:inline">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
+                  <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
+                    <Presentation size={13} />
+                    顾客展示
+                  </Button>
+                </div>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto">
@@ -244,6 +253,21 @@ export function StepTwo() {
           {bridged ? '返回自由画布' : '打开自由画布'}
         </Button>
       </footer>
+
+      {/* 顾客展示模式（全屏只读 · Esc 退出） */}
+      <PresentationMode
+        open={presentOpen}
+        onClose={() => setPresentOpen(false)}
+        shape={s.appliedShape}
+        length={s.appliedLength}
+        templateId={s.templateId}
+        templateName={s.templateName}
+        baseColor={s.baseColor ?? '#F5E0D3'}
+        finish={s.finish}
+        fingerOverrides={s.fingerOverrides}
+        status={s.status}
+        initialFinger={s.selectedFinger}
+      />
     </div>
   );
 }
