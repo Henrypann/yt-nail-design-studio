@@ -48,7 +48,7 @@ export function FingerDetailPanel({
 
   const strokeScale = useMemo(() => {
     const w = Number(silhouette?.viewBox.split(/\s+/)[2] ?? 120);
-    return 220 / w;
+    return 180 / w;
   }, [silhouette]);
 
   return (
@@ -137,7 +137,7 @@ function FingerDetailBody({
     <>
       <div className="relative flex justify-center">
         {failed && <span className="absolute left-1 top-1 z-10 text-sm">⚠️</span>}
-        <svg viewBox={viewBox} className="h-auto w-[220px] max-w-full select-none">
+        <svg viewBox={viewBox} className="h-auto w-[180px] max-w-full select-none">
           <defs>
             <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
               <path d={silhouetteD} />

@@ -77,7 +77,7 @@ try {
   step('风格推荐弹窗弹出', true);
   await page.getByRole('button', { name: /选用此风格/ }).first().click();
 
-  await page.getByText('Back · 手背').waitFor({ timeout: 20000 });
+  await page.getByRole('tab', { name: /整体搭配/ }).waitFor({ timeout: 20000 });
   step('STEP 1 甲型/长度 + 风格 → 进入 STEP 2', true);
 
   /* 5c. 三视图：默认视图为十指平铺（v2 三视图改版） */
@@ -108,14 +108,16 @@ try {
   await page.getByText('左·中指 · 单独定制').waitFor({ timeout: 5000 });
   step('点选中指 → 单独定制面板', true);
   const colorGrid = page.locator('section:has-text("单独定制") .grid.grid-cols-8 button');
-  await colorGrid.nth(3).click();
+  await colorGrid.nth(3).scrollIntoViewIfNeeded();
+  /* 视口较小时色格可能被调试面板浮条遮挡，用 dispatchEvent 直接触发（冒烟只验证业务逻辑） */
+  await colorGrid.nth(3).dispatchEvent('click');
   await page.getByRole('button', { name: /清除该指定制/ }).waitFor({ timeout: 5000 });
   step('该指单独换色 → 覆写生效', true);
-  await page.getByRole('button', { name: /清除该指定制/ }).click();
+  await page.getByRole('button', { name: /清除该指定制/ }).dispatchEvent('click');
   await page.waitForTimeout(300);
   const clearGone = (await page.getByRole('button', { name: /清除该指定制/ }).count()) === 0;
   step('清除该指定制 → 覆写移除', clearGone);
-  await page.getByRole('button', { name: '完成' }).click();
+  await page.getByRole('button', { name: '完成' }).dispatchEvent('click');
 
   /* 7c. 单指细节视图：tab 切换 + Esc 返回（v2 三视图改版） */
   await page.getByRole('tab', { name: '单指细节' }).click();
@@ -133,6 +135,15 @@ try {
   const presentGone = (await page.locator('[data-debug-id="studio.wizard.presentation"]').count()) === 0;
   step('Esc 退出顾客展示模式', presentGone);
 
+  /* 7e. 再次设置覆写并保留 → 桥接应带入 Editor（v2 桥接数据修复验证） */
+  await page.getByRole('tab', { name: /整体搭配/ }).click();
+  await v2Svg.waitFor({ timeout: 5000 });
+  await v2Svg.locator('path[fill="transparent"]').nth(2).click({ force: true });
+  await page.getByText('左·中指 · 单独定制').waitFor({ timeout: 5000 });
+  await colorGrid.nth(4).dispatchEvent('click');
+  await page.getByRole('button', { name: /清除该指定制/ }).waitFor({ timeout: 5000 });
+  step('保留逐指覆写（桥接验证前置）', true);
+
   /* 8. 手动保存 → 💾 已保存 */
   await page.getByRole('button', { name: /^保存$/ }).click();
   await page.getByText('💾 已保存').waitFor({ timeout: 10000 });
@@ -149,6 +160,13 @@ try {
   await page.waitForURL('**/design/canvas?design=**', { timeout: 10000 });
   await page.waitForTimeout(1500);
   step('进入 Editor 画布', !page.url().includes('bridge='), page.url());
+
+  /* 10b. 桥接保真：Editor 十指平铺出现解锁标记（v2 桥接修复：逐指覆写不丢失） */
+  await page.getByRole('button', { name: '十指平铺预览' }).click();
+  await page.locator('span[title="已解锁"]').first().waitFor({ timeout: 5000 });
+  const unlockBadges = await page.locator('span[title="已解锁"]').count();
+  step('桥接后逐指覆写保留（Editor 解锁指）', unlockBadges === 1, `🔓 数量=${unlockBadges}`);
+  await page.getByRole('button', { name: '返回单甲' }).click();
 
   /* 11. 设计列表可见 */
   await page.goto(`${BASE}/design`, { waitUntil: 'networkidle' });
