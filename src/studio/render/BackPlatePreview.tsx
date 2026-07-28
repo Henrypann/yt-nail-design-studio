@@ -21,6 +21,8 @@ export interface BackPlatePreviewProps {
   plate: BackPlateV2;
   /** 已按当前长度调整（slotsForLength） */
   slots: NailSlotV2[];
+  /** 自定义相机窗口（viewBox 裁剪，纯视图层，不影响 slot 几何）；缺省整幅 plate */
+  viewBox?: string;
   silhouetteD: string;
   widthMm: number;
   lengthMm: number;
@@ -44,6 +46,7 @@ export interface BackPlatePreviewProps {
 export function BackPlatePreview({
   plate,
   slots,
+  viewBox,
   silhouetteD,
   widthMm,
   lengthMm,
@@ -66,7 +69,7 @@ export function BackPlatePreview({
   return (
     <svg
       ref={svgRef}
-      viewBox={`0 0 ${plate.sourceWidth} ${plate.sourceHeight}`}
+      viewBox={viewBox ?? `0 0 ${plate.sourceWidth} ${plate.sourceHeight}`}
       className="block w-full select-none"
       role="img"
       aria-label="十指预览（手背视图 · NailSlot V2 标定线稿）"

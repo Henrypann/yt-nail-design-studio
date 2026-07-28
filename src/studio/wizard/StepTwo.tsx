@@ -1,23 +1,35 @@
 /**
- * STEP 2 · 三栏画布（Studio-PRD §12.4）
+ * STEP 2 · 三栏画布（Studio-PRD §12.4 · 三视图主视觉）
  *
- * 左：模板库（风格映射智能排序）｜ 中：5×2 十指预览（Back 单视图 · NailSlot V2）｜ 右：参数 + 操作
- * 顶栏 [修改]：预览区收缩为一行摘要条 → 甲型/长度重新选择 → [应用→重新生成]，
- * 模板与参数不丢失；取消完整恢复。
- * 底部 [打开自由画布]：先确保设计已保存 → openBridge(designId)（首次桥接做数据转化 +
- * 不可逆警告；已桥接则续进画布，见 @/studio/bridge）。已桥接后顶栏 [修改] 失效（WizardPage）。
+ * 左：模板库（窄栏，风格映射智能排序）｜ 中：主视觉三视图 tab
+ *   - 整体搭配：Back plate 相机裁剪（viewBox 纯视图操作，不动 slots V2 几何）
+ *   - 十指平铺（默认）：5×2 网格每格 ≥120px
+ *   - 单指细节：≥240px 大图 + 十指搭配条（右栏常驻详情为其紧凑形态）
+ * 右：常驻单指详情（≥240px）+ 参数 + 操作
+ * 导出/缩略图：隐藏挂载的整幅 plate 实例为唯一注册源（与当前视图无关，导出语义稳定）。
+ * 顶栏 [修改]：预览区收缩为一行摘要条 → 甲型/长度重新选择 → [应用→重新生成]；
+ * 底部 [打开自由画布]：openBridge(designId)（已桥接则续进画布，见 @/studio/bridge）。
  */
 
-import { Button, useToast } from '@/design-system';
+import { Button, useToast, cx } from '@/design-system';
 import { TenFingerPreview } from '@/studio/preview/TenFingerPreview';
+import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
+import { SingleNailView } from '@/studio/preview/SingleNailView';
 import { loadShapeParams } from '@/studio/preview/material-library';
 import { openBridge } from '@/studio/bridge';
 import { getEditorDoc } from '@/studio/editor';
 import { useEffect, useState } from 'react';
-import { useWizardStore } from './wizard-store';
+import { useWizardStore, type WizardViewMode } from './wizard-store';
 import { ShapeLengthPicker } from './ShapeLengthPicker';
 import { TemplateGallery } from './TemplateGallery';
 import { ParamsPanel } from './ParamsPanel';
+import { FingerDetailPanel } from './FingerDetailPanel';
+
+const VIEW_TABS: { key: WizardViewMode; label: string }[] = [
+  { key: 'ensemble', label: '整体搭配 · Back 手背' },
+  { key: 'tiled', label: '十指平铺' },
+  { key: 'single', label: '单指细节' },
+];
 
 export function StepTwo() {
   const toast = useToast();
@@ -75,15 +87,24 @@ export function StepTwo() {
     }
   };
 
+  const previewProps = {
+    shape: s.appliedShape,
+    length: s.appliedLength,
+    templateId: s.templateId,
+    baseColor: s.baseColor ?? '#F5E0D3',
+    fingerOverrides: s.fingerOverrides,
+    readOnly,
+  } as const;
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="grid min-h-0 flex-1 grid-cols-[440px_minmax(0,1fr)_300px] gap-4">
-        {/* 左：模板库（v1.5.1 加宽：风格标签 + 图文卡片可读性优先） */}
+      <div className="grid min-h-0 flex-1 grid-cols-[240px_minmax(0,1fr)_300px] gap-4">
+        {/* 左：模板库（窄栏 · 风格标签 + 单列图文卡片） */}
         <aside data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 rounded-card border border-gray-200 bg-white p-3">
           <TemplateGallery />
         </aside>
 
-        {/* 中：十指预览（或 [修改] 编辑态） */}
+        {/* 中：主视觉三视图（或 [修改] 编辑态） */}
         <section data-debug-id="studio.wizard.step2.preview" className="flex min-h-0 flex-col gap-3">
           {s.editingShapeLength ? (
             /* 顶栏 [修改]：预览区收缩为摘要条 + 重新选择 */
@@ -117,29 +138,85 @@ export function StepTwo() {
             </>
           ) : (
             <>
+              {/* 视图切换 tab（UI 瞬态，不写入设计文档） */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-700">Back · 手背</span>
-                <span className="text-[10px] text-gray-400">NailSlot V2 标定视图（back-v2.1.0）</span>
+                <div className="flex rounded-button border border-gray-200 bg-white p-0.5" role="tablist">
+                  {VIEW_TABS.map((tab) => (
+                    <button
+                      key={tab.key}
+                      role="tab"
+                      aria-selected={s.viewMode === tab.key}
+                      onClick={() => s.setViewMode(tab.key)}
+                      className={cx(
+                        'rounded-button px-2.5 py-1 text-xs transition-colors duration-fast',
+                        s.viewMode === tab.key
+                          ? 'bg-primary-soft font-medium text-primary'
+                          : 'text-gray-500 hover:text-gray-800',
+                      )}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[10px] text-gray-400">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
               </div>
+
               <div className="min-h-0 flex-1 overflow-y-auto">
-                <TenFingerPreview
-                  shape={s.appliedShape}
-                  length={s.appliedLength}
-                  templateId={s.templateId}
-                  baseColor={s.baseColor ?? '#F5E0D3'}
-                  fingerOverrides={s.fingerOverrides}
-                  selectedFinger={s.selectedFinger}
-                  onFingerClick={(fc) => s.setSelectedFinger(s.selectedFinger === fc ? null : fc)}
-                  readOnly={readOnly}
-                />
+                {s.viewMode === 'ensemble' && (
+                  <TenFingerPreview
+                    {...previewProps}
+                    cropToNails
+                    registerExport={false}
+                    selectedFinger={s.selectedFinger}
+                    onFingerClick={(fc) => s.setSelectedFinger(s.selectedFinger === fc ? null : fc)}
+                  />
+                )}
+                {s.viewMode === 'tiled' && (
+                  <TiledNailsPreview
+                    {...previewProps}
+                    selectedFinger={s.selectedFinger}
+                    onFingerClick={(fc) => s.setSelectedFinger(fc)}
+                    onOpenSingle={(fc) => {
+                      s.setSelectedFinger(fc);
+                      s.setViewMode('single');
+                    }}
+                  />
+                )}
+                {s.viewMode === 'single' && (
+                  <SingleNailView
+                    {...previewProps}
+                    finger={s.selectedFinger ?? 'R4'}
+                    onSelectFinger={s.setSelectedFinger}
+                    onExit={() => s.setViewMode('tiled')}
+                  />
+                )}
+              </div>
+
+              {/*
+                导出/缩略图专用：整幅 plate 的隐藏挂载实例（唯一 registerExport 源）。
+                与当前视图解耦——无论停在哪个视图，导出 PNG 与列表缩略图语义稳定。
+              */}
+              <div className="pointer-events-none h-0 overflow-hidden" aria-hidden="true">
+                <TenFingerPreview {...previewProps} readOnly />
               </div>
             </>
           )}
         </section>
 
-        {/* 右：参数 + 操作 */}
-        <aside data-debug-id="studio.wizard.step2.params-panel" className="min-h-0 rounded-card border border-gray-200 bg-white p-3">
-          <ParamsPanel />
+        {/* 右：常驻单指详情（≥240px）+ 参数 + 操作 */}
+        <aside className="flex min-h-0 flex-col gap-3">
+          <FingerDetailPanel
+            shape={s.appliedShape}
+            length={s.appliedLength}
+            templateId={s.templateId}
+            baseColor={s.baseColor ?? '#F5E0D3'}
+            fingerOverrides={s.fingerOverrides}
+            selectedFinger={s.selectedFinger}
+            onExpand={() => s.setViewMode('single')}
+          />
+          <div data-debug-id="studio.wizard.step2.params-panel" className="min-h-0 flex-1 rounded-card border border-gray-200 bg-white p-3">
+            <ParamsPanel />
+          </div>
         </aside>
       </div>
 

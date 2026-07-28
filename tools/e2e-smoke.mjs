@@ -80,18 +80,25 @@ try {
   await page.getByText('Back · 手背').waitFor({ timeout: 20000 });
   step('STEP 1 甲型/长度 + 风格 → 进入 STEP 2', true);
 
+  /* 5c. 三视图：默认视图为十指平铺（v2 三视图改版） */
+  const tiledGrid = page.locator('[data-debug-id="studio.wizard.step2.tiled-view"]');
+  await tiledGrid.waitFor({ timeout: 10000 });
+  const tiledCells = await tiledGrid.locator('button').count();
+  step('默认视图 = 十指平铺（每格 ≥120px）', tiledCells === 10, `格子数=${tiledCells}`);
+
   /* 6. 应用第一个模板 */
   await page.getByRole('button', { name: '应用此模板' }).first().click();
   await page.waitForTimeout(500);
   step('应用模板', true);
 
-  /* 7. 十指预览出现（5×2 共 10 个指甲位） */
+  /* 7. 十指预览出现（平铺 10 格 + plate 实例，svg 节点充足） */
   await page.waitForTimeout(1500);
   const nailCount = await page.locator('svg').count();
   step('十指预览渲染', nailCount >= 10, `svg 节点数=${nailCount}`);
 
-  /* 7a. NailSlot V2 渲染路径：签收线稿 plate + 标定版本标记（v1.4.0） */
-  const v2Svg = page.locator('svg[data-calibration="back-v2.1.0"]');
+  /* 7a. NailSlot V2 渲染路径：切到「整体搭配」视图后断言签收 plate（v2 三视图改版） */
+  await page.getByRole('tab', { name: /整体搭配/ }).click();
+  const v2Svg = page.locator('svg[data-calibration="back-v2.1.0"]').first();
   await v2Svg.waitFor({ timeout: 10000 });
   const v2Images = await v2Svg.locator('image').count();
   step('Back 视图走 NailSlot V2（plate 内联 + back-v2.1.0）', v2Images >= 1, `image 节点=${v2Images}`);
@@ -109,6 +116,14 @@ try {
   const clearGone = (await page.getByRole('button', { name: /清除该指定制/ }).count()) === 0;
   step('清除该指定制 → 覆写移除', clearGone);
   await page.getByRole('button', { name: '完成' }).click();
+
+  /* 7c. 单指细节视图：tab 切换 + Esc 返回（v2 三视图改版） */
+  await page.getByRole('tab', { name: '单指细节' }).click();
+  await page.locator('[data-debug-id="studio.wizard.step2.single-view"]').waitFor({ timeout: 5000 });
+  step('单指细节视图（大图 + 十指搭配条）', true);
+  await page.keyboard.press('Escape');
+  await tiledGrid.waitFor({ timeout: 5000 });
+  step('Esc 返回十指平铺', true);
 
   /* 8. 手动保存 → 💾 已保存 */
   await page.getByRole('button', { name: /^保存$/ }).click();

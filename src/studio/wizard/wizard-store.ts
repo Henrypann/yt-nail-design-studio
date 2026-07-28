@@ -45,11 +45,29 @@ export function setWizardNotifier(n: WizardNotifier | null): void {
 
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 
+/** 主视觉三视图：整体搭配（plate 相机裁剪）/ 十指平铺（默认）/ 单指细节 */
+export type WizardViewMode = 'ensemble' | 'tiled' | 'single';
+
+/** 视图 tab 属 UI 瞬态分区（StudioStatePartitions.ui）：不写入设计文档，仅 sessionStorage 记忆 */
+const VIEW_MODE_SESSION_KEY = 'ui.wizard-viewmode';
+
+function initialViewMode(): WizardViewMode {
+  try {
+    const v = window.sessionStorage.getItem(VIEW_MODE_SESSION_KEY);
+    if (v === 'ensemble' || v === 'tiled' || v === 'single') return v;
+  } catch {
+    /* sessionStorage 不可用时用默认值 */
+  }
+  return 'tiled';
+}
+
 interface WizardState {
   /* 流程 */
   step: 1 | 2;
   pickerOpen: boolean;
   customer: Customer | null;
+  /* 主视觉视图（UI 瞬态） */
+  viewMode: WizardViewMode;
   /* STEP 1 选择（编辑态复用） */
   shape: NailShape | null;
   length: NailLength | null;
@@ -81,6 +99,7 @@ interface WizardState {
   openPicker: () => void;
   closePicker: () => void;
   setCustomer: (c: Customer) => void;
+  setViewMode: (v: WizardViewMode) => void;
   setShape: (s: NailShape) => void;
   setLength: (l: NailLength) => void;
   setStyle: (id: string, name: string) => void;
@@ -213,6 +232,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     step: 1,
     pickerOpen: true,
     customer: null,
+    viewMode: initialViewMode(),
     shape: null,
     length: null,
     styleId: null,
@@ -237,6 +257,14 @@ export const useWizardStore = create<WizardState>((set, get) => {
     openPicker: () => set({ pickerOpen: true }),
     closePicker: () => set({ pickerOpen: false }),
     setCustomer: (customer) => set({ customer, pickerOpen: false }),
+    setViewMode: (viewMode) => {
+      try {
+        window.sessionStorage.setItem(VIEW_MODE_SESSION_KEY, viewMode);
+      } catch {
+        /* 忽略持久化失败，视图切换本身仍生效 */
+      }
+      set({ viewMode });
+    },
     setShape: (shape) => set({ shape }),
     setLength: (length) => set({ length }),
     setStyle: (styleId, styleName) => set({ styleId, styleName, stylePrompted: true }),
