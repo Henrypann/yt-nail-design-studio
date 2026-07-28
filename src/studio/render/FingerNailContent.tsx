@@ -3,12 +3,14 @@
  *
  * 投影路径（v1.4.1 起唯一）：NailSlot V2 ——
  * matrix(slot.transform) · contentUvTransform（Back 签收线稿 plate）。
- * 组件本身只做「轮廓 + 底色 + 图案 + 附件 + 选中/点击/失败态」，
- * 不关心外层如何把设计单位投到屏幕。
+ * 合成顺序：底色 → 本体弧面阴影（NailSurfaceBody）→ 图案 → 附件 →
+ * 封层高光（NailTopcoatGloss，gloss/matte/pearl 三质感）→ 轮廓线 → 选中/点击态。
+ * 组件本身不关心外层如何把设计单位投到屏幕。
  */
 
-import type { FingerCode } from '@/lib/types';
+import type { FingerCode, Finish } from '@/lib/types';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
+import { NailSurfaceBody, NailSurfaceDefs, NailTopcoatGloss } from './NailSurfaceFX';
 
 export interface FingerNailContentProps {
   finger: FingerCode;
@@ -17,6 +19,8 @@ export interface FingerNailContentProps {
   /** 本指 clipPath id（外层 <defs> 已声明） */
   clipId: string;
   baseColor: string;
+  /** 封层质感：驱动高光带与弧面强度（默认 gloss） */
+  finish?: Finish;
   failed: boolean;
   selected: boolean;
   patternMarkup: string | null;
@@ -37,6 +41,7 @@ export function FingerNailContent({
   silhouetteD,
   clipId,
   baseColor,
+  finish = 'gloss',
   failed,
   selected,
   patternMarkup,
@@ -49,10 +54,18 @@ export function FingerNailContent({
   onFingerClick,
   fingerLabel,
 }: FingerNailContentProps) {
+  const fxId = `${clipId}-fx`;
   return (
     <>
+      <NailSurfaceDefs fxId={fxId} finish={finish} />
       {/* 底色（改色即时像素级替换，无动画） */}
       <path d={silhouetteD} fill={failed ? '#D4D4D8' : baseColor} />
+      {/* 本体弧面阴影（纵向渐变 + 侧缘收暗 + 甘皮阴影 + 甲尖暗边） */}
+      {!failed && (
+        <g clipPath={`url(#${clipId})`}>
+          <NailSurfaceBody fxId={fxId} silhouetteD={silhouetteD} />
+        </g>
+      )}
       {/* 图案（应用模板淡入淡出） */}
       {!failed && patternMarkup && (
         <g
@@ -69,6 +82,12 @@ export function FingerNailContent({
           transform={`translate(${decoration.defaults.x * patternK} ${decoration.defaults.y * patternK}) rotate(${decoration.defaults.rotation}) scale(${decoration.defaults.scale})`}
           dangerouslySetInnerHTML={{ __html: decoration.innerMarkup }}
         />
+      )}
+      {/* 封层高光（图案/附件之上的 topcoat 光泽） */}
+      {!failed && (
+        <g clipPath={`url(#${clipId})`}>
+          <NailTopcoatGloss fxId={fxId} finish={finish} silhouetteD={silhouetteD} />
+        </g>
       )}
       {/* 轮廓线 */}
       <path

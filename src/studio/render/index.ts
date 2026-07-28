@@ -4,3 +4,4 @@ export { FingerNailContent } from './FingerNailContent';
 export type { FingerNailContentProps } from './FingerNailContent';
 export { BackPlatePreview } from './BackPlatePreview';
 export type { BackPlatePreviewProps } from './BackPlatePreview';
+export { NailSurfaceDefs, NailSurfaceBody, NailTopcoatGloss } from './NailSurfaceFX';

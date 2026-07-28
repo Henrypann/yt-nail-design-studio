@@ -10,7 +10,7 @@
  */
 
 import type { RefObject } from 'react';
-import type { FingerCode, FingerOverrides } from '@/lib/types';
+import type { FingerCode, FingerOverrides, Finish } from '@/lib/types';
 import type { NailSlotV2 } from '@/studio/slots';
 import { formatSvgMatrix, uvToStage } from '@/studio/slots';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
@@ -21,10 +21,19 @@ export interface BackPlatePreviewProps {
   plate: BackPlateV2;
   /** 已按当前长度调整（slotsForLength） */
   slots: NailSlotV2[];
+  /** 自定义相机窗口（viewBox 裁剪，纯视图层，不影响 slot 几何）；缺省整幅 plate */
+  viewBox?: string;
+  /**
+   * 完整画布适配模式（整体搭配 / 顾客展示专用）：SVG 占满父容器（父级需有确定高度），
+   * 配合 xMidYMid meet 居中 contain。缺省 w-full + 固有纵横比（导出/缩略图实例行为不变）。
+   */
+  fitContainer?: boolean;
   silhouetteD: string;
   widthMm: number;
   lengthMm: number;
   baseColor: string;
+  /** 封层质感（高光带/弧面强度） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   patternMarkup: string | null;
   patternK: number;
@@ -44,10 +53,13 @@ export interface BackPlatePreviewProps {
 export function BackPlatePreview({
   plate,
   slots,
+  viewBox,
+  fitContainer = false,
   silhouetteD,
   widthMm,
   lengthMm,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   patternMarkup,
   patternK,
@@ -66,8 +78,9 @@ export function BackPlatePreview({
   return (
     <svg
       ref={svgRef}
-      viewBox={`0 0 ${plate.sourceWidth} ${plate.sourceHeight}`}
-      className="block w-full select-none"
+      viewBox={viewBox ?? `0 0 ${plate.sourceWidth} ${plate.sourceHeight}`}
+      className={fitContainer ? 'block h-full w-full select-none' : 'block w-full select-none'}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="十指预览（手背视图 · NailSlot V2 标定线稿）"
       data-calibration={plate.calibrationVersion}
@@ -109,6 +122,7 @@ export function BackPlatePreview({
                   silhouetteD={silhouetteD}
                   clipId={`nailclip-${rawId}-${fc}`}
                   baseColor={color}
+                  finish={finish}
                   failed={failed}
                   selected={selectedFinger === fc}
                   patternMarkup={patternMarkup}

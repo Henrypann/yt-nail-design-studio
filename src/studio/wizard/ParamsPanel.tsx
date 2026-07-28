@@ -99,7 +99,7 @@ export function ParamsPanel() {
         </div>
       </section>
 
-      {/* 质感（仅记录参数） */}
+      {/* 质感（驱动高保真甲面：高光带/弧面阴影三质感差异化） */}
       <section>
         <p className="mb-2 text-xs font-medium text-gray-700">质感</p>
         <select
@@ -114,7 +114,7 @@ export function ParamsPanel() {
             </option>
           ))}
         </select>
-        <p className="mt-1 text-[10px] text-gray-400">原型期仅记录参数，不做真实渲染差异。</p>
+        <p className="mt-1 text-[10px] text-gray-400">切换后甲面高光与弧面效果即时更新。</p>
       </section>
 
       {/* 参数级逐指例外 */}
@@ -231,9 +231,6 @@ export function ParamsPanel() {
             )}
           </div>
         )}
-        <Button variant="secondary" disabled title="即将推出">
-          3D 预览 · 即将推出
-        </Button>
       </section>
 
       {/* 顾客已确认 · 二次确认弹窗（线下场景：无线上确认功能） */}

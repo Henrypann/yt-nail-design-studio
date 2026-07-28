@@ -104,11 +104,11 @@ export function TemplateGallery() {
         ))}
       </div>
 
-      {/* 卡片列表 */}
+      {/* 卡片列表（窄栏单列） */}
       <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         {state === 'loading' && (
-          <div className="grid grid-cols-2 gap-2">
-            {Array.from({ length: 6 }, (_, i) => (
+          <div className="grid grid-cols-1 gap-2">
+            {Array.from({ length: 4 }, (_, i) => (
               <Skeleton key={i} className="h-36 w-full" />
             ))}
           </div>
@@ -125,7 +125,7 @@ export function TemplateGallery() {
         )}
 
         {state === 'ready' && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {visible.map((t) => (
               <TemplateCard
                 key={t.id}
@@ -139,7 +139,7 @@ export function TemplateGallery() {
               />
             ))}
             {visible.length === 0 && (
-              <p className="col-span-2 py-8 text-center text-xs text-gray-400">
+              <p className="py-8 text-center text-xs text-gray-400">
                 该风格下暂无模板。
               </p>
             )}
