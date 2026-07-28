@@ -10,7 +10,7 @@
  */
 
 import type { RefObject } from 'react';
-import type { FingerCode, FingerOverrides } from '@/lib/types';
+import type { FingerCode, FingerOverrides, Finish } from '@/lib/types';
 import type { NailSlotV2 } from '@/studio/slots';
 import { formatSvgMatrix, uvToStage } from '@/studio/slots';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
@@ -27,6 +27,8 @@ export interface BackPlatePreviewProps {
   widthMm: number;
   lengthMm: number;
   baseColor: string;
+  /** 封层质感（高光带/弧面强度） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   patternMarkup: string | null;
   patternK: number;
@@ -51,6 +53,7 @@ export function BackPlatePreview({
   widthMm,
   lengthMm,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   patternMarkup,
   patternK,
@@ -112,6 +115,7 @@ export function BackPlatePreview({
                   silhouetteD={silhouetteD}
                   clipId={`nailclip-${rawId}-${fc}`}
                   baseColor={color}
+                  finish={finish}
                   failed={failed}
                   selected={selectedFinger === fc}
                   patternMarkup={patternMarkup}

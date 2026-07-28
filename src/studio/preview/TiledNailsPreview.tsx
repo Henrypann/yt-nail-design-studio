@@ -11,7 +11,7 @@
 import { useId, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button, Spinner, cx } from '@/design-system';
-import { FINGER_CODES, type FingerCode, type FingerOverrides, type NailLength, type NailShape } from '@/lib/types';
+import { FINGER_CODES, type FingerCode, type FingerOverrides, type Finish, type NailLength, type NailShape } from '@/lib/types';
 import type { DecorationAsset } from './nail-assets';
 import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
@@ -25,6 +25,8 @@ export interface NailCellViewProps {
   /** 剪影 viewBox（0.1mm 坐标系，如 "-60 -200 120 220"） */
   viewBox: string;
   baseColor: string;
+  /** 封层质感（高光带/弧面强度） */
+  finish?: Finish;
   patternMarkup: string | null;
   patternK: number;
   patternVisible: boolean;
@@ -48,6 +50,7 @@ export function NailCellView({
   silhouetteD,
   viewBox,
   baseColor,
+  finish = 'gloss',
   patternMarkup,
   patternK,
   patternVisible,
@@ -102,6 +105,7 @@ export function NailCellView({
           silhouetteD={silhouetteD}
           clipId={clipId}
           baseColor={baseColor}
+          finish={finish}
           failed={failed}
           selected={selected}
           patternMarkup={patternMarkup}
@@ -129,6 +133,8 @@ export interface TiledNailsPreviewProps {
   length: NailLength;
   templateId: string | null;
   baseColor: string;
+  /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   selectedFinger?: FingerCode | null;
   onFingerClick?: (finger: FingerCode) => void;
@@ -143,6 +149,7 @@ export function TiledNailsPreview({
   length,
   templateId,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   selectedFinger = null,
   onFingerClick,
@@ -198,6 +205,7 @@ export function TiledNailsPreview({
               silhouetteD={silhouette.d}
               viewBox={silhouette.viewBox}
               baseColor={override?.baseColor ?? baseColor}
+              finish={finish}
               patternMarkup={patternMarkup}
               patternK={patternK}
               patternVisible={patternVisible}

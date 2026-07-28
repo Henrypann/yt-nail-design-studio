@@ -8,7 +8,7 @@
 import { useMemo } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { Spinner } from '@/design-system';
-import type { FingerCode, FingerOverrides, NailLength, NailShape } from '@/lib/types';
+import type { FingerCode, FingerOverrides, Finish, NailLength, NailShape } from '@/lib/types';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
 import { useNailDesignAssets } from '@/studio/preview/use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
@@ -19,6 +19,8 @@ export interface FingerDetailPanelProps {
   length: NailLength;
   templateId: string | null;
   baseColor: string;
+  /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   selectedFinger: FingerCode | null;
   /** [放大查看] → 切到单指细节展开形态 */
@@ -30,6 +32,7 @@ export function FingerDetailPanel({
   length,
   templateId,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   selectedFinger,
   onExpand,
@@ -83,6 +86,7 @@ export function FingerDetailPanel({
           silhouetteD={silhouette.d}
           viewBox={silhouette.viewBox}
           baseColor={baseColor}
+          finish={finish}
           override={fingerOverrides?.[selectedFinger]}
           patternMarkup={patternMarkup}
           patternK={patternK}
@@ -102,6 +106,7 @@ function FingerDetailBody({
   silhouetteD,
   viewBox,
   baseColor,
+  finish,
   override,
   patternMarkup,
   patternK,
@@ -115,6 +120,7 @@ function FingerDetailBody({
   silhouetteD: string;
   viewBox: string;
   baseColor: string;
+  finish: Finish;
   override?: { baseColor?: string; decorationId?: string | null };
   patternMarkup: string | null;
   patternK: number;
@@ -142,6 +148,7 @@ function FingerDetailBody({
             silhouetteD={silhouetteD}
             clipId={clipId}
             baseColor={color}
+            finish={finish}
             failed={failed}
             selected={false}
             patternMarkup={patternMarkup}

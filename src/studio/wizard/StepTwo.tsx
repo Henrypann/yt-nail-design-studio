@@ -92,9 +92,23 @@ export function StepTwo() {
     length: s.appliedLength,
     templateId: s.templateId,
     baseColor: s.baseColor ?? '#F5E0D3',
+    finish: s.finish,
     fingerOverrides: s.fingerOverrides,
     readOnly,
   } as const;
+
+  const detailPanel = (
+    <FingerDetailPanel
+      shape={s.appliedShape}
+      length={s.appliedLength}
+      templateId={s.templateId}
+      baseColor={s.baseColor ?? '#F5E0D3'}
+      finish={s.finish}
+      fingerOverrides={s.fingerOverrides}
+      selectedFinger={s.selectedFinger}
+      onExpand={() => s.setViewMode('single')}
+    />
+  );
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -205,15 +219,7 @@ export function StepTwo() {
 
         {/* 右：常驻单指详情（≥240px）+ 参数 + 操作 */}
         <aside className="flex min-h-0 flex-col gap-3">
-          <FingerDetailPanel
-            shape={s.appliedShape}
-            length={s.appliedLength}
-            templateId={s.templateId}
-            baseColor={s.baseColor ?? '#F5E0D3'}
-            fingerOverrides={s.fingerOverrides}
-            selectedFinger={s.selectedFinger}
-            onExpand={() => s.setViewMode('single')}
-          />
+          {detailPanel}
           <div data-debug-id="studio.wizard.step2.params-panel" className="min-h-0 flex-1 rounded-card border border-gray-200 bg-white p-3">
             <ParamsPanel />
           </div>

@@ -12,7 +12,7 @@
 import { useEffect, useId, useMemo, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button, Spinner, cx } from '@/design-system';
-import type { FingerCode, FingerOverrides, NailLength, NailShape } from '@/lib/types';
+import type { FingerCode, FingerOverrides, Finish, NailLength, NailShape } from '@/lib/types';
 import type { DecorationAsset } from './nail-assets';
 import { registerPreviewSvg } from './export-png';
 import { useNailDesignAssets } from './use-nail-design-assets';
@@ -55,6 +55,8 @@ export interface TenFingerPreviewProps {
   length: NailLength;
   templateId: string | null;
   baseColor: string;
+  /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   selectedFinger?: FingerCode | null;
   onFingerClick?: (finger: FingerCode) => void;
@@ -71,6 +73,7 @@ export function TenFingerPreview({
   length,
   templateId,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   selectedFinger = null,
   onFingerClick,
@@ -140,6 +143,7 @@ export function TenFingerPreview({
               widthMm={widthMm}
               lengthMm={lengthMm}
               baseColor={baseColor}
+              finish={finish}
               fingerOverrides={fingerOverrides}
               patternMarkup={patternMarkup}
               patternK={patternK}

@@ -9,7 +9,7 @@
 import { useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Button, Spinner, cx } from '@/design-system';
-import { FINGER_CODES, type FingerCode, type FingerOverrides, type NailLength, type NailShape } from '@/lib/types';
+import { FINGER_CODES, type FingerCode, type FingerOverrides, type Finish, type NailLength, type NailShape } from '@/lib/types';
 import type { DecorationAsset } from './nail-assets';
 import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
@@ -21,6 +21,8 @@ export interface SingleNailViewProps {
   length: NailLength;
   templateId: string | null;
   baseColor: string;
+  /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
+  finish?: Finish;
   fingerOverrides?: FingerOverrides;
   /** 当前焦点指（缺省 R4 主视觉指） */
   finger: FingerCode;
@@ -36,6 +38,7 @@ export function SingleNailView({
   length,
   templateId,
   baseColor,
+  finish = 'gloss',
   fingerOverrides,
   finger,
   onSelectFinger,
@@ -134,6 +137,7 @@ export function SingleNailView({
               silhouetteD={silhouette.d}
               clipId={clipId}
               baseColor={color}
+              finish={finish}
               failed={failed}
               selected={false}
               patternMarkup={patternMarkup}
@@ -182,6 +186,7 @@ export function SingleNailView({
               silhouetteD={silhouette.d}
               viewBox={silhouette.viewBox}
               baseColor={ov?.baseColor ?? baseColor}
+              finish={finish}
               patternMarkup={patternMarkup}
               patternK={patternK}
               patternVisible={patternVisible}
