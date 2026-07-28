@@ -9,6 +9,7 @@
 import type { FingerCode, NailShape } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
 import { getDecorationInner, getPatternArtwork, getSilhouette, type SilhouetteInfo } from './material';
+import { buildFrenchEdgePaths } from './french-edge';
 import type { AttachmentElement, EditorDoc, FingerData, PatternElement, Transform } from './model';
 import { resolveFingerData } from './model';
 
@@ -39,12 +40,33 @@ function eraserStroke(el: EraserEl): string {
   return `<polyline points="${pointsAttr(el.points)}" fill="none" stroke="#000" stroke-width="${el.size}" stroke-linecap="round" stroke-linejoin="round"/>`;
 }
 
-function patternElementSvg(el: PatternElement, shape: NailShape, uid: string): string {
+function patternElementSvg(
+  el: PatternElement,
+  shape: NailShape,
+  length: EditorDoc['length'],
+  uid: string,
+): string {
   switch (el.kind) {
     case 'template_pattern': {
       const art = getPatternArtwork(el.templateId, shape);
       if (!art) return '';
       return `<g transform="${transformAttr(el.transform)}">${renameInternalIds(art.inner, uid)}</g>`;
+    }
+    case 'french_edge': {
+      const sil = getSilhouette(shape, length);
+      if (!sil) return '';
+      const { fillD, strokePaths } = buildFrenchEdgePaths(sil, el);
+      const fill = `<path d="${fillD}" fill="${el.fillColor}"/>`;
+      const strokes =
+        (el.outlineEnabled ?? false) || el.variant === 'double'
+          ? strokePaths
+              .map(
+                (d) =>
+                  `<path d="${d}" fill="none" stroke="${el.strokeColor}" stroke-width="${el.strokeWidth}" stroke-linecap="butt" stroke-linejoin="round"/>`,
+              )
+              .join('')
+          : '';
+      return `<g transform="${transformAttr(el.transform)}">${fill}${strokes}</g>`;
     }
     case 'brush':
       return brushStroke(el);
@@ -91,7 +113,7 @@ export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): str
     input.liveEraser && input.liveEraser.points.length > 1 ? eraserStroke(input.liveEraser) : '';
 
   const patternSvg =
-    drawables.map((el) => patternElementSvg(el, input.shape, uid)).join('') +
+    drawables.map((el) => patternElementSvg(el, input.shape, input.length, uid)).join('') +
     (input.liveStroke && input.liveStroke.points.length > 1 ? brushStroke(input.liveStroke) : '');
 
   const attachments = input.data.attachments.map(attachmentSvg).join('');

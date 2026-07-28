@@ -55,5 +55,25 @@ assert(brands.has('OPI') && brands.has('CND') && brands.has('Essie'), 'three bra
 const renderSrc = readFileSync(join(root, 'src/studio/editor/lib/render.ts'), 'utf8');
 assert(renderSrc.includes('brushStroke'), 'render has brushStroke');
 assert(renderSrc.includes('composeTiledSvg'), 'render has tiled export');
+assert(renderSrc.includes("case 'french_edge'"), 'render has french_edge');
+
+// ── model has FrenchEdgeElement ──
+const modelSrc = readFileSync(join(root, 'src/studio/editor/lib/model.ts'), 'utf8');
+assert(modelSrc.includes("kind: 'french_edge'"), 'model has french_edge kind');
+assert(modelSrc.includes('ClassicFrenchControls'), 'model has classic French 3-point controls');
+
+// ── classic French canvas handles ──
+const nailCanvasSrc = readFileSync(
+  join(root, 'src/studio/editor/components/NailCanvas.tsx'),
+  'utf8',
+);
+assert(
+  nailCanvasSrc.includes('data-french-handle'),
+  'canvas renders classic French drag handles',
+);
+assert(
+  nailCanvasSrc.includes('updateClassicControlsForHandle'),
+  'canvas constrains classic French handle drag',
+);
 
 console.log('test:handdraw — all passed');

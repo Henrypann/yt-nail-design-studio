@@ -7,8 +7,13 @@ import { create } from 'zustand';
 import type { DesignStatus, FingerCode } from '@/lib/types';
 import { isReadOnly } from '@/lib/state-machine';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
-import type { AttachmentElement, EditorDoc, PatternElement, Transform } from './lib/model';
-import { genId, resolveFingerData } from './lib/model';
+import type { AttachmentElement, EditorDoc, FrenchEdgeVariant, PatternElement, Transform } from './lib/model';
+import { genId, IDENTITY_TRANSFORM, resolveFingerData } from './lib/model';
+import { getSilhouette } from './lib/material';
+import {
+  defaultClassicControls,
+  defaultFrenchParams,
+} from './lib/french-edge';
 import {
   getDesign,
   getEditorDoc,
@@ -23,7 +28,7 @@ import {
   oppositeFinger,
   type MirrorMode,
 } from './lib/mirror';
-import { ensureSession, recordMirror, recordUndo } from './lib/session-metrics';
+import { ensureSession, recordFrenchEdge, recordMirror, recordUndo } from './lib/session-metrics';
 
 export type EditorTool = 'brush' | 'eraser';
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error';
@@ -85,6 +90,15 @@ interface EditorState {
   setView: (view: Partial<{ zoom: number; panX: number; panY: number }>) => void;
   setCurrentFinger: (finger: FingerCode) => void;
   setSelection: (sel: ElementRef | null) => void;
+
+  /** 一键插入参数化法式边（当前指 pattern 层） */
+  insertFrenchEdge: (opts: {
+    variant: FrenchEdgeVariant;
+    fillColor: string;
+    outlineEnabled: boolean;
+    strokeColor: string;
+    strokeWidth: number;
+  }) => 'ok' | 'no-silhouette' | 'readonly';
 
   /** 编辑当前手指的显示数据（解锁指改副本，否则改共享基指数据 → 十指同步） */
   editCurrentFingerData: (mutate: (data: {
@@ -266,6 +280,35 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     })),
   setCurrentFinger: (finger) => set({ currentFinger: finger, selection: null }),
   setSelection: (sel) => set({ selection: sel }),
+
+  insertFrenchEdge: (opts) => {
+    const { doc, readOnly } = get();
+    if (!doc || readOnly) return 'readonly';
+    const sil = getSilhouette(doc.shape, doc.length);
+    if (!sil) return 'no-silhouette';
+    const defaults = defaultFrenchParams(sil);
+    const id = genId('el_french');
+    get().editCurrentFingerData((d) => {
+      d.pattern.push({
+        id,
+        kind: 'french_edge',
+        variant: opts.variant,
+        fillColor: opts.fillColor,
+        outlineEnabled: opts.outlineEnabled,
+        strokeColor: opts.strokeColor,
+        strokeWidth: opts.strokeWidth,
+        tipOffset: defaults.tipOffset,
+        smileDepth: defaults.smileDepth,
+        classicControls:
+          opts.variant === 'arc' ? defaultClassicControls(sil) : undefined,
+        lineGap: defaults.lineGap,
+        transform: { ...IDENTITY_TRANSFORM },
+      });
+    });
+    recordFrenchEdge();
+    set({ selection: { layer: 'pattern', id } });
+    return 'ok';
+  },
 
   editCurrentFingerData: (mutate) => {
     const { doc, currentFinger } = get();

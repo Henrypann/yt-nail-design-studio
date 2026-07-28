@@ -63,6 +63,48 @@ if (mirrored.pattern[0].kind === 'brush') {
 const patternOnly = mirrorFingerData(source, 'R4' as FingerCode, 'pattern-only', '#CCCCCC');
 assert(patternOnly.baseColor === '#CCCCCC', 'pattern-only keeps fallback base');
 
+// French is regenerated from the target silhouette and must not receive the
+// generic thumb +180° compensation that previously moved it outside clipPath.
+const frenchSource: FingerData = {
+  baseColor: '#F2E4DA',
+  pattern: [
+    {
+      id: 'f1',
+      kind: 'french_edge',
+      variant: 'arc',
+      fillColor: '#FFFFFF',
+      outlineEnabled: false,
+      strokeColor: '#B8896B',
+      strokeWidth: 4,
+      tipOffset: 42,
+      smileDepth: 18,
+      classicControls: {
+        leftWingOffset: 54,
+        centerOffset: 24,
+        rightWingOffset: 66,
+      },
+      transform: { x: 0, y: 0, scale: 1, rotation: 0 },
+    },
+  ],
+  attachments: [],
+};
+const mirroredThumb = mirrorFingerData(
+  frenchSource,
+  'L1' as FingerCode,
+  'include-base',
+  '#FFF',
+);
+assert(mirroredThumb.pattern[0].kind === 'french_edge', 'French edge preserved');
+if (mirroredThumb.pattern[0].kind === 'french_edge') {
+  assert(mirroredThumb.pattern[0].transform.rotation === 0, 'French thumb stays upright');
+  assert(mirroredThumb.pattern[0].tipOffset === 42, 'French geometry params preserved');
+  assert(
+    mirroredThumb.pattern[0].classicControls?.leftWingOffset === 66 &&
+      mirroredThumb.pattern[0].classicControls.rightWingOffset === 54,
+    'classic French wing controls swap on mirror',
+  );
+}
+
 // left hand list
 assert(LEFT_FINGERS.length === 5, '5 left fingers');
 

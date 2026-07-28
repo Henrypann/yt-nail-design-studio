@@ -4,12 +4,13 @@
  */
 
 import { useRef, useState } from 'react';
-import { Brush, Eraser, ImagePlus, Palette } from 'lucide-react';
+import { Brush, Eraser, ImagePlus, Palette, Spline } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
 import { LENGTHS, loadRecentColors, PALETTE, SHAPES, lengthName, pushRecentColor, shapeName } from '../lib/material';
 import { genId } from '../lib/model';
 import { useEditorStore, type BrushPreset, type EditorTool } from '../store';
 import { BrandPalettePopover } from './BrandPalettePopover';
+import { FrenchEdgePopover } from './FrenchEdgePopover';
 
 const TOOLS: { key: EditorTool; label: string; icon: typeof Brush; hotkey: string }[] = [
   { key: 'brush', label: '画笔', icon: Brush, hotkey: 'B' },
@@ -40,6 +41,7 @@ export function ToolPanel() {
   const toast = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [frenchOpen, setFrenchOpen] = useState(false);
   const recentColors = loadRecentColors();
 
   const onImportFile = (file: File) => {
@@ -112,6 +114,29 @@ export function ToolPanel() {
         }}
       />
 
+      <div className="relative">
+        <button
+          disabled={readOnly}
+          onClick={() => {
+            setFrenchOpen((v) => !v);
+            setPaletteOpen(false);
+          }}
+          title="法式边一键模板"
+          className={cx(
+            'flex h-10 w-10 items-center justify-center rounded-button transition-colors duration-fast',
+            frenchOpen ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-100',
+            readOnly && 'cursor-not-allowed opacity-40',
+          )}
+        >
+          <Spline size={18} />
+        </button>
+        {frenchOpen && !readOnly && (
+          <FrenchEdgePopover
+            onClose={() => setFrenchOpen(false)}
+          />
+        )}
+      </div>
+
       <div className="my-2 h-px w-8 bg-gray-200" />
 
       {tool === 'brush' && !readOnly && (
@@ -164,7 +189,10 @@ export function ToolPanel() {
           <div className="relative w-full">
             <button
               type="button"
-              onClick={() => setPaletteOpen((v) => !v)}
+              onClick={() => {
+                setPaletteOpen((v) => !v);
+                setFrenchOpen(false);
+              }}
               title="打开 120 色品牌色板"
               className={cx(
                 'flex w-full items-center justify-center gap-1 rounded-button border py-1 text-[9px]',

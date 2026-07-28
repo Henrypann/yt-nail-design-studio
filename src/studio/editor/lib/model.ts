@@ -58,11 +58,45 @@ export interface ImageElement {
   transform: Transform;
 }
 
+export type FrenchEdgeVariant = 'arc' | 'v' | 'double';
+
+/** 经典法式三点控制（均为距甲尖的纵向距离；两侧 X 始终吸附真实甲缘） */
+export interface ClassicFrenchControls {
+  leftWingOffset: number;
+  centerOffset: number;
+  rightWingOffset: number;
+}
+
+/** 参数化法式边：甲尖填色区 + 微笑线/边线描边 */
+export interface FrenchEdgeElement {
+  id: string;
+  kind: 'french_edge';
+  variant: FrenchEdgeVariant;
+  /** 甲尖区域填色；外边缘始终由当前甲型 silhouette 裁切 */
+  fillColor: string;
+  /** 可选微笑线/金属细边，经典法式默认关闭 */
+  outlineEnabled: boolean;
+  strokeColor: string;
+  /** 线宽（0.1mm 单位） */
+  strokeWidth: number;
+  /** 微笑线两侧翼点距甲尖的距离（0.1mm，正数） */
+  tipOffset: number;
+  /** 微笑线中心相对两侧翼点向甲根深入的距离（0.1mm） */
+  smileDepth: number;
+  /** 仅经典弧使用：左翼、中心、右翼三个可拖拽控制点 */
+  classicControls?: ClassicFrenchControls;
+  /** double 变体两线间距（0.1mm） */
+  lineGap?: number;
+  /** 保留兼容旧文档；French UI 不开放自由变换，确保始终贴合甲尖 */
+  transform: Transform;
+}
+
 export type PatternElement =
   | TemplatePatternElement
   | BrushElement
   | EraserElement
-  | ImageElement;
+  | ImageElement
+  | FrenchEdgeElement;
 
 /* ── 附件层元素（禁透明度控制；heightMm 唯一立体高度通路） ── */
 

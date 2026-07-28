@@ -7,15 +7,34 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Hand } from 'lucide-react';
+import {
+  buildFrenchEdgePaths,
+  resolveClassicControls,
+  silhouetteMetrics,
+  updateClassicControlsForHandle,
+  type ClassicFrenchHandle,
+} from '../lib/french-edge';
 import { getSilhouette } from '../lib/material';
 import { nailContentSvg } from '../lib/render';
-import { genId, resolveFingerData, type BrushElement, type EraserElement } from '../lib/model';
+import {
+  genId,
+  resolveFingerData,
+  type BrushElement,
+  type ClassicFrenchControls,
+  type EraserElement,
+  type FrenchEdgeElement,
+} from '../lib/model';
 import { recordStroke } from '../lib/session-metrics';
 import { useEditorStore } from '../store';
 
 const PAD = 24; // viewBox 外扩（0.1mm 单位），避免描边被裁
 /** 点距节流：小于此距离（0.1mm）不追加采样点 */
 const MIN_POINT_DIST_SQ = 1.5 * 1.5;
+interface FrenchDrag {
+  id: string;
+  handle: ClassicFrenchHandle;
+  controls: ClassicFrenchControls;
+}
 
 export function NailCanvas() {
   const doc = useEditorStore((s) => s.doc);
@@ -31,6 +50,7 @@ export function NailCanvas() {
   const panY = useEditorStore((s) => s.panY);
   const setView = useEditorStore((s) => s.setView);
   const editCurrentFingerData = useEditorStore((s) => s.editCurrentFingerData);
+  const selection = useEditorStore((s) => s.selection);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -39,6 +59,8 @@ export function NailCanvas() {
   const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
   const [liveStroke, setLiveStroke] = useState<BrushElement | null>(null);
   const [liveEraser, setLiveEraser] = useState<EraserElement | null>(null);
+  const [liveFrenchDrag, setLiveFrenchDrag] = useState<FrenchDrag | null>(null);
+  const liveFrenchDragRef = useRef<FrenchDrag | null>(null);
   const drawing = useRef(false);
 
   const sil = doc ? getSilhouette(doc.shape, doc.length) : null;
@@ -50,21 +72,77 @@ export function NailCanvas() {
   }, [sil]);
 
   const fingerData = doc ? resolveFingerData(doc, currentFinger) : null;
+  const selectedClassic = useMemo(() => {
+    if (!fingerData || selection?.layer !== 'pattern') return null;
+    const element = fingerData.pattern.find(
+      (candidate): candidate is FrenchEdgeElement =>
+        candidate.id === selection.id &&
+        candidate.kind === 'french_edge' &&
+        candidate.variant === 'arc',
+    );
+    return element ?? null;
+  }, [fingerData, selection]);
 
   const content = useMemo(() => {
     if (!doc || !sil || !fingerData) return '';
-    return nailContentSvg(
+    const displayData =
+      liveFrenchDrag && liveFrenchDrag.id === selectedClassic?.id
+        ? {
+            ...fingerData,
+            pattern: fingerData.pattern.map((element) =>
+              element.id === liveFrenchDrag.id &&
+              element.kind === 'french_edge'
+                ? { ...element, classicControls: liveFrenchDrag.controls }
+                : element,
+            ),
+          }
+        : fingerData;
+    const nailSvg = nailContentSvg(
       {
         shape: doc.shape,
         length: doc.length,
-        data: fingerData,
+        data: displayData,
         uid: 'canvas',
         liveStroke,
         liveEraser,
       },
       sil,
     );
-  }, [doc, sil, fingerData, liveStroke, liveEraser]);
+    if (!selectedClassic || readOnly) return nailSvg;
+
+    const controls =
+      liveFrenchDrag?.id === selectedClassic.id
+        ? liveFrenchDrag.controls
+        : resolveClassicControls(sil, selectedClassic);
+    const paths = buildFrenchEdgePaths(sil, {
+      ...selectedClassic,
+      classicControls: controls,
+    });
+    const handles = [
+      { key: 'left', x: paths.wingLeftX, y: paths.leftWingY },
+      { key: 'center', x: 0, y: paths.centerY },
+      { key: 'right', x: paths.wingRightX, y: paths.rightWingY },
+    ] as const;
+    const handleSvg = handles
+      .map(
+        ({ key, x, y }) =>
+          `<g data-french-handle="${key}" style="cursor:ns-resize">` +
+          `<circle cx="${x}" cy="${y}" r="10" fill="transparent"/>` +
+          `<circle cx="${x}" cy="${y}" r="4.5" fill="#C2497A" stroke="#FFFFFF" stroke-width="2" pointer-events="none"/>` +
+          `</g>`,
+      )
+      .join('');
+    return `${nailSvg}<g data-testid="classic-french-handles">${handleSvg}</g>`;
+  }, [
+    doc,
+    sil,
+    fingerData,
+    liveStroke,
+    liveEraser,
+    liveFrenchDrag,
+    selectedClassic,
+    readOnly,
+  ]);
 
   /* ── 空格平移 ───────────────────────────────────────── */
   useEffect(() => {
@@ -126,6 +204,24 @@ export function NailCanvas() {
       return;
     }
     if (readOnly || drawing.current) return;
+    const handleNode = (e.target as Element).closest?.(
+      '[data-french-handle]',
+    ) as SVGElement | null;
+    const handle = handleNode?.dataset.frenchHandle as
+      | ClassicFrenchHandle
+      | undefined;
+    if (handle && selectedClassic && sil) {
+      const drag: FrenchDrag = {
+        id: selectedClassic.id,
+        handle,
+        controls: resolveClassicControls(sil, selectedClassic),
+      };
+      liveFrenchDragRef.current = drag;
+      setLiveFrenchDrag(drag);
+      e.currentTarget.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      return;
+    }
     const p = toSvgPoint(e.clientX, e.clientY);
     if (!p) return;
     drawing.current = true;
@@ -150,6 +246,22 @@ export function NailCanvas() {
         panX: panStart.current.panX + (e.clientX - panStart.current.x),
         panY: panStart.current.panY + (e.clientY - panStart.current.y),
       });
+      return;
+    }
+    const frenchDrag = liveFrenchDragRef.current;
+    if (frenchDrag && sil) {
+      const p = toSvgPoint(e.clientX, e.clientY);
+      if (!p) return;
+      const metrics = silhouetteMetrics(sil);
+      const nextControls = updateClassicControlsForHandle(
+        frenchDrag.controls,
+        frenchDrag.handle,
+        p.y - metrics.tipY,
+        metrics.nailLength - 2,
+      );
+      const nextDrag = { ...frenchDrag, controls: nextControls };
+      liveFrenchDragRef.current = nextDrag;
+      setLiveFrenchDrag(nextDrag);
       return;
     }
     if (!drawing.current) return;
@@ -180,6 +292,21 @@ export function NailCanvas() {
   const endStroke = () => {
     if (panning) {
       setPanning(false);
+      return;
+    }
+    const frenchDrag = liveFrenchDragRef.current;
+    if (frenchDrag) {
+      liveFrenchDragRef.current = null;
+      setLiveFrenchDrag(null);
+      editCurrentFingerData((data) => {
+        const element = data.pattern.find(
+          (candidate): candidate is FrenchEdgeElement =>
+            candidate.id === frenchDrag.id &&
+            candidate.kind === 'french_edge' &&
+            candidate.variant === 'arc',
+        );
+        if (element) element.classicControls = frenchDrag.controls;
+      });
       return;
     }
     if (!drawing.current) return;

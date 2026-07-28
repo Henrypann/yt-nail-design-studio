@@ -59,7 +59,7 @@ export function TiledPreview(props: { onClose: () => void }) {
   const unlockedCount = FINGER_CODES.filter((f) => isFingerUnlocked(doc, f)).length;
   const syncMode = unlockedCount === 0;
   const hasBrush = FINGER_CODES.some((f) =>
-    resolveFingerData(doc, f).pattern.some((el) => el.kind === 'brush'),
+    resolveFingerData(doc, f).pattern.some((el) => el.kind === 'brush' || el.kind === 'french_edge'),
   );
 
   const exportPng = async () => {
@@ -121,7 +121,7 @@ export function TiledPreview(props: { onClose: () => void }) {
               const isMaster = doc.masterFinger === finger;
               const isUnlocked = isFingerUnlocked(doc, finger);
               const hasStroke = resolveFingerData(doc, finger).pattern.some(
-                (el) => el.kind === 'brush',
+                (el) => el.kind === 'brush' || el.kind === 'french_edge',
               );
               return (
                 <button
@@ -169,7 +169,7 @@ export function TiledPreview(props: { onClose: () => void }) {
       <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-[11px] text-gray-500">
         <span>
           点击指位切换编辑指并返回单甲画布
-          {hasBrush && ' · 导出 PNG 含手绘笔画'}
+          {hasBrush && ' · 导出 PNG 含手绘/法式'}
         </span>
         <span className="text-[10px] text-gray-400">
           {syncMode

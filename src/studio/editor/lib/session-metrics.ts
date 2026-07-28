@@ -8,6 +8,7 @@ const STORAGE_KEY = 'editor.handdraw.session';
 export interface HandDrawSessionMetrics {
   startedAt: string;
   strokeCount: number;
+  frenchEdgeCount: number;
   undoCount: number;
   mirrorUsed: boolean;
   mirrorCount: number;
@@ -24,6 +25,7 @@ function read(): HandDrawSessionMetrics {
   return {
     startedAt: new Date().toISOString(),
     strokeCount: 0,
+    frenchEdgeCount: 0,
     undoCount: 0,
     mirrorUsed: false,
     mirrorCount: 0,
@@ -47,6 +49,12 @@ export function ensureSession(): HandDrawSessionMetrics {
 export function recordStroke(): void {
   const m = read();
   m.strokeCount += 1;
+  write(m);
+}
+
+export function recordFrenchEdge(): void {
+  const m = read();
+  m.frenchEdgeCount = (m.frenchEdgeCount ?? 0) + 1;
   write(m);
 }
 

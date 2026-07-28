@@ -11,8 +11,8 @@ import type {
   FingerData,
   PatternElement,
   Transform,
-} from './model';
-import { genId } from './model';
+} from './model.ts';
+import { genId } from './model.ts';
 
 /** 对侧指位：L1↔R1 … L5↔R5 */
 export function oppositeFinger(finger: FingerCode): FingerCode {
@@ -49,12 +49,28 @@ export function mirrorPatternElement(el: PatternElement, targetFinger: FingerCod
         ? 'el_eraser'
         : el.kind === 'image'
           ? 'el_img'
-          : 'el_tpl';
+          : el.kind === 'french_edge'
+            ? 'el_french'
+            : 'el_tpl';
 
   switch (el.kind) {
     case 'brush':
     case 'eraser':
       return { ...el, id: genId(idPrefix), points: mirrorPoints(el.points) };
+    case 'french_edge':
+      // French 由当前甲型的真实 tip 轮廓重新生成；不得套用拇指 +180° 补偿。
+      return {
+        ...el,
+        id: genId(idPrefix),
+        classicControls: el.classicControls
+          ? {
+              leftWingOffset: el.classicControls.rightWingOffset,
+              centerOffset: el.classicControls.centerOffset,
+              rightWingOffset: el.classicControls.leftWingOffset,
+            }
+          : undefined,
+        transform: { ...el.transform },
+      };
     case 'template_pattern':
     case 'image':
       return {

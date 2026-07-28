@@ -14,9 +14,11 @@ import {
   genId,
   resolveFingerData,
   type AttachmentElement,
+  type FrenchEdgeElement,
   type PatternElement,
   type Transform,
 } from '../lib/model';
+import { FRENCH_VARIANT_LABELS } from '../lib/french-edge';
 import { useEditorStore } from '../store';
 
 function patternElLabel(el: PatternElement): string {
@@ -29,6 +31,8 @@ function patternElLabel(el: PatternElement): string {
       return `导入 · ${el.name}`;
     case 'eraser':
       return '橡皮擦除';
+    case 'french_edge':
+      return `法式 · ${FRENCH_VARIANT_LABELS[el.variant]}`;
   }
 }
 
@@ -76,6 +80,141 @@ function TransformSliders(props: {
   );
 }
 
+function FrenchEdgeSliders(props: {
+  value: FrenchEdgeElement;
+  onPatch: (patch: Partial<FrenchEdgeElement>) => void;
+}) {
+  const { value, onPatch } = props;
+  const [draft, setDraft] = useState<Partial<FrenchEdgeElement> | null>(null);
+  const shown = { ...value, ...draft };
+  const classicControls = shown.classicControls ?? {
+    leftWingOffset: shown.tipOffset,
+    centerOffset: Math.max(2, shown.tipOffset - shown.smileDepth),
+    rightWingOffset: shown.tipOffset,
+  };
+  const commitDraft = () => {
+    if (draft) onPatch(draft);
+    setDraft(null);
+  };
+  const row = (
+    label: string,
+    key: 'strokeWidth' | 'tipOffset' | 'smileDepth' | 'lineGap',
+    min: number,
+    max: number,
+    step: number,
+  ) => (
+    <label className="flex items-center gap-2 text-[11px] text-gray-500">
+      <span className="w-12 shrink-0">{label}</span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={shown[key] ?? 8}
+        onChange={(e) =>
+          setDraft((current) => ({
+            ...(current ?? {}),
+            [key]: Number(e.target.value),
+          }))
+        }
+        onPointerUp={commitDraft}
+        onBlur={commitDraft}
+        className="flex-1 accent-[#C2497A]"
+      />
+      <span className="w-8 text-right tnum">{shown[key] ?? 8}</span>
+    </label>
+  );
+  const classicRow = (
+    label: string,
+    key: 'leftWingOffset' | 'centerOffset' | 'rightWingOffset',
+  ) => (
+    <label className="flex items-center gap-2 text-[11px] text-gray-500">
+      <span className="w-12 shrink-0">{label}</span>
+      <input
+        type="range"
+        min={4}
+        max={100}
+        step={1}
+        value={classicControls[key]}
+        onChange={(e) => {
+          const raw = Number(e.target.value);
+          const next = { ...classicControls, [key]: raw };
+          if (key === 'centerOffset') {
+            next.centerOffset = Math.min(
+              raw,
+              Math.min(next.leftWingOffset, next.rightWingOffset) - 2,
+            );
+          } else if (next.centerOffset >= raw - 2) {
+            next.centerOffset = Math.max(2, raw - 2);
+          }
+          setDraft((current) => ({
+            ...(current ?? {}),
+            classicControls: next,
+          }));
+        }}
+        onPointerUp={commitDraft}
+        onBlur={commitDraft}
+        className="flex-1 accent-[#C2497A]"
+      />
+      <span className="w-8 text-right tnum">{classicControls[key]}</span>
+    </label>
+  );
+  return (
+    <div className="mt-1 flex flex-col gap-1 rounded-button bg-gray-50 p-2">
+      <label className="flex items-center justify-between text-[11px] text-gray-500">
+        <span>甲尖颜色</span>
+        <input
+          type="color"
+          value={shown.fillColor}
+          onChange={(e) => onPatch({ fillColor: e.target.value })}
+          className="h-6 w-10 cursor-pointer"
+        />
+      </label>
+      <label className="flex cursor-pointer items-center justify-between text-[11px] text-gray-500">
+        <span>{value.variant === 'double' ? '双线边线' : '金属细边'}</span>
+        <input
+          type="checkbox"
+          checked={(shown.outlineEnabled ?? false) || value.variant === 'double'}
+          disabled={value.variant === 'double'}
+          onChange={(e) => onPatch({ outlineEnabled: e.target.checked })}
+          className="accent-[#C2497A]"
+        />
+      </label>
+      {((shown.outlineEnabled ?? false) || value.variant === 'double') && (
+        <>
+          <label className="flex items-center justify-between text-[11px] text-gray-500">
+            <span>边线颜色</span>
+            <input
+              type="color"
+              value={shown.strokeColor}
+              onChange={(e) => onPatch({ strokeColor: e.target.value })}
+              className="h-6 w-10 cursor-pointer"
+            />
+          </label>
+          {row('细边宽度', 'strokeWidth', 2, 10, 1)}
+        </>
+      )}
+      {value.variant === 'arc' ? (
+        <>
+          {classicRow('左翼点', 'leftWingOffset')}
+          {classicRow('中心点', 'centerOffset')}
+          {classicRow('右翼点', 'rightWingOffset')}
+          <p className="text-[10px] text-gray-400">
+            也可直接拖拽画布上的三个控制点
+          </p>
+        </>
+      ) : (
+        <>
+          {row('侧翼延伸', 'tipOffset', 15, 100, 1)}
+          {row('微笑线深', 'smileDepth', 4, 50, 1)}
+        </>
+      )}
+      {value.variant === 'double' && row('线间距', 'lineGap', 4, 24, 1)}
+      {draft && <p className="text-[10px] text-gray-400">松开鼠标应用</p>}
+    </div>
+  );
+}
+
 export function LayerPanel() {
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
@@ -94,6 +233,13 @@ export function LayerPanel() {
       const list = layer === 'pattern' ? d.pattern : d.attachments;
       const el = list.find((e) => e.id === id);
       if (el && 'transform' in el) el.transform = t;
+    });
+  };
+
+  const updateFrenchEdge = (id: string, patch: Partial<FrenchEdgeElement>) => {
+    editCurrentFingerData((d) => {
+      const el = d.pattern.find((e) => e.id === id);
+      if (el?.kind === 'french_edge') Object.assign(el, patch);
     });
   };
 
@@ -191,6 +337,12 @@ export function LayerPanel() {
                     <TransformSliders
                       value={el.transform}
                       onCommit={(t) => updateElementTransform('pattern', el.id, t)}
+                    />
+                  )}
+                  {selected && el.kind === 'french_edge' && !readOnly && (
+                    <FrenchEdgeSliders
+                      value={el}
+                      onPatch={(patch) => updateFrenchEdge(el.id, patch)}
                     />
                   )}
                 </li>

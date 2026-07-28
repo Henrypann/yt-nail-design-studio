@@ -47,7 +47,7 @@
 - 登录账号或读取账号信息
 - 读取密码、令牌、密钥、Cookie、钥匙串或 SSH 私钥
 - 上传文件或数据到外部服务
-- 推送远程 Git 仓库
+- 任何 Git 写操作：`commit` / `push` / `merge` / `rebase` / `cherry-pick`（每项须用户明确下令）
 - 创建或合并 Pull Request
 - 发布公开网站或部署生产环境
 - 创建付费资源或发起购买
@@ -234,7 +234,7 @@
 快速确认：
 
 - 用户真正要验证的结果
-- 当前工作目录
+- **Worktree 硬门禁**（见第 8 节）：路径与分支必须匹配，否则立即停止
 - 现有技术栈
 - 项目启动方式
 - 任务范围
@@ -349,3 +349,81 @@
 - 仍然存在的明确限制
 
 保持简洁、具体、可验证。
+
+---
+
+## 8. Studio 多 Agent 与模型路由
+
+默认策略：**Composer 2.5 主写代码，Grok 4.5 做高风险判断与最终门禁**。
+结构：1 个 Composer 写者 + 最多 2 个并行只读 Sub Agent。不要让多个 Agent 同时修改产品源码。
+
+### 8.1 角色与模型
+
+| Agent | 模型 | 权限 | 职责 |
+|---|---|---|---|
+| 主开发 Agent | Composer 2.5 | 读写源码、运行测试 | UI、组件、状态、小型重构、Bug 修复 |
+| `studio-explorer` | Composer 2.5 | 只读 | 搜索代码、定位影响范围、输出文件清单 |
+| `studio-visual-qa` | Composer 2.5 | 只读 + 浏览器 | 截图对比、响应式、交互与视觉走查 |
+| `studio-architecture-reviewer` | Grok 4.5 | 只读 | 状态机、数据完整性、几何源、架构风险 |
+| `studio-integration-gate` | Grok 4.5 | 只读 + 测试命令 | 最终 diff 审查，输出 P0/P1/P2，判断能否合入 |
+
+### 8.2 路由逻辑
+
+交给 **Composer 2.5**：
+
+- React / CSS 组件实现
+- 验收标准明确的前端任务
+- 测试补充与机械性重构
+- 常规代码搜索、截图走查
+- 预计改动不超过 3–5 个相关文件
+
+升级给 **Grok 4.5**：
+
+- 状态机、桥接、存储、导出逻辑
+- 多模块根因诊断
+- 产品方案存在歧义
+- 涉及 Slot、坐标、几何单一来源
+- 大规模迁移或跨服务修改
+- 最终验收与合入判断
+
+配额偏好（内置模型优先）：
+
+- Composer 2.5 Standard：默认开发主力
+- Composer Fast：仅短小、强交互任务；不作为后台 Sub Agent 默认模型
+- Grok 4.5：架构审查、疑难诊断、最终门禁
+- 暂停调用 Other Models，避免提前耗尽该池
+
+首次配置 Sub Agent 模型后，用极小任务验证运行信息与用量面板中的**真实模型**；不要依赖非官方模型名称写法。
+
+### 8.3 执行硬规则
+
+1. **单写者原则**
+   同一轮只有主 Composer Agent 可修改产品代码（尤其 `src/`）。Sub Agent 默认只读。禁止嵌套 Sub Agent。
+
+2. **最多并行两个 Sub Agent**
+   可并行「代码探索 + 视觉检查」，但不得两个 Agent 同时改 `src/`。
+
+3. **Plan 模式绝对只读**
+   Plan 阶段关闭 Edit / Write。终端仅允许：
+
+   ```bash
+   pwd
+   git status
+   git diff
+   rg
+   npm run typecheck
+   npm run build
+   ```
+
+4. **Worktree 硬门禁**
+   每个 Agent 开始前必须确认：
+
+   ```text
+   路径：/Users/henry.macbook/Documents/kimi/Workspaces/nextGen-beauty-cursor
+   分支：exp/cursor-studio-mvp
+   ```
+
+   路径或分支不匹配时：**立即停止**，不得自动切分支或修改文件。
+
+5. **Git 操作单独授权**
+   可开发与验证，但不得自行执行 `commit` / `push` / `merge` / `rebase` / `cherry-pick`；每项须用户明确下令。
