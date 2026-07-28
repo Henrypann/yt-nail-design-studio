@@ -194,7 +194,7 @@ export function PresentationMode({
         <div className="flex items-center gap-4 text-xs text-gray-600">
           <span>{shapeLabel}</span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3.5 w-3.5 rounded-full border border-gray-300" style={{ backgroundColor }} />
+            <span className="inline-block h-3.5 w-3.5 rounded-full border border-gray-300" style={{ backgroundColor: baseColor }} />
             {baseColor}
           </span>
           <span>质感：{finishLabel}</span>
