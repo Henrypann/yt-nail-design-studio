@@ -1,7 +1,7 @@
 /**
  * 顾客展示模式（全屏只读，适合直接把屏幕转向顾客）
  *
- * 布局：设计大图（整体搭配 · 整幅 plate 完整显示）
+ * 布局：设计大图（整体搭配 · 整幅 plate 完整显示，继承 Wizard 指尖观察方向）
  *   + 当前重点单指（点击搭配条切换）
  *   + 十指搭配条
  *   + 甲型 / 长度 / 色号 / 质感 / 模板信息
@@ -33,6 +33,8 @@ export interface PresentationModeProps {
   status: DesignStatus;
   /** 初始重点指（进入时同步 Wizard 当前选中指，缺省 R4 主视觉指） */
   initialFinger?: FingerCode | null;
+  /** 指尖观察方向（继承 Wizard 当前选择，展示模式内不再提供第二个开关） */
+  tipOrientation?: 'up' | 'down';
 }
 
 export function PresentationMode({
@@ -47,6 +49,7 @@ export function PresentationMode({
   fingerOverrides,
   status,
   initialFinger,
+  tipOrientation = 'up',
 }: PresentationModeProps) {
   const assets = useNailDesignAssets(shape, length, templateId);
   const { status: loadStatus, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
@@ -139,6 +142,7 @@ export function PresentationMode({
               finish={finish}
               fingerOverrides={fingerOverrides}
               registerExport={false}
+              tipOrientation={tipOrientation}
               fitContainer
               selectedFinger={focusFinger}
               onFingerClick={setFocusFinger}

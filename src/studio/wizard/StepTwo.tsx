@@ -176,6 +176,33 @@ export function StepTwo() {
                   ))}
                 </div>
                 <div className="flex items-center gap-3">
+                  {/* 指尖观察方向（UI 瞬态，整体搭配视图专用）：整幅组合画布 180° 旋转，不改设计数据 */}
+                  {s.viewMode === 'ensemble' && (
+                    <div
+                      className="flex rounded-button border border-gray-200 bg-white p-0.5"
+                      role="group"
+                      aria-label="指尖观察方向"
+                      data-testid="tip-orientation-toggle"
+                    >
+                      {(['up', 'down'] as const).map((o) => (
+                        <button
+                          key={o}
+                          type="button"
+                          aria-pressed={s.tipOrientation === o}
+                          aria-label={o === 'up' ? '指尖朝上' : '指尖朝下'}
+                          onClick={() => s.setTipOrientation(o)}
+                          className={cx(
+                            'rounded-button px-2.5 py-1 text-xs transition-colors duration-fast',
+                            s.tipOrientation === o
+                              ? 'bg-primary-soft font-medium text-primary'
+                              : 'text-gray-500 hover:text-gray-800',
+                          )}
+                        >
+                          {o === 'up' ? '指尖朝上' : '指尖朝下'}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <span className="hidden text-[10px] text-gray-400 xl:inline">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
                   <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
                     <Presentation size={13} />
@@ -189,6 +216,7 @@ export function StepTwo() {
                   <TenFingerPreview
                     {...previewProps}
                     registerExport={false}
+                    tipOrientation={s.tipOrientation}
                     fitContainer
                     className="h-full"
                     selectedFinger={s.selectedFinger}
@@ -255,7 +283,7 @@ export function StepTwo() {
         </Button>
       </footer>
 
-      {/* 顾客展示模式（全屏只读 · Esc 退出） */}
+      {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向） */}
       <PresentationMode
         open={presentOpen}
         onClose={() => setPresentOpen(false)}
@@ -268,6 +296,7 @@ export function StepTwo() {
         fingerOverrides={s.fingerOverrides}
         status={s.status}
         initialFinger={s.selectedFinger}
+        tipOrientation={s.tipOrientation}
       />
     </div>
   );

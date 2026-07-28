@@ -63,6 +63,8 @@ export interface TenFingerPreviewProps {
   readOnly?: boolean;
   /** 相机窗口裁剪到指甲带（旧整体搭配放大语义，保留给其他展示场景）；缺省整幅 plate（导出/缩略图/整体搭配用） */
   cropToNails?: boolean;
+  /** 指尖观察方向（纯视图层）：down 时组合画布整体旋转 180°，点击命中与几何数据不变 */
+  tipOrientation?: 'up' | 'down';
   /**
    * 完整画布适配模式（整体搭配 / 顾客展示专用）：占满父级可用宽高并居中，
    * SVG 以 meet 语义 contain。缺省保持 w-full + 4:3 固有比例（导出/缩略图/普通实例行为不变）。
@@ -84,6 +86,7 @@ export function TenFingerPreview({
   onFingerClick,
   readOnly = false,
   cropToNails = false,
+  tipOrientation = 'up',
   fitContainer = false,
   registerExport = true,
   className,
@@ -140,10 +143,21 @@ export function TenFingerPreview({
           )}
 
           {/* NailSlot V2 标定线稿渲染路径（Back 手背，唯一视图）。
-              fitContainer 时外层占满可用空间并居中，SVG 以 meet 语义 contain。 */}
+              fitContainer 时外层占满可用空间并居中，SVG 以 meet 语义 contain；
+              tipOrientation=down 仅旋转最外视觉容器（CSS transform 同步命中测试，
+              坐标系/FingerCode/几何数据不变）。 */}
           {status === 'ready' && backV2 && silhouette && (
-            <div className={cx(fitContainer && 'flex h-full w-full items-center justify-center')}>
-              <div className={cx(fitContainer && 'h-full w-full')}>
+            <div
+              className={cx(fitContainer && 'flex h-full w-full items-center justify-center')}
+              data-tip-orientation={tipOrientation}
+            >
+              <div
+                className={cx(
+                  fitContainer && 'h-full w-full',
+                  'transition-transform duration-200 ease-out motion-reduce:transition-none',
+                  tipOrientation === 'down' && 'rotate-180',
+                )}
+              >
                 <BackPlatePreview
                   plate={backV2}
                   slots={slots}
