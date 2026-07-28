@@ -1,7 +1,7 @@
 /**
  * 顾客展示模式（全屏只读，适合直接把屏幕转向顾客）
  *
- * 布局：设计大图（整体搭配 · plate 相机裁剪，全屏尺度下每指可达 48px+）
+ * 布局：设计大图（整体搭配 · 整幅 plate 完整显示）
  *   + 当前重点单指（点击搭配条切换）
  *   + 十指搭配条
  *   + 甲型 / 长度 / 色号 / 质感 / 模板信息
@@ -128,7 +128,7 @@ export function PresentationMode({
 
       {/* 主区：设计大图 + 重点单指 */}
       <main className="flex min-h-0 flex-1 items-stretch gap-8 px-8 pb-4">
-        {/* 整体搭配大图（全屏尺度：每指可达 48px+） */}
+        {/* 整体搭配大图（整幅 plate 完整显示，继承 Wizard 指尖方向） */}
         <div className="flex min-w-0 flex-1 items-center justify-center">
           {loadStatus === 'ready' ? (
             <TenFingerPreview
@@ -138,12 +138,12 @@ export function PresentationMode({
               baseColor={baseColor}
               finish={finish}
               fingerOverrides={fingerOverrides}
-              cropToNails
               registerExport={false}
+              fitContainer
               selectedFinger={focusFinger}
               onFingerClick={setFocusFinger}
               readOnly={false}
-              className="max-h-full w-full border-none bg-transparent"
+              className="h-full max-h-full w-full border-none bg-transparent"
             />
           ) : (
             <Spinner size={32} className="text-primary" />

@@ -61,8 +61,13 @@ export interface TenFingerPreviewProps {
   selectedFinger?: FingerCode | null;
   onFingerClick?: (finger: FingerCode) => void;
   readOnly?: boolean;
-  /** 相机窗口裁剪到指甲带（视图 1 · 整体搭配）；缺省整幅 plate（导出/缩略图用） */
+  /** 相机窗口裁剪到指甲带（旧整体搭配放大语义，保留给其他展示场景）；缺省整幅 plate（导出/缩略图/整体搭配用） */
   cropToNails?: boolean;
+  /**
+   * 完整画布适配模式（整体搭配 / 顾客展示专用）：占满父级可用宽高并居中，
+   * SVG 以 meet 语义 contain。缺省保持 w-full + 4:3 固有比例（导出/缩略图/普通实例行为不变）。
+   */
+  fitContainer?: boolean;
   /** 是否注册为导出 PNG / 缩略图的 svg 源（多实例同时挂载时只能有一个注册） */
   registerExport?: boolean;
   className?: string;
@@ -79,6 +84,7 @@ export function TenFingerPreview({
   onFingerClick,
   readOnly = false,
   cropToNails = false,
+  fitContainer = false,
   registerExport = true,
   className,
 }: TenFingerPreviewProps) {
@@ -125,7 +131,7 @@ export function TenFingerPreview({
       )}
 
       {status !== 'error' && (
-        <div className="relative">
+        <div className={cx('relative', fitContainer && 'h-full')}>
           {status === 'loading' && (
             <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-canvas">
               <Spinner size={28} className="text-primary" />
@@ -133,31 +139,37 @@ export function TenFingerPreview({
             </div>
           )}
 
-          {/* NailSlot V2 标定线稿渲染路径（Back 手背，唯一视图） */}
+          {/* NailSlot V2 标定线稿渲染路径（Back 手背，唯一视图）。
+              fitContainer 时外层占满可用空间并居中，SVG 以 meet 语义 contain。 */}
           {status === 'ready' && backV2 && silhouette && (
-            <BackPlatePreview
-              plate={backV2}
-              slots={slots}
-              viewBox={viewBox}
-              silhouetteD={silhouette.d}
-              widthMm={widthMm}
-              lengthMm={lengthMm}
-              baseColor={baseColor}
-              finish={finish}
-              fingerOverrides={fingerOverrides}
-              patternMarkup={patternMarkup}
-              patternK={patternK}
-              patternVisible={patternVisible}
-              patternFadeMs={patternFadeMs}
-              decorationById={decorationById}
-              failedFingers={failedFingers}
-              selectedFinger={selectedFinger}
-              onFingerClick={onFingerClick}
-              readOnly={readOnly}
-              rawId={rawId}
-              svgRef={svgRef}
-              fingerLabel={(fc) => FINGER_LABEL[fc]}
-            />
+            <div className={cx(fitContainer && 'flex h-full w-full items-center justify-center')}>
+              <div className={cx(fitContainer && 'h-full w-full')}>
+                <BackPlatePreview
+                  plate={backV2}
+                  slots={slots}
+                  viewBox={viewBox}
+                  fitContainer={fitContainer}
+                  silhouetteD={silhouette.d}
+                  widthMm={widthMm}
+                  lengthMm={lengthMm}
+                  baseColor={baseColor}
+                  finish={finish}
+                  fingerOverrides={fingerOverrides}
+                  patternMarkup={patternMarkup}
+                  patternK={patternK}
+                  patternVisible={patternVisible}
+                  patternFadeMs={patternFadeMs}
+                  decorationById={decorationById}
+                  failedFingers={failedFingers}
+                  selectedFinger={selectedFinger}
+                  onFingerClick={onFingerClick}
+                  readOnly={readOnly}
+                  rawId={rawId}
+                  svgRef={svgRef}
+                  fingerLabel={(fc) => FINGER_LABEL[fc]}
+                />
+              </div>
+            </div>
           )}
         </div>
       )}

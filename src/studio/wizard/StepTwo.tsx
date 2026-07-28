@@ -188,8 +188,9 @@ export function StepTwo() {
                 {s.viewMode === 'ensemble' && (
                   <TenFingerPreview
                     {...previewProps}
-                    cropToNails
                     registerExport={false}
+                    fitContainer
+                    className="h-full"
                     selectedFinger={s.selectedFinger}
                     onFingerClick={(fc) => s.setSelectedFinger(s.selectedFinger === fc ? null : fc)}
                   />

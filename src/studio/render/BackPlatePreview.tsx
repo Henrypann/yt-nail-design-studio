@@ -23,6 +23,11 @@ export interface BackPlatePreviewProps {
   slots: NailSlotV2[];
   /** 自定义相机窗口（viewBox 裁剪，纯视图层，不影响 slot 几何）；缺省整幅 plate */
   viewBox?: string;
+  /**
+   * 完整画布适配模式（整体搭配 / 顾客展示专用）：SVG 占满父容器（父级需有确定高度），
+   * 配合 xMidYMid meet 居中 contain。缺省 w-full + 固有纵横比（导出/缩略图实例行为不变）。
+   */
+  fitContainer?: boolean;
   silhouetteD: string;
   widthMm: number;
   lengthMm: number;
@@ -49,6 +54,7 @@ export function BackPlatePreview({
   plate,
   slots,
   viewBox,
+  fitContainer = false,
   silhouetteD,
   widthMm,
   lengthMm,
@@ -73,7 +79,8 @@ export function BackPlatePreview({
     <svg
       ref={svgRef}
       viewBox={viewBox ?? `0 0 ${plate.sourceWidth} ${plate.sourceHeight}`}
-      className="block w-full select-none"
+      className={fitContainer ? 'block h-full w-full select-none' : 'block w-full select-none'}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="十指预览（手背视图 · NailSlot V2 标定线稿）"
       data-calibration={plate.calibrationVersion}
