@@ -103,6 +103,67 @@ try {
   const v2Images = await v2Svg.locator('image').count();
   step('Back 视图走 NailSlot V2（plate 内联 + back-v2.1.0）', v2Images >= 1, `image 节点=${v2Images}`);
 
+  /* 7a2. 完整 plate + 指尖方向开关（v3 观察模式改版：整幅 1200×900 + 组合画布整体旋转） */
+  const fullViewBox = await v2Svg.getAttribute('viewBox');
+  step('整体搭配 = 整幅 plate（无指甲带裁剪）', fullViewBox === '0 0 1200 900', `viewBox=${fullViewBox}`);
+  const ensembleBox = await v2Svg.boundingBox();
+
+  /* 保存基线：进入方向测试前确保自动保存已落地 */
+  await page.getByText('💾 已保存').waitFor({ timeout: 10000 });
+
+  const orientToggle = page.getByTestId('tip-orientation-toggle');
+  await orientToggle.waitFor({ timeout: 5000 });
+  const orientWrapper = v2Svg.locator('xpath=ancestor::*[@data-tip-orientation][1]');
+  const upBtn = orientToggle.getByRole('button', { name: '指尖朝上' });
+  const downBtn = orientToggle.getByRole('button', { name: '指尖朝下' });
+  const defaultUp =
+    (await orientWrapper.getAttribute('data-tip-orientation')) === 'up' &&
+    (await upBtn.getAttribute('aria-pressed')) === 'true';
+  step('方向开关默认 = 指尖朝上', defaultUp);
+
+  await downBtn.click();
+  await page.waitForTimeout(350);
+  const isDown = (await orientWrapper.getAttribute('data-tip-orientation')) === 'down';
+  const sessionVal = await page.evaluate(() => window.sessionStorage.getItem('ui.wizard-tip-orientation'));
+  step('切换 → 指尖朝下（组合画布 rotate-180 + sessionStorage 记忆）', isDown && sessionVal === 'down', `session=${sessionVal}`);
+
+  /* 连续切换 10 次：画布几何盒无漂移，终态恢复朝上 */
+  for (let i = 0; i < 5; i += 1) {
+    await downBtn.click();
+    await upBtn.click();
+  }
+  await downBtn.click();
+  await page.waitForTimeout(350);
+  const driftBox = await v2Svg.boundingBox();
+  const boxStable =
+    !!ensembleBox && !!driftBox &&
+    Math.abs(ensembleBox.x - driftBox.x) < 1 && Math.abs(ensembleBox.y - driftBox.y) < 1 &&
+    Math.abs(ensembleBox.width - driftBox.width) < 1 && Math.abs(ensembleBox.height - driftBox.height) < 1;
+  step('连续切换 10 次画布无漂移', boxStable && (await orientWrapper.getAttribute('data-tip-orientation')) === 'down');
+
+  /* 朝下状态点击左·中指命中区：CSS transform 同步命中测试，不交换左右手 */
+  await v2Svg.locator('path[fill="transparent"]').nth(2).click({ force: true });
+  await page.getByText('左·中指 · 单独定制').waitFor({ timeout: 5000 });
+  step('朝下点击中指 → 仍命中正确 FingerCode（左·中指）', true);
+  await page.getByRole('button', { name: '完成' }).dispatchEvent('click');
+
+  /* 方向切换为 UI 瞬态：不置脏、不触发自动保存 */
+  await page.waitForTimeout(800);
+  const saveLabel = await page.locator('text=/💾 已保存|● 未保存|保存中…|保存失败/').first().textContent();
+  step('方向切换不触发设计自动保存', (saveLabel ?? '').includes('已保存'), `保存状态=${(saveLabel ?? '').trim()}`);
+
+  await upBtn.click();
+  await page.waitForTimeout(350);
+  step('切回指尖朝上', (await orientWrapper.getAttribute('data-tip-orientation')) === 'up');
+
+  /* 方向开关为整体搭配专用：十指平铺下不出现 */
+  await page.getByRole('tab', { name: '十指平铺' }).click();
+  await tiledGrid.waitFor({ timeout: 5000 });
+  const toggleHidden = (await page.getByTestId('tip-orientation-toggle').count()) === 0;
+  step('十指平铺视图不显示方向开关', toggleHidden);
+  await page.getByRole('tab', { name: /整体搭配/ }).click();
+  await v2Svg.waitFor({ timeout: 5000 });
+
   /* 7b. 单指覆写：点中指 → 单独换底色 → 清除定制（v1.4.0 Phase 3） */
   await v2Svg.locator('path[fill="transparent"]').nth(2).click({ force: true });
   await page.getByText('左·中指 · 单独定制').waitFor({ timeout: 5000 });
@@ -127,13 +188,24 @@ try {
   await tiledGrid.waitFor({ timeout: 5000 });
   step('Esc 返回十指平铺', true);
 
-  /* 7d. 顾客展示模式：全屏只读 + Esc 退出（v2 新增） */
+  /* 7d. 顾客展示模式：全屏只读 + Esc 退出（v2 新增；v3 起继承 Wizard 指尖方向） */
+  await page.getByRole('tab', { name: /整体搭配/ }).click();
+  await page.getByTestId('tip-orientation-toggle').getByRole('button', { name: '指尖朝下' }).click();
+  await page.waitForTimeout(350);
   await page.getByRole('button', { name: /顾客展示/ }).click();
-  await page.locator('[data-debug-id="studio.wizard.presentation"]').waitFor({ timeout: 5000 });
+  const presentation = page.locator('[data-debug-id="studio.wizard.presentation"]');
+  await presentation.waitFor({ timeout: 5000 });
   step('顾客展示模式打开（全屏只读）', true);
+  const presentOrientation = await presentation.locator('[data-tip-orientation]').first().getAttribute('data-tip-orientation');
+  const presentNoToggle = (await presentation.getByTestId('tip-orientation-toggle').count()) === 0;
+  step('顾客展示继承指尖朝下（展示内无第二个开关）', presentOrientation === 'down' && presentNoToggle, `方向=${presentOrientation}`);
   await page.keyboard.press('Escape');
   const presentGone = (await page.locator('[data-debug-id="studio.wizard.presentation"]').count()) === 0;
   step('Esc 退出顾客展示模式', presentGone);
+  const wizardStillDown = (await v2Svg.locator('xpath=ancestor::*[@data-tip-orientation][1]').getAttribute('data-tip-orientation')) === 'down';
+  step('退出后 Wizard 方向保持朝下', wizardStillDown);
+  await page.getByTestId('tip-orientation-toggle').getByRole('button', { name: '指尖朝上' }).click();
+  await page.waitForTimeout(300);
 
   /* 7e. 再次设置覆写并保留 → 桥接应带入 Editor（v2 桥接数据修复验证） */
   await page.getByRole('tab', { name: /整体搭配/ }).click();
