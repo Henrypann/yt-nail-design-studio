@@ -1,0 +1,165 @@
+{
+  "version": 3,
+  "updated_at": "2026-07-24T15:30:00Z",
+  "units": {
+    "svg": "0.1mm",
+    "comment": "所有生成 SVG 的坐标单位为 0.1mm（widthMm 11 → 半宽 55 单位）。本文件为前后端唯一参数源（DEV-PLAN §2.3-6 / §4.3），禁止第二参数源。"
+  },
+  "coordinate_system": {
+    "origin": "nail_root_center（甲根中心；根角高度 y=0）",
+    "axes": "x 向右为正；y 向下为正（SVG 原生），甲尖位于负 y 方向；rotationDeg=0 时指甲生长轴指向 12 点方向",
+    "root_edge": {
+      "width-profile": "过 (±halfWidth, 0) 的浅弧，控制点 (0, +halfWidth*0.22)，向甲根方向（+y）微凸",
+      "cuticle-seat": "独立半月浅弧：中心下凹 cuticleDepth，根角 (±rootHalfWidth, 0)；根宽 < 最大宽"
+    }
+  },
+  "curve_model": {
+    "version": 3,
+    "default": "width-profile",
+    "models": {
+      "width-profile": {
+        "type": "width-profile",
+        "summary": "v2：宽度剖面 w(t) 驱动。coffin/squoval/round/square/stiletto 使用。",
+        "fields": {
+          "taperStart": "开始收窄的 t（0=甲根，1=甲尖），此前 w=1（含鼓度）",
+          "rootFullness": "甲根—甲身中段外凸鼓度（最大宽度超出甲根半宽的比例，峰值在 fullnessPos）",
+          "midFullness": "甲身丰盈度 0..1，映射侧壁指数 k=1+2*midFullness",
+          "fullnessPos": "鼓度峰值位置 t（默认 0.30）",
+          "tipStyle": "flat | semicircle | pointed",
+          "tipWidthRatio": "收口区起点半宽 ÷ 甲根半宽",
+          "cornerRadiusMm": "flat：甲尖圆角半径（mm）",
+          "capHeightRatio": "semicircle/pointed：收口区高度 ÷ 全长",
+          "tipRoundness": "pointed：0 锐 → 1 钝",
+          "endLinearMix": "端部线性混合 λ"
+        }
+      },
+      "cuticle-seat": {
+        "type": "cuticle-seat",
+        "summary": "v3：分段显式 Bézier（S1 cuticle arc / S2 flare / S3 taper），G1 连续。推翻「最宽处=甲根」。almond 已于 2026-07-24 签收。",
+        "fields": {
+          "curveModel": "必须为 cuticle-seat",
+          "rootWidthRatio": "甲根有效宽 / 最大宽（0.84–0.90）",
+          "cuticleDepthRatio": "甲根弧深 / 最大宽（约 8%–12%）",
+          "maxWidthT": "最大宽位置 t（从根角向甲尖，0.12–0.22）",
+          "taperE1": "S3 第一控制点高度占比（椭圆收窄感）",
+          "tipRadiusMmByLength": "各长度档软尖曲率半径（mm）"
+        }
+      }
+    }
+  },
+  "shapes": {
+    "almond": {
+      "name": "杏仁形",
+      "name_en": "Almond",
+      "curveModel": "cuticle-seat",
+      "rootWidthRatio": 0.87,
+      "cuticleDepthRatio": 0.1,
+      "maxWidthT": 0.17,
+      "taperE1": 0.42,
+      "tipRadiusMmByLength": {
+        "14": 1.35,
+        "18": 1.15,
+        "22": 0.95,
+        "26": 0.8
+      },
+      "cCurve": 0.42,
+      "signed_off_at": "2026-07-24",
+      "signed_off_note": "cuticle-seat 研究稿人工签收；替代 v2 width-profile almond"
+    },
+    "coffin": {
+      "name": "芭蕾/棺材形",
+      "name_en": "Coffin",
+      "tipStyle": "flat",
+      "tipWidthRatio": 0.48,
+      "cornerRadiusMm": 1.2,
+      "taperStart": 0.32,
+      "rootFullness": 0.035,
+      "midFullness": 0.1,
+      "fullnessPos": 0.3,
+      "cCurve": 0.4,
+      "endLinearMix": 0.55
+    },
+    "squoval": {
+      "name": "方圆形",
+      "name_en": "Squoval",
+      "tipStyle": "flat",
+      "tipWidthRatio": 0.94,
+      "cornerRadiusMm": 2.2,
+      "taperStart": 0.55,
+      "rootFullness": 0.03,
+      "midFullness": 0.3,
+      "fullnessPos": 0.3,
+      "cCurve": 0.38
+    },
+    "round": {
+      "name": "圆形",
+      "name_en": "Round",
+      "tipStyle": "semicircle",
+      "tipWidthRatio": 0.92,
+      "capHeightRatio": 0.17,
+      "taperStart": 0.45,
+      "rootFullness": 0.03,
+      "midFullness": 0.25,
+      "fullnessPos": 0.3,
+      "cCurve": 0.4
+    },
+    "square": {
+      "name": "方形",
+      "name_en": "Square",
+      "tipStyle": "flat",
+      "tipWidthRatio": 0.97,
+      "cornerRadiusMm": 1.0,
+      "taperStart": 0.55,
+      "rootFullness": 0.025,
+      "midFullness": 0.3,
+      "fullnessPos": 0.3,
+      "cCurve": 0.35
+    },
+    "stiletto": {
+      "name": "尖形",
+      "name_en": "Stiletto",
+      "tipStyle": "pointed",
+      "tipWidthRatio": 0.008,
+      "capHeightRatio": 0.04,
+      "tipRoundness": 0.3,
+      "taperStart": 0.15,
+      "rootFullness": 0.03,
+      "midFullness": 0.4,
+      "fullnessPos": 0.35,
+      "cCurve": 0.5,
+      "endLinearMix": 0.7
+    }
+  },
+  "lengths": {
+    "short": {
+      "name": "短",
+      "lengthMm": 14,
+      "widthMm": 11
+    },
+    "medium": {
+      "name": "中",
+      "lengthMm": 18,
+      "widthMm": 11
+    },
+    "long": {
+      "name": "长",
+      "lengthMm": 22,
+      "widthMm": 11
+    },
+    "extra-long": {
+      "name": "超长",
+      "lengthMm": 26,
+      "widthMm": 11
+    }
+  },
+  "generator": {
+    "script": "tools/generate-nail-shapes.py（薄封装；几何事实源 = daimon skills/nails-shape-svg/scripts/generate_nail_shapes.py）",
+    "output_dir": "material-library/shapes/silhouettes/",
+    "filename_pattern": "{shape}_{length}.svg（length 中的 '-' 替换为 '_'，如 almond_extra_long.svg）",
+    "consumers": [
+      "tools/generate-template-patterns.py（图案 clipPath 使用 medium 长度轮廓）",
+      "tools/generate-mock-stl.py（壳体尺寸参数，使用 cCurve 字段）",
+      "前端画布轮廓 / NailSlot 占位渲染 / 后端预览 Pipeline / 工艺映射引擎"
+    ]
+  }
+}

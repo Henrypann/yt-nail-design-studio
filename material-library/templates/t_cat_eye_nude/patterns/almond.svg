@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -200 120 220" data-template="t_cat_eye_nude" data-shape="almond" data-units="0.1mm" data-origin="nail-root-center">
+  <defs>
+    <clipPath id="nail-clip"><path d="M -47.9 0 C -51.3 -3.5 -55 -18.4 -55 -30.6 C -55 -93.3 -25.8 -180 0 -180 C 25.8 -180 55 -93.3 55 -30.6 C 55 -18.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+    <linearGradient id="ce-band" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFBEF" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#FFFBEF" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFFBEF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#nail-clip)">
+    <rect x="-60" y="-200" width="120" height="220" fill="#E7CDBE" opacity="0.35"/>
+    <rect x="-70" y="-107" width="140" height="30" fill="url(#ce-band)" transform="rotate(-28 0 -90)"/>
+    <rect x="-70" y="-107" width="140" height="8" fill="url(#ce-band)" opacity="0.5" transform="rotate(-28 0 -120)"/>
+  </g>
+</svg>

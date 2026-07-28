@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-decoration="bow" data-units="0.1mm" data-origin="decoration-center">
+  <!-- 蝴蝶结 · 预制附件组件（DEV-PLAN §4.5）。原点 = 组件中心，单位 0.1mm -->
+  <path d="M -2 0 C -8 -9 -14 -9 -14 -3 C -14 3 -8 7 -2 2 Z"
+        fill="#F0A8C0" stroke="#C9738F" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M 2 0 C 8 -9 14 -9 14 -3 C 14 3 8 7 2 2 Z"
+        fill="#F0A8C0" stroke="#C9738F" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M -2 2 L -6 12 L -2 10 L 0 12 L 2 10 L 6 12 L 2 2 Z"
+        fill="#E08BA9" stroke="#C9738F" stroke-width="1" stroke-linejoin="round"/>
+  <rect x="-3" y="-3" width="6" height="6" rx="2" fill="#D16E94" stroke="#B4537A" stroke-width="0.8"/>
+</svg>

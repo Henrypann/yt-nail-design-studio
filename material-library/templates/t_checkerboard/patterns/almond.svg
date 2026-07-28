@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -200 120 220" data-template="t_checkerboard" data-shape="almond" data-units="0.1mm" data-origin="nail-root-center">
+  <defs>
+    <clipPath id="nail-clip"><path d="M -47.9 0 C -51.3 -3.5 -55 -18.4 -55 -30.6 C -55 -93.3 -25.8 -180 0 -180 C 25.8 -180 55 -93.3 55 -30.6 C 55 -18.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#nail-clip)">
+    <rect x="-66" y="-198" width="22" height="22" fill="#26262B"/>
+    <rect x="-66" y="-176" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-66" y="-154" width="22" height="22" fill="#26262B"/>
+    <rect x="-66" y="-132" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-66" y="-110" width="22" height="22" fill="#26262B"/>
+    <rect x="-66" y="-88" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-66" y="-66" width="22" height="22" fill="#26262B"/>
+    <rect x="-66" y="-44" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-66" y="-22" width="22" height="22" fill="#26262B"/>
+    <rect x="-66" y="0" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="-198" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="-176" width="22" height="22" fill="#26262B"/>
+    <rect x="-44" y="-154" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="-132" width="22" height="22" fill="#26262B"/>
+    <rect x="-44" y="-110" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="-88" width="22" height="22" fill="#26262B"/>
+    <rect x="-44" y="-66" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="-44" width="22" height="22" fill="#26262B"/>
+    <rect x="-44" y="-22" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-44" y="0" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="-198" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="-176" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-22" y="-154" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="-132" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-22" y="-110" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="-88" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-22" y="-66" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="-44" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="-22" y="-22" width="22" height="22" fill="#26262B"/>
+    <rect x="-22" y="0" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="-198" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="-176" width="22" height="22" fill="#26262B"/>
+    <rect x="0" y="-154" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="-132" width="22" height="22" fill="#26262B"/>
+    <rect x="0" y="-110" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="-88" width="22" height="22" fill="#26262B"/>
+    <rect x="0" y="-66" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="-44" width="22" height="22" fill="#26262B"/>
+    <rect x="0" y="-22" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="0" y="0" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="-198" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="-176" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="22" y="-154" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="-132" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="22" y="-110" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="-88" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="22" y="-66" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="-44" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="22" y="-22" width="22" height="22" fill="#26262B"/>
+    <rect x="22" y="0" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="-198" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="-176" width="22" height="22" fill="#26262B"/>
+    <rect x="44" y="-154" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="-132" width="22" height="22" fill="#26262B"/>
+    <rect x="44" y="-110" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="-88" width="22" height="22" fill="#26262B"/>
+    <rect x="44" y="-66" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="-44" width="22" height="22" fill="#26262B"/>
+    <rect x="44" y="-22" width="22" height="22" fill="#F2F2F4"/>
+    <rect x="44" y="0" width="22" height="22" fill="#26262B"/>
+  </g>
+</svg>

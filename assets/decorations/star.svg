@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-decoration="star" data-units="0.1mm" data-origin="decoration-center">
+  <!-- 星星 · 预制附件组件（DEV-PLAN §4.5）。原点 = 组件中心，单位 0.1mm -->
+  <path d="M 0 -12
+           L 3 -4 L 11.5 -3.5
+           L 5 2 L 7 10.5
+           L 0 6 L -7 10.5
+           L -5 2 L -11.5 -3.5
+           L -3 -4 Z"
+        fill="#F2C94C" stroke="#D9A72E" stroke-width="1" stroke-linejoin="round"/>
+  <ellipse cx="-2.5" cy="-4" rx="2" ry="1.2" fill="#FFFFFF" opacity="0.7" transform="rotate(-25 -2.5 -4)"/>
+</svg>

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "comment": "预制附件组件清单（DEV-PLAN §4.5）。供 Wizard 参数级逐指例外（换装饰）与 Editor 附件层复用。x/y 为甲面坐标（0.1mm 单位，原点 = 甲根中心，与图案 SVG 同一空间）；heightMm 参数域硬限制 0.05–0.30mm（§9 红线，UV 喷绘阴影 P0 风险规避）。",
+  "height_domain_mm": [0.05, 0.3],
+  "coordinate_space": "与 material-library 图案 SVG 一致：0.1mm 单位，原点 = 甲根中心；组件自身 SVG 原点 = 组件中心",
+  "decorations": [
+    {
+      "id": "heart",
+      "name": "爱心",
+      "name_en": "Heart",
+      "file": "heart.svg",
+      "defaults": { "x": 0, "y": -90, "scale": 1.0, "rotation": 0, "heightMm": 0.22 }
+    },
+    {
+      "id": "pearl",
+      "name": "珍珠",
+      "name_en": "Pearl",
+      "file": "pearl.svg",
+      "defaults": { "x": 0, "y": -70, "scale": 1.0, "rotation": 0, "heightMm": 0.3 }
+    },
+    {
+      "id": "bow",
+      "name": "蝴蝶结",
+      "name_en": "Bow",
+      "file": "bow.svg",
+      "defaults": { "x": 0, "y": -100, "scale": 1.0, "rotation": 0, "heightMm": 0.18 }
+    },
+    {
+      "id": "star",
+      "name": "星星",
+      "name_en": "Star",
+      "file": "star.svg",
+      "defaults": { "x": 0, "y": -80, "scale": 1.0, "rotation": 0, "heightMm": 0.2 }
+    }
+  ]
+}

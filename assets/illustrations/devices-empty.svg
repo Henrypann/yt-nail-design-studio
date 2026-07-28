@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" data-illustration="devices-empty">
+  <!-- 空状态插画 · 设备列表（DEV-PLAN §4.7）：打印机/设备 + 无线信号 -->
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="110" y="130" width="180" height="100" rx="14"/>
+    <rect x="140" y="92" width="120" height="38" rx="8"/>
+    <path d="M 140 196 L 260 196" opacity="0.5"/>
+    <circle cx="252" cy="158" r="7"/>
+    <path d="M 176 66 C 188 56 212 56 224 66" opacity="0.5"/>
+    <path d="M 162 48 C 184 32 216 32 238 48" opacity="0.5"/>
+    <circle cx="200" cy="80" r="4" opacity="0.5"/>
+  </g>
+</svg>

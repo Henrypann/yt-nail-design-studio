@@ -1,0 +1,21 @@
+{
+  "template_id": "t_chrome_mirror",
+  "version": 1,
+  "patterns": {
+    "almond": "patterns/almond.svg",
+    "coffin": "patterns/coffin.svg",
+    "squoval": "patterns/squoval.svg",
+    "round": "patterns/round.svg",
+    "square": "patterns/square.svg",
+    "stiletto": "patterns/stiletto.svg"
+  },
+  "thumbnails": {
+    "default": "thumbnails/default.png"
+  },
+  "uv_params": {
+    "anchor_u": 0.5,
+    "anchor_v": 0.85,
+    "scale_u": 1.0,
+    "scale_v": 1.0
+  }
+}

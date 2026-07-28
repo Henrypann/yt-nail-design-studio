@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>NailSlot V2 Calibrator · Back line-art</title>
+<style>
+  body { margin:0; font:13px/1.4 ui-monospace, Menlo, monospace; background:#1c1c1c; color:#eee; }
+  header { padding:10px 14px; background:#111; border-bottom:1px solid #333; }
+  main { display:flex; gap:12px; padding:12px; }
+  canvas { background:#222; cursor:crosshair; image-rendering:pixelated; }
+  aside { width:320px; max-height:900px; overflow:auto; }
+  .slot { border:1px solid #444; padding:8px; margin:0 0 8px; border-radius:6px; }
+  .slot.active { border-color:#6af; }
+  button { margin:2px; }
+  code { color:#9cf; }
+</style>
+</head>
+<body>
+<header>
+  <strong>NailSlot V2 Calibrator</strong> — plate 1200×900 · overlays contour / root / axis / tip / ID<br/>
+  Dev-only. Does not modify Wizard. Load <code>slots.back.v2.json</code>. Drag: tip · rootL · rootR.
+</header>
+<main>
+  <canvas id="c" width="1200" height="900"></canvas>
+  <aside>
+    <div>
+      <button id="reload">Reload JSON</button>
+      <button id="export">Download overlay PNG</button>
+      <button id="toggle">Toggle overlay</button>
+    </div>
+    <p>Selected: <span id="sel">—</span></p>
+    <div id="list"></div>
+  </aside>
+</main>
+<script>
+const PLATE = "../../assets/visual-plates/back/back-line-art-approved-v1.png";
+const JSON_URL = "../../assets/nail-slots/slots.back.v2.json";
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let doc = null, img = new Image(), show = true, selected = 0, drag = null;
+
+const COLORS = {
+  L1:'#dc2828',L2:'#dc7828',L3:'#28a03c',L4:'#2878c8',L5:'#8c3cc8',
+  R1:'#dc2828',R2:'#dc7828',R3:'#28a03c',R4:'#2878c8',R5:'#8c3cc8'
+};
+
+function uvToStage(u,v,m) {
+  const [a,b,c,d,tx,ty]=m;
+  return {x:a*u+c*v+tx, y:b*u+d*v+ty};
+}
+function rebuild(slot) {
+  const rl=slot.rootLeft, rr=slot.rootRight, tip=slot.tipCenter;
+  const rootC={x:(rl.x+rr.x)/2,y:(rl.y+rr.y)/2};
+  const U={x:rr.x-rl.x,y:rr.y-rl.y};
+  const V={x:rootC.x-tip.x,y:rootC.y-tip.y};
+  const T={x:tip.x-0.5*U.x,y:tip.y-0.5*U.y};
+  slot.center=rootC;
+  slot.transform=[U.x,U.y,V.x,V.y,T.x,T.y];
+  slot.nailBedWidthPx=Math.hypot(U.x,U.y);
+  slot.visibleLengthPx=Math.hypot(tip.x-rootC.x, tip.y-rootC.y);
+  slot.rotationDeg=Math.atan2(tip.x-rootC.x, -(tip.y-rootC.y))*180/Math.PI;
+}
+
+function draw() {
+  ctx.clearRect(0,0,1200,900);
+  ctx.drawImage(img,0,0);
+  if (!show || !doc) return;
+  doc.slots.forEach((s,i) => {
+    const col = COLORS[s.fingerCode] || '#fff';
+    ctx.strokeStyle = col; ctx.lineWidth = i===selected ? 2.5 : 1.5;
+    // contour from UV rectangle for live edit
+    const m=s.transform;
+    const poly=[[0,0],[1,0],[1,1],[0,1]].map(([u,v])=>uvToStage(u,v,m));
+    ctx.beginPath();
+    poly.forEach((p,j)=> j?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.closePath(); ctx.stroke();
+    // root
+    ctx.strokeStyle='#e00'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(s.rootLeft.x,s.rootLeft.y); ctx.lineTo(s.rootRight.x,s.rootRight.y); ctx.stroke();
+    // axis
+    ctx.strokeStyle='#08f'; ctx.beginPath();
+    ctx.moveTo(s.center.x,s.center.y); ctx.lineTo(s.tipCenter.x,s.tipCenter.y); ctx.stroke();
+    // tip
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(s.tipCenter.x,s.tipCenter.y,3,0,Math.PI*2); ctx.fill();
+    // id
+    ctx.fillStyle='#fff'; ctx.fillRect(s.center.x-14, s.center.y+6, 28, 14);
+    ctx.fillStyle=col; ctx.font='12px monospace'; ctx.fillText(s.fingerCode, s.center.x-12, s.center.y+17);
+    // handles
+    for (const p of [s.tipCenter, s.rootLeft, s.rootRight]) {
+      ctx.strokeStyle='#fff'; ctx.strokeRect(p.x-4,p.y-4,8,8);
+    }
+  });
+}
+
+function renderList() {
+  const list=document.getElementById('list');
+  list.innerHTML='';
+  doc.slots.forEach((s,i) => {
+    const el=document.createElement('div');
+    el.className='slot'+(i===selected?' active':'');
+    el.innerHTML = `<strong>${s.fingerCode}</strong> ${s.fingerRole}<br/>
+      rot ${s.rotationDeg.toFixed(1)}° · w ${s.nailBedWidthPx.toFixed(1)} · L ${s.visibleLengthPx.toFixed(1)}<br/>
+      tip (${s.tipCenter.x.toFixed(0)},${s.tipCenter.y.toFixed(0)})` ;
+    el.onclick=()=>{selected=i; document.getElementById('sel').textContent=s.fingerCode; renderList(); draw();};
+    list.appendChild(el);
+  });
+}
+
+async function load() {
+  doc = await (await fetch(JSON_URL)).json();
+  renderList(); draw();
+}
+
+canvas.addEventListener('mousedown', e => {
+  if (!doc) return;
+  const r=canvas.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(1200/r.width), y=(e.clientY-r.top)*(900/r.height);
+  const s=doc.slots[selected];
+  for (const [key,p] of [['tipCenter',s.tipCenter],['rootLeft',s.rootLeft],['rootRight',s.rootRight]]) {
+    if (Math.hypot(p.x-x,p.y-y)<10) { drag={key}; break; }
+  }
+});
+canvas.addEventListener('mousemove', e => {
+  if (!drag) return;
+  const r=canvas.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(1200/r.width), y=(e.clientY-r.top)*(900/r.height);
+  const s=doc.slots[selected];
+  s[drag.key]={x,y};
+  rebuild(s); draw(); renderList();
+});
+window.addEventListener('mouseup', ()=> drag=null);
+
+document.getElementById('reload').onclick=load;
+document.getElementById('toggle').onclick=()=>{show=!show; draw();};
+document.getElementById('export').onclick=()=>{
+  const a=document.createElement('a');
+  a.download='calibration-back-v2-overlay.png';
+  a.href=canvas.toDataURL('image/png'); a.click();
+};
+
+img.onload=()=>load();
+img.src=PLATE;
+</script>
+</body>
+</html>

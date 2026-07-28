@@ -1,0 +1,30 @@
+{
+  "version": "v3-cuticle-seat",
+  "updated_at": "2026-07-24",
+  "status": "accepted",
+  "signed_off_at": "2026-07-24T15:30:00+08:00",
+  "source_geometry": "tools/v3_almond_geometry.py（研究稿）→ nails-shape-svg skill（正式事实源）",
+  "promoted_to": {
+    "shape_params": "material-library/shapes/shape-params.json#shapes.almond",
+    "skill": "nails-shape-svg/scripts/generate_nail_shapes.py（curveModel=cuticle-seat）",
+    "silhouettes": "material-library/shapes/silhouettes/almond_*.svg",
+    "patterns": "material-library/templates/*/patterns/almond.svg"
+  },
+  "parameters": {
+    "maxWidthMm": 11.0,
+    "rootWidthRatio": 0.87,
+    "cuticleDepthRatio": 0.1,
+    "cuticleDepthMm": 1.1,
+    "maxWidthT": 0.17,
+    "taperE1": 0.42,
+    "tipRadiusMmByLength": {
+      "14": 1.35,
+      "18": 1.15,
+      "22": 0.95,
+      "26": 0.8
+    }
+  },
+  "hard_checks": "ALL_PASS",
+  "validate_assets": "PASS",
+  "study_png": "assets/shape-calibration/v3-almond-root-study.png"
+}

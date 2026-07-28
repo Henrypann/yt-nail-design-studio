@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" data-view="palm" data-reference="ref-image-2.png">
+  <!--
+    hand-palm.svg · Palm 掌心半握拳底图（DEV-PLAN §4.2，对标 ref-image-2.png）
+    - 掌心朝向、四指弯曲向下、拇指斜向中指（DUV0722 架构）
+    - 第一人称掌心视角：图左 = 右手（R1–R5），图右 = 左手（L1–L5），双手关于 x=600 镜像
+      （与 ref-image-2 一致；业务侧 Palm 显示层反向规则 xPalm = 1 - xModel 由渲染器统一处理）
+    - 细描边（1.5px）+ 平涂肤色（token 引用 skin-base / skin-outline）+ 背景透明
+    - 指甲区域留空：指甲由 NailSlot 动态渲染（§4.4），锚点见 assets/nail-slots/slots.palm.json
+    - 拇指为独立叠加路径（半握拳时拇指搭在掌面与掌纹之上），随整手一起镜像
+  -->
+  <defs>
+    <g id="hand-palm-right">
+      <!-- 拳体轮廓：腕底 → 食指侧 → 四个弯曲指节凸包（R2→R5，深谷分隔）→ 小指侧 → 腕底 -->
+      <path d="M 258 855
+               C 238 755 208 655 190 565
+               C 172 495 152 455 140 415
+               C 128 375 118 300 116 235
+               C 112 175 126 120 158 114
+               C 190 108 206 145 206 185
+               C 206 196 214 194 216 182
+               C 220 130 234 98 262 95
+               C 290 92 304 128 304 178
+               C 304 189 312 187 314 175
+               C 318 124 332 100 356 102
+               C 380 104 392 136 392 182
+               C 392 193 400 191 402 179
+               C 406 140 420 126 440 128
+               C 462 130 474 155 472 200
+               C 470 290 466 360 456 430
+               C 444 530 418 645 398 742
+               C 390 800 384 830 382 855
+               Z"
+            fill="var(--skin-base, #F7DED3)" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 掌面主纹（拇指之下） -->
+      <g fill="none" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1" stroke-linecap="round" opacity="0.55">
+        <path d="M 168 510 Q 258 478 348 508"/>
+        <path d="M 188 575 Q 282 555 366 580"/>
+      </g>
+      <!-- 拇指（斜向中指，宽体圆尖，搭于掌面之上） -->
+      <path d="M 139 608
+               C 170 545 195 505 232 460
+               C 255 432 268 405 279 378
+               C 288 360 312 356 328 372
+               C 342 386 348 404 340 420
+               C 320 458 300 500 281 537
+               C 258 580 230 625 211 652
+               C 196 672 150 668 142 640
+               C 138 628 137 618 139 608
+               Z"
+            fill="var(--skin-base, #F7DED3)" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 指根与腕部细纹（指甲区域保持留空） -->
+      <g fill="none" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1" stroke-linecap="round" opacity="0.55">
+        <path d="M 128 258 Q 158 246 196 254"/>
+        <path d="M 216 242 Q 250 232 290 240"/>
+        <path d="M 308 246 Q 342 238 380 246"/>
+        <path d="M 398 268 Q 426 258 458 266"/>
+        <path d="M 264 825 Q 320 816 378 824"/>
+      </g>
+    </g>
+  </defs>
+  <use href="#hand-palm-right"/>
+  <use href="#hand-palm-right" transform="translate(1200 0) scale(-1 1)"/>
+</svg>

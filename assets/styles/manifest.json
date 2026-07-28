@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-27T00:00:00Z",
+  "comment": "Wizard 风格推荐弹窗数据源（DEV-PLAN §5.10）。按甲型分组；封面一律 16:9 1280×720。cover_status=REAL 为实拍/正式图，MOCK 为程序生成占位图（入库红线：MOCK 不得冒充正式图）。template_id 指向 material-library/index.json 中现有模板，选中风格后自动应用；为空则仅记录风格不应用模板。",
+  "recommendations": {
+    "almond": [
+      {
+        "id": "liquid-velvet-cat-eye",
+        "name": "裸透猫眼金属流线",
+        "name_en": "Liquid Velvet Cat-eye",
+        "priority": 1,
+        "best_lengths": ["short", "medium", "long", "extra-long"],
+        "best_length_label": "14–26mm 全覆盖",
+        "reason": "Almond 的中轴与软尖能把磁光拉成长光束；金属流线沿侧弧走，不会显得生硬。Cat-eye swirl 与半透明纹理是 2026 强信号。",
+        "cover_url": "/assets/styles/liquid-velvet-cat-eye.png",
+        "cover_status": "REAL",
+        "template_id": "t_liquid_velvet_cat_eye"
+      },
+      {
+        "id": "petal-veil-french",
+        "name": "奶雾法式立体花",
+        "name_en": "Petal Veil French",
+        "priority": 2,
+        "best_lengths": ["short", "medium", "long"],
+        "best_length_label": "14–22mm 优先",
+        "reason": "柔和尖端天然适合法式弧线；小花、珠点与细金线能顺着椭圆收窄排列，婚礼、约会、通勤均成立。",
+        "cover_url": "/assets/styles/petal-veil-french.png",
+        "cover_status": "REAL",
+        "template_id": "t_petal_veil_french"
+      },
+      {
+        "id": "sea-glass-mermaid",
+        "name": "海玻璃果冻贝壳珠光",
+        "name_en": "Sea Glass Mermaid",
+        "priority": 3,
+        "best_lengths": ["medium", "long", "extra-long"],
+        "best_length_label": "18–26mm 优先",
+        "reason": "Almond 的连续轮廓最能承接贝壳纹、珠光渐变、气泡与低浮雕鱼鳞；适合夏季传播与 Studio 3D 打印展示款。",
+        "cover_url": "/assets/styles/sea-glass-mermaid.png",
+        "cover_status": "MOCK",
+        "template_id": "t_3d_waterdrop"
+      }
+    ]
+  }
+}

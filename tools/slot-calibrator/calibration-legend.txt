@@ -1,0 +1,2 @@
+Colors: L1/R1 thumb red; L2/R2 index orange; L3/R3 middle green; L4/R4 ring blue; L5/R5 pinky purple
+Red thick = root line; Blue = root→tip axis; Black dot = tipCenter; Colored polygon = clip contour

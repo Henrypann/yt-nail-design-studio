@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" data-illustration="customers-empty">
+  <!-- 空状态插画 · 客户列表（DEV-PLAN §4.7）：与手部底图同一线稿风格，stroke=currentColor 由前端主题着色 -->
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="200" cy="118" r="46"/>
+    <path d="M 120 236 C 128 190 162 168 200 168 C 238 168 272 190 280 236"/>
+    <circle cx="296" cy="98" r="30" opacity="0.5"/>
+    <path d="M 296 84 L 296 112 M 282 98 L 310 98" opacity="0.5"/>
+  </g>
+</svg>

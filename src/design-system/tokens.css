@@ -1,0 +1,59 @@
+/**
+ * 设计 Token · 单一来源（DEV-PLAN §3.2）
+ * Tailwind theme 通过 CSS 变量引用本文件，改 token 只改这里。
+ */
+:root {
+  /* ── 中性灰阶（11 级） ─────────────────────────────── */
+  --gray-50: #fafafa;
+  --gray-100: #f4f4f5; /* 画布区浅灰底 */
+  --gray-200: #e4e4e7;
+  --gray-300: #d4d4d8;
+  --gray-400: #a1a1aa;
+  --gray-500: #71717a;
+  --gray-600: #52525b;
+  --gray-700: #3f3f46;
+  --gray-800: #27272a;
+  --gray-900: #18181b;
+  --gray-950: #0a0a0a;
+
+  /* ── 单一品牌主色（暖调玫瑰/浆果） ─────────────────── */
+  --color-primary: #c2497a;
+  --color-primary-hover: #ad3f6b;
+  --color-primary-active: #96355c;
+  --color-primary-soft: rgba(194, 73, 122, 0.08); /* 选中态 8% 填充 */
+  --color-primary-foreground: #ffffff;
+
+  /* ── 语义色（Toast / 状态徽标） ────────────────────── */
+  --color-success: #277a58;
+  --color-success-soft: rgba(39, 122, 88, 0.1);
+  --color-warning: #9a5a12;
+  --color-warning-soft: rgba(154, 90, 18, 0.1);
+  --color-error: #b42318;
+  --color-error-soft: rgba(180, 35, 24, 0.1);
+  --color-info: #3f6678;
+  --color-info-soft: rgba(63, 102, 120, 0.1);
+
+  /* ── 表面 ─────────────────────────────────────────── */
+  --color-canvas-bg: var(--gray-100); /* 画布区浅灰底 */
+  --color-panel-bg: #ffffff; /* 面板白底 */
+  --color-focus-ring: rgba(194, 73, 122, 0.35);
+
+  /* ── 圆角 ─────────────────────────────────────────── */
+  --radius-button: 6px;
+  --radius-panel: 8px;
+  --radius-card: 12px;
+
+  /* ── 阴影（仅两级） ───────────────────────────────── */
+  --shadow-float: 0 2px 8px rgba(0, 0, 0, 0.08); /* 悬浮面板 */
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.12); /* 模态 */
+
+  /* ── 动效时长 ─────────────────────────────────────── */
+  --duration-fast: 150ms; /* 淡出 */
+  --duration-base: 200ms; /* 淡入 / 微动效 */
+  --duration-skeleton: 1.2s; /* 骨架屏脉动 */
+
+  /* ── 肤色（手部底图占位，资产管线消费，预留 3 档） ──── */
+  --skin-base: #f2d5c4;
+  --skin-light: #f7e3d6;
+  --skin-deep: #d9b096;
+}

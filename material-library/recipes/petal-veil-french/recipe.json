@@ -1,0 +1,105 @@
+{
+  "id": "petal-veil-french",
+  "name": "奶雾法式立体花",
+  "name_en": "Petal Veil French",
+  "version": "0.2.0",
+  "status": "data-contract-draft",
+  "updated_at": "2026-07-27",
+  "comment": "六层配方数据契约（DEV-PLAN §5.11 Phase 4）。t_petal_veil_french 的 2D SVG 图案已由 Wizard/Editor 消费；本 recipe 仍为参数化渲染器的数据契约草稿，不得声称已由 recipe 渲染。所有坐标为 (u,v) 0..1 相对坐标：u=0.5 中轴、v=1 甲根、v=0 甲尖；禁止存屏幕/像素坐标。尺寸类字段均为相对值（相对甲片宽=1.0）。",
+  "coordinate_space": {
+    "u": "0=left edge, 0.5=center axis, 1=right edge (相对甲根宽)",
+    "v": "1=root(cuticle), 0=tip",
+    "size_unit": "相对甲片宽（1.0 = 当前甲型×长度的 widthMm）"
+  },
+  "linked_template_id": "t_petal_veil_french",
+  "best_shapes": ["almond"],
+  "best_lengths": ["short", "medium", "long"],
+  "layers": [
+    {
+      "key": "base",
+      "order": 1,
+      "kind": "color_fill",
+      "name": "奶雾裸透底",
+      "color": "#F2E4DA",
+      "opacity": 0.92,
+      "coverage": "full_nail"
+    },
+    {
+      "key": "french",
+      "order": 2,
+      "kind": "veil_arc",
+      "name": "奶雾法式弧",
+      "color": "#FBF7F2",
+      "opacity": 0.75,
+      "smile_line": {
+        "bezier_anchors": [
+          { "u": 0.10, "v": 0.34 },
+          { "u": 0.50, "v": 0.10 },
+          { "u": 0.90, "v": 0.34 }
+        ],
+        "note": "微笑线随 Almond 椭圆收窄；长档锚点 v 不变，由 UV 投影自然拉长"
+      },
+      "edge_softness": 0.35
+    },
+    {
+      "key": "petal",
+      "order": 3,
+      "kind": "relief_flower",
+      "name": "立体小花",
+      "height_mm": 0.18,
+      "flowers": [
+        { "uv": [0.30, 0.42], "scale": 0.16, "rotation_deg": -18, "petals": 5, "color": "#F7EDE6", "center_color": "#E8C9A0" },
+        { "uv": [0.68, 0.55], "scale": 0.13, "rotation_deg": 22, "petals": 5, "color": "#F7EDE6", "center_color": "#E8C9A0" },
+        { "uv": [0.40, 0.68], "scale": 0.10, "rotation_deg": 8, "petals": 5, "color": "#F5E8E0", "center_color": "#E8C9A0" }
+      ],
+      "per_finger_scale": { "thumb": 1.15, "pinky": 0.8 }
+    },
+    {
+      "key": "pearl",
+      "order": 4,
+      "kind": "pearl_dots",
+      "name": "珠点",
+      "height_mm": 0.12,
+      "dots": [
+        { "uv": [0.50, 0.30], "radius_rel": 0.030 },
+        { "uv": [0.58, 0.47], "radius_rel": 0.024 },
+        { "uv": [0.32, 0.58], "radius_rel": 0.024 }
+      ],
+      "color": "#FDFAF5",
+      "luster": "pearl"
+    },
+    {
+      "key": "goldLine",
+      "order": 5,
+      "kind": "metal_polyline",
+      "name": "细金线",
+      "color": "#D4AF7A",
+      "width_rel": 0.012,
+      "polylines": [
+        [
+          { "u": 0.22, "v": 0.50 },
+          { "u": 0.30, "v": 0.36 },
+          { "u": 0.44, "v": 0.26 }
+        ],
+        [
+          { "u": 0.78, "v": 0.62 },
+          { "u": 0.70, "v": 0.50 },
+          { "u": 0.60, "v": 0.42 }
+        ]
+      ],
+      "note": "沿侧弧走线，贴合 Almond 连续椭圆轮廓"
+    },
+    {
+      "key": "finish",
+      "order": 6,
+      "kind": "top_coat",
+      "name": "高光封层",
+      "finish": "gloss",
+      "relief_clearance_mm": 0.05
+    }
+  ],
+  "acceptance": {
+    "self_check": "python3 tools/validate-assets.py（schema/坐标域 0..1 校验）",
+    "visual_signoff": "渲染器接入后需人工视觉签收，签收前不得标 REAL"
+  }
+}

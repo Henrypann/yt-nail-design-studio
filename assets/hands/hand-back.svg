@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" data-view="back" data-reference="ref-image-1.png">
+  <!--
+    hand-back.svg · Back 手背张手底图（DEV-PLAN §4.2，对标 ref-image-1.png）
+    - 第一人称手背视角：图左 = 左手（L1–L5），图右 = 右手（R1–R5），双手关于 x=600 镜像
+    - 细描边（1.5px）+ 平涂肤色（token 引用 skin-base / skin-outline，附回退值）+ 背景透明
+    - 指甲区域留空：指甲由 NailSlot 动态渲染（§4.4），锚点见 assets/nail-slots/slots.back.json
+    - 右手为左手的镜像 <use>，修改左手路径即双手同步
+  -->
+  <defs>
+    <g id="hand-back-left">
+      <!-- 手轮廓：腕底 → 小指外侧 → 四指 → 拇指 → 掌内侧 → 腕底 -->
+      <path d="M 228 852
+               C 212 760 188 660 172 560
+               C 162 500 152 460 147 420
+               C 140 360 142 300 154 258
+               C 160 238 176 238 182 258
+               C 194 310 196 360 192 408
+               C 190 424 200 426 204 406
+               C 208 350 216 220 228 132
+               C 233 106 259 106 264 132
+               C 274 230 276 320 272 382
+               C 271 398 281 400 285 382
+               C 290 290 300 170 308 98
+               C 312 74 332 74 336 98
+               C 346 180 352 290 350 376
+               C 349 392 359 392 363 374
+               C 368 280 378 190 384 140
+               C 388 116 408 116 412 140
+               C 420 220 424 320 424 395
+               C 424 430 432 452 448 462
+               C 472 446 496 408 510 368
+               C 516 346 534 344 536 360
+               C 536 388 512 436 480 486
+               C 448 535 414 585 392 645
+               C 374 720 364 790 360 852
+               Z"
+            fill="var(--skin-base, #F7DED3)" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 指节与腕部细纹（极简线稿细节，指甲区域保持留空） -->
+      <g fill="none" stroke="var(--skin-outline, #D8BBA8)" stroke-width="1" stroke-linecap="round" opacity="0.55">
+        <path d="M 152 340 Q 168 334 186 338"/>
+        <path d="M 154 448 Q 170 442 190 446"/>
+        <path d="M 226 260 Q 246 254 268 258"/>
+        <path d="M 218 420 Q 246 412 274 418"/>
+        <path d="M 302 240 Q 322 234 344 238"/>
+        <path d="M 294 408 Q 322 400 352 406"/>
+        <path d="M 380 260 Q 398 254 418 258"/>
+        <path d="M 470 440 Q 486 420 500 396"/>
+        <path d="M 240 822 Q 300 814 362 820"/>
+      </g>
+    </g>
+  </defs>
+  <use href="#hand-back-left"/>
+  <use href="#hand-back-left" transform="translate(1200 0) scale(-1 1)"/>
+</svg>

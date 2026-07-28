@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-decoration="heart" data-units="0.1mm" data-origin="decoration-center">
+  <!-- 爱心 · 预制附件组件（DEV-PLAN §4.5）。原点 = 组件中心，单位 0.1mm -->
+  <path d="M 0 11
+           C -1 8 -12 2 -12 -5
+           C -12 -10 -8 -13 -4.5 -13
+           C -2 -13 -0.5 -11.5 0 -10
+           C 0.5 -11.5 2 -13 4.5 -13
+           C 8 -13 12 -10 12 -5
+           C 12 2 1 8 0 11 Z"
+        fill="#E35D8E" stroke="#B93A6B" stroke-width="1" stroke-linejoin="round"/>
+  <ellipse cx="-4.5" cy="-6" rx="2.2" ry="1.4" fill="#FFFFFF" opacity="0.65" transform="rotate(-25 -4.5 -6)"/>
+</svg>

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "comment": "手部画布背景清单（DEV-PLAN §4.2）：视图 → 底图 → NailSlot 组 的绑定。肤色 token 化（--skin-base / --skin-outline），预留 3 档肤色变体。",
+  "viewBox": "0 0 1200 900",
+  "style": {
+    "stroke_width": 1.5,
+    "skin_token": "--skin-base",
+    "outline_token": "--skin-outline",
+    "background": "transparent",
+    "nail_area": "留空，由 NailSlot 动态渲染（§4.4）"
+  },
+  "skin_variants": {
+    "light": {
+      "--skin-base": "#F7DED3",
+      "--skin-outline": "#D8BBA8"
+    },
+    "medium": {
+      "--skin-base": "#E8C0A4",
+      "--skin-outline": "#C49A7E"
+    },
+    "deep": {
+      "--skin-base": "#B98A6B",
+      "--skin-outline": "#96684E"
+    }
+  },
+  "views": {
+    "back": {
+      "image": "hand-back.svg",
+      "slots": "../nail-slots/slots.back.json",
+      "reference": "../../ref-image-1.png",
+      "pose": "手背朝向、自然张开、四指微并拢；图左=左手"
+    },
+    "palm": {
+      "image": "hand-palm.svg",
+      "slots": "../nail-slots/slots.palm.json",
+      "reference": "../../ref-image-2.png",
+      "pose": "掌心朝向、半握拳、四指弯曲向下、拇指斜向中指；图左=右手"
+    }
+  },
+  "status": "archived",
+  "archived_at": "2026-07-27",
+  "archive_note": "v1.4.1：hand-back/hand-palm 双视图 SVG 底图随 legacy anchor 渲染路径退役（Back 已由 assets/visual-plates/back 线稿 plate + slots.back.v2.json 取代；Palm MVP 砍除）。文件保留不删除；肤色变体方案随之搁置。"
+}

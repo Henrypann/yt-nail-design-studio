@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "view": "palm",
+  "image": "../hands/hand-palm.svg",
+  "coordinate_space": {
+    "width": 1200,
+    "height": 900,
+    "anchor": "normalized（0–1，除以 1200/900 还原像素）",
+    "anchor_point": "甲根中心（指甲轮廓 SVG 的原点落在此锚点）",
+    "rotation": "rotationDeg = 指甲生长轴相对 12 点方向的顺时针角度（0 = 指向图像正上方）"
+  },
+  "handedness": "第一人称掌心半握拳视角（与 ref-image-2.png 一致）：图左 = 右手（R1–R5），图右 = 左手（L1–L5）。业务侧 Palm 显示层反向规则 xPalm = 1 - xModel 由渲染器统一处理，本文件记录的是图像内的真实锚点坐标。",
+  "slots": [
+    {
+      "fingerCode": "R1",
+      "view": "palm",
+      "anchor": {
+        "x": 0.2375,
+        "y": 0.48
+      },
+      "rotationDeg": 48,
+      "fingerWidthMm": 15
+    },
+    {
+      "fingerCode": "R2",
+      "view": "palm",
+      "anchor": {
+        "x": 0.1333,
+        "y": 0.2389
+      },
+      "rotationDeg": -4,
+      "fingerWidthMm": 12
+    },
+    {
+      "fingerCode": "R3",
+      "view": "palm",
+      "anchor": {
+        "x": 0.2083,
+        "y": 0.2133
+      },
+      "rotationDeg": -1,
+      "fingerWidthMm": 12.5
+    },
+    {
+      "fingerCode": "R4",
+      "view": "palm",
+      "anchor": {
+        "x": 0.2833,
+        "y": 0.2222
+      },
+      "rotationDeg": 3,
+      "fingerWidthMm": 11.5
+    },
+    {
+      "fingerCode": "R5",
+      "view": "palm",
+      "anchor": {
+        "x": 0.3542,
+        "y": 0.2644
+      },
+      "rotationDeg": 9,
+      "fingerWidthMm": 9.5
+    },
+    {
+      "fingerCode": "L1",
+      "view": "palm",
+      "anchor": {
+        "x": 0.7625,
+        "y": 0.48
+      },
+      "rotationDeg": -48,
+      "fingerWidthMm": 15
+    },
+    {
+      "fingerCode": "L2",
+      "view": "palm",
+      "anchor": {
+        "x": 0.8667,
+        "y": 0.2389
+      },
+      "rotationDeg": 4,
+      "fingerWidthMm": 12
+    },
+    {
+      "fingerCode": "L3",
+      "view": "palm",
+      "anchor": {
+        "x": 0.7917,
+        "y": 0.2133
+      },
+      "rotationDeg": 1,
+      "fingerWidthMm": 12.5
+    },
+    {
+      "fingerCode": "L4",
+      "view": "palm",
+      "anchor": {
+        "x": 0.7167,
+        "y": 0.2222
+      },
+      "rotationDeg": -3,
+      "fingerWidthMm": 11.5
+    },
+    {
+      "fingerCode": "L5",
+      "view": "palm",
+      "anchor": {
+        "x": 0.6458,
+        "y": 0.2644
+      },
+      "rotationDeg": -9,
+      "fingerWidthMm": 9.5
+    }
+  ],
+  "status": "archived",
+  "archived_at": "2026-07-27",
+  "archive_note": "v1.4.1：Palm 视图 MVP 砍除、Back 切换 NailSlot V2（slots.back.v2.json + 线稿 plate）。本 legacy anchor 文件不再被前端消费，保留供追溯；未来 Palm 复活须走 V2 标定流程，不从本文件恢复。"
+}

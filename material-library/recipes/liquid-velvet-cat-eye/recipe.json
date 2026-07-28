@@ -1,0 +1,109 @@
+{
+  "id": "liquid-velvet-cat-eye",
+  "name": "裸透猫眼金属流线",
+  "name_en": "Liquid Velvet Cat-eye",
+  "version": "0.1.0",
+  "status": "data-contract-draft",
+  "updated_at": "2026-07-27",
+  "comment": "五层配方数据契约。t_liquid_velvet_cat_eye 的 2D SVG 图案由 Wizard/Editor 消费；本 recipe 仍为参数化渲染器草稿，不得声称已由 recipe 渲染。所有坐标均为 (u,v) 0..1 相对坐标，结构高度使用 mm。",
+  "coordinate_space": {
+    "u": "0=left edge, 0.5=center axis, 1=right edge",
+    "v": "1=root(cuticle), 0=tip",
+    "size_unit": "相对甲片宽（1.0 = 当前甲型×长度的 widthMm）"
+  },
+  "linked_template_id": "t_liquid_velvet_cat_eye",
+  "best_shapes": ["almond"],
+  "best_lengths": ["short", "medium", "long", "extra-long"],
+  "editable_params": {
+    "base_color": {
+      "default": "#8A625A",
+      "type": "color"
+    },
+    "cat_eye_angle_deg": {
+      "default": -7,
+      "min": -35,
+      "max": 35,
+      "step": 1
+    },
+    "metal_line": {
+      "default": "gold",
+      "options": ["gold", "silver"]
+    },
+    "waterdrop_enabled": {
+      "default": true,
+      "type": "boolean"
+    }
+  },
+  "layers": [
+    {
+      "key": "base",
+      "order": 1,
+      "kind": "jelly_color_fill",
+      "name": "裸透丝绒底",
+      "color": "#8A625A",
+      "opacity": 0.72,
+      "coverage": "full_nail"
+    },
+    {
+      "key": "catEye",
+      "order": 2,
+      "kind": "magnetic_beam",
+      "name": "纵向猫眼光带",
+      "angle_deg": -7,
+      "center_u": 0.5,
+      "beam_width_rel": 0.28,
+      "softness": 0.68,
+      "color": "#FFF8F1"
+    },
+    {
+      "key": "metalLine",
+      "order": 3,
+      "kind": "metal_polyline",
+      "name": "侧弧金属流线",
+      "color": "#D8B16E",
+      "width_rel": 0.012,
+      "polylines": [
+        [
+          { "u": 0.86, "v": 0.82 },
+          { "u": 0.84, "v": 0.58 },
+          { "u": 0.76, "v": 0.34 },
+          { "u": 0.58, "v": 0.12 }
+        ]
+      ]
+    },
+    {
+      "key": "waterdrop",
+      "order": 4,
+      "kind": "relief_waterdrop",
+      "name": "单颗透明水滴",
+      "height_mm": 0.16,
+      "drops": [
+        {
+          "uv": [0.34, 0.40],
+          "scale": 0.12,
+          "rotation_deg": -8,
+          "color": "#F8EAE4"
+        }
+      ],
+      "per_finger_visibility": {
+        "thumb": false,
+        "index": false,
+        "middle": false,
+        "ring": true,
+        "pinky": false
+      }
+    },
+    {
+      "key": "finish",
+      "order": 5,
+      "kind": "top_coat",
+      "name": "高光封层",
+      "finish": "gloss",
+      "relief_clearance_mm": 0.05
+    }
+  ],
+  "acceptance": {
+    "self_check": "python3 tools/validate-assets.py",
+    "visual_signoff": "SVG 模板接入后人工签收；recipe 渲染器接入前保持 data-contract-draft"
+  }
+}

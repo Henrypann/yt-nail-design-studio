@@ -1,0 +1,118 @@
+结论：v2 的核心问题不是“曲线不够平滑”，而是**把甲型的 3D 饱满感错误地建模成了 2D 轮廓向外鼓包**。所以它即使 C1 连续，仍然像“葫芦 / 人形 / 火箭”，不是真实甲片。
+
+我已对照了生成器、参数、参考图和最终 contact sheet。问题可以明确分成四层。
+
+## 核心 Bug 1：需求被悄悄缩减了
+
+参考定义包含 Square、Round、Oval、Squoval、Coffin、Ballerina、Almond、Stiletto，以及 XXS–XLong 长度体系；生成器实际上只支持 6 种形状、4 档长度：
+
+- 缺少 `oval`
+- 将 `coffin` 和 `ballerina` 合并为同一甲型
+- 只实现 `short / medium / long / extra-long`
+
+证据在 [generate_nail_shapes.py](/Users/henry.macbook/Library/Application%20Support/kimi-desktop/daimon-share/daimon/skills/nails-shape-svg/scripts/generate_nail_shapes.py:35)。这意味着即使曲线调好，也无法满足你确认的专业图谱体系。
+
+## 核心 Bug 2：`rootFullness` 制造了错误的“外扩肚子”
+
+当前宽度公式是：
+
+```text
+base *= 1 + rootFullness × bump
+```
+
+也就是在甲根到甲身中段把顶视轮廓宽度扩大到超过甲根宽度。代码位于 [generate_nail_shapes.py](/Users/henry.macbook/Library/Application%20Support/kimi-desktop/daimon-share/daimon/skills/nails-shape-svg/scripts/generate_nail_shapes.py:90)。
+
+实测中段最大宽度已经超过甲根：
+
+- Almond：`1.04 ×` 甲根宽度
+- Coffin：`1.035 ×`
+- Round：`1.03 ×`
+
+这正是 contact sheet 里 Coffin 出现“花瓶腰”、Round 出现“大头”、Almond/Stiletto 呈“火箭三角”的原因。见 [contact-sheet-v2.png](/Users/henry.macbook/Documents/Kimi/Workspaces/nextGen-beauty-tech/assets/shape-calibration/contact-sheet-v2.png)。
+
+真实甲片所说的“侧弧饱满”，主要是：
+
+- 顶视图里：肩部到甲尖的过渡自然、不断裂；
+- 3D 侧视/横截面里：C-curve 有弧高、侧壁圆润。
+
+它不意味着顶视轮廓要在中段向外膨胀。当前把这两个维度混为了一个 `rootFullness`。
+
+## 核心 Bug 3：Almond 被错误地当作软化的 Stiletto
+
+Almond 和 Stiletto 都进入同一 `pointed` 分支，都是“宽度接近零 + 顶点收口”的模型。见 [generate_nail_shapes.py](/Users/henry.macbook/Library/Application%20Support/kimi-desktop/daimon-share/daimon/skills/nails-shape-svg/scripts/generate_nail_shapes.py:158)。
+
+但二者不是尖锐度不同的同一种形：
+
+- **Almond**：连续椭圆式收窄，顶部是有限半径的软尖；
+- **Stiletto**：更晚或更长的收敛，才接近解析尖点。
+
+另外，参数中的 `midFullness` 对所有 `pointed` 甲型完全无效——代码把它固定为 `k = 1`。所以用户以为可以调 Almond 的“饱满度”，实际这个参数不会影响 Almond 或 Stiletto。见 [generate_nail_shapes.py](/Users/henry.macbook/Library/Application%20Support/kimi-desktop/daimon-share/daimon/skills/nails-shape-svg/scripts/generate_nail_shapes.py:83)。
+
+## 核心 Bug 4：验收工具只能验证“资产存在”，不能验证“甲型语义正确”
+
+目前的 contact sheet 是 2D 填充轮廓网格。它没有：
+
+- 与参考图的归一化叠加；
+- 关键形态点比较，例如最大宽度、肩部位置、尖端半径、平顶比例；
+- 横截面/C-curve 预览；
+- Coffin 与 Ballerina 的差异校验。
+
+因此 `validate-assets.py PASS` 只能证明 SVG、clipPath、文件引用等结构正确，不能证明视觉正确。“C1 连续”同样只能证明切线连续，不代表轮廓像真实甲型。
+
+## 正确解决方案：停止继续调 v2 参数，改为双层 v3 模型
+
+不要继续叠加 `rootFullness`、`midFullness` 或 Catmull-Rom 采样数。应该将“顶视甲型”和“横截面饱满度”拆开。
+
+```mermaid
+flowchart LR
+  A["2D Plan Outline<br/>甲型、肩部、尖端、平顶"] --> C["Studio 十指预览"]
+  B["3D Cross Section<br/>C-curve、弧高、侧壁滚圆、厚度"] --> D["侧视检查 / 打印工艺"]
+  A --> E["SVG / 图案 clipPath"]
+  B --> F["壳体 STL / 生产参数"]
+```
+
+### v3 的 2D 顶视轮廓
+
+每个甲型使用少量语义锚点和 2–3 段可控 Bézier，而不是“统一宽度函数 + 鼓包”：
+
+- `rootWidth`
+- `maxWidthRatio`：默认不得超过 `1.0`
+- `shoulderT`：开始收窄的位置
+- `tipWidthRatio`
+- `tipRadius`
+- `taperEase`
+- `cornerRadius`
+
+甲型应分为 8 个独立语义：
+
+- Square：近直侧壁，小圆角平顶
+- Squoval：近直侧壁，较大圆角
+- Round：浅圆穹顶
+- Oval：更长、更窄的椭圆穹顶
+- Coffin：较明确的梯形收窄、短平顶
+- Ballerina：更柔和、更长的收窄、圆润平顶
+- Almond：有限半径的软尖，不收至零宽
+- Stiletto：长而连续的收敛尖
+
+### v3 的 3D 横截面
+
+把当前的 `cCurve` 升级为真正独立的制造/预览参数，例如：
+
+- `cCurveHeight`
+- `apexOffset`
+- `sidewallRoll`
+- `tipThickness`
+
+它才负责“侧弧饱满”，而不是让 2D 平面轮廓往外鼓。
+
+## 建议的修复顺序
+
+1. 冻结 v2，停止基于它全量重生成资产。
+2. 恢复完整 taxonomy：8 种甲型，并确认 XXS–XLong 的具体档位和毫米定义。
+3. 删除 2D 模型中的 `rootFullness` 外扩逻辑；顶视轮廓默认保持 `maxWidth ≤ rootWidth`。
+4. 为 Almond、Stiletto、Oval、Coffin、Ballerina 建立独立 tip/shoulder 规则。
+5. 建立“参考图标注 → 归一化叠图 → 关键比例检查 → 人工签收”的校准流程。
+6. 在 contact sheet 之外新增横截面板；顶视正确与 C-curve 饱满分别验收。
+7. 仅在 v3 签收后，才重生成 SVG、模板 clipPath 与 STL Mock。
+
+这不是微调问题，而是**模型分层和形态分类错误**。最值得优先修的不是 Catmull-Rom，而是“2D 甲型轮廓 / 3D C-curve / 甲型语义”三者分离。

@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "comment": "质感元数据（DEV-PLAN §5.6）。原型期仅参数记录，不做真实渲染差异（Studio-PRD §12.4）；preview_params 供后端预览 Pipeline / 工艺映射引擎使用。",
+  "finishes": [
+    {
+      "id": "gloss",
+      "name": "高光",
+      "name_en": "Gloss",
+      "description": "标准亮面封层，反光强烈",
+      "gloss_level": 0.9,
+      "preview_params": { "sheen_opacity": 0.55, "sheen_width_ratio": 0.28, "roughness": 0.1 }
+    },
+    {
+      "id": "matte",
+      "name": "哑光",
+      "name_en": "Matte",
+      "description": "雾面封层，无反光",
+      "gloss_level": 0.1,
+      "preview_params": { "sheen_opacity": 0.0, "sheen_width_ratio": 0.0, "roughness": 0.9 }
+    },
+    {
+      "id": "pearl",
+      "name": "珠光",
+      "name_en": "Pearl",
+      "description": "细腻珠光封层，柔和漫反射",
+      "gloss_level": 0.5,
+      "preview_params": { "sheen_opacity": 0.3, "sheen_width_ratio": 0.5, "roughness": 0.4, "pearl_tint": "#F3E9E4" }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "view": "back",
+  "plate": "back-line-art-approved-v1.png",
+  "sourceWidth": 1200,
+  "sourceHeight": 900,
+  "style": "line-art-neutral-prescan",
+  "acceptance": "human_approved",
+  "approved_at": "2026-07-24",
+  "slot_v2": {
+    "status": "approved",
+    "slots_file": "assets/nail-slots/slots.back.v2.json",
+    "calibrated_at": "2026-07-24",
+    "calibrationVersion": "back-v2.1.0",
+    "approved_at": "2026-07-27"
+  },
+  "notes": "Neutral pre-scan line-art canvas; calibrate nail beds only; not manufacturing scan. Plate approved for NailSlot V2 calibration."
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -200 120 220" data-template="t_dark_gradient" data-shape="almond" data-units="0.1mm" data-origin="nail-root-center">
+  <defs>
+    <clipPath id="nail-clip"><path d="M -47.9 0 C -51.3 -3.5 -55 -18.4 -55 -30.6 C -55 -93.3 -25.8 -180 0 -180 C 25.8 -180 55 -93.3 55 -30.6 C 55 -18.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+    <linearGradient id="dark-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-180">
+      <stop offset="0" stop-color="#53357E" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#35205C" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#170B30" stop-opacity="0.98"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#nail-clip)">
+    <rect x="-60" y="-200" width="120" height="220" fill="url(#dark-g)"/>
+    <ellipse cx="0" cy="-70" rx="34" ry="10" fill="#8A6AB8" opacity="0.18"/>
+  </g>
+</svg>

@@ -1,0 +1,499 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "status": "MOCK_PENDING_ALGO",
+  "comment": "Mock STL 占位清单（DEV-PLAN §4.6）。正式 STL 由算法组工艺映射引擎产出，替换时只改本 manifest 指向，UI 与导出链路零改动。原型期 STL 不暴露给用户（PNG 唯一导出）。",
+  "mock_file": "mock-shell.stl",
+  "mock_params": {
+    "shape": "almond",
+    "length": "medium",
+    "semi_axes_mm": [
+      5.5,
+      9.0,
+      3.04
+    ],
+    "source": "material-library/shapes/shape-params.json"
+  },
+  "entries": [
+    {
+      "template_id": "t_french_white",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_french_white",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_french_white",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_french_white",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_french_white",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_french_white",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_nude_gradient",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_cat_eye_nude",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_y2k_ice",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_dark_gradient",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_chrome_mirror",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_checkerboard",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_3d_waterdrop",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_classic_high_gloss",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "almond",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "coffin",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "squoval",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "round",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "square",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    },
+    {
+      "template_id": "t_holiday_glitter",
+      "shape": "stiletto",
+      "status": "MOCK_PENDING_ALGO",
+      "placeholder_file": "mock-shell.stl",
+      "final_file": null,
+      "note": "正式 STL 待算法组工艺映射引擎产出（Q3 后段）"
+    }
+  ]
+}

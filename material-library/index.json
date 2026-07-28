@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-27T00:00:00Z",
+  "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码（DEV-PLAN §2.3-8）。not_recommended 的每个条目必须带人类可读 reason（入库强制，tools/validate-assets.py 检查）。路径均相对于仓库根目录。",
+  "style_tags": [
+    { "id": "trending", "name": "当下流行", "name_en": "Trending Now" },
+    { "id": "sweet", "name": "甜美", "name_en": "Sweet" },
+    { "id": "minimal", "name": "简约", "name_en": "Minimal" },
+    { "id": "cool", "name": "酷炫", "name_en": "Cool" },
+    { "id": "retro", "name": "复古", "name_en": "Retro" },
+    { "id": "luxe", "name": "奢华", "name_en": "Luxe" },
+    { "id": "holiday", "name": "节日", "name_en": "Holiday" }
+  ],
+  "shape_ids": ["almond", "coffin", "squoval", "round", "square", "stiletto"],
+  "templates": [
+    {
+      "id": "t_liquid_velvet_cat_eye",
+      "name": "裸透猫眼金属流线",
+      "name_en": "Liquid Velvet Cat-eye",
+      "style_tags": ["trending", "luxe", "minimal"],
+      "default_base_color": "#8A625A",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "coffin", "squoval"],
+        "neutral": ["round", "stiletto"],
+        "not_recommended": {
+          "square": "平直宽甲面会让纵向磁光发散，侧弧金属流线也难以形成连续拉长感"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "sort_order": 0
+    },
+    {
+      "id": "t_petal_veil_french",
+      "name": "奶雾法式立体花",
+      "name_en": "Petal Veil French",
+      "style_tags": ["trending", "sweet", "minimal"],
+      "default_base_color": "#F2E4DA",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "round", "squoval"],
+        "neutral": ["coffin", "square"],
+        "not_recommended": {
+          "stiletto": "极尖甲面会压缩法式弧与低浮雕花的留白，削弱轻柔比例"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_petal_veil_french/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_petal_veil_french/manifest.json",
+      "sort_order": 1
+    },
+    {
+      "id": "t_french_white",
+      "name": "法式白边",
+      "name_en": "French White Tip",
+      "style_tags": ["minimal", "classic"],
+      "default_base_color": "#F5E0D3",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "squoval", "coffin"],
+        "neutral": ["square", "round"],
+        "not_recommended": {
+          "stiletto": "极尖甲面上法式弧线比例失衡，白边视觉效果不理想"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_french_white/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_french_white/manifest.json",
+      "sort_order": 2
+    },
+    {
+      "id": "t_nude_gradient",
+      "name": "裸粉渐变",
+      "name_en": "Nude Pink Gradient",
+      "style_tags": ["sweet"],
+      "default_base_color": "#F7D9CF",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "round", "squoval"],
+        "neutral": ["coffin", "square"],
+        "not_recommended": {
+          "stiletto": "渐变过渡在尖端被截断，色彩层次不完整"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_nude_gradient/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_nude_gradient/manifest.json",
+      "sort_order": 3
+    },
+    {
+      "id": "t_cat_eye_nude",
+      "name": "猫眼裸色",
+      "name_en": "Cat Eye Nude",
+      "style_tags": ["luxe"],
+      "default_base_color": "#E8D5C4",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "coffin", "squoval"],
+        "neutral": ["round"],
+        "not_recommended": {
+          "square": "猫眼光带需要纵向弧面支撑，平直甲面光带发散不集中",
+          "stiletto": "猫眼光带需要纵向弧面，过尖甲面上光带断裂"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_cat_eye_nude/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_cat_eye_nude/manifest.json",
+      "sort_order": 4
+    },
+    {
+      "id": "t_y2k_ice",
+      "name": "Y2K 冰川",
+      "name_en": "Y2K Glacier",
+      "style_tags": ["cool"],
+      "default_base_color": "#DCEBF2",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["coffin", "almond", "stiletto"],
+        "neutral": ["squoval"],
+        "not_recommended": {
+          "round": "短圆甲面气场不足，冰川碎线比例失衡",
+          "square": "短平甲面气场不足，冰川碎线显得局促"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_y2k_ice/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_y2k_ice/manifest.json",
+      "sort_order": 5
+    },
+    {
+      "id": "t_dark_gradient",
+      "name": "暗夜渐变",
+      "name_en": "Midnight Gradient",
+      "style_tags": ["cool"],
+      "default_base_color": "#3B2A4A",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["stiletto", "coffin", "almond"],
+        "neutral": ["squoval"],
+        "not_recommended": {
+          "round": "渐变需要长度支撑，短圆甲面色彩过渡仓促",
+          "square": "渐变需要长度支撑，短平甲面色彩过渡仓促"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_dark_gradient/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_dark_gradient/manifest.json",
+      "sort_order": 6
+    },
+    {
+      "id": "t_chrome_mirror",
+      "name": "镜面铬",
+      "name_en": "Chrome Mirror",
+      "style_tags": ["luxe"],
+      "default_base_color": "#D9DCE0",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["stiletto", "coffin"],
+        "neutral": ["almond", "squoval"],
+        "not_recommended": {
+          "round": "镜面效果在大圆弧平面上显廉价，长甲面反光更集中",
+          "square": "镜面效果在大平面上显廉价，窄长甲面反光更集中"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_chrome_mirror/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_chrome_mirror/manifest.json",
+      "sort_order": 7
+    },
+    {
+      "id": "t_checkerboard",
+      "name": "棋盘格",
+      "name_en": "Checkerboard",
+      "style_tags": ["retro"],
+      "default_base_color": "#F5F5F5",
+      "default_finish": "matte",
+      "shape_compatibility": {
+        "highly_compatible": ["square", "coffin"],
+        "neutral": ["almond", "squoval"],
+        "not_recommended": {
+          "round": "格子在圆弧边上变形，图案边缘被裁切",
+          "stiletto": "格子在收窄的曲边上变形，图案边缘被裁切"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_checkerboard/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_checkerboard/manifest.json",
+      "sort_order": 8
+    },
+    {
+      "id": "t_3d_waterdrop",
+      "name": "3D 水滴",
+      "name_en": "3D Waterdrop",
+      "style_tags": ["sweet"],
+      "default_base_color": "#F5E0D3",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "round"],
+        "neutral": ["coffin", "squoval"],
+        "not_recommended": {
+          "square": "水滴造型与直边轮廓冲突，视觉风格不协调",
+          "stiletto": "水滴造型与尖角轮廓冲突，视觉风格不协调"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_3d_waterdrop/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "sort_order": 9
+    },
+    {
+      "id": "t_classic_high_gloss",
+      "name": "经典高光",
+      "name_en": "Classic High Gloss",
+      "style_tags": ["minimal"],
+      "default_base_color": "#F5E0D3",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "coffin", "squoval", "round", "square", "stiletto"],
+        "neutral": [],
+        "not_recommended": {}
+      },
+      "thumbnail_url": "material-library/templates/t_classic_high_gloss/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_classic_high_gloss/manifest.json",
+      "sort_order": 10
+    },
+    {
+      "id": "t_holiday_glitter",
+      "name": "节日闪粉",
+      "name_en": "Holiday Glitter",
+      "style_tags": ["holiday"],
+      "default_base_color": "#7E2A44",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "coffin", "round"],
+        "neutral": ["squoval", "square"],
+        "not_recommended": {
+          "stiletto": "闪粉在尖端堆积过厚，封层易起翘"
+        }
+      },
+      "thumbnail_url": "material-library/templates/t_holiday_glitter/thumbnails/default.png",
+      "manifest_url": "material-library/templates/t_holiday_glitter/manifest.json",
+      "sort_order": 11
+    }
+  ]
+}

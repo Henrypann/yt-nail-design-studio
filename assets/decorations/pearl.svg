@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-decoration="pearl" data-units="0.1mm" data-origin="decoration-center">
+  <!-- 珍珠 · 预制附件组件（DEV-PLAN §4.5）。原点 = 组件中心，单位 0.1mm -->
+  <defs>
+    <radialGradient id="pearl-g" cx="0.35" cy="0.3" r="0.95">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#F2EBE4"/>
+      <stop offset="1" stop-color="#CBBFB2"/>
+    </radialGradient>
+  </defs>
+  <circle cx="0" cy="0" r="11" fill="url(#pearl-g)" stroke="#B9AC9E" stroke-width="0.8"/>
+  <ellipse cx="-3.5" cy="-4" rx="2.6" ry="1.7" fill="#FFFFFF" opacity="0.9" transform="rotate(-30 -3.5 -4)"/>
+</svg>

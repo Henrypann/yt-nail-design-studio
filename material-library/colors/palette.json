@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-23T00:00:00Z",
+  "comment": "Wizard 参数面板 8 色色板（DEV-PLAN §5.6 / Studio-PRD §12.4）。点击 swatch → 十指底色即时替换。",
+  "colors": [
+    { "id": "c_nude_pink", "name": "裸粉", "name_en": "Nude Pink", "hex": "#F5E0D3", "sort_order": 1 },
+    { "id": "c_milky_white", "name": "奶白", "name_en": "Milky White", "hex": "#FBF5F0", "sort_order": 2 },
+    { "id": "c_dusty_rose", "name": "干枯玫瑰", "name_en": "Dusty Rose", "hex": "#D4A0A7", "sort_order": 3 },
+    { "id": "c_berry", "name": "浆果红", "name_en": "Berry", "hex": "#C2497A", "sort_order": 4 },
+    { "id": "c_wine", "name": "酒红", "name_en": "Wine", "hex": "#7A2E4D", "sort_order": 5 },
+    { "id": "c_caramel", "name": "焦糖棕", "name_en": "Caramel", "hex": "#B08968", "sort_order": 6 },
+    { "id": "c_grey_taupe", "name": "灰褐", "name_en": "Grey Taupe", "hex": "#8A7E78", "sort_order": 7 },
+    { "id": "c_deep_plum", "name": "暗夜紫", "name_en": "Deep Plum", "hex": "#3B2A4A", "sort_order": 8 }
+  ]
+}

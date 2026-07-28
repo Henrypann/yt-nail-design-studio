@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" data-illustration="404">
+  <!-- 空状态插画 · 404（DEV-PLAN §4.7）：放大镜 + 虚线甲型轮廓 + 问号 -->
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 200 218
+             C 176 218 164 196 164 166
+             C 164 136 180 110 200 88
+             C 220 110 236 136 236 166
+             C 236 196 224 218 200 218 Z"
+          stroke-dasharray="10 9" opacity="0.5"/>
+    <circle cx="200" cy="158" r="58"/>
+    <path d="M 241 199 L 282 240"/>
+    <path d="M 188 148 C 188 138 196 132 203 134 C 211 136 214 144 209 151 C 205 156 200 158 200 164"/>
+    <circle cx="200" cy="176" r="3.5" fill="currentColor" stroke="none"/>
+  </g>
+</svg>

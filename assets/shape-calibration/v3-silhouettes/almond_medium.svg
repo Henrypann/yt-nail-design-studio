@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-61.0 -186.0 122.0 203.0" data-shape="almond" data-length="medium" data-units="0.1mm" data-origin="nail-root-center" data-curve-model="v3-cuticle-seat" data-status="prototype-pending-review" data-tip-radius-mm="1.15">
+  <defs>
+    <clipPath id="nail-clip">
+      <path d="M -47.85 0 C -51.3 -3.47 -55 -18.36 -55 -30.6 C -55 -93.35 -25.77 -180 0 -180 C 25.77 -180 55 -93.35 55 -30.6 C 55 -18.36 51.3 -3.47 47.85 0 C 44.02 3.85 21.53 11 0 11 C -21.53 11 -44.02 3.85 -47.85 0 Z"/>
+    </clipPath>
+  </defs>
+  <path d="M -47.85 0 C -51.3 -3.47 -55 -18.36 -55 -30.6 C -55 -93.35 -25.77 -180 0 -180 C 25.77 -180 55 -93.35 55 -30.6 C 55 -18.36 51.3 -3.47 47.85 0 C 44.02 3.85 21.53 11 0 11 C -21.53 11 -44.02 3.85 -47.85 0 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <!-- prototype only: do not consume from material-library until signed off -->
+</svg>
