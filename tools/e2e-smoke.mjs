@@ -71,6 +71,9 @@ try {
   const tierOneShapes = page.locator('[data-shape-tier="1"]');
   await tierOneShapes.first().waitFor({ timeout: 10000 });
   const tierOneCount = await tierOneShapes.count();
+  const tierOneOrder = await tierOneShapes.evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute('data-shape-id')),
+  );
   const enabledShapeStates = await Promise.all(
     ['almond', 'oval', 'coffin'].map(async (shape) =>
       (await page.locator(`[data-shape-id="${shape}"]`).getAttribute('aria-disabled')) !== 'true'),
@@ -86,10 +89,25 @@ try {
     tierOneCount === 5 && tierTwoCount === 10 && enabledShapeStates.every(Boolean) && tierOneDisabled.every(Boolean),
     `Tier1=${tierOneCount}, Tier2=${tierTwoCount}, 已开放=${enabledShapeStates.filter(Boolean).length}`,
   );
+  step(
+    '已开放甲型自动靠前',
+    tierOneOrder.join(',') === 'almond,oval,coffin,squoval,square',
+    tierOneOrder.join(' → '),
+  );
   await page.getByRole('button', { name: '更多甲型（10）' }).click();
 
   /* 5. STEP 1：选甲型 + 长度 → 应用（v1.3.0：先弹风格推荐） */
   await page.getByRole('button', { name: /Coffin/ }).first().click();
+  const coffinLengthSignals = await Promise.all(
+    ['短', '中', '长', '超长'].map(async (label) =>
+      page.getByRole('button', { name: label, exact: true }).getAttribute('data-compatibility')),
+  );
+  step(
+    'Coffin 长度规则全局生效且不阻断选择',
+    coffinLengthSignals.join(',') === 'strong,caution,recommended,recommended' &&
+      await page.getByRole('button', { name: '短', exact: true }).isEnabled(),
+    coffinLengthSignals.join(' → '),
+  );
   await page.getByRole('button', { name: '中', exact: true }).click();
   await page.getByRole('button', { name: '应用 → 预览十指' }).click();
 
@@ -109,6 +127,18 @@ try {
   await tiledGrid.waitFor({ timeout: 10000 });
   const tiledCells = await tiledGrid.locator('button').count();
   step('默认视图 = 十指平铺（每格 ≥120px）', tiledCells === 10, `格子数=${tiledCells}`);
+  const wizardThumbBox = await tiledGrid.locator('[data-finger-code="L1"] [data-finger-nail]').boundingBox();
+  const wizardMiddleBox = await tiledGrid.locator('[data-finger-code="L3"] [data-finger-nail]').boundingBox();
+  const wizardPinkyBox = await tiledGrid.locator('[data-finger-code="L5"] [data-finger-nail]').boundingBox();
+  step(
+    'Wizard 五指展示比例 = Thumb > Middle > Pinky',
+    !!wizardThumbBox &&
+      !!wizardMiddleBox &&
+      !!wizardPinkyBox &&
+      wizardThumbBox.width > wizardMiddleBox.width * 1.1 &&
+      wizardPinkyBox.width < wizardMiddleBox.width * 0.85,
+    `L1=${wizardThumbBox?.width.toFixed(1)} · L3=${wizardMiddleBox?.width.toFixed(1)} · L5=${wizardPinkyBox?.width.toFixed(1)}`,
+  );
 
   /* 6. 应用第一个模板 */
   await page.getByRole('button', { name: '应用此模板' }).first().click();
@@ -329,6 +359,28 @@ try {
   const squovalStillDisabled = await page.getByRole('button', { name: 'Squoval' }).isDisabled();
   step('Editor 同步开放 Coffin；Squoval / Square 保持灰态', coffinEnabled && squareStillDisabled && squovalStillDisabled);
 
+  const editorUrl = page.url();
+  await page.goto(`${BASE}/design/canvas?blank=1`, { waitUntil: 'networkidle' });
+  await page.getByRole('heading', { name: '空白画布新建' }).waitFor({ timeout: 5000 });
+  const blankShapeOrder = await page.locator('[data-shape-id]').evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute('data-shape-id')),
+  );
+  const blankCoffinEnabled = await page.locator('[data-shape-id="coffin"]').isEnabled();
+  const blankSquareDisabled = await page.locator('[data-shape-id="square"]').isDisabled();
+  const blankNaturalSignal = await page
+    .getByRole('button', { name: '短', exact: true })
+    .getAttribute('data-compatibility');
+  step(
+    '空白画布复用能力注册表与兼容规则',
+    blankShapeOrder.join(',') === 'almond,oval,coffin,squoval,square' &&
+      blankCoffinEnabled &&
+      blankSquareDisabled &&
+      blankNaturalSignal === 'strong',
+    `${blankShapeOrder.join(' → ')} · 短=${blankNaturalSignal}`,
+  );
+  await page.goto(editorUrl, { waitUntil: 'networkidle' });
+  await page.getByTestId('editor-inspector').waitFor({ timeout: 5000 });
+
   /* 10f. 全局中英文切换；甲型名称保持英文 */
   await page.getByTestId('language-toggle').getByRole('button', { name: 'EN' }).click();
   await page.getByTestId('editor-finger-strip').getByText('EDIT SCOPE').first().waitFor({ timeout: 5000 });
@@ -338,6 +390,18 @@ try {
 
   /* 10g. 桥接保真：Editor 十指平铺出现 L3 + R4 两个解锁标记 */
   await page.getByRole('button', { name: '十指预览' }).click();
+  const editorThumbBox = await page.locator('[data-finger-code="L1"] [data-finger-nail]').boundingBox();
+  const editorMiddleBox = await page.locator('[data-finger-code="L3"] [data-finger-nail]').boundingBox();
+  const editorPinkyBox = await page.locator('[data-finger-code="L5"] [data-finger-nail]').boundingBox();
+  step(
+    'Editor 十指预览复用五指展示比例',
+    !!editorThumbBox &&
+      !!editorMiddleBox &&
+      !!editorPinkyBox &&
+      editorThumbBox.height > editorMiddleBox.height * 1.1 &&
+      editorPinkyBox.height < editorMiddleBox.height * 0.85,
+    `L1=${editorThumbBox?.height.toFixed(1)} · L3=${editorMiddleBox?.height.toFixed(1)} · L5=${editorPinkyBox?.height.toFixed(1)}`,
+  );
   await page.locator('span[title="已解锁独立编辑"]').first().waitFor({ timeout: 5000 });
   const unlockBadges = await page.locator('span[title="已解锁独立编辑"]').count();
   step('桥接覆写 + Editor 单甲编辑均保留', unlockBadges === 2, `🔓 数量=${unlockBadges}`);

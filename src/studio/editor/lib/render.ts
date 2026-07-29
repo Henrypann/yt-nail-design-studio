@@ -8,6 +8,7 @@
 
 import type { FingerCode, NailShape } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
+import { fingerDisplayRatio, fingerDisplayScale } from '@/studio/finger-display';
 import { getDecorationInner, getPatternArtwork, getSilhouette, type SilhouetteInfo } from './material';
 import { buildFrenchEdgePaths } from './french-edge';
 import type {
@@ -211,7 +212,7 @@ export function composeTiledSvg(doc: EditorDoc, opts: TiledRenderOpts): string |
   const [vx, vy, vw, vh] = parseViewBox(sil.viewBox);
   const cellW = 150;
   const cellH = 220;
-  const scale = (cellH - 52) / vh;
+  const maxScale = (cellH - 52) / vh;
   const width = cellW * 5;
   const height = cellH * 2;
 
@@ -220,13 +221,15 @@ export function composeTiledSvg(doc: EditorDoc, opts: TiledRenderOpts): string |
     const row = Math.floor(i / 5);
     const cx = col * cellW + cellW / 2;
     const cy = row * cellH + cellH / 2 - 6;
+    const displayScale = fingerDisplayScale(finger);
+    const scale = maxScale * fingerDisplayRatio(finger);
     const mirror = opts.view === 'palm' ? 'scale(-1 1) ' : '';
     const locked = doc.fingerLocks[finger] !== undefined;
     const isMaster = doc.masterFinger === finger;
-    const labelY = cy + (vh * scale) / 2 + 18;
+    const labelY = cy + (vh * maxScale) / 2 + 18;
 
     if (opts.degradedFinger === finger) {
-      return `<g transform="translate(${cx} ${cy}) scale(${scale})">
+      return `<g data-finger="${finger}" data-display-scale="${displayScale}" transform="translate(${cx} ${cy}) scale(${scale})">
           <path d="${sil.pathD}" transform="translate(${-(vx + vw / 2)} ${-(vy + vh / 2)})" fill="#E4E4E7" stroke="#A1A1AA" stroke-width="2"/>
         </g>
         <text x="${cx}" y="${cy}" text-anchor="middle" font-size="18">⚠️</text>
@@ -241,7 +244,7 @@ export function composeTiledSvg(doc: EditorDoc, opts: TiledRenderOpts): string |
     const badge = opts.markBadges
       ? `<text x="${cx}" y="${labelY}" text-anchor="middle" font-size="12" fill="#52525B" font-family="sans-serif">${finger}${isMaster ? ' 💗' : ''}${locked ? ' 🔓' : ''}</text>`
       : '';
-    return `<g transform="translate(${cx} ${cy})">
+    return `<g data-finger="${finger}" data-display-scale="${displayScale}" transform="translate(${cx} ${cy})">
         <g transform="${mirror}scale(${scale}) translate(${-(vx + vw / 2)} ${-(vy + vh / 2)})">${content}</g>
       </g>${badge}`;
   }).join('');

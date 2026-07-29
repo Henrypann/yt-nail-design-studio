@@ -21,6 +21,18 @@
   "shape_length": [
     {
       "shape_id": "almond",
+      "evidence": [
+        {
+          "source": "OPI Professional",
+          "url": "https://www.opi.com/professionals/how-to-shape-nails",
+          "finding": "Almond is described as ideal for medium to long nails."
+        },
+        {
+          "source": "Aprés Nail University",
+          "url": "https://secure.apresnail.com/en-ca/blogs/university/coffin-vs-almond-nails-which-is-right-for-you",
+          "finding": "Almond is positioned for medium-to-long lengths."
+        }
+      ],
       "recommended": [
         "short-extension",
         "medium",
@@ -43,16 +55,46 @@
     },
     {
       "shape_id": "oval",
+      "evidence": [
+        {
+          "source": "OPI",
+          "url": "https://www.opi.com/blog/nail-care/how-to-find-the-best-nail-shape-for-your-hands",
+          "finding": "Oval is presented as suitable for long nails and visually elongating."
+        },
+        {
+          "source": "DepEd Beauty Care learning material, citing Milady Standard Nail Technology",
+          "url": "https://www.deped.gov.ph/wp-content/uploads/Q1-TLE910-FCS-LAS36-Beauty-Care-Services.pdf",
+          "finding": "Oval is described as natural-looking at short-to-medium length."
+        }
+      ],
       "recommended": [
         "natural",
         "short-extension",
-        "medium"
+        "medium",
+        "long"
       ],
       "warning": {},
       "review_status": "pending_cloudia"
     },
     {
       "shape_id": "coffin",
+      "evidence": [
+        {
+          "source": "Aprés Nail University",
+          "url": "https://secure.apresnail.com/en-ca/blogs/university/coffin-vs-almond-nails-which-is-right-for-you",
+          "finding": "Coffin is best suited to longer lengths so its taper and squared tip can read clearly."
+        },
+        {
+          "source": "Gelish Core Catalog",
+          "url": "https://o.gelish.com/pdf/16199-GM-CORE-Catalog-MobileVersion-AG-FNL.pdf",
+          "finding": "The professional tip catalog includes a Medium Coffin product."
+        },
+        {
+          "source": "OPI xPRESS/ON",
+          "url": "https://www.opi.com/en-GB/blog/product-spotlight/launching-soon-xpress-on-press-on-nails",
+          "finding": "OPI's press-on range pairs Coffin with long length."
+        }
+      ],
       "recommended": [
         "medium",
         "long"

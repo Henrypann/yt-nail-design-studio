@@ -12,6 +12,7 @@ import { useId, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button, Spinner, cx } from '@/design-system';
 import { FINGER_CODES, type FingerCode, type FingerOverrides, type Finish, type NailLength, type NailShape } from '@/lib/types';
+import { fingerDisplayRatio, fingerDisplayScale } from '@/studio/finger-display';
 import type { DecorationAsset } from './nail-assets';
 import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
@@ -67,6 +68,13 @@ export function NailCellView({
 }: NailCellViewProps) {
   const rawId = useId().replace(/[^a-zA-Z0-9]/g, '');
   const clipId = `cellclip-${rawId}-${finger}`;
+  const displayScale = fingerDisplayScale(finger);
+  const displayRatio = fingerDisplayRatio(finger);
+  const baseWidth = size === 'md' ? 120 : 48;
+  const viewBoxParts = viewBox.split(/\s+/).map(Number);
+  const viewBoxWidth = viewBoxParts[2] || 120;
+  const viewBoxHeight = viewBoxParts[3] || 220;
+  const stageHeight = baseWidth * (viewBoxHeight / viewBoxWidth);
   return (
     <button
       type="button"
@@ -74,6 +82,8 @@ export function NailCellView({
       onClick={() => onClick?.(finger)}
       onDoubleClick={() => onDoubleClick?.(finger)}
       title={FINGER_LABEL[finger]}
+      data-finger-code={finger}
+      data-finger-display-scale={displayScale}
       className={cx(
         'group relative flex flex-col items-center gap-1 rounded-card border bg-white transition-all duration-fast',
         size === 'md' ? 'min-w-[120px] p-2' : 'min-w-[48px] p-1',
@@ -94,30 +104,41 @@ export function NailCellView({
           title="该指有单独定制"
         />
       )}
-      <svg viewBox={viewBox} className={cx('h-auto select-none', size === 'md' ? 'w-[120px]' : 'w-[48px]')}>
-        <defs>
-          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-            <path d={silhouetteD} />
-          </clipPath>
-        </defs>
-        <FingerNailContent
-          finger={finger}
-          silhouetteD={silhouetteD}
-          clipId={clipId}
-          baseColor={baseColor}
-          finish={finish}
-          failed={failed}
-          selected={selected}
-          patternMarkup={patternMarkup}
-          patternK={patternK}
-          patternVisible={patternVisible}
-          patternFadeMs={patternFadeMs}
-          decoration={decoration}
-          strokeScale={strokeScale}
-          readOnly
-          fingerLabel={FINGER_LABEL[finger]}
-        />
-      </svg>
+      <span
+        className="flex shrink-0 items-center justify-center"
+        style={{ width: `${baseWidth}px`, height: `${stageHeight}px` }}
+        aria-hidden="true"
+      >
+        <svg
+          viewBox={viewBox}
+          className="h-auto select-none"
+          style={{ width: `${baseWidth * displayRatio}px` }}
+          data-finger-nail
+        >
+          <defs>
+            <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+              <path d={silhouetteD} />
+            </clipPath>
+          </defs>
+          <FingerNailContent
+            finger={finger}
+            silhouetteD={silhouetteD}
+            clipId={clipId}
+            baseColor={baseColor}
+            finish={finish}
+            failed={failed}
+            selected={selected}
+            patternMarkup={patternMarkup}
+            patternK={patternK}
+            patternVisible={patternVisible}
+            patternFadeMs={patternFadeMs}
+            decoration={decoration}
+            strokeScale={strokeScale}
+            readOnly
+            fingerLabel={FINGER_LABEL[finger]}
+          />
+        </svg>
+      </span>
       <span className={cx('flex items-center gap-1 text-gray-500', size === 'md' ? 'text-[10px]' : 'text-[9px]')}>
         <span className="font-medium tnum">{finger}</span>
         {size === 'md' && <span>{FINGER_LABEL[finger]}</span>}

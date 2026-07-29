@@ -56,6 +56,8 @@ const renderSrc = readFileSync(join(root, 'src/studio/editor/lib/render.ts'), 'u
 assert(renderSrc.includes('brushStroke'), 'render has brushStroke');
 assert(renderSrc.includes('composeTiledSvg'), 'render has tiled export');
 assert(renderSrc.includes("case 'french_edge'"), 'render has french_edge');
+assert(renderSrc.includes('fingerDisplayRatio'), 'tiled export consumes shared finger display ratios');
+assert(renderSrc.includes('data-display-scale'), 'tiled export records per-finger display scale');
 
 // ── model has FrenchEdgeElement ──
 const modelSrc = readFileSync(join(root, 'src/studio/editor/lib/model.ts'), 'utf8');

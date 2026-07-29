@@ -213,15 +213,18 @@ export function shapeName(shape: NailShape): string {
   return shapeParams?.shapes?.[shape]?.name_en ?? shape;
 }
 
+export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
+  return shape.capabilities.geometry === 'signed_off' && shape.capabilities.editor === 'enabled';
+}
+
 export const TIER_ONE_EDITOR_SHAPES: readonly EditorShapeCapability[] = (
   shapeCapabilities?.shapes ?? []
 )
   .filter((shape) => shape.tier === 1)
-  .sort((a, b) => a.order - b.order);
-
-export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
-  return shape.capabilities.geometry === 'signed_off' && shape.capabilities.editor === 'enabled';
-}
+  .sort((a, b) => {
+    const readiness = Number(isEditorShapeEnabled(b)) - Number(isEditorShapeEnabled(a));
+    return readiness !== 0 ? readiness : a.order - b.order;
+  });
 
 const LENGTH_LABELS: Record<NailLength, string> = {
   short: '短',
@@ -233,8 +236,10 @@ export function lengthName(length: NailLength): string {
   return LENGTH_LABELS[length];
 }
 
-/** Editor 只暴露已有几何资产的甲型；产品占位目录由 shape-capabilities 管理。 */
-export const SHAPES: readonly NailShape[] = Object.keys(shapeParams?.shapes ?? {}) as NailShape[];
+/** 紧凑型 Editor 控件只暴露能力注册表中已签收、已启用的甲型。 */
+export const SHAPES: readonly NailShape[] = TIER_ONE_EDITOR_SHAPES
+  .filter(isEditorShapeEnabled)
+  .map((shape) => shape.id);
 export const LENGTHS: readonly NailLength[] = ['short', 'medium', 'long', 'extra-long'];
 
 export function templateById(id: string): TemplateIndexEntry | undefined {

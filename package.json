@@ -13,7 +13,7 @@
     "test:slots": "node tools/slot-calibrator/test-slot-math.mjs",
     "test:mirror": "node tools/test-handdraw.mjs",
     "test:render-brush": "node tools/test-handdraw.mjs",
-    "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
+    "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
   },
   "dependencies": {
     "immer": "^10.1.1",

@@ -10,6 +10,7 @@ import { Download, RefreshCw, X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { FINGER_CODES } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
+import { fingerDisplayRatio, fingerDisplayScale } from '@/studio/finger-display';
 import { getSilhouette, lengthName, shapeName } from '../lib/material';
 import { nailContentSvg, composeTiledSvg, downloadDataUrl, svgToPngDataUrl } from '../lib/render';
 import { resolveFingerData, isFingerUnlocked } from '../lib/model';
@@ -133,6 +134,8 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
               const isCurrent = currentFinger === finger;
               const isMaster = doc.masterFinger === finger;
               const isUnlocked = isFingerUnlocked(doc, finger);
+              const displayScale = fingerDisplayScale(finger);
+              const displayRatio = fingerDisplayRatio(finger);
               const hasStroke = resolveFingerData(doc, finger).pattern.some(
                 (el) => el.kind === 'brush' || el.kind === 'french_edge',
               );
@@ -140,6 +143,8 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                 <button
                   key={finger}
                   disabled={presentation}
+                  data-finger-code={finger}
+                  data-finger-display-scale={displayScale}
                   onClick={() => {
                     if (presentation) return;
                     setCurrentFinger(finger);
@@ -152,18 +157,25 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                       : 'border-gray-200 hover:border-gray-300 hover:shadow-float',
                   )}
                 >
-                  {html === null ? (
-                    <div className="flex h-44 w-24 flex-col items-center justify-center gap-1 rounded-panel bg-gray-100">
-                      <span className="text-lg">⚠️</span>
-                      <span className="text-[10px] text-gray-500">渲染失败</span>
-                    </div>
-                  ) : (
-                    <svg
-                      viewBox={sil.viewBox}
-                      className="h-44 w-auto"
-                      dangerouslySetInnerHTML={{ __html: html }}
-                    />
-                  )}
+                  <div className="flex h-44 w-28 shrink-0 items-center justify-center" aria-hidden="true">
+                    {html === null ? (
+                      <div
+                        className="flex flex-col items-center justify-center gap-1 rounded-panel bg-gray-100"
+                        style={{ height: `${176 * displayRatio}px`, width: `${96 * displayRatio}px` }}
+                      >
+                        <span className="text-lg">⚠️</span>
+                        <span className="text-[10px] text-gray-500">渲染失败</span>
+                      </div>
+                    ) : (
+                      <svg
+                        viewBox={sil.viewBox}
+                        className="w-auto"
+                        style={{ height: `${176 * displayRatio}px` }}
+                        data-finger-nail
+                        dangerouslySetInnerHTML={{ __html: html }}
+                      />
+                    )}
+                  </div>
                   <span className="flex flex-wrap items-center justify-center gap-1 text-[10px] text-gray-500">
                     <span className="font-medium tnum">{finger}</span>
                     {!presentation && isMaster && <span title="主视觉指">💗</span>}

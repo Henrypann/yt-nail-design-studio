@@ -1,6 +1,12 @@
 import { ScanSearch } from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
+import {
+  compatibilityLabel,
+  compatibilityTitle,
+  compatibilityToneClass,
+  getShapeLengthCompatibility,
+} from '@/studio/compatibility';
 import { COLOR_PRESETS, SURFACE_PRESETS, shapeName } from '../lib/material';
 import { isEditorShapeEnabled, TIER_ONE_EDITOR_SHAPES } from '../lib/material';
 import { GEOMETRY_LENGTH_BY_PRESET, resolveFingerData, type LengthPreset } from '../lib/model';
@@ -48,19 +54,28 @@ function DesignInspector() {
         <div className="grid grid-cols-3 gap-1.5">
           {TIER_ONE_EDITOR_SHAPES.map((capability) => {
             const enabled = isEditorShapeEnabled(capability);
+            const selected = doc.shape === capability.id;
+            const compatibility = getShapeLengthCompatibility(capability.id, doc.length);
+            const hint = compatibilityTitle(compatibility, locale);
+            const badge = compatibilityLabel(compatibility, locale);
             return (
             <button
               key={capability.id}
               disabled={readOnly || !enabled}
-              title={enabled ? capability.label_en : `${capability.label_en} · Pending geometry sign-off`}
+              title={enabled ? hint || capability.label_en : `${capability.label_en} · Pending geometry sign-off`}
+              data-shape-id={capability.id}
+              data-editor-enabled={enabled}
+              data-compatibility={enabled ? compatibility.severity : undefined}
               onClick={() => commit((draft) => { draft.shape = capability.id; })}
               className={cx(
                 'rounded-button border px-2 py-1.5 text-[11px]',
-                doc.shape === capability.id ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
+                selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
+                enabled && compatibilityToneClass(compatibility, selected),
                 !enabled && 'cursor-not-allowed opacity-45',
               )}
             >
               {shapeName(capability.id)}
+              {enabled && !selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
             </button>
             );
           })}
@@ -70,24 +85,40 @@ function DesignInspector() {
       <section>
         <p className="mb-2 text-[11px] font-medium text-gray-700">{text('长度 · 扫描相对值', 'LENGTH · RELATIVE TO SCAN')}</p>
         <div className="grid grid-cols-2 gap-1.5">
-          {LENGTHS.map((length) => (
-            <button
-              key={length.id}
-              disabled={readOnly}
-              onClick={() =>
-                commit((draft) => {
-                  draft.lengthPreset = length.id;
-                  draft.length = GEOMETRY_LENGTH_BY_PRESET[length.id];
-                })
-              }
-              className={cx(
-                'flex items-center justify-between rounded-button border px-2 py-1.5 text-[11px]',
-                doc.lengthPreset === length.id ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
-              )}
-            >
-              <span>{locale === 'en' ? LENGTH_LABEL_EN[length.id] : length.label}</span><span className="tnum opacity-65">{length.extension}</span>
-            </button>
-          ))}
+          {LENGTHS.map((length) => {
+            const selected = doc.lengthPreset === length.id;
+            const compatibility = getShapeLengthCompatibility(
+              doc.shape,
+              GEOMETRY_LENGTH_BY_PRESET[length.id],
+            );
+            const hint = compatibilityTitle(compatibility, locale);
+            const badge = compatibilityLabel(compatibility, locale);
+            return (
+              <button
+                key={length.id}
+                disabled={readOnly}
+                title={hint || undefined}
+                data-compatibility={compatibility.severity}
+                onClick={() =>
+                  commit((draft) => {
+                    draft.lengthPreset = length.id;
+                    draft.length = GEOMETRY_LENGTH_BY_PRESET[length.id];
+                  })
+                }
+                className={cx(
+                  'flex items-center justify-between rounded-button border px-2 py-1.5 text-[11px]',
+                  selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
+                  compatibilityToneClass(compatibility, selected),
+                )}
+              >
+                <span>
+                  {locale === 'en' ? LENGTH_LABEL_EN[length.id] : length.label}
+                  {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
+                </span>
+                <span className="tnum opacity-65">{length.extension}</span>
+              </button>
+            );
+          })}
         </div>
         <p className="mt-1 text-[10px] text-gray-400">{text('无扫描时回退为 14 / 18 / 22 / 26mm。', 'Fallback without scan: 14 / 18 / 22 / 26mm.')}</p>
       </section>

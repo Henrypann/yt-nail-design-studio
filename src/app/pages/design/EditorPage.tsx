@@ -10,11 +10,24 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
-import { Button, EmptyState, Modal } from '@/design-system';
+import { Button, cx, EmptyState, Modal } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { useLocale } from '@/lib/i18n';
 import { BRIDGE_WARNING_LINES, BRIDGE_WARNING_TITLE } from '@/studio/bridge';
+import {
+  compatibilityLabel,
+  compatibilityTitle,
+  compatibilityToneClass,
+  getShapeLengthCompatibility,
+} from '@/studio/compatibility';
 import { EditorShell, useEditorStore, createBlankEditorDesign } from '@/studio/editor';
-import { LENGTHS, SHAPES, lengthName, shapeName } from '@/studio/editor/lib/material';
+import {
+  isEditorShapeEnabled,
+  LENGTHS,
+  lengthName,
+  shapeName,
+  TIER_ONE_EDITOR_SHAPES,
+} from '@/studio/editor/lib/material';
 import type { NailLength, NailShape } from '@/lib/types';
 
 type PageState =
@@ -26,6 +39,7 @@ type PageState =
   | { kind: 'invalid'; unsupported?: boolean };
 
 export default function EditorPage() {
+  const { locale } = useLocale();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const load = useEditorStore((s) => s.load);
@@ -191,37 +205,66 @@ export default function EditorPage() {
           <div>
             <p className="mb-1.5 text-xs font-medium text-gray-700">甲型</p>
             <div className="grid grid-cols-3 gap-1.5">
-              {SHAPES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setBlankShape(s)}
-                  className={
-                    blankShape === s
-                      ? 'rounded-button border border-primary bg-primary-soft px-2 py-1.5 text-xs text-primary'
-                      : 'rounded-button border border-gray-200 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-50'
-                  }
-                >
-                  {shapeName(s)}
-                </button>
-              ))}
+              {TIER_ONE_EDITOR_SHAPES.map((capability) => {
+                const enabled = isEditorShapeEnabled(capability);
+                const selected = blankShape === capability.id;
+                const compatibility = getShapeLengthCompatibility(capability.id, blankLength);
+                const hint = compatibilityTitle(compatibility, locale);
+                const badge = compatibilityLabel(compatibility, locale);
+                return (
+                  <button
+                    key={capability.id}
+                    disabled={!enabled}
+                    onClick={() => setBlankShape(capability.id)}
+                    title={enabled ? hint || shapeName(capability.id) : `${shapeName(capability.id)} · Pending geometry sign-off`}
+                    data-shape-id={capability.id}
+                    data-editor-enabled={enabled}
+                    data-compatibility={enabled ? compatibility.severity : undefined}
+                    className={cx(
+                      'rounded-button border px-2 py-1.5 text-xs',
+                      selected
+                        ? 'border-primary bg-primary-soft text-primary'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50',
+                      enabled && compatibilityToneClass(compatibility, selected),
+                      !enabled && 'cursor-not-allowed bg-gray-50 opacity-45',
+                    )}
+                  >
+                    <span>{shapeName(capability.id)}</span>
+                    {enabled && !selected && badge && (
+                      <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
             <p className="mb-1.5 text-xs font-medium text-gray-700">长度</p>
             <div className="grid grid-cols-4 gap-1.5">
-              {LENGTHS.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setBlankLength(l)}
-                  className={
-                    blankLength === l
-                      ? 'rounded-button border border-primary bg-primary-soft px-2 py-1.5 text-xs text-primary'
-                      : 'rounded-button border border-gray-200 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-50'
-                  }
-                >
-                  {lengthName(l)}
-                </button>
-              ))}
+              {LENGTHS.map((l) => {
+                const selected = blankLength === l;
+                const compatibility = getShapeLengthCompatibility(blankShape, l);
+                const hint = compatibilityTitle(compatibility, locale);
+                const badge = compatibilityLabel(compatibility, locale);
+                return (
+                  <button
+                    key={l}
+                    onClick={() => setBlankLength(l)}
+                    title={hint || undefined}
+                    data-compatibility={compatibility.severity}
+                    className={cx(
+                      'rounded-button border px-2 py-1.5 text-xs',
+                      selected
+                        ? 'border-primary bg-primary-soft text-primary'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50',
+                      compatibilityToneClass(compatibility, selected),
+                    )}
+                  >
+                    {lengthName(l)}
+                    {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

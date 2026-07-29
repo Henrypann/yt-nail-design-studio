@@ -12,6 +12,12 @@ import { Check, ChevronDown } from 'lucide-react';
 import { cx } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
 import type { NailLength, NailShape } from '@/lib/types';
+import {
+  compatibilityLabel,
+  compatibilityTitle,
+  compatibilityToneClass,
+  getShapeLengthCompatibility,
+} from '@/studio/compatibility';
 import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
 import {
   isWizardShapeEnabled,
@@ -26,7 +32,10 @@ import {
 const LENGTH_ORDER: NailLength[] = ['short', 'medium', 'long', 'extra-long'];
 
 function sortCapabilities(shapes: ShapeCapability[]): ShapeCapability[] {
-  return [...shapes].sort((a, b) => a.order - b.order);
+  return [...shapes].sort((a, b) => {
+    const readiness = Number(isWizardShapeEnabled(b)) - Number(isWizardShapeEnabled(a));
+    return readiness !== 0 ? readiness : a.order - b.order;
+  });
 }
 
 /** 只加载已有 geometry_id 的轮廓；产品占位不会发起必然失败的 SVG 请求。 */
@@ -68,13 +77,17 @@ interface ShapeCardProps {
   capability: ShapeCapability;
   silhouette?: SilhouetteAsset;
   selected: boolean;
+  length: NailLength;
   lengthMm: number;
   onSelect: (shape: NailShape) => void;
 }
 
-function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: ShapeCardProps) {
+function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelect }: ShapeCardProps) {
   const { locale } = useLocale();
   const enabled = isWizardShapeEnabled(capability);
+  const compatibility = getShapeLengthCompatibility(capability.id, length);
+  const compatibilityHint = compatibilityTitle(compatibility, locale);
+  const compatibilityBadge = compatibilityLabel(compatibility, locale);
   const rawAvailability = shapeAvailabilityLabel(capability);
   const availability =
     locale === 'zh'
@@ -90,6 +103,7 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
               : 'Coming soon';
   const shapeLabel = capability.label_en;
   const unavailableReason = `${shapeLabel} · ${availability}`;
+  const enabledTitle = compatibilityHint ? `${shapeLabel} · ${compatibilityHint}` : shapeLabel;
 
   return (
     <button
@@ -102,7 +116,8 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
       data-shape-id={capability.id}
       data-shape-tier={capability.tier}
       data-wizard-enabled={enabled}
-      title={enabled ? shapeLabel : unavailableReason}
+      data-compatibility={enabled ? compatibility.severity : undefined}
+      title={enabled ? enabledTitle : unavailableReason}
       className={cx(
         'group relative flex min-w-0 flex-col items-center gap-1 rounded-card border bg-white px-2 pb-2 pt-3',
         'transition-all duration-fast ease-out',
@@ -111,6 +126,7 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
           : enabled
             ? 'border-gray-200 hover:border-primary'
             : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-65',
+        enabled && compatibilityToneClass(compatibility, selected),
       )}
     >
       {selected && (
@@ -168,12 +184,25 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
           {availability}
         </span>
       )}
+      {enabled && compatibilityBadge && (
+        <span
+          aria-hidden="true"
+          className={cx(
+            'rounded-full px-1.5 py-px text-[10px] leading-4',
+            compatibility.severity === 'recommended' && 'bg-success-soft text-success',
+            compatibility.severity === 'caution' && 'bg-warning-soft text-warning',
+            compatibility.severity === 'strong' && 'bg-gray-200 text-gray-500',
+          )}
+        >
+          {compatibilityBadge}
+        </span>
+      )}
     </button>
   );
 }
 
 export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange }: ShapeLengthPickerProps) {
-  const { text } = useLocale();
+  const { locale, text } = useLocale();
   const [params, setParams] = useState<ShapeParams | null>(null);
   const [registry, setRegistry] = useState<ShapeCapabilitiesRegistry | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -210,6 +239,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
           capability={capability}
           silhouette={silhouettes[capability.id]}
           selected={shape === capability.id}
+          length={effectiveLength}
           lengthMm={lengthMm}
           onSelect={onShapeChange}
         />
@@ -253,22 +283,31 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
           {LENGTH_ORDER.map((item) => {
             const meta = params?.lengths[item];
             const selected = length === item;
+            const compatibility = shape
+              ? getShapeLengthCompatibility(shape, item)
+              : { severity: 'neutral' as const, selectable: true as const };
+            const hint = compatibilityTitle(compatibility, locale);
+            const badge = compatibilityLabel(compatibility, locale);
             return (
               <button
                 type="button"
                 key={item}
                 onClick={() => onLengthChange(item)}
+                title={hint || undefined}
+                data-compatibility={compatibility.severity}
                 className={cx(
                   'flex h-9 items-center gap-1.5 rounded-button border px-4 text-sm',
                   'transition-colors duration-fast ease-out',
                   selected
                     ? 'border-primary bg-primary font-medium text-primary-foreground'
                     : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400',
+                  compatibilityToneClass(compatibility, selected),
                 )}
                 aria-pressed={selected}
               >
                 {meta?.name ?? item}
                 {selected && meta && <span className="text-xs opacity-80 tnum">{meta.lengthMm}mm</span>}
+                {!selected && badge && <span aria-hidden="true" className="text-[10px] opacity-80">{badge}</span>}
               </button>
             );
           })}
