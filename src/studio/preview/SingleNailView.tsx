@@ -113,7 +113,10 @@ export function SingleNailView({
   const decoration = override?.decorationId ? decorationById.get(override.decorationId) : undefined;
 
   return (
-    <div className={cx('flex h-full min-h-0 flex-col rounded-card border border-gray-200 bg-white', className)} data-debug-id="studio.wizard.step2.single-view">
+    <div
+      className={cx('flex h-full min-h-0 flex-col rounded-card border border-gray-200 bg-white', className)}
+      data-debug-id="studio.preview.single"
+    >
       {/* 大图区 */}
       <div className="flex min-h-0 flex-1 items-center justify-center gap-6 overflow-y-auto p-4">
         <Button size="sm" variant="ghost" onClick={() => step(-1)} title="上一指（←）">

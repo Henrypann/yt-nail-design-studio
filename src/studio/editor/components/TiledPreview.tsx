@@ -89,7 +89,10 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-gray-50/98 animate-fade-in">
+    <div
+      className="fixed inset-0 z-40 flex flex-col bg-gray-50/98 animate-fade-in"
+      data-debug-id="studio.editor.preview"
+    >
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-gray-900">

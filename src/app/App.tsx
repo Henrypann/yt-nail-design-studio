@@ -1,6 +1,6 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes as RouterRoutes } from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
-import { DebugPanel } from '@/lib/debug-panel';
 import { LocaleProvider } from '@/lib/i18n';
 import { AppLayout } from './layouts/AppLayout';
 import { Routes } from './routes';
@@ -17,6 +17,10 @@ import MobileBindPage from './pages/devices/MobileBindPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
+
+const DevDebugPanel = import.meta.env.DEV
+  ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
+  : null;
 
 /** 应用根：路由（PRD §1.4 全 13 条）+ 全局 Toast + 调试面板（仅 DEV，v1.5.1） */
 export function App() {
@@ -45,7 +49,11 @@ export function App() {
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </RouterRoutes>
-        <DebugPanel />
+        {DevDebugPanel && (
+          <Suspense fallback={null}>
+            <DevDebugPanel />
+          </Suspense>
+        )}
         </BrowserRouter>
       </ToastProvider>
     </LocaleProvider>

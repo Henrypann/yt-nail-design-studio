@@ -23,6 +23,7 @@ export function FingerStrip() {
     <footer
       className="flex h-20 shrink-0 items-center gap-3 border-t border-gray-200 bg-white px-3"
       data-testid="editor-finger-strip"
+      data-debug-id="studio.editor.finger-strip"
     >
       <div className="w-[218px] shrink-0">
         <p className="mb-1 text-[10px] font-semibold text-gray-700">

@@ -142,7 +142,10 @@ export function EditorTopBar(props: {
   };
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-3">
+    <header
+      className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-3"
+      data-debug-id="studio.editor.topbar"
+    >
       <div className="flex min-w-0 items-center gap-3">
         <button
           onClick={requestLeave}

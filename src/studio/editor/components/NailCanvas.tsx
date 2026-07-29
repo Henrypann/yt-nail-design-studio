@@ -385,6 +385,7 @@ export function NailCanvas() {
       className="relative h-full w-full overflow-hidden bg-canvas"
       style={{ cursor }}
       data-testid="nail-canvas"
+      data-debug-id="studio.editor.canvas"
     >
       <div
         className="absolute left-0 top-0"

@@ -213,15 +213,17 @@ export function StepTwo() {
 
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {s.viewMode === 'ensemble' && (
-                  <TenFingerPreview
-                    {...previewProps}
-                    registerExport={false}
-                    tipOrientation={s.tipOrientation}
-                    fitContainer
-                    className="h-full"
-                    selectedFinger={s.selectedFinger}
-                    onFingerClick={(fc) => s.setSelectedFinger(s.selectedFinger === fc ? null : fc)}
-                  />
+                  <div className="h-full" data-debug-id="studio.preview.ensemble">
+                    <TenFingerPreview
+                      {...previewProps}
+                      registerExport={false}
+                      tipOrientation={s.tipOrientation}
+                      fitContainer
+                      className="h-full"
+                      selectedFinger={s.selectedFinger}
+                      onFingerClick={(fc) => s.setSelectedFinger(s.selectedFinger === fc ? null : fc)}
+                    />
+                  </div>
                 )}
                 {s.viewMode === 'tiled' && (
                   <TiledNailsPreview
@@ -265,7 +267,10 @@ export function StepTwo() {
       </div>
 
       {/* 底部：桥接入口（PRD §15：首次转化 + 不可逆警告；已桥接续进画布） */}
-      <footer className="flex justify-center border-t border-gray-100 pt-3">
+      <footer
+        className="flex justify-center border-t border-gray-100 pt-3"
+        data-debug-id="studio.wizard.bridge"
+      >
         <Button
           variant="ghost"
           disabled={readOnly}

@@ -76,7 +76,11 @@ export function EditorContextDrawer(props: {
   };
 
   return (
-    <aside className="flex w-[260px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-gray-50 p-3" data-testid="editor-context-drawer">
+    <aside
+      className="flex w-[260px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-gray-50 p-3"
+      data-testid="editor-context-drawer"
+      data-debug-id="studio.editor.context-drawer"
+    >
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-xs font-semibold text-gray-900">
           {props.active === 'looks'

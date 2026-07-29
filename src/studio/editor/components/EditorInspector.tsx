@@ -45,7 +45,11 @@ function DesignInspector() {
   if (!doc) return null;
   const currentData = resolveFingerData(doc, currentFinger);
   return (
-    <div className="flex flex-col gap-4" data-testid="editor-design-inspector">
+    <div
+      className="flex flex-col gap-4"
+      data-testid="editor-design-inspector"
+      data-debug-id="studio.editor.inspector.design"
+    >
       <p className="rounded-button bg-info-soft px-2 py-1.5 text-[10px] leading-relaxed text-info">
         {text('甲型、长度和表面属于整套设计；颜色遵循底部“编辑范围”。', 'Shape, length and surface apply to the set. Color follows EDIT SCOPE below.')}
       </p>
@@ -211,7 +215,7 @@ export function EditorInspector(props: {
         {props.tab === 'design' && <DesignInspector />}
         {props.tab === 'layers' && <LayerPanel />}
         {props.tab === 'check' && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3" data-debug-id="studio.editor.inspector.check">
             <section className="rounded-panel border border-gray-200 bg-white p-3">
               <h3 className="text-xs font-semibold text-gray-800">二维风险检查</h3>
               <p className="mt-1 text-[11px] leading-relaxed text-gray-500">

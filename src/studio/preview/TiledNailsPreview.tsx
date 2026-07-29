@@ -235,7 +235,7 @@ export function TiledNailsPreview({
           </Button>
         </div>
       )}
-      <div className="grid grid-cols-5 gap-3" data-debug-id="studio.wizard.step2.tiled-view">
+      <div className="grid grid-cols-5 gap-3" data-debug-id="studio.preview.tiled">
         {FINGER_CODES.map((finger) => {
           const override = fingerOverrides?.[finger];
           return (

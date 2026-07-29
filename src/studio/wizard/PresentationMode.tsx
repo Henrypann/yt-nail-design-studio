@@ -104,7 +104,7 @@ export function PresentationMode({
     <div
       className="fixed inset-0 z-50 flex flex-col animate-fade-in"
       style={{ backgroundColor: '#F7F3EE' }}
-      data-debug-id="studio.wizard.presentation"
+      data-debug-id="studio.presentation"
       role="dialog"
       aria-label="顾客展示模式"
     >

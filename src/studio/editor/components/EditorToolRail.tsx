@@ -18,7 +18,11 @@ export function EditorToolRail(props: {
     { id: 'import', label: text('导入', 'Import'), icon: ImagePlus },
   ] as const;
   return (
-    <nav className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3" aria-label="Editor 工具">
+    <nav
+      className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3"
+      aria-label="Editor 工具"
+      data-debug-id="studio.editor.tool-rail"
+    >
       {items.map((item) => (
         <button
           key={item.id}

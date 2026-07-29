@@ -123,7 +123,7 @@ try {
   step('STEP 1 甲型/长度 + 风格 → 进入 STEP 2', true);
 
   /* 5c. 三视图：默认视图为十指平铺（v2 三视图改版） */
-  const tiledGrid = page.locator('[data-debug-id="studio.wizard.step2.tiled-view"]');
+  const tiledGrid = page.locator('[data-debug-id="studio.preview.tiled"]');
   await tiledGrid.waitFor({ timeout: 10000 });
   const tiledCells = await tiledGrid.locator('button').count();
   step('默认视图 = 十指平铺（每格 ≥120px）', tiledCells === 10, `格子数=${tiledCells}`);
@@ -236,7 +236,7 @@ try {
 
   /* 7c. 单指细节视图：tab 切换 + Esc 返回（v2 三视图改版） */
   await page.getByRole('tab', { name: '单指细节' }).click();
-  await page.locator('[data-debug-id="studio.wizard.step2.single-view"]').waitFor({ timeout: 5000 });
+  await page.locator('[data-debug-id="studio.preview.single"]').waitFor({ timeout: 5000 });
   step('单指细节视图（大图 + 十指搭配条）', true);
   await page.keyboard.press('Escape');
   await tiledGrid.waitFor({ timeout: 5000 });
@@ -247,7 +247,7 @@ try {
   await page.getByTestId('tip-orientation-toggle').getByRole('button', { name: '指尖朝下' }).click();
   await page.waitForTimeout(350);
   await page.getByRole('button', { name: /顾客展示/ }).click();
-  const presentation = page.locator('[data-debug-id="studio.wizard.presentation"]');
+  const presentation = page.locator('[data-debug-id="studio.presentation"]');
   await presentation.waitFor({ timeout: 5000 });
   step('顾客展示模式打开（全屏只读）', true);
   const presentOrientation = await presentation.locator('[data-tip-orientation]').first().getAttribute('data-tip-orientation');
@@ -303,6 +303,32 @@ try {
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
   );
   step('E1 专业工作区 + 默认单甲编辑 + 1280 无横向滚动', noHorizontalOverflow && (await singleScope.getAttribute('aria-pressed')) === 'true');
+
+  /* 10a2. DEV 源码反向 PRD：独立入口、全 Studio 搜索、源码状态与页面定位 */
+  await page.getByRole('button', { name: '需求说明', exact: true }).click();
+  const requirementsDrawer = page.locator('[data-debug-id="app.requirements-drawer"]');
+  await requirementsDrawer.waitFor({ timeout: 5000 });
+  await requirementsDrawer.getByPlaceholder('搜索模块、ID、功能或源码语义').fill('法式');
+  const canvasRequirement = requirementsDrawer.getByRole('button', { name: /单甲自由画布/ });
+  await canvasRequirement.waitFor({ timeout: 5000 });
+  await canvasRequirement.click();
+  await requirementsDrawer.getByRole('button', { name: '定位页面元素' }).click();
+  await requirementsDrawer.getByText('已定位并高亮页面元素').waitFor({ timeout: 5000 });
+  const verifiedSources = await requirementsDrawer
+    .getByText('源码与最近人工复核版本一致')
+    .count();
+  const locatorCopyVisible = await requirementsDrawer
+    .getByRole('button', { name: '复制定位' })
+    .isVisible();
+  const prdCopyVisible = await requirementsDrawer
+    .getByRole('button', { name: '复制 PRD' })
+    .isVisible();
+  step(
+    '源码反向 PRD：独立入口 + 搜索 + 定位 + 证据状态',
+    verifiedSources === 2 && locatorCopyVisible && prdCopyVisible,
+    `已核对源码=${verifiedSources}`,
+  );
+  await requirementsDrawer.getByRole('button', { name: '关闭需求说明' }).click();
 
   /* 10b. E2 Recipe → Layer：法式入口直接暴露在画布，不再要求先猜到图层入口 */
   await page.getByRole('button', { name: /常规法式/ }).click();

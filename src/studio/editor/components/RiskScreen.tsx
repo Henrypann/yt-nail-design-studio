@@ -36,7 +36,7 @@ export function RiskScreen(props: { open: boolean; onClose: () => void }) {
         </Button>
       }
     >
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3" data-debug-id="studio.editor.risk-screen">
         <p className="text-[11px] text-gray-400">
           附件参数级检查（数量 / 高度 / 边缘邻近）· 原型期规则为 Mock，接入真实 Pipeline 后入口位置不变。
         </p>

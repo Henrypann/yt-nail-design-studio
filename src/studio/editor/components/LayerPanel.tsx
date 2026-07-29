@@ -309,7 +309,7 @@ export function LayerPanel() {
   };
 
   return (
-    <div className="flex flex-col gap-3" data-testid="layer-panel">
+    <div className="flex flex-col gap-3" data-testid="layer-panel" data-debug-id="studio.editor.layers">
       {/* ① 底色层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
