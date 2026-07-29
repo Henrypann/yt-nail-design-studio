@@ -5,12 +5,23 @@
  */
 
 import { useState } from 'react';
-import { Lock, Plus, Trash2 } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Copy,
+  Eye,
+  EyeOff,
+  Lock,
+  LockOpen,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import { DECORATIONS, FINISHES, PALETTE } from '../lib/material';
 import {
   HEIGHT_MAX_MM,
   HEIGHT_MIN_MM,
+  createLayerMeta,
   genId,
   resolveFingerData,
   type AttachmentElement,
@@ -29,6 +40,8 @@ function patternElLabel(el: PatternElement): string {
       return `手绘笔画（${el.points.length} 点）`;
     case 'image':
       return `导入 · ${el.name}`;
+    case 'gradient':
+      return `渐变 · ${el.name}`;
     case 'eraser':
       return '橡皮擦除';
     case 'french_edge':
@@ -232,14 +245,66 @@ export function LayerPanel() {
     editCurrentFingerData((d) => {
       const list = layer === 'pattern' ? d.pattern : d.attachments;
       const el = list.find((e) => e.id === id);
-      if (el && 'transform' in el) el.transform = t;
+      if (el && !el.locked && 'transform' in el) el.transform = t;
     });
   };
 
   const updateFrenchEdge = (id: string, patch: Partial<FrenchEdgeElement>) => {
     editCurrentFingerData((d) => {
       const el = d.pattern.find((e) => e.id === id);
-      if (el?.kind === 'french_edge') Object.assign(el, patch);
+      if (el?.kind === 'french_edge' && !el.locked) Object.assign(el, patch);
+    });
+  };
+
+  const patchElementMeta = (
+    layer: 'pattern' | 'attachment',
+    id: string,
+    patch: Partial<{ name: string; visible: boolean; locked: boolean }>,
+  ) => {
+    editCurrentFingerData((d) => {
+      const list = layer === 'pattern' ? d.pattern : d.attachments;
+      const element = list.find((item) => item.id === id);
+      if (element) Object.assign(element, patch);
+    });
+  };
+
+  const moveElement = (layer: 'pattern' | 'attachment', id: string, delta: -1 | 1) => {
+    editCurrentFingerData((d) => {
+      if (layer === 'pattern') {
+        const index = d.pattern.findIndex((item) => item.id === id);
+        if (index < 0 || d.pattern[index]?.kind === 'eraser' || d.pattern[index]?.locked) return;
+        const next = index + delta;
+        if (next < 0 || next >= d.pattern.length || d.pattern[next]?.kind === 'eraser') return;
+        [d.pattern[index], d.pattern[next]] = [d.pattern[next], d.pattern[index]];
+        return;
+      }
+      const index = d.attachments.findIndex((item) => item.id === id);
+      if (index < 0 || d.attachments[index]?.locked) return;
+      const next = index + delta;
+      if (next < 0 || next >= d.attachments.length) return;
+      [d.attachments[index], d.attachments[next]] = [d.attachments[next], d.attachments[index]];
+    });
+  };
+
+  const duplicateElement = (layer: 'pattern' | 'attachment', id: string) => {
+    editCurrentFingerData((d) => {
+      if (layer === 'pattern') {
+        const index = d.pattern.findIndex((item) => item.id === id);
+        if (index < 0 || d.pattern[index]?.kind === 'eraser' || d.pattern[index]?.locked) return;
+        const copy = structuredClone(d.pattern[index]);
+        copy.id = genId('el_pattern');
+        copy.name = `${copy.name} · 副本`;
+        d.pattern.splice(index + 1, 0, copy);
+        setSelection({ layer, id: copy.id });
+        return;
+      }
+      const index = d.attachments.findIndex((item) => item.id === id);
+      if (index < 0 || d.attachments[index]?.locked) return;
+      const copy = structuredClone(d.attachments[index]);
+      copy.id = genId('el_att');
+      copy.name = `${copy.name} · 副本`;
+      d.attachments.splice(index + 1, 0, copy);
+      setSelection({ layer, id: copy.id });
     });
   };
 
@@ -309,6 +374,7 @@ export function LayerPanel() {
                     className={cx(
                       'flex items-center justify-between rounded-button px-2 py-1 text-[11px]',
                       selected ? 'bg-primary-soft text-primary' : 'text-gray-600 hover:bg-gray-50',
+                      !el.visible && 'opacity-45',
                     )}
                   >
                     <button
@@ -317,29 +383,67 @@ export function LayerPanel() {
                         setSelection(selected ? null : { layer: 'pattern', id: el.id })
                       }
                     >
-                      {patternElLabel(el)}
+                      {el.name || patternElLabel(el)}
                     </button>
                     {!readOnly && (
-                      <button
-                        title="删除元素"
-                        onClick={() =>
-                          editCurrentFingerData((d) => {
-                            d.pattern = d.pattern.filter((e) => e.id !== el.id);
-                          })
-                        }
-                        className="ml-1 text-gray-400 hover:text-error"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                      <span className="ml-1 flex items-center gap-0.5">
+                        <button
+                          title={el.visible ? '隐藏' : '显示'}
+                          onClick={() => patchElementMeta('pattern', el.id, { visible: !el.visible })}
+                          className="text-gray-400 hover:text-gray-700"
+                        >
+                          {el.visible ? <Eye size={11} /> : <EyeOff size={11} />}
+                        </button>
+                        <button
+                          title={el.locked ? '解锁' : '锁定'}
+                          onClick={() => patchElementMeta('pattern', el.id, { locked: !el.locked })}
+                          className="text-gray-400 hover:text-gray-700"
+                        >
+                          {el.locked ? <Lock size={11} /> : <LockOpen size={11} />}
+                        </button>
+                        {el.kind !== 'eraser' && (
+                          <>
+                            <button title={el.locked ? '请先解锁' : '上移'} disabled={el.locked} onClick={() => moveElement('pattern', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                              <ArrowUp size={11} />
+                            </button>
+                            <button title={el.locked ? '请先解锁' : '下移'} disabled={el.locked} onClick={() => moveElement('pattern', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                              <ArrowDown size={11} />
+                            </button>
+                            <button title={el.locked ? '请先解锁' : '复制'} disabled={el.locked} onClick={() => duplicateElement('pattern', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                              <Copy size={11} />
+                            </button>
+                          </>
+                        )}
+                        <button
+                          title={el.locked ? '请先解锁' : '删除元素'}
+                          disabled={el.locked}
+                          onClick={() =>
+                            editCurrentFingerData((d) => {
+                              d.pattern = d.pattern.filter((e) => e.id !== el.id);
+                            })
+                          }
+                          className="text-gray-400 hover:text-error disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </span>
                     )}
                   </div>
-                  {selected && (el.kind === 'template_pattern' || el.kind === 'image') && !readOnly && (
+                  {selected && !readOnly && el.kind !== 'eraser' && (
+                    <input
+                      value={el.name}
+                      aria-label="图层名称"
+                      onChange={(event) => patchElementMeta('pattern', el.id, { name: event.target.value })}
+                      className="mt-1 h-7 w-full rounded-button border border-gray-200 bg-white px-2 text-[11px] text-gray-700"
+                    />
+                  )}
+                  {selected && (el.kind === 'template_pattern' || el.kind === 'image') && !readOnly && !el.locked && (
                     <TransformSliders
                       value={el.transform}
                       onCommit={(t) => updateElementTransform('pattern', el.id, t)}
                     />
                   )}
-                  {selected && el.kind === 'french_edge' && !readOnly && (
+                  {selected && el.kind === 'french_edge' && !readOnly && !el.locked && (
                     <FrenchEdgeSliders
                       value={el}
                       onPatch={(patch) => updateFrenchEdge(el.id, patch)}
@@ -373,6 +477,7 @@ export function LayerPanel() {
                     className={cx(
                       'flex items-center justify-between rounded-button px-2 py-1 text-[11px]',
                       selected ? 'bg-primary-soft text-primary' : 'text-gray-600 hover:bg-gray-50',
+                      !el.visible && 'opacity-45',
                     )}
                   >
                     <button
@@ -384,20 +489,46 @@ export function LayerPanel() {
                       {el.name} · {el.heightMm.toFixed(2)}mm
                     </button>
                     {!readOnly && (
-                      <button
-                        title="删除附件"
-                        onClick={() =>
-                          editCurrentFingerData((d) => {
-                            d.attachments = d.attachments.filter((e) => e.id !== el.id);
-                          })
-                        }
-                        className="ml-1 text-gray-400 hover:text-error"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                      <span className="ml-1 flex items-center gap-0.5">
+                        <button title={el.visible ? '隐藏' : '显示'} onClick={() => patchElementMeta('attachment', el.id, { visible: !el.visible })} className="text-gray-400 hover:text-gray-700">
+                          {el.visible ? <Eye size={11} /> : <EyeOff size={11} />}
+                        </button>
+                        <button title={el.locked ? '解锁' : '锁定'} onClick={() => patchElementMeta('attachment', el.id, { locked: !el.locked })} className="text-gray-400 hover:text-gray-700">
+                          {el.locked ? <Lock size={11} /> : <LockOpen size={11} />}
+                        </button>
+                        <button title={el.locked ? '请先解锁' : '上移'} disabled={el.locked} onClick={() => moveElement('attachment', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                          <ArrowUp size={11} />
+                        </button>
+                        <button title={el.locked ? '请先解锁' : '下移'} disabled={el.locked} onClick={() => moveElement('attachment', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                          <ArrowDown size={11} />
+                        </button>
+                        <button title={el.locked ? '请先解锁' : '复制'} disabled={el.locked} onClick={() => duplicateElement('attachment', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                          <Copy size={11} />
+                        </button>
+                        <button
+                          title={el.locked ? '请先解锁' : '删除附件'}
+                          disabled={el.locked}
+                          onClick={() =>
+                            editCurrentFingerData((d) => {
+                              d.attachments = d.attachments.filter((e) => e.id !== el.id);
+                            })
+                          }
+                          className="text-gray-400 hover:text-error disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </span>
                     )}
                   </div>
                   {selected && !readOnly && (
+                    <input
+                      value={el.name}
+                      aria-label="附件名称"
+                      onChange={(event) => patchElementMeta('attachment', el.id, { name: event.target.value })}
+                      className="mt-1 h-7 w-full rounded-button border border-gray-200 bg-white px-2 text-[11px] text-gray-700"
+                    />
+                  )}
+                  {selected && !readOnly && !el.locked && (
                     <div className="mt-1 flex flex-col gap-1 rounded-button bg-gray-50 p-2">
                       <label className="flex items-center gap-2 text-[11px] text-gray-500">
                         <span className="w-10 shrink-0">高度</span>
@@ -440,15 +571,15 @@ export function LayerPanel() {
                   <button
                     key={dec.id}
                     onClick={() => {
-                      const el: AttachmentElement = {
-                        id: genId('el_att'),
-                        kind: 'attachment',
-                        decorationId: dec.id,
-                        name: dec.name,
-                        transform: { ...dec.defaults },
-                        heightMm: Math.min(HEIGHT_MAX_MM, Math.max(HEIGHT_MIN_MM, dec.defaults.heightMm)),
-                      };
                       editCurrentFingerData((d) => {
+                        const el: AttachmentElement = {
+                          id: genId('el_att'),
+                          kind: 'attachment',
+                          ...createLayerMeta(dec.name, d.attachments.length),
+                          decorationId: dec.id,
+                          transform: { ...dec.defaults },
+                          heightMm: Math.min(HEIGHT_MAX_MM, Math.max(HEIGHT_MIN_MM, dec.defaults.heightMm)),
+                        };
                         d.attachments.push(el);
                       });
                       setPickerOpen(false);
@@ -474,18 +605,19 @@ export function LayerPanel() {
           <span className="text-[10px] text-gray-400"> gloss / matte / pearl</span>
         </header>
         <div className="flex gap-1.5">
-          {FINISHES.map((f) => (
+          {FINISHES.filter((f) => f.id !== 'pearl').map((f) => (
             <button
               key={f.id}
               disabled={readOnly}
               onClick={() =>
                 commit((d) => {
-                  d.finish = f.id;
+                  d.appearance.topFinish = f.id === 'matte' ? 'matte' : 'gloss';
+                  if (f.id === 'matte') d.appearance.opticalEffect = 'none';
                 })
               }
               className={cx(
                 'rounded-button border px-2.5 py-1 text-[11px] transition-colors duration-fast disabled:opacity-40',
-                doc.finish === f.id
+                doc.appearance.topFinish === f.id
                   ? 'border-primary bg-primary-soft text-primary'
                   : 'border-gray-200 text-gray-600 hover:bg-gray-50',
               )}

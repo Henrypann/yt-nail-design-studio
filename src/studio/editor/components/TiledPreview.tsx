@@ -5,18 +5,18 @@
  * 整体失败（Mock）：错误态 + [刷新]。点击指位切换当前编辑指。
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Download, RefreshCw, X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { FINGER_CODES } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
-import { getSilhouette } from '../lib/material';
+import { getSilhouette, lengthName, shapeName } from '../lib/material';
 import { nailContentSvg, composeTiledSvg, downloadDataUrl, svgToPngDataUrl } from '../lib/render';
 import { resolveFingerData, isFingerUnlocked } from '../lib/model';
 import { useEditorStore } from '../store';
 
-export function TiledPreview(props: { onClose: () => void }) {
-  const { onClose } = props;
+export function TiledPreview(props: { onClose: () => void; presentation?: boolean }) {
+  const { onClose, presentation = false } = props;
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
   const setCurrentFinger = useEditorStore((s) => s.setCurrentFinger);
@@ -28,6 +28,14 @@ export function TiledPreview(props: { onClose: () => void }) {
   const view = 'back' as const;
   const [reloadTick, setReloadTick] = useState(0);
   const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   const failAll = isScenarioOn(flags, 'render.failAll');
   const degradeFinger = isScenarioOn(flags, 'render.failFinger') ? failFinger : null;
@@ -47,6 +55,7 @@ export function TiledPreview(props: { onClose: () => void }) {
             length: doc.length,
             data: resolveFingerData(doc, finger),
             uid: `pv-${finger}`,
+            appearance: doc.appearance,
           },
           sil,
         ),
@@ -66,7 +75,7 @@ export function TiledPreview(props: { onClose: () => void }) {
     if (!doc) return;
     setExporting(true);
     try {
-      const svg = composeTiledSvg(doc, { view, degradedFinger: degradeFinger, markBadges: true });
+      const svg = composeTiledSvg(doc, { view, degradedFinger: degradeFinger, markBadges: !presentation });
       if (!svg) throw new Error('compose failed');
       const png = await svgToPngDataUrl(svg, 1500, 880);
       downloadDataUrl(png, `十指平铺预览_${doc.shape}_${view}.png`);
@@ -82,8 +91,12 @@ export function TiledPreview(props: { onClose: () => void }) {
     <div className="fixed inset-0 z-40 flex flex-col bg-gray-50/98 animate-fade-in">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-semibold text-gray-900">十指平铺预览</h2>
-          <span className="text-[10px] text-gray-400">Back 手背</span>
+          <h2 className="text-sm font-semibold text-gray-900">
+            {presentation ? '顾客确认展示' : '十指平铺预览'}
+          </h2>
+          <span className="text-[10px] text-gray-400">
+            {presentation ? '全屏只读 · Esc 退出' : 'Back 手背'}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="secondary" loading={exporting} onClick={exportPng}>
@@ -126,13 +139,15 @@ export function TiledPreview(props: { onClose: () => void }) {
               return (
                 <button
                   key={finger}
+                  disabled={presentation}
                   onClick={() => {
+                    if (presentation) return;
                     setCurrentFinger(finger);
                     onClose();
                   }}
                   className={cx(
                     'flex flex-col items-center gap-1 rounded-card border bg-white p-2 transition-all duration-fast',
-                    isCurrent
+                    isCurrent && !presentation
                       ? 'border-primary shadow-float ring-2 ring-primary/30'
                       : 'border-gray-200 hover:border-gray-300 hover:shadow-float',
                   )}
@@ -151,13 +166,13 @@ export function TiledPreview(props: { onClose: () => void }) {
                   )}
                   <span className="flex flex-wrap items-center justify-center gap-1 text-[10px] text-gray-500">
                     <span className="font-medium tnum">{finger}</span>
-                    {isMaster && <span title="主视觉指">💗</span>}
-                    {isUnlocked ? (
+                    {!presentation && isMaster && <span title="主视觉指">💗</span>}
+                    {!presentation && (isUnlocked ? (
                       <span title="已解锁独立编辑">🔓</span>
                     ) : syncMode ? (
                       <span title="十指同步">🔗</span>
-                    ) : null}
-                    {hasStroke && <span title="含手绘">✏️</span>}
+                    ) : null)}
+                    {!presentation && hasStroke && <span title="含手绘">✏️</span>}
                   </span>
                 </button>
               );
@@ -168,15 +183,17 @@ export function TiledPreview(props: { onClose: () => void }) {
 
       <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-[11px] text-gray-500">
         <span>
-          点击指位切换编辑指并返回单甲画布
-          {hasBrush && ' · 导出 PNG 含手绘/法式'}
+          {presentation
+            ? `${shapeName(doc.shape)} · ${lengthName(doc.length)} · ${doc.lengthPreset}`
+            : `点击指位切换编辑指并返回单甲画布${hasBrush ? ' · 导出 PNG 含手绘/法式' : ''}`}
         </span>
         <span className="text-[10px] text-gray-400">
-          {syncMode
+          {presentation
+            ? `设计号 ${doc.designId}`
+            : syncMode
             ? '● 十指同步模式'
             : `○ 逐指解锁（${unlockedCount} 指独立）`}
-          {' · '}
-          当前 {currentFinger}
+          {!presentation && ` · 当前 ${currentFinger}`}
         </span>
       </footer>
     </div>

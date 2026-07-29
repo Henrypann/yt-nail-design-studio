@@ -6,7 +6,9 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Hand } from 'lucide-react';
+import { Hand, Maximize2, MousePointer2 } from 'lucide-react';
+import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import {
   buildFrenchEdgePaths,
   resolveClassicControls,
@@ -18,6 +20,7 @@ import { getSilhouette } from '../lib/material';
 import { nailContentSvg } from '../lib/render';
 import {
   genId,
+  createLayerMeta,
   resolveFingerData,
   type BrushElement,
   type ClassicFrenchControls,
@@ -37,6 +40,7 @@ interface FrenchDrag {
 }
 
 export function NailCanvas() {
+  const { text } = useLocale();
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
   const readOnly = useEditorStore((s) => s.readOnly);
@@ -51,6 +55,7 @@ export function NailCanvas() {
   const setView = useEditorStore((s) => s.setView);
   const editCurrentFingerData = useEditorStore((s) => s.editCurrentFingerData);
   const selection = useEditorStore((s) => s.selection);
+  const setSelection = useEditorStore((s) => s.setSelection);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -70,15 +75,50 @@ export function NailCanvas() {
     const [x, y, w, h] = sil.viewBox.split(/\s+/).map(Number);
     return `${x - PAD} ${y - PAD} ${w + PAD * 2} ${h + PAD * 2}`;
   }, [sil]);
+  const canvasHeight = useMemo(
+    () => Math.round(320 * (Number(viewBox.split(/\s+/)[3]) / Number(viewBox.split(/\s+/)[2]))),
+    [viewBox],
+  );
+
+  const fitCanvas = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const nextZoom = Math.max(
+      0.5,
+      Math.min(1.35, (rect.width - 64) / 320, (rect.height - 80) / canvasHeight),
+    );
+    setView({
+      zoom: nextZoom,
+      panX: (rect.width - 320 * nextZoom) / 2,
+      panY: Math.max(24, (rect.height - canvasHeight * nextZoom) / 2),
+    });
+  }, [canvasHeight, setView]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(fitCanvas);
+    return () => window.cancelAnimationFrame(frame);
+  }, [doc?.shape, doc?.length, fitCanvas]);
 
   const fingerData = doc ? resolveFingerData(doc, currentFinger) : null;
+  const classicFrench = useMemo(
+    () =>
+      fingerData?.pattern.find(
+        (candidate): candidate is FrenchEdgeElement =>
+          candidate.kind === 'french_edge' &&
+          candidate.variant === 'arc' &&
+          candidate.visible,
+      ) ?? null,
+    [fingerData],
+  );
   const selectedClassic = useMemo(() => {
     if (!fingerData || selection?.layer !== 'pattern') return null;
     const element = fingerData.pattern.find(
       (candidate): candidate is FrenchEdgeElement =>
         candidate.id === selection.id &&
         candidate.kind === 'french_edge' &&
-        candidate.variant === 'arc',
+        candidate.variant === 'arc' &&
+        !candidate.locked,
     );
     return element ?? null;
   }, [fingerData, selection]);
@@ -105,6 +145,7 @@ export function NailCanvas() {
         uid: 'canvas',
         liveStroke,
         liveEraser,
+        appearance: doc.appearance,
       },
       sil,
     );
@@ -230,13 +271,20 @@ export function NailCanvas() {
       setLiveStroke({
         id: genId('el_brush'),
         kind: 'brush',
+        ...createLayerMeta('手绘笔画', fingerData?.pattern.length ?? 0),
         points: [p],
         color: brushColor,
         size: brushSize,
         opacity: brushOpacity,
       });
     } else {
-      setLiveEraser({ id: genId('el_eraser'), kind: 'eraser', points: [p], size: eraserSize });
+      setLiveEraser({
+        id: genId('el_eraser'),
+        kind: 'eraser',
+        ...createLayerMeta('擦除蒙版', fingerData?.pattern.length ?? 0),
+        points: [p],
+        size: eraserSize,
+      });
     }
   };
 
@@ -346,7 +394,7 @@ export function NailCanvas() {
           ref={svgRef}
           viewBox={viewBox}
           width={320}
-          height={Math.round(320 * (Number(viewBox.split(/\s+/)[3]) / Number(viewBox.split(/\s+/)[2])))}
+          height={canvasHeight}
           className="select-none rounded-card bg-white shadow-float"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -356,12 +404,44 @@ export function NailCanvas() {
         />
       </div>
 
+      {classicFrench && !readOnly && (
+        <button
+          type="button"
+          onClick={() => setSelection({ layer: 'pattern', id: classicFrench.id })}
+          className={cx(
+            'absolute left-3 top-3 flex items-center gap-1.5 rounded-button border px-3 py-2 text-xs shadow-float',
+            selectedClassic
+              ? 'border-primary bg-primary text-white'
+              : 'border-primary/30 bg-white text-primary hover:bg-primary-soft',
+          )}
+          data-testid="edit-french-curve"
+        >
+          <MousePointer2 size={13} />
+          {selectedClassic ? text('正在编辑法式曲线', 'Editing French curve') : text('编辑法式曲线', 'Edit French curve')}
+        </button>
+      )}
+      {selectedClassic && (
+        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-panel border border-primary/20 bg-white/95 px-3 py-2 text-center text-[11px] text-gray-600 shadow-float">
+          {text('拖动甲面上的左翼、中心、右翼三个粉色控制点', 'Drag the left, center and right pink handles on the nail')}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={fitCanvas}
+        className="absolute right-3 top-3 flex items-center gap-1 rounded-button border border-gray-200 bg-white/95 px-2 py-1.5 text-[11px] text-gray-600 shadow-float hover:text-primary"
+        title="适合画布"
+      >
+        <Maximize2 size={12} />
+        {text('适合画布', 'Fit')}
+      </button>
+
       {/* 画布状态条 */}
       <div className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-panel border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-500 shadow-float">
         <span className="tnum">{Math.round(zoom * 100)}%</span>
         <span className="flex items-center gap-1">
           <Hand size={12} />
-          空格 + 拖拽平移 · 滚轮缩放
+          {text('空格 + 拖拽平移 · 滚轮缩放', 'Space + drag to pan · Wheel to zoom')}
         </span>
         {readOnly && <span className="font-medium text-info">只读（已冻结）</span>}
       </div>

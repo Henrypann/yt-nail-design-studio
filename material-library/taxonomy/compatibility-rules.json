@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-29T00:00:00Z",
+  "comment": "甲型、长度与款式保持独立变量；本文件只提供软推荐与警告，不得阻断用户选择。pending_cloudia 表示规则仍待 Cloudia 手艺签收。",
+  "policy": {
+    "mode": "advisory",
+    "allow_override": true,
+    "auto_select_length": false,
+    "unknown_combination": "neutral"
+  },
+  "severity": {
+    "caution": {
+      "tone": "yellow",
+      "selectable": true
+    },
+    "strong": {
+      "tone": "gray",
+      "selectable": true
+    }
+  },
+  "shape_length": [
+    {
+      "shape_id": "almond",
+      "recommended": [
+        "short-extension",
+        "medium",
+        "long"
+      ],
+      "warning": {
+        "natural": {
+          "severity": "strong",
+          "reason": {
+            "zh": "长度较短时，Almond 甲尖的收窄特征可能不明显。",
+            "en": "At natural length, the Almond taper may be less visible."
+          },
+          "suggestion": {
+            "zh": "建议使用短延长或更长长度。",
+            "en": "Short extension or longer is recommended."
+          },
+          "review_status": "pending_cloudia"
+        }
+      }
+    },
+    {
+      "shape_id": "oval",
+      "recommended": [
+        "natural",
+        "short-extension",
+        "medium"
+      ],
+      "warning": {},
+      "review_status": "pending_cloudia"
+    },
+    {
+      "shape_id": "coffin",
+      "recommended": [
+        "medium",
+        "long"
+      ],
+      "warning": {
+        "natural": {
+          "severity": "strong",
+          "reason": {
+            "zh": "长度不足时，Coffin 的平直甲尖和侧壁收窄比例不明显。",
+            "en": "At natural length, the Coffin tip and taper may not read clearly."
+          },
+          "suggestion": {
+            "zh": "建议使用中长度或长款。",
+            "en": "Medium or long is recommended."
+          },
+          "review_status": "pending_cloudia"
+        },
+        "short-extension": {
+          "severity": "caution",
+          "reason": {
+            "zh": "可以制作，但甲尖比例会更紧凑。",
+            "en": "This combination works, but the tip will appear more compact."
+          },
+          "review_status": "pending_cloudia"
+        }
+      }
+    },
+    {
+      "shape_id": "squoval",
+      "recommended": [
+        "natural",
+        "short-extension"
+      ],
+      "warning": {
+        "long": {
+          "severity": "caution",
+          "reason": {
+            "zh": "较长 Squoval 可能显得偏宽。",
+            "en": "Long Squoval nails may appear visually wide."
+          },
+          "review_status": "pending_cloudia"
+        }
+      }
+    }
+  ],
+  "look_length": [
+    {
+      "look_id": "classic-french",
+      "recommended": [
+        "short-extension",
+        "medium",
+        "long"
+      ],
+      "warning": {
+        "natural": {
+          "severity": "caution",
+          "reason": {
+            "zh": "短甲的甲尖区域可能只有 2–3mm，法式白边展示空间有限。",
+            "en": "Natural nails may leave only 2–3mm for the French tip."
+          },
+          "suggestion": {
+            "zh": "可以继续制作，或缩窄白边。",
+            "en": "Continue with a narrower French tip if preferred."
+          },
+          "review_status": "pending_cloudia"
+        }
+      }
+    }
+  ]
+}

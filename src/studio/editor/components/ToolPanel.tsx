@@ -7,7 +7,7 @@ import { useRef, useState } from 'react';
 import { Brush, Eraser, ImagePlus, Palette, Spline } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
 import { LENGTHS, loadRecentColors, PALETTE, SHAPES, lengthName, pushRecentColor, shapeName } from '../lib/material';
-import { genId } from '../lib/model';
+import { createLayerMeta, genId } from '../lib/model';
 import { useEditorStore, type BrushPreset, type EditorTool } from '../store';
 import { BrandPalettePopover } from './BrandPalettePopover';
 import { FrenchEdgePopover } from './FrenchEdgePopover';
@@ -58,7 +58,7 @@ export function ToolPanel() {
           d.pattern.push({
             id: genId('el_img'),
             kind: 'image',
-            name: file.name,
+            ...createLayerMeta(file.name, d.pattern.length),
             dataUrl,
             width: img.naturalWidth,
             height: img.naturalHeight,

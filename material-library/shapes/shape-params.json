@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-07-24T15:30:00Z",
+  "updated_at": "2026-07-29T00:00:00Z",
   "units": {
     "svg": "0.1mm",
     "comment": "所有生成 SVG 的坐标单位为 0.1mm（widthMm 11 → 半宽 55 单位）。本文件为前后端唯一参数源（DEV-PLAN §2.3-6 / §4.3），禁止第二参数源。"
@@ -30,7 +30,9 @@
           "cornerRadiusMm": "flat：甲尖圆角半径（mm）",
           "capHeightRatio": "semicircle/pointed：收口区高度 ÷ 全长",
           "tipRoundness": "pointed：0 锐 → 1 钝",
-          "endLinearMix": "端部线性混合 λ"
+          "endLinearMix": "legacy width-profile 的端部线性混合 λ",
+          "sidewallProfile": "可选 single-convex：从宽肩到甲尖使用无拐点单调凸侧壁",
+          "sidewallPower": "single-convex 曲率指数；>1 时由宽肩平缓起步、靠近甲尖逐渐加强收窄"
         }
       },
       "cuticle-seat": {
@@ -85,17 +87,22 @@
       "signed_off_note": "Almond / Oval / Round 四长度对照签收；Oval 从中上段持续收窄，圆钝甲尖，与 Round 短圆帽及 Almond 软尖保持可辨差异"
     },
     "coffin": {
-      "name": "芭蕾/棺材形",
+      "name": "梯形",
       "name_en": "Coffin",
       "tipStyle": "flat",
-      "tipWidthRatio": 0.48,
-      "cornerRadiusMm": 1.2,
-      "taperStart": 0.32,
-      "rootFullness": 0.035,
-      "midFullness": 0.1,
+      "sidewallProfile": "single-convex",
+      "sidewallPower": 1.8,
+      "tipWidthRatio": 0.6,
+      "cornerRadiusMm": 0.9,
+      "taperStart": 0.0,
+      "rootFullness": 0.0,
+      "midFullness": 0.0,
       "fullnessPos": 0.3,
       "cCurve": 0.4,
-      "endLinearMix": 0.55
+      "endLinearMix": 1.0,
+      "review_note": "v4: single-curvature convex sidewalls with no middle S inflection; broad shoulder eases into a balanced flat free edge with softened corners; rebuilt from annotated human reference",
+      "signed_off_at": "2026-07-29",
+      "signed_off_note": "Coffin v4 四长度人工签收通过；侧壁从宽肩到甲尖保持单一凸曲率，无中段 S 形拐点；甲尖宽度与软圆角比例确认"
     },
     "squoval": {
       "name": "方圆形",

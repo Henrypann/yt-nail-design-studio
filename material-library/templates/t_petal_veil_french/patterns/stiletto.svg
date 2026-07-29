@@ -19,8 +19,8 @@
   </defs>
   <g clip-path="url(#nail-clip)">
     <rect x="-60" y="-200" width="120" height="220" fill="url(#petal-veil-base)"/>
-    <path d="M -60 -200 H 60 V -118 Q 0 -84 -60 -118 Z" fill="#FFFDF9" opacity="0.9"/>
-    <path d="M -60 -118 Q 0 -84 60 -118" fill="none" stroke="#F0E3DC" stroke-width="1.1" opacity="0.88"/>
+    <path d="M -60 -200 H 60 V -84 Q 0 -118 -60 -84 Z" fill="#FFFDF9" opacity="0.9"/>
+    <path d="M -60 -84 Q 0 -118 60 -84" fill="none" stroke="#F0E3DC" stroke-width="1.1" opacity="0.88"/>
     <circle cx="-19" cy="-68" r="0.9" fill="#FFFFFF" opacity="0.62"/>
     <circle cx="8" cy="-54" r="0.7" fill="#FFFFFF" opacity="0.52"/>
     <circle cx="-8" cy="-118" r="0.8" fill="#FFFFFF" opacity="0.58"/>

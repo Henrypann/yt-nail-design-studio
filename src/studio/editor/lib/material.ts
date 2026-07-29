@@ -133,8 +133,55 @@ export interface DecorationDef {
 }
 
 interface ShapeParamsFile {
-  shapes: Record<string, { name: string }>;
+  shapes: Record<string, { name: string; name_en?: string }>;
   lengths?: Record<string, { name?: string; lengthMm?: number }>;
+}
+
+export interface EditorShapeCapability {
+  id: NailShape;
+  label_en: string;
+  tier: 1 | 2;
+  order: number;
+  capabilities: {
+    geometry: 'placeholder' | 'generated' | 'in_review' | 'signed_off';
+    editor: 'disabled' | 'experimental' | 'enabled';
+  };
+}
+
+interface ShapeCapabilitiesFile {
+  shapes: EditorShapeCapability[];
+}
+
+export interface TaxonomyColorPreset {
+  id: string;
+  name: string;
+  hex: string;
+  base_coverage: 'opaque' | 'translucent';
+}
+
+export interface TaxonomySurfacePreset {
+  id: 'gloss' | 'matte' | 'cat-eye' | 'aurora' | 'silk';
+  name: string;
+  appearance: {
+    optical_effect: 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';
+    top_finish: 'gloss' | 'matte';
+  };
+}
+
+export interface TaxonomyLookPreset {
+  id: string;
+  name: string;
+  direction: 'classic' | 'fashion' | 'sweet' | 'art';
+  recipe: string;
+  surface: string;
+  color_preset?: string;
+  preview_only?: boolean;
+}
+
+interface NailDesignTaxonomy {
+  look_presets: TaxonomyLookPreset[];
+  color_presets: TaxonomyColorPreset[];
+  surface_presets: TaxonomySurfacePreset[];
 }
 
 /* ── 清单导出（运行时读取，非硬编码） ──────────────────── */
@@ -156,9 +203,24 @@ const decorationManifest =
 export const DECORATIONS: readonly DecorationDef[] = decorationManifest?.decorations ?? [];
 
 const shapeParams = pickJson<ShapeParamsFile>(jsonRaw, '/shapes/shape-params.json');
+const shapeCapabilities = pickJson<ShapeCapabilitiesFile>(jsonRaw, '/shapes/shape-capabilities.json');
+const taxonomy = pickJson<NailDesignTaxonomy>(jsonRaw, '/taxonomy/nail-design-taxonomy.json');
+export const LOOK_PRESETS: readonly TaxonomyLookPreset[] = taxonomy?.look_presets ?? [];
+export const COLOR_PRESETS: readonly TaxonomyColorPreset[] = taxonomy?.color_presets ?? [];
+export const SURFACE_PRESETS: readonly TaxonomySurfacePreset[] = taxonomy?.surface_presets ?? [];
 
 export function shapeName(shape: NailShape): string {
-  return shapeParams?.shapes?.[shape]?.name ?? shape;
+  return shapeParams?.shapes?.[shape]?.name_en ?? shape;
+}
+
+export const TIER_ONE_EDITOR_SHAPES: readonly EditorShapeCapability[] = (
+  shapeCapabilities?.shapes ?? []
+)
+  .filter((shape) => shape.tier === 1)
+  .sort((a, b) => a.order - b.order);
+
+export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
+  return shape.capabilities.geometry === 'signed_off' && shape.capabilities.editor === 'enabled';
 }
 
 const LENGTH_LABELS: Record<NailLength, string> = {

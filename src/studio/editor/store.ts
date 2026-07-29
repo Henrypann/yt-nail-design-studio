@@ -7,8 +7,15 @@ import { create } from 'zustand';
 import type { DesignStatus, FingerCode } from '@/lib/types';
 import { isReadOnly } from '@/lib/state-machine';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
-import type { AttachmentElement, EditorDoc, FrenchEdgeVariant, PatternElement, Transform } from './lib/model';
-import { genId, IDENTITY_TRANSFORM, resolveFingerData } from './lib/model';
+import type { AttachmentElement, EditorDoc, FingerData, FrenchEdgeVariant, PatternElement, Transform } from './lib/model';
+import {
+  createLayerMeta,
+  genId,
+  IDENTITY_TRANSFORM,
+  normalizeEditorLayerOrders,
+  resolveFingerData,
+} from './lib/model';
+import { buildRecipePattern, type EditorRecipeId } from './lib/recipes';
 import { getSilhouette } from './lib/material';
 import {
   defaultClassicControls,
@@ -16,7 +23,7 @@ import {
 } from './lib/french-edge';
 import {
   getDesign,
-  getEditorDoc,
+  getEditorDocResult,
   saveEditorDoc,
   upsertDesign,
   writeCanvasEnvelope,
@@ -33,6 +40,8 @@ import { ensureSession, recordFrenchEdge, recordMirror, recordUndo } from './lib
 export type EditorTool = 'brush' | 'eraser';
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type BrushPreset = 'fine' | 'standard' | 'thick';
+export type EditorEditScope = 'single' | 'all';
+export type { EditorRecipeId } from './lib/recipes';
 
 /** 线宽（0.1mm 单位）：细 0.5mm / 标准 1.2mm / 粗 2.5mm */
 export const BRUSH_PRESET_SIZES: Record<BrushPreset, number> = {
@@ -55,6 +64,8 @@ interface EditorState {
   readOnly: boolean;
 
   currentFinger: FingerCode;
+  /** 默认单甲编辑；只有显式切换 all 才修改共享十指基底。 */
+  editScope: EditorEditScope;
   tool: EditorTool;
   brushColor: string;
   brushSize: number;
@@ -72,7 +83,7 @@ interface EditorState {
   future: EditorDoc[];
   saveState: SaveState;
 
-  load: (designId: string) => 'ok' | 'missing';
+  load: (designId: string) => 'ok' | 'missing' | 'invalid' | 'unsupported';
   unload: () => void;
 
   /** 提交一次可撤销修改（推入历史栈） */
@@ -89,6 +100,7 @@ interface EditorState {
   mirrorLeftHandToRight: (mode: MirrorMode) => void;
   setView: (view: Partial<{ zoom: number; panX: number; panY: number }>) => void;
   setCurrentFinger: (finger: FingerCode) => void;
+  setEditScope: (scope: EditorEditScope) => void;
   setSelection: (sel: ElementRef | null) => void;
 
   /** 一键插入参数化法式边（当前指 pattern 层） */
@@ -99,6 +111,7 @@ interface EditorState {
     strokeColor: string;
     strokeWidth: number;
   }) => 'ok' | 'no-silhouette' | 'readonly';
+  applyRecipe: (recipe: EditorRecipeId) => 'ok' | 'no-silhouette' | 'readonly';
 
   /** 编辑当前手指的显示数据（解锁指改副本，否则改共享基指数据 → 十指同步） */
   editCurrentFingerData: (mutate: (data: {
@@ -120,6 +133,15 @@ function cloneDoc(doc: EditorDoc): EditorDoc {
   return structuredClone(doc);
 }
 
+function ensureSingleFingerData(draft: EditorDoc, finger: FingerCode): FingerData {
+  const existing = draft.fingerLocks[finger];
+  if (existing) return existing;
+  const source = resolveFingerData(draft, finger);
+  const created = structuredClone(source);
+  draft.fingerLocks[finger] = created;
+  return created;
+}
+
 export const useEditorStore = create<EditorState>((set, get) => ({
   designId: null,
   status: null,
@@ -127,6 +149,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   readOnly: false,
 
   currentFinger: 'R4',
+  editScope: 'single',
   tool: 'brush',
   brushColor: '#C2497A',
   brushSize: BRUSH_PRESET_SIZES.standard,
@@ -145,14 +168,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   load: (designId) => {
     const design = getDesign(designId);
-    const doc = getEditorDoc(designId);
-    if (!design || !doc) return 'missing';
+    if (!design) return 'missing';
+    const result = getEditorDocResult(designId);
+    if (result.status !== 'ok') return result.status;
+    const doc = result.doc;
     set({
       designId,
       status: design.status,
       doc: cloneDoc(doc),
       readOnly: isReadOnly(design.status),
       currentFinger: doc.masterFinger,
+      editScope: 'single',
       tool: 'brush',
       zoom: 1,
       panX: 0,
@@ -172,6 +198,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       status: null,
       doc: null,
       readOnly: false,
+      editScope: 'single',
       history: [],
       future: [],
       selection: null,
@@ -184,6 +211,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!doc || readOnly) return;
     const next = cloneDoc(doc);
     mutate(next);
+    normalizeEditorLayerOrders(next);
     next.updatedAt = new Date().toISOString();
     set((s) => ({
       doc: next,
@@ -279,6 +307,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       panY: view.panY ?? s.panY,
     })),
   setCurrentFinger: (finger) => set({ currentFinger: finger, selection: null }),
+  setEditScope: (editScope) => set({ editScope, selection: null }),
   setSelection: (sel) => set({ selection: sel }),
 
   insertFrenchEdge: (opts) => {
@@ -292,6 +321,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       d.pattern.push({
         id,
         kind: 'french_edge',
+        ...createLayerMeta('经典法式', d.pattern.length),
         variant: opts.variant,
         fillColor: opts.fillColor,
         outlineEnabled: opts.outlineEnabled,
@@ -310,15 +340,41 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return 'ok';
   },
 
+  applyRecipe: (recipe) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return 'readonly';
+    const sil = getSilhouette(doc.shape, doc.length);
+    if (!sil) return 'no-silhouette';
+    let selectedId: string | null = null;
+    get().commit((draft) => {
+      const data = editScope === 'single' ? ensureSingleFingerData(draft, currentFinger) : draft;
+      data.pattern = data.pattern.filter((element) => element.source !== 'recipe');
+      const recipeElements = buildRecipePattern(recipe, sil, data.pattern.length);
+      data.pattern.push(...recipeElements);
+      selectedId = recipeElements[0]?.id ?? null;
+      draft.intent = {
+        ...draft.intent,
+        styleDirection: 'classic',
+        lookPresetId:
+          recipe === 'solid'
+            ? 'solid-color'
+            : recipe === 'french'
+              ? 'classic-french'
+              : 'nude-gradient',
+      };
+    });
+    set({ selection: selectedId ? { layer: 'pattern', id: selectedId } : null });
+    return 'ok';
+  },
+
   editCurrentFingerData: (mutate) => {
-    const { doc, currentFinger } = get();
+    const { doc, currentFinger, editScope } = get();
     if (!doc) return;
     get().commit((draft) => {
-      const target = draft.fingerLocks[currentFinger];
-      if (target) {
-        mutate(target);
+      if (editScope === 'single') {
+        mutate(ensureSingleFingerData(draft, currentFinger));
       } else {
-        // 共享分支：经 get/set 视图回写 draft 的标量与数组替换（push 等原地修改亦可）
+        // 十指同步模式只改共享基底；已存在的逐指例外保持独立。
         const view = {
           get baseColor() {
             return draft.baseColor;
@@ -386,7 +442,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       writeCanvasEnvelope(doc);
       const design = getDesign(doc.designId);
       if (design) {
-        upsertDesign({ ...design, updatedAt: doc.updatedAt });
+        const legacyFinish =
+          doc.appearance.topFinish === 'matte'
+            ? 'matte'
+            : doc.appearance.opticalEffect === 'pearl'
+              ? 'pearl'
+              : 'gloss';
+        upsertDesign({
+          ...design,
+          shape: doc.shape,
+          length: doc.length,
+          lengthPreset: doc.lengthPreset,
+          baseColor: doc.baseColor,
+          finish: legacyFinish,
+          surface: doc.appearance,
+          updatedAt: doc.updatedAt,
+        });
       }
     };
 
@@ -408,7 +479,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // 缩略图（异步，不阻塞保存）
     const data = resolveFingerData(doc, doc.masterFinger);
     const svg = composeNailSvg(
-      { shape: doc.shape, length: doc.length, data, uid: `thumb-${doc.designId}` },
+      {
+        shape: doc.shape,
+        length: doc.length,
+        data,
+        uid: `thumb-${doc.designId}`,
+        appearance: doc.appearance,
+      },
       2,
     );
     if (svg) {

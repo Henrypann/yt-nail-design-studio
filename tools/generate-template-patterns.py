@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """generate-template-patterns.py · 模板图案生成器（DEV-PLAN §5.6）
 
-为模板库中的款式生成 6 个甲型适配的图案 SVG，并为每套模板写
+为模板库中的款式生成所有已注册几何甲型适配的图案 SVG，并为每套模板写
 manifest.json（§5.6 / 后端架构文档 §2.3 规范，含 uv_params）与缩略图。
 
 约定：
@@ -33,14 +33,16 @@ LIB = ROOT / "material-library" / "templates"
 VIEWBOX = "-60 -200 120 220"
 MED_LEN, MED_W = 18.0, 11.0  # medium 基准尺寸（mm）
 
-# 每甲型的法式微笑线参数（ys = 侧壁端点 y，yc = 曲线控制点 y，控制点更低 → ∪ 形微笑线）
+# 每甲型的法式微笑线参数（ys = 侧翼 y，yc = 中心控制点 y）。
+# 坐标系中甲尖为负 y、甲根接近 0，因此中心朝甲尖 = yc < ys。
 FRENCH_SMILE = {
-    "almond": (-128, -92),
-    "squoval": (-124, -100),
-    "coffin": (-126, -98),
+    "almond": (-92, -128),
+    "oval": (-96, -126),
+    "squoval": (-100, -124),
+    "coffin": (-98, -126),
     "square": (-130, -130),  # 方形：平直白边
-    "round": (-122, -94),
-    "stiletto": (-118, -84),
+    "round": (-94, -122),
+    "stiletto": (-84, -118),
 }
 
 

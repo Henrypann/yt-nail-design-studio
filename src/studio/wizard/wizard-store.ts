@@ -26,7 +26,13 @@ import { readData, StorageKeys } from '@/lib/storage';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { loadSilhouette } from '@/studio/preview/nail-assets';
 import { loadBackPlateV2 } from '@/studio/render';
-import { loadPalette, loadShapeParams, type TemplateEntry } from '@/studio/preview/material-library';
+import {
+  isWizardShapeEnabled,
+  loadPalette,
+  loadShapeCapabilities,
+  loadShapeParams,
+  type TemplateEntry,
+} from '@/studio/preview/material-library';
 import { renderThumbnailDataUrl } from '@/studio/preview/export-png';
 import { persistDesign } from './design-repository';
 
@@ -222,6 +228,12 @@ export const useWizardStore = create<WizardState>((set, get) => {
     try {
       if (isScenarioOn(useMockScenarios.getState().flags, 'render.failAll')) {
         throw new Error('预览生成失败（MOCK）');
+      }
+      // UI 灰卡不是安全边界：动作层再次检查能力注册表，禁止恢复数据/直接 action 绕过门禁。
+      const registry = await loadShapeCapabilities();
+      const capability = registry.shapes.find((item) => item.id === s.shape);
+      if (!capability || !isWizardShapeEnabled(capability)) {
+        throw new Error(`甲型 ${s.shape} 尚未通过 Wizard 能力门禁`);
       }
       // 预生成：轮廓 + V2 plate/slots + 参数源 + 色板（首次进入初始化默认底色）
       const [, , , palette] = await Promise.all([

@@ -20,6 +20,10 @@ const fingerData: FingerData = {
     {
       id: 'b1',
       kind: 'brush',
+      name: '手绘笔画',
+      visible: true,
+      locked: false,
+      order: 0,
       points: [
         { x: 0, y: -50 },
         { x: 10, y: -80 },
@@ -41,11 +45,12 @@ assert(svg.includes('<polyline'), 'nailContentSvg renders brush polyline');
 assert(svg.includes('#C2497A'), 'brush color preserved');
 
 const doc: EditorDoc = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   designId: 'test-design',
   shape: 'almond',
   length: 'medium',
-  finish: 'gloss',
+  lengthPreset: 'short-extension',
+  appearance: { baseCoverage: 'opaque', opticalEffect: 'none', topFinish: 'gloss' },
   baseColor: '#FBF5F0',
   pattern: fingerData.pattern,
   attachments: [],

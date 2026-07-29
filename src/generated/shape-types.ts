@@ -20,19 +20,19 @@ export const NAIL_SHAPE_IDS = [
 export type NailShape = (typeof NAIL_SHAPE_IDS)[number];
 
 export const NAIL_SHAPE_LABELS: Record<NailShape, string> = {
-  "almond": "杏仁形",
-  "oval": "椭圆形",
-  "square": "方形",
-  "round": "圆形",
-  "coffin": "棺材形",
-  "squoval": "方圆形",
-  "stiletto": "细高跟形",
-  "soft-square": "柔方形",
-  "tapered-square": "收窄方形",
-  "ballerina": "芭蕾形",
-  "lipstick": "口红形",
-  "flare": "外扩形",
-  "mountain-peak": "山峰形",
-  "edge": "棱线形",
-  "arrowhead": "箭头形"
+  "almond": "Almond",
+  "oval": "Oval",
+  "square": "Square",
+  "round": "Round",
+  "coffin": "Coffin",
+  "squoval": "Squoval",
+  "stiletto": "Stiletto",
+  "soft-square": "Soft Square",
+  "tapered-square": "Tapered Square",
+  "ballerina": "Ballerina",
+  "lipstick": "Lipstick",
+  "flare": "Flare",
+  "mountain-peak": "Mountain Peak",
+  "edge": "Edge",
+  "arrowhead": "Arrowhead"
 };

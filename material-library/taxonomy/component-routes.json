@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-29T00:00:00Z",
+  "comment": "能力路由注册表。L2/L3 仅注册语义，运行时延后到 E4；当前既不渲染，也不代表制造可用。",
+  "routes": [
+    { "component_id": "metallic-line", "route": "L1", "runtime": "enabled", "manufacturing": "unverified" },
+    { "component_id": "3d-flower", "route": "L2", "runtime": "deferred", "manufacturing": "blocked" },
+    { "component_id": "crystal-gravel", "route": "L2", "runtime": "deferred", "manufacturing": "blocked" },
+    { "component_id": "pearl", "route": "L3", "runtime": "deferred", "manufacturing": "blocked" },
+    { "component_id": "rhinestone", "route": "L3", "runtime": "deferred", "manufacturing": "blocked" },
+    { "component_id": "caviar-bead", "route": "L3", "runtime": "deferred", "manufacturing": "blocked" }
+  ]
+}

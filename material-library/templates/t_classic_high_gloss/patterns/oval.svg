@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -200 120 220" data-template="t_classic_high_gloss" data-shape="oval" data-units="0.1mm" data-origin="nail-root-center">
+  <defs>
+    <clipPath id="nail-clip"><path d="M -47.9 0 C -51.3 -3.5 -55 -18.4 -55 -30.6 C -55 -75.4 -47.2 -180 0 -180 C 47.2 -180 55 -75.4 55 -30.6 C 55 -18.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#nail-clip)">
+    <!-- classic_high_gloss: intentionally empty pattern layer -->
+  </g>
+</svg>

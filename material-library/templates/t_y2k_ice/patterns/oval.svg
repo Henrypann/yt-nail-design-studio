@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -200 120 220" data-template="t_y2k_ice" data-shape="oval" data-units="0.1mm" data-origin="nail-root-center">
+  <defs>
+    <clipPath id="nail-clip"><path d="M -47.9 0 C -51.3 -3.5 -55 -18.4 -55 -30.6 C -55 -75.4 -47.2 -180 0 -180 C 47.2 -180 55 -75.4 55 -30.6 C 55 -18.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+    <linearGradient id="ice-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-180">
+      <stop offset="0" stop-color="#DFF2FA" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#B7DDF2" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#nail-clip)">
+    <rect x="-60" y="-200" width="120" height="220" fill="url(#ice-g)"/>
+    <polyline points="0,-178 -14,-150 6,-128 -8,-100" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <polyline points="-30,-160 -18,-138 -34,-112 -22,-88" fill="none" stroke="#8FCBEA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <polyline points="28,-168 40,-144 24,-118 36,-92" fill="none" stroke="#FFFFFF" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <polyline points="-6,-84 10,-66 -2,-46 14,-30" fill="none" stroke="#8FCBEA" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <polyline points="14,-176 4,-156 18,-140" fill="none" stroke="#DFF2FA" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <polygon points="-38,-72 -30,-58 -44,-56" fill="#FFFFFF" opacity="0.55"/>
+    <polygon points="30,-40 40,-28 26,-22" fill="#FFFFFF" opacity="0.45"/>
+    <polygon points="6,-112 14,-100 0,-96" fill="#B7DDF2" opacity="0.6"/>
+  </g>
+</svg>

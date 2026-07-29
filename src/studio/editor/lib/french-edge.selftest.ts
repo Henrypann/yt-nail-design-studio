@@ -111,7 +111,7 @@ const draggedRight = updateClassicControlsForHandle(
 );
 assert(draggedRight.rightWingOffset === 92, 'right wing drags independently');
 
-const shapes = ['almond', 'coffin', 'squoval', 'round', 'square', 'stiletto'];
+const shapes = ['almond', 'oval', 'coffin', 'squoval', 'round', 'square', 'stiletto'];
 const lengths = ['short', 'medium', 'long', 'extra_long'];
 for (const shape of shapes) {
   for (const length of lengths) {

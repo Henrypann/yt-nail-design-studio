@@ -6,6 +6,7 @@
 import { readData, writeEnvelope, removeKey, StorageKeys } from '@/lib/storage';
 import type { Customer, DesignSummary, NailLength, NailShape, ProjectV3 } from '@/lib/types';
 import { createBlankDoc, genId, type EditorDoc } from './model';
+import { migrateEditorDoc, type EditorDocMigrationResult } from './migrate';
 
 /* ── 设计集合 ─────────────────────────────────────────── */
 
@@ -36,14 +37,24 @@ export function removeDesign(id: string): void {
 
 /* ── Editor 文档 ─────────────────────────────────────── */
 
-type EditorDocMap = Record<string, EditorDoc>;
+type EditorDocMap = Record<string, unknown>;
 
 export function readEditorDocs(): EditorDocMap {
   return readData<EditorDocMap>(StorageKeys.editorDocs) ?? {};
 }
 
 export function getEditorDoc(designId: string): EditorDoc | undefined {
-  return readEditorDocs()[designId];
+  const result = getEditorDocResult(designId);
+  return result.status === 'ok' ? result.doc : undefined;
+}
+
+export function getEditorDocResult(designId: string): EditorDocMigrationResult {
+  return migrateEditorDoc(readEditorDocs()[designId]);
+}
+
+/** raw 存在与否独立于迁移结果，避免坏数据/未来版本被 Bridge 静默覆盖。 */
+export function hasEditorDocRaw(designId: string): boolean {
+  return Object.prototype.hasOwnProperty.call(readEditorDocs(), designId);
 }
 
 export function saveEditorDoc(doc: EditorDoc): void {
@@ -61,10 +72,10 @@ export function removeEditorDoc(designId: string): void {
 }
 
 export function duplicateEditorDoc(sourceId: string, newDesignId: string): void {
-  const source = getEditorDoc(sourceId);
-  if (!source) return;
+  const sourceResult = getEditorDocResult(sourceId);
+  if (sourceResult.status !== 'ok') return;
   saveEditorDoc({
-    ...structuredClone(source),
+    ...structuredClone(sourceResult.doc),
     designId: newDesignId,
     updatedAt: new Date().toISOString(),
   });
@@ -137,10 +148,16 @@ export function docToProjectV3(doc: EditorDoc): ProjectV3 {
           id: el.id,
           type: el.kind,
           transform:
-            el.kind === 'brush' || el.kind === 'eraser'
+            el.kind === 'brush' || el.kind === 'eraser' || el.kind === 'gradient'
               ? { x: 0, y: 0, scale: 1, rotation: 0 }
               : el.transform,
           editable: true,
+          payload: {
+            name: el.name,
+            visible: el.visible,
+            locked: el.locked,
+            order: el.order,
+          },
         })),
       },
       {
@@ -153,6 +170,12 @@ export function docToProjectV3(doc: EditorDoc): ProjectV3 {
           transform: el.transform,
           editable: true,
           heightMm: el.heightMm,
+          payload: {
+            name: el.name,
+            visible: el.visible,
+            locked: el.locked,
+            order: el.order,
+          },
         })),
       },
     ],

@@ -44,6 +44,10 @@ const source: FingerData = {
     {
       id: 'b1',
       kind: 'brush',
+      name: '手绘笔画',
+      visible: true,
+      locked: false,
+      order: 0,
       points: [{ x: 5, y: -100 }],
       color: '#000',
       size: 6,
@@ -71,6 +75,10 @@ const frenchSource: FingerData = {
     {
       id: 'f1',
       kind: 'french_edge',
+      name: '经典法式',
+      visible: true,
+      locked: false,
+      order: 0,
       variant: 'arc',
       fillColor: '#FFFFFF',
       outlineEnabled: false,

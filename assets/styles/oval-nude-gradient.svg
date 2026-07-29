@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF7F3"/>
+      <stop offset="1" stop-color="#EAD7D2"/>
+    </linearGradient>
+    <linearGradient id="nude" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#F8E8E1"/>
+      <stop offset="0.58" stop-color="#EABEC0"/>
+      <stop offset="1" stop-color="#D991A4"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#8B5B68" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <circle cx="1080" cy="112" r="190" fill="#FFFFFF" opacity="0.45"/>
+  <circle cx="160" cy="660" r="250" fill="#E4BCC2" opacity="0.24"/>
+  <g filter="url(#shadow)" fill="url(#nude)" stroke="#D9C7C4" stroke-width="3">
+    <path d="M250 560 C225 430 230 230 320 155 C410 230 415 430 390 560 Q320 610 250 560Z"/>
+    <path d="M415 570 C390 410 400 180 500 105 C600 180 610 410 585 570 Q500 625 415 570Z"/>
+    <path d="M600 575 C575 390 590 145 700 70 C810 145 825 390 800 575 Q700 635 600 575Z"/>
+    <path d="M820 570 C795 410 805 180 905 105 C1005 180 1015 410 990 570 Q905 625 820 570Z"/>
+  </g>
+  <text x="80" y="95" fill="#704E56" font-family="system-ui,sans-serif" font-size="34" font-weight="600">Natural Nude Gradient</text>
+  <text x="82" y="136" fill="#96757B" font-family="system-ui,sans-serif" font-size="22">Oval · soft root-to-tip transition</text>
+</svg>

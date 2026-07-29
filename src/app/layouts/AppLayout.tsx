@@ -3,6 +3,7 @@ import { Bell, Home, Users, Palette, Monitor, LogOut, PanelLeftClose, PanelLeftO
 import { useState } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
+import { LanguageToggle, useLocale } from '@/lib/i18n';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
 interface SessionInfo {
@@ -24,45 +25,10 @@ interface NavGroup {
 }
 
 /** 侧栏结构（PRD §1.2）：首页 / 客户管理 / 设计工作台 / 设备管理，无门店设置组 */
-const NAV_GROUPS: NavGroup[] = [
-  {
-    key: 'home',
-    label: '首页',
-    icon: Home,
-    items: [{ to: '/', label: 'Dashboard', end: true }],
-  },
-  {
-    key: 'customers',
-    label: '客户管理',
-    icon: Users,
-    items: [
-      { to: '/customers', label: '客户列表', end: true },
-      { to: '/customers/new', label: '新建客户' },
-    ],
-  },
-  {
-    key: 'studio',
-    label: '设计工作台',
-    icon: Palette,
-    items: [
-      { to: '/design/new', label: '新建设计' },
-      { to: '/design', label: '我的设计', end: true },
-    ],
-  },
-  {
-    key: 'devices',
-    label: '设备管理',
-    icon: Monitor,
-    items: [
-      { to: '/devices/bind', label: '设备绑定' },
-      { to: '/devices', label: '我的设备', end: true },
-    ],
-  },
-];
-
 /** 登录后全局布局：侧栏 + 顶栏（门店名纯文本 / 通知 / 用户名 / 退出）
  *  v1.5.1：侧栏支持收起/展开（持久化 localStorage，收起后仅图标 + tooltip） */
 export function AppLayout() {
+  const { text } = useLocale();
   const navigate = useNavigate();
   const session = readData<SessionInfo>(StorageKeys.session) ?? {};
   const [collapsed, setCollapsed] = useState(
@@ -79,6 +45,41 @@ export function AppLayout() {
     removeKey(StorageKeys.session);
     navigate('/login', { replace: true });
   };
+  const navGroups: NavGroup[] = [
+    {
+      key: 'home',
+      label: text('首页', 'Home'),
+      icon: Home,
+      items: [{ to: '/', label: 'Dashboard', end: true }],
+    },
+    {
+      key: 'customers',
+      label: text('客户管理', 'Customers'),
+      icon: Users,
+      items: [
+        { to: '/customers', label: text('客户列表', 'Customer list'), end: true },
+        { to: '/customers/new', label: text('新建客户', 'New customer') },
+      ],
+    },
+    {
+      key: 'studio',
+      label: 'Studio',
+      icon: Palette,
+      items: [
+        { to: '/design/new', label: text('新建设计', 'New design') },
+        { to: '/design', label: text('我的设计', 'My designs'), end: true },
+      ],
+    },
+    {
+      key: 'devices',
+      label: text('设备管理', 'Devices'),
+      icon: Monitor,
+      items: [
+        { to: '/devices/bind', label: text('设备绑定', 'Bind device') },
+        { to: '/devices', label: text('我的设备', 'My devices'), end: true },
+      ],
+    },
+  ];
 
   return (
     <div className="flex min-h-screen">
@@ -96,7 +97,7 @@ export function AppLayout() {
             collapsed ? 'justify-center px-2' : 'justify-between px-4',
           )}
         >
-          {!collapsed && <span className="text-sm font-bold text-primary">智能美甲 Studio</span>}
+          {!collapsed && <span className="text-sm font-bold text-primary">NextGen Beauty Studio</span>}
           <button
             onClick={toggleCollapsed}
             title={collapsed ? '展开导航' : '收起导航'}
@@ -107,7 +108,7 @@ export function AppLayout() {
           </button>
         </div>
         <nav className={cx('flex-1 overflow-y-auto py-4', collapsed ? 'px-2' : 'px-3')}>
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.key} className="mb-4">
               {collapsed ? (
                 <p className="mb-1 flex justify-center text-gray-300" title={group.label}>
@@ -154,19 +155,20 @@ export function AppLayout() {
             {session.storeName ?? '未命名门店'}
           </span>
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <button
               className="rounded-button p-2 text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
-              aria-label="通知"
+              aria-label={text('通知', 'Notifications')}
             >
               <Bell size={16} />
             </button>
-            <span className="text-sm text-gray-700">{session.userName ?? '美甲师'}</span>
+            <span className="text-sm text-gray-700">{session.userName ?? text('美甲师', 'Nail artist')}</span>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 rounded-button px-2 py-1.5 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
             >
               <LogOut size={13} />
-              退出
+              {text('退出', 'Sign out')}
             </button>
           </div>
         </header>

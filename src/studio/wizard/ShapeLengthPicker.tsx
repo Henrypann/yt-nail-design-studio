@@ -10,6 +10,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { NailLength, NailShape } from '@/lib/types';
 import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
 import {
@@ -72,9 +73,23 @@ interface ShapeCardProps {
 }
 
 function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: ShapeCardProps) {
+  const { locale } = useLocale();
   const enabled = isWizardShapeEnabled(capability);
-  const availability = shapeAvailabilityLabel(capability);
-  const unavailableReason = `${capability.label}·${availability}`;
+  const rawAvailability = shapeAvailabilityLabel(capability);
+  const availability =
+    locale === 'zh'
+      ? rawAvailability
+      : rawAvailability === '可用'
+        ? 'Available'
+        : rawAvailability === '校准中'
+          ? 'In review'
+          : rawAvailability === '模板适配中'
+            ? 'Assets pending'
+            : rawAvailability === '规划中'
+              ? 'Planned'
+              : 'Coming soon';
+  const shapeLabel = capability.label_en;
+  const unavailableReason = `${shapeLabel} · ${availability}`;
 
   return (
     <button
@@ -87,7 +102,7 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
       data-shape-id={capability.id}
       data-shape-tier={capability.tier}
       data-wizard-enabled={enabled}
-      title={enabled ? capability.label : unavailableReason}
+      title={enabled ? shapeLabel : unavailableReason}
       className={cx(
         'group relative flex min-w-0 flex-col items-center gap-1 rounded-card border bg-white px-2 pb-2 pt-3',
         'transition-all duration-fast ease-out',
@@ -145,7 +160,7 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
               : 'text-gray-400',
         )}
       >
-        {capability.label}
+        {shapeLabel}
       </span>
 
       {!enabled && (
@@ -158,6 +173,7 @@ function ShapeCard({ capability, silhouette, selected, lengthMm, onSelect }: Sha
 }
 
 export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange }: ShapeLengthPickerProps) {
+  const { text } = useLocale();
   const [params, setParams] = useState<ShapeParams | null>(null);
   const [registry, setRegistry] = useState<ShapeCapabilitiesRegistry | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -204,7 +220,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-xs font-medium text-gray-700">甲型</p>
+        <p className="mb-2 text-xs font-medium text-gray-700">{text('甲型', 'NAIL SHAPE')}</p>
         {loadFailed ? (
           <div role="alert" className="rounded-card border border-error/20 bg-error-soft px-3 py-2 text-xs text-error">
             甲型目录加载失败，请刷新后重试。
@@ -219,7 +235,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
                 aria-expanded={tierTwoOpen}
                 className="flex w-full items-center justify-between px-3 py-2 text-left text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
-                <span>更多甲型（{tierTwo.length}）</span>
+                <span>{text(`更多甲型（${tierTwo.length}）`, `More shapes (${tierTwo.length})`)}</span>
                 <ChevronDown
                   size={15}
                   className={cx('transition-transform duration-fast', tierTwoOpen && 'rotate-180')}
@@ -232,7 +248,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-medium text-gray-700">长度</p>
+        <p className="mb-2 text-xs font-medium text-gray-700">{text('长度', 'LENGTH')}</p>
         <div className="flex flex-wrap gap-2">
           {LENGTH_ORDER.map((item) => {
             const meta = params?.lengths[item];

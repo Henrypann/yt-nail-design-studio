@@ -49,7 +49,7 @@ export function StepTwo() {
     loadShapeParams()
       .then((p) =>
         setShapeNames({
-          shape: p.shapes[s.appliedShape!]?.name ?? s.appliedShape!,
+          shape: p.shapes[s.appliedShape!]?.name_en ?? s.appliedShape!,
           length: p.lengths[s.appliedLength!].name,
           mm: p.lengths[s.appliedLength!].lengthMm,
         }),

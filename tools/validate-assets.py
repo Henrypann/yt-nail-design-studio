@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 import sys
 import xml.etree.ElementTree as ET
 from functools import lru_cache
@@ -41,6 +42,8 @@ LENGTH_IDS = {"short", "medium", "long", "extra-long"}
 FINISH_IDS = {"gloss", "matte", "pearl"}
 STYLE_TAGS = {"trending", "sweet", "minimal", "cool", "retro", "luxe", "holiday"}
 EXPECTED_TEMPLATE_COUNT = 12
+EXPECTED_TIER_ONE = {"almond", "oval", "squoval", "square", "coffin"}
+EXPECTED_WIZARD_ENABLED = {"almond", "oval", "coffin"}
 FINGER_CODES = {f"{h}{i}" for h in "LR" for i in range(1, 6)}
 
 errors: list[str] = []
@@ -81,6 +84,9 @@ def shape_sets() -> tuple[set[str], set[str], set[str]]:
     tier_two = [item for item in items if item.get("tier") == 2]
     if len(tier_one) != 5:
         err(f"Tier 1 数量 = {len(tier_one)}，应为 5")
+    tier_one_ids = {item.get("id") for item in tier_one}
+    if tier_one_ids != EXPECTED_TIER_ONE:
+        err(f"Tier 1 集合错误: {sorted(tier_one_ids)}，应为 {sorted(EXPECTED_TIER_ONE)}")
     if len(tier_two) != len(items) - 5:
         err("除 Tier 1 外的甲型必须全部属于 Tier 2")
     for tier in (tier_one, tier_two):
@@ -90,6 +96,7 @@ def shape_sets() -> tuple[set[str], set[str], set[str]]:
 
     geometry_ids: set[str] = set()
     template_ids: set[str] = set()
+    wizard_enabled_ids: set[str] = set()
     aliases: set[str] = set()
     for item in items:
         sid = item.get("id", "<missing>")
@@ -115,6 +122,7 @@ def shape_sets() -> tuple[set[str], set[str], set[str]]:
         if caps.get("templates") == "complete":
             template_ids.add(sid)
         if caps.get("wizard") == "enabled":
+            wizard_enabled_ids.add(sid)
             required = {
                 "geometry": "signed_off",
                 "templates": "complete",
@@ -125,6 +133,11 @@ def shape_sets() -> tuple[set[str], set[str], set[str]]:
                     err(f"{sid}: wizard enabled 但 {key}={caps.get(key)}，应为 {expected}")
             if geometry_id is None:
                 err(f"{sid}: wizard enabled 但 geometry_id 为空")
+    if wizard_enabled_ids != EXPECTED_WIZARD_ENABLED:
+        err(
+            f"Wizard 开放甲型错误: {sorted(wizard_enabled_ids)}，"
+            f"应为 {sorted(EXPECTED_WIZARD_ENABLED)}"
+        )
 
     generated = ROOT / "src" / "generated" / "shape-types.ts"
     if not generated.exists():
@@ -232,6 +245,20 @@ def check_templates() -> None:
             text = fpath.read_text(encoding="utf-8")
             if 'id="nail-clip"' not in text or 'clip-path="url(#nail-clip)"' not in text:
                 err(f"{tid}/{sid}: 图案 SVG 缺少 nail-clip 裁剪（溢出风险，§5.8-2）")
+            if tid in {"t_french_white", "t_petal_veil_french"}:
+                smile = re.search(r"M -60 (-?\d+(?:\.\d+)?) Q 0 (-?\d+(?:\.\d+)?) 60", text)
+                if not smile:
+                    err(f"{tid}/{sid}: 缺少可验证的法式微笑线路径")
+                else:
+                    wing_y, center_y = map(float, smile.groups())
+                    if sid == "square":
+                        if center_y != wing_y:
+                            err(f"{tid}/{sid}: 方形法式应保持平直")
+                    elif center_y >= wing_y:
+                        err(
+                            f"{tid}/{sid}: 微笑线中心必须朝甲尖（centerY < wingY），"
+                            f"实际 {center_y} >= {wing_y}"
+                        )
             # 剥离 hex 色值与 url(...) 引用后再提取坐标数值，避免误判
             artwork = text.split("</defs>")[-1]
             artwork = re.sub(r"viewBox=\"[^\"]*\"", "", artwork)
@@ -258,7 +285,6 @@ def check_templates() -> None:
         turl = t.get("thumbnail_url")
         if turl and not (ROOT / turl).exists():
             err(f"{tid}: index.json thumbnail_url 不存在: {turl}")
-
         # uv_params
         uv = manifest.get("uv_params", {})
         for k in ("anchor_u", "anchor_v", "scale_u", "scale_v"):
@@ -268,6 +294,123 @@ def check_templates() -> None:
     # 全库 viewBox 一致（比 §5.8-1 更严，便于渲染器统一处理）
     if len(all_viewboxes) > 1:
         err(f"全库图案 viewBox 不统一: {sorted(all_viewboxes)}")
+
+
+def image_size(path: Path) -> tuple[int, int] | None:
+    if path.suffix.lower() == ".png":
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n" or len(data) < 24:
+            return None
+        return struct.unpack(">II", data[16:24])
+    if path.suffix.lower() == ".svg":
+        root = parse_svg(path)
+        if root is None:
+            return None
+        view_box = root.attrib.get("viewBox", "").split()
+        if len(view_box) == 4:
+            return round(float(view_box[2])), round(float(view_box[3]))
+        width = re.sub(r"[^0-9.]", "", root.attrib.get("width", ""))
+        height = re.sub(r"[^0-9.]", "", root.attrib.get("height", ""))
+        if width and height:
+            return round(float(width)), round(float(height))
+    return None
+
+
+def check_styles() -> None:
+    registry = load_json(LIB / "shapes" / "shape-capabilities.json")
+    index = load_json(LIB / "index.json")
+    manifest = load_json(ASSETS / "styles" / "manifest.json")
+    if not registry or not index or not manifest:
+        return
+    valid_templates = {item.get("id") for item in index.get("templates", [])}
+    valid_lengths = LENGTH_IDS
+    recommendations = manifest.get("recommendations", {})
+    styles_ready = {
+        item.get("id")
+        for item in registry.get("shapes", [])
+        if item.get("capabilities", {}).get("styles") == "complete"
+    }
+    for sid in styles_ready:
+        items = recommendations.get(sid, [])
+        if len(items) < 3:
+            err(f"styles complete 的 {sid} 推荐数 = {len(items)}，应 ≥ 3")
+            continue
+        priorities = [item.get("priority") for item in items]
+        if len(set(priorities)) != len(priorities):
+            err(f"{sid}: 风格推荐 priority 必须唯一")
+        for item in items:
+            style_id = item.get("id", "<missing>")
+            template_id = item.get("template_id")
+            if template_id is not None and template_id not in valid_templates:
+                err(f"{sid}/{style_id}: template_id 不存在: {template_id}")
+            lengths = item.get("best_lengths", [])
+            if not lengths or not set(lengths).issubset(valid_lengths):
+                err(f"{sid}/{style_id}: best_lengths 非法: {lengths}")
+            if item.get("cover_status") not in {"REAL", "MOCK"}:
+                err(f"{sid}/{style_id}: cover_status 必须为 REAL 或 MOCK")
+            cover_url = item.get("cover_url", "")
+            cover = ROOT / cover_url.lstrip("/")
+            if not cover.exists():
+                err(f"{sid}/{style_id}: cover 不存在: {cover_url}")
+                continue
+            if image_size(cover) != (1280, 720):
+                err(f"{sid}/{style_id}: cover 必须为 1280×720，实际 {image_size(cover)}")
+
+
+def check_compatibility_rules() -> None:
+    taxonomy = load_json(LIB / "taxonomy" / "nail-design-taxonomy.json")
+    rules = load_json(LIB / "taxonomy" / "compatibility-rules.json")
+    if not taxonomy or not rules:
+        return
+
+    shape_ids = set(taxonomy.get("shapes", []))
+    length_ids = {item.get("id") for item in taxonomy.get("length_presets", [])}
+    look_ids = {item.get("id") for item in taxonomy.get("look_presets", [])}
+    policy = rules.get("policy", {})
+    if (
+        policy.get("mode") != "advisory"
+        or policy.get("allow_override") is not True
+        or policy.get("auto_select_length") is not False
+    ):
+        err("compatibility-rules 必须保持 advisory、允许覆盖且不得自动改选长度")
+
+    severity = rules.get("severity", {})
+    for level in ("caution", "strong"):
+        if severity.get(level, {}).get("selectable") is not True:
+            err(f"compatibility-rules severity.{level} 必须保持 selectable=true")
+
+    def check_rule(rule: dict, dimension: str, valid_ids: set[str]) -> None:
+        key = f"{dimension}_id"
+        entity_id = rule.get(key)
+        if entity_id not in valid_ids:
+            err(f"compatibility-rules {key} 非法: {entity_id}")
+        recommended = set(rule.get("recommended", []))
+        warning = rule.get("warning", {})
+        warning_lengths = set(warning)
+        if not recommended.issubset(length_ids):
+            err(f"compatibility-rules {entity_id}: recommended 含非法长度")
+        if not warning_lengths.issubset(length_ids):
+            err(f"compatibility-rules {entity_id}: warning 含非法长度")
+        if recommended & warning_lengths:
+            err(f"compatibility-rules {entity_id}: 同一长度不能同时 recommended 和 warning")
+        for length_id, item in warning.items():
+            if item.get("severity") not in {"caution", "strong"}:
+                err(f"compatibility-rules {entity_id}/{length_id}: severity 非法")
+            reason = item.get("reason", {})
+            if not reason.get("zh") or not reason.get("en"):
+                err(f"compatibility-rules {entity_id}/{length_id}: 缺少中英文 reason")
+
+    shape_rules = rules.get("shape_length", [])
+    if len({item.get("shape_id") for item in shape_rules}) != len(shape_rules):
+        err("compatibility-rules shape_length 存在重复 shape_id")
+    for rule in shape_rules:
+        check_rule(rule, "shape", shape_ids)
+
+    look_rules = rules.get("look_length", [])
+    if len({item.get("look_id") for item in look_rules}) != len(look_rules):
+        err("compatibility-rules look_length 存在重复 look_id")
+    for rule in look_rules:
+        check_rule(rule, "look", look_ids)
 
 
 def check_shapes() -> None:
@@ -283,9 +426,28 @@ def check_shapes() -> None:
     by_id = {item.get("id"): item for item in registry.get("shapes", [])}
     for sid in sorted(geometry_shape_ids):
         status = by_id.get(sid, {}).get("capabilities", {}).get("geometry")
-        signed_off_at = params.get("shapes", {}).get(sid, {}).get("signed_off_at")
+        shape_params = params.get("shapes", {}).get(sid, {})
+        signed_off_at = shape_params.get("signed_off_at")
         if status == "signed_off" and not signed_off_at:
             err(f"{sid}: geometry=signed_off 但 shape-params 缺少 signed_off_at")
+        if shape_params.get("sidewallProfile") == "single-convex":
+            power = float(shape_params.get("sidewallPower", 0))
+            tip_width = float(shape_params.get("tipWidthRatio", 0))
+            if power <= 1:
+                err(f"{sid}: single-convex 的 sidewallPower 必须 > 1，实际 {power}")
+                continue
+            widths = [
+                1.0 - (1.0 - tip_width) * (i / 40) ** power
+                for i in range(41)
+            ]
+            if any(widths[i + 1] >= widths[i] for i in range(40)):
+                err(f"{sid}: single-convex 侧壁必须从甲根到甲尖单调收窄")
+            second_differences = [
+                widths[i + 1] - 2 * widths[i] + widths[i - 1]
+                for i in range(1, 40)
+            ]
+            if any(delta >= 1e-9 for delta in second_differences):
+                err(f"{sid}: single-convex 侧壁出现反向曲率或 S 形拐点")
     # ---- §5.8-6 已注册几何 × 4 长度全组合存在且可解析
     for sid in sorted(geometry_shape_ids):
         for lid in sorted(LENGTH_IDS):
@@ -391,6 +553,8 @@ def check_illustrations_stl() -> None:
 def main() -> int:
     registered_shape_ids, geometry_shape_ids, template_shape_ids = shape_sets()
     check_templates()
+    check_styles()
+    check_compatibility_rules()
     check_shapes()
     check_palette_finishes()
     check_hands_slots()

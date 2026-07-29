@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-07-28T00:00:00Z",
+  "updated_at": "2026-07-29T00:00:00Z",
   "comment": "非几何性质的甲型能力注册表。只描述产品展示、资产就绪度与功能门禁；轮廓参数唯一来源仍为 shape-params.json。",
   "shapes": [
     {
@@ -31,10 +31,10 @@
       "geometry_id": "oval",
       "capabilities": {
         "geometry": "signed_off",
-        "editor": "experimental",
-        "templates": "missing",
-        "styles": "missing",
-        "wizard": "disabled"
+        "editor": "enabled",
+        "templates": "complete",
+        "styles": "complete",
+        "wizard": "enabled"
       }
     },
     {
@@ -42,7 +42,7 @@
       "label": "方形",
       "label_en": "Square",
       "tier": 1,
-      "order": 3,
+      "order": 4,
       "family": "square",
       "aliases": [],
       "geometry_id": "square",
@@ -58,8 +58,8 @@
       "id": "round",
       "label": "圆形",
       "label_en": "Round",
-      "tier": 1,
-      "order": 4,
+      "tier": 2,
+      "order": 1,
       "family": "rounded",
       "aliases": [],
       "geometry_id": "round",
@@ -81,19 +81,19 @@
       "aliases": [],
       "geometry_id": "coffin",
       "capabilities": {
-        "geometry": "generated",
+        "geometry": "signed_off",
         "editor": "enabled",
         "templates": "complete",
-        "styles": "missing",
-        "wizard": "disabled"
+        "styles": "complete",
+        "wizard": "enabled"
       }
     },
     {
       "id": "squoval",
       "label": "方圆形",
       "label_en": "Squoval",
-      "tier": 2,
-      "order": 1,
+      "tier": 1,
+      "order": 3,
       "family": "square",
       "aliases": [],
       "geometry_id": "squoval",

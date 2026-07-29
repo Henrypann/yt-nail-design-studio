@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "updated_at": "2026-07-29T00:00:00Z",
+  "comment": "Cloudia 领域枚举。用于 Agent 提案、Editor 筛选与精选 Recipe；禁止对七个维度做笛卡尔积穷举。",
+  "style_directions": [
+    { "id": "classic", "name": "经典" },
+    { "id": "fashion", "name": "时尚" },
+    { "id": "sweet", "name": "甜美" },
+    { "id": "art", "name": "艺术" }
+  ],
+  "look_presets": [
+    { "id": "classic-french", "name": "常规法式", "direction": "classic", "recipe": "french", "surface": "gloss" },
+    { "id": "nude-gradient", "name": "裸色渐变", "direction": "classic", "recipe": "gradient", "surface": "gloss" },
+    { "id": "solid-color", "name": "纯色单色", "direction": "classic", "recipe": "solid", "surface": "gloss" },
+    { "id": "cat-eye", "name": "猫眼", "direction": "fashion", "recipe": "solid", "surface": "cat-eye" },
+    { "id": "aurora-powder", "name": "极光粉", "direction": "fashion", "recipe": "solid", "surface": "aurora" },
+    { "id": "metallic-line", "name": "金属线条", "direction": "fashion", "recipe": "metallic-line", "surface": "gloss" },
+    { "id": "pearl-accent", "name": "小珍珠点缀", "direction": "sweet", "recipe": "pearl-accent", "surface": "gloss" },
+    { "id": "jelly-color", "name": "果冻色", "direction": "sweet", "recipe": "solid", "color_preset": "jelly-pink", "surface": "gloss" },
+    { "id": "tiny-floral", "name": "小碎花手绘", "direction": "sweet", "recipe": "tiny-floral", "surface": "gloss" },
+    { "id": "sculpted-flower", "name": "立体雕花", "direction": "art", "recipe": "sculpted-flower", "surface": "gloss", "preview_only": true },
+    { "id": "watercolor-bloom", "name": "水彩晕染", "direction": "art", "recipe": "watercolor-bloom", "surface": "gloss" },
+    { "id": "crystal-gravel", "name": "水晶碎石", "direction": "art", "recipe": "crystal-gravel", "surface": "gloss", "preview_only": true }
+  ],
+  "shapes": ["almond", "oval", "squoval", "square", "coffin"],
+  "length_presets": [
+    { "id": "natural", "name": "本甲长度", "extension_mm": 0, "fallback_geometry_length": "short" },
+    { "id": "short-extension", "name": "短延长", "extension_mm": 4, "fallback_geometry_length": "medium" },
+    { "id": "medium", "name": "中长度", "extension_mm": 8, "fallback_geometry_length": "long" },
+    { "id": "long", "name": "长", "extension_mm": 12, "fallback_geometry_length": "extra-long" }
+  ],
+  "color_presets": [
+    { "id": "milk-tea-nude", "name": "裸奶茶", "hex": "#D8BBA8", "base_coverage": "opaque" },
+    { "id": "nude-pink", "name": "裸粉", "hex": "#F5E0D3", "base_coverage": "opaque" },
+    { "id": "milky-white", "name": "奶白", "hex": "#FBF5F0", "base_coverage": "opaque" },
+    { "id": "gray-nude", "name": "灰裸", "hex": "#C8BAB5", "base_coverage": "opaque" },
+    { "id": "jelly-pink", "name": "果冻粉", "hex": "#F3AFC2", "base_coverage": "translucent" }
+  ],
+  "surface_presets": [
+    { "id": "gloss", "name": "亮面", "appearance": { "optical_effect": "none", "top_finish": "gloss" } },
+    { "id": "matte", "name": "磨砂", "appearance": { "optical_effect": "none", "top_finish": "matte" } },
+    { "id": "cat-eye", "name": "猫眼", "appearance": { "optical_effect": "cat-eye", "top_finish": "gloss" } },
+    { "id": "aurora", "name": "极光粉", "appearance": { "optical_effect": "aurora", "top_finish": "gloss" } },
+    { "id": "silk", "name": "丝绸感", "appearance": { "optical_effect": "silk", "top_finish": "gloss" } }
+  ],
+  "decorations": [
+    { "id": "pearl", "name": "小珍珠", "render_route": "L3", "preview_only": true },
+    { "id": "rhinestone", "name": "平底钻", "render_route": "L3", "preview_only": true },
+    { "id": "metallic-line", "name": "金属细线", "render_route": "L1", "preview_only": false },
+    { "id": "caviar-bead", "name": "小钢珠", "render_route": "L3", "preview_only": true },
+    { "id": "3d-flower", "name": "立体小花", "render_route": "L2", "preview_only": true }
+  ],
+  "occasions": [
+    { "id": "commute", "name": "日常通勤", "recommended_looks": ["solid-color", "nude-gradient", "pearl-accent", "metallic-line"] },
+    { "id": "date", "name": "约会", "recommended_looks": ["cat-eye", "aurora-powder", "pearl-accent"] },
+    { "id": "wedding", "name": "婚礼", "recommended_looks": ["classic-french", "sculpted-flower", "pearl-accent"] },
+    { "id": "party", "name": "派对", "recommended_looks": ["cat-eye", "aurora-powder", "metallic-line", "crystal-gravel"] },
+    { "id": "vacation", "name": "度假/旅行", "recommended_looks": ["jelly-color", "tiny-floral", "watercolor-bloom"] }
+  ],
+  "conflicts": [
+    { "left": "optical-effect:cat-eye", "right": "optical-effect:aurora", "reason": "两种互斥光学效果不可同时作为主表面效果。" },
+    { "left": "optical-effect:silk", "right": "top-finish:matte", "reason": "丝绸光带需要亮面封层，磨砂会破坏方向性高光。" }
+  ]
+}

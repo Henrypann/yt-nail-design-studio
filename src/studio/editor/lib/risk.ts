@@ -63,7 +63,7 @@ export function runRiskChecks(doc: EditorDoc, forceIssues = false): RiskReport {
 
   for (const finger of FINGER_CODES) {
     const data = resolveFingerData(doc, finger);
-    const atts = data.attachments;
+    const atts = data.attachments.filter((attachment) => attachment.visible);
 
     if (atts.length > ATTACHMENT_COUNT_WARN) {
       issues.push({

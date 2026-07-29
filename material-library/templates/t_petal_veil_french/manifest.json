@@ -3,6 +3,7 @@
   "version": 1,
   "patterns": {
     "almond": "patterns/almond.svg",
+    "oval": "patterns/oval.svg",
     "coffin": "patterns/coffin.svg",
     "squoval": "patterns/squoval.svg",
     "round": "patterns/round.svg",

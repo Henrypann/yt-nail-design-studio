@@ -12,7 +12,9 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Sparkles, X } from 'lucide-react';
 import { Badge, Button, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { NailLength, NailShape } from '@/lib/types';
+import { loadShapeCapabilities } from '@/studio/preview/material-library';
 
 export interface StyleRecommendation {
   id: string;
@@ -40,12 +42,22 @@ export interface StyleRecommendModalProps {
 }
 
 export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: StyleRecommendModalProps) {
+  const { locale, text } = useLocale();
   const [styles, setStyles] = useState<StyleRecommendation[]>([]);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [shapeLabel, setShapeLabel] = useState('');
 
   useEffect(() => {
     if (!open || !shape) return;
     let cancelled = false;
+    loadShapeCapabilities()
+      .then((registry) => {
+        if (cancelled) return;
+        setShapeLabel(registry.shapes.find((item) => item.id === shape)?.label_en ?? shape);
+      })
+      .catch(() => {
+        if (!cancelled) setShapeLabel(shape);
+      });
     fetch('/assets/styles/manifest.json')
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -91,10 +103,13 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
           <div>
             <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
               <Sparkles size={16} className="text-primary" />
-              为杏仁形推荐当下流行风格
+              {text(
+                `为 ${shapeLabel || shape || '当前甲型'} 推荐当下流行风格`,
+                `Trending looks for ${shapeLabel || shape || 'this shape'}`,
+              )}
             </h2>
             <p className="mt-0.5 text-xs text-gray-500">
-              选择一款直接进入画布（自动应用匹配模板），或跳过自行搭配
+              {text('选择一款直接进入画布（自动应用匹配模板），或跳过自行搭配', 'Choose a look to apply its template, or skip and design freely')}
             </p>
           </div>
           <button
@@ -145,8 +160,8 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                 {/* 文案区 */}
                 <div className="flex flex-1 flex-col gap-1.5 px-3.5 py-3">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-sm font-semibold text-gray-900">{st.name}</span>
-                    <span className="truncate text-[11px] text-gray-400">{st.name_en}</span>
+                    <span className="text-sm font-semibold text-gray-900">{locale === 'en' ? st.name_en : st.name}</span>
+                    {locale === 'zh' && <span className="truncate text-[11px] text-gray-400">{st.name_en}</span>}
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px]">
                     <span className="text-gray-500">最佳长度 {st.best_length_label}</span>
@@ -157,7 +172,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                   <p className="line-clamp-3 text-xs leading-relaxed text-gray-600">{st.reason}</p>
                   <div className="mt-auto pt-2">
                     <Button size="sm" className="w-full" onClick={() => onSelect(st)}>
-                      选用此风格
+                      {text('选用此风格', 'Use this look')}
                       <ArrowRight size={13} />
                     </Button>
                   </div>
@@ -170,7 +185,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
         {/* 底部 */}
         <div className="flex items-center justify-end border-t border-gray-200 px-6 py-3">
           <Button variant="ghost" size="sm" onClick={onSkip}>
-            暂不选择，直接进入画布
+            {text('暂不选择，直接进入画布', 'Skip and open canvas')}
           </Button>
         </div>
       </div>

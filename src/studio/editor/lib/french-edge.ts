@@ -4,14 +4,15 @@
  * 甲尖在负 y。甲尖填色区域由「真实 silhouette 外轮廓 + 微笑线」共同围合：
  * - 外边缘始终交给项目唯一 silhouette clipPath；
  * - 内边缘的两侧翼点由真实轮廓水平求交得到；
- * - smileDepth 表示微笑线中心向甲根深入的可见深度。
+ * - 经典弧中心明确朝甲尖（centerY < wingY），由三点控制值决定；
+ * - smileDepth 仅保留给 V 形 / 双线的旧参数语义。
  */
 
-import type { SilhouetteInfo } from './material';
+import type { SilhouetteInfo } from './material.ts';
 import type {
   ClassicFrenchControls,
   FrenchEdgeElement,
-} from './model';
+} from './model.ts';
 
 // 经典法式的两侧翼点需要落到甲型已经展开的侧壁，避免形成尖端“小帽子”。
 const TIP_OFFSET_RATIO = 0.34;

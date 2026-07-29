@@ -158,7 +158,18 @@ export function TiledNailsPreview({
   className,
 }: TiledNailsPreviewProps) {
   const assets = useNailDesignAssets(shape, length, templateId);
-  const { status, retry, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
+  const {
+    status,
+    retry,
+    silhouette,
+    patternMarkup,
+    patternError,
+    retryPattern,
+    patternVisible,
+    patternFadeMs,
+    failedFingers,
+    patternK,
+  } = assets;
 
   const decorationById = useMemo(() => {
     const map = new Map<string, DecorationAsset>();
@@ -194,7 +205,15 @@ export function TiledNailsPreview({
   }
 
   return (
-    <div className={cx('flex h-full items-start justify-center overflow-y-auto rounded-card border border-gray-200 bg-white p-4', className)}>
+    <div className={cx('flex h-full flex-col items-center gap-3 overflow-y-auto rounded-card border border-gray-200 bg-white p-4', className)}>
+      {patternError && (
+        <div role="alert" className="flex w-full items-center justify-between rounded-button border border-error/20 bg-error-soft px-3 py-2 text-xs text-error">
+          <span>{patternError}</span>
+          <Button size="sm" variant="ghost" onClick={retryPattern}>
+            重试图案
+          </Button>
+        </div>
+      )}
       <div className="grid grid-cols-5 gap-3" data-debug-id="studio.wizard.step2.tiled-view">
         {FINGER_CODES.map((finger) => {
           const override = fingerOverrides?.[finger];

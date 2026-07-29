@@ -22,7 +22,8 @@ type PageState =
   | { kind: 'bridge-warning'; designId: string }
   | { kind: 'blank-picker' }
   | { kind: 'ready' }
-  | { kind: 'missing' };
+  | { kind: 'missing' }
+  | { kind: 'invalid'; unsupported?: boolean };
 
 export default function EditorPage() {
   const [params, setParams] = useSearchParams();
@@ -49,7 +50,14 @@ export default function EditorPage() {
       return;
     }
     if (designId) {
-      setState(load(designId) === 'ok' ? { kind: 'ready' } : { kind: 'missing' });
+      const result = load(designId);
+      setState(
+        result === 'ok'
+          ? { kind: 'ready' }
+          : result === 'invalid' || result === 'unsupported'
+            ? { kind: 'invalid', unsupported: result === 'unsupported' }
+            : { kind: 'missing' },
+      );
       return;
     }
     setState({ kind: 'missing' });
@@ -64,7 +72,10 @@ export default function EditorPage() {
       setParams({ design: designId }, { replace: true });
       setState({ kind: 'ready' });
     } else {
-      setState({ kind: 'missing' });
+      setState({
+        kind: result === 'invalid' || result === 'unsupported' ? 'invalid' : 'missing',
+        ...(result === 'unsupported' ? { unsupported: true } : {}),
+      });
     }
   };
 
@@ -81,7 +92,7 @@ export default function EditorPage() {
     <div className="flex flex-col gap-4">
       <header>
         <h1 className="text-lg font-semibold text-gray-900">Studio Editor</h1>
-        <p className="mt-0.5 text-xs text-gray-500">甲型轮廓内 2D 自由画布 · 十指编排 · 3D 单甲检查（只读）</p>
+        <p className="mt-0.5 text-xs text-gray-500">甲型轮廓内 2D 自由画布 · 十指编排 · 顾客展示</p>
       </header>
 
       {(state.kind === 'missing' || state.kind === 'loading') && (
@@ -103,6 +114,22 @@ export default function EditorPage() {
                 </Button>
               </div>
             ) : undefined
+          }
+          className="min-h-[320px]"
+        />
+      )}
+      {state.kind === 'invalid' && (
+        <EmptyState
+          title={state.unsupported ? '设计来自更高版本' : '设计数据无法读取'}
+          description={
+            state.unsupported
+              ? '当前版本不会覆盖这份设计。请使用创建它的新版 Studio 打开。'
+              : '原始 Editor 数据已保留，没有被空白画布覆盖。请返回列表后恢复或复制备份。'
+          }
+          action={
+            <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
+              返回设计列表
+            </Button>
           }
           className="min-h-[320px]"
         />

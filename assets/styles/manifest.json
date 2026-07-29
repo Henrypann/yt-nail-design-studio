@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-07-27T00:00:00Z",
+  "updated_at": "2026-07-29T00:00:00Z",
   "comment": "Wizard 风格推荐弹窗数据源（DEV-PLAN §5.10）。按甲型分组；封面一律 16:9 1280×720。cover_status=REAL 为实拍/正式图，MOCK 为程序生成占位图（入库红线：MOCK 不得冒充正式图）。template_id 指向 material-library/index.json 中现有模板，选中风格后自动应用；为空则仅记录风格不应用模板。",
   "recommendations": {
     "almond": [
@@ -36,6 +36,82 @@
         "best_lengths": ["medium", "long", "extra-long"],
         "best_length_label": "18–26mm 优先",
         "reason": "Almond 的连续轮廓最能承接贝壳纹、珠光渐变、气泡与低浮雕鱼鳞；适合夏季传播与 Studio 3D 打印展示款。",
+        "cover_url": "/assets/styles/sea-glass-mermaid.png",
+        "cover_status": "MOCK",
+        "template_id": "t_3d_waterdrop"
+      }
+    ],
+    "oval": [
+      {
+        "id": "oval-nude-gradient",
+        "name": "自然裸粉渐变",
+        "name_en": "Natural Nude Gradient",
+        "priority": 1,
+        "best_lengths": ["short", "medium", "long"],
+        "best_length_label": "14–22mm 优先",
+        "reason": "Oval 的连续圆弧适合从甲根到甲尖的柔和过渡，日常感强且不压缩甲面比例。",
+        "cover_url": "/assets/styles/oval-nude-gradient.svg",
+        "cover_status": "MOCK",
+        "template_id": "t_nude_gradient"
+      },
+      {
+        "id": "oval-classic-french",
+        "name": "经典微笑线法式",
+        "name_en": "Classic Smile French",
+        "priority": 2,
+        "best_lengths": ["short", "medium", "long", "extra-long"],
+        "best_length_label": "14–26mm 全覆盖",
+        "reason": "Oval 的对称侧壁能让微笑线自然贴合甲尖，短甲和日常长度也能保持干净比例。",
+        "cover_url": "/assets/styles/oval-classic-french.svg",
+        "cover_status": "MOCK",
+        "template_id": "t_french_white"
+      },
+      {
+        "id": "oval-liquid-cat-eye",
+        "name": "裸透丝绒猫眼",
+        "name_en": "Sheer Velvet Cat-eye",
+        "priority": 3,
+        "best_lengths": ["medium", "long"],
+        "best_length_label": "18–22mm 优先",
+        "reason": "纵向磁光可以顺着 Oval 中轴拉长，圆润甲尖会减弱金属光带的攻击感。",
+        "cover_url": "/assets/styles/liquid-velvet-cat-eye.png",
+        "cover_status": "REAL",
+        "template_id": "t_liquid_velvet_cat_eye"
+      }
+    ],
+    "coffin": [
+      {
+        "id": "coffin-liquid-velvet-cat-eye",
+        "name": "丝绒猫眼流线",
+        "name_en": "Liquid Velvet Cat-eye",
+        "priority": 1,
+        "best_lengths": ["medium", "long", "extra-long"],
+        "best_length_label": "18–26mm 优先",
+        "reason": "Coffin v4 的宽肩和连续凸侧壁能稳定承接纵向磁光，平直甲尖强化干练轮廓。",
+        "cover_url": "/assets/styles/liquid-velvet-cat-eye.png",
+        "cover_status": "REAL",
+        "template_id": "t_liquid_velvet_cat_eye"
+      },
+      {
+        "id": "coffin-petal-veil-french",
+        "name": "奶雾法式立体花",
+        "name_en": "Petal Veil French",
+        "priority": 2,
+        "best_lengths": ["short", "medium", "long"],
+        "best_length_label": "14–22mm 优先",
+        "reason": "平直甲尖为法式留出清晰边界，柔和凸侧壁避免整体过硬，适合婚礼和约会场景。",
+        "cover_url": "/assets/styles/petal-veil-french.png",
+        "cover_status": "REAL",
+        "template_id": "t_petal_veil_french"
+      },
+      {
+        "id": "coffin-sea-glass-mermaid",
+        "name": "海玻璃果冻珠光",
+        "name_en": "Sea Glass Mermaid",
+        "priority": 3,
+        "best_lengths": ["medium", "long", "extra-long"],
+        "best_length_label": "18–26mm 优先",
+        "reason": "较长 Coffin 甲面适合承载水滴、珠光渐变和低浮雕颗粒；当前封面仍为模拟效果。",
         "cover_url": "/assets/styles/sea-glass-mermaid.png",
         "cover_status": "MOCK",
         "template_id": "t_3d_waterdrop"

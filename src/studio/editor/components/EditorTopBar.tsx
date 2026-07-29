@@ -10,12 +10,17 @@ import {
   CheckCircle2,
   ChevronDown,
   Download,
+  HelpCircle,
   LayoutGrid,
+  Presentation,
+  Redo2,
   Save,
+  Undo2,
   User,
 } from 'lucide-react';
 import { Button, Modal, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { useLocale } from '@/lib/i18n';
 import { confirmDesign } from '@/lib/state-machine';
 import { readData, StorageKeys } from '@/lib/storage';
 import { customerName, getDesign, upsertDesign } from '../lib/repo';
@@ -36,9 +41,15 @@ const SAVE_LABEL = {
   error: '保存失败',
 } as const;
 
-export function EditorTopBar(props: { onOpenTiled: () => void }) {
-  const { onOpenTiled } = props;
+export function EditorTopBar(props: {
+  onOpenTiled: () => void;
+  onOpenPresentation: () => void;
+  onOpenHelp: () => void;
+  onFirstOutcome: () => void;
+}) {
+  const { onOpenTiled, onOpenPresentation, onOpenHelp, onFirstOutcome } = props;
   const navigate = useNavigate();
+  const { text } = useLocale();
   const toast = useToast();
   const doc = useEditorStore((s) => s.doc);
   const status = useEditorStore((s) => s.status);
@@ -46,6 +57,10 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
   const saveState = useEditorStore((s) => s.saveState);
   const save = useEditorStore((s) => s.save);
   const currentFinger = useEditorStore((s) => s.currentFinger);
+  const historyCount = useEditorStore((s) => s.history.length);
+  const futureCount = useEditorStore((s) => s.future.length);
+  const undo = useEditorStore((s) => s.undo);
+  const redo = useEditorStore((s) => s.redo);
 
   const [exportOpen, setExportOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -65,7 +80,10 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
 
   const doSave = async () => {
     const result = await save();
-    if (result === 'saved') toast.success('已保存');
+    if (result === 'saved') {
+      toast.success('已保存');
+      onFirstOutcome();
+    }
     else toast.error('保存失败（已自动重试 3 次）。请检查数据后点击 [保存] 重试。');
   };
 
@@ -85,6 +103,7 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
             length: doc.length,
             data: resolveFingerData(doc, currentFinger),
             uid: `export-${currentFinger}`,
+            appearance: doc.appearance,
           },
           4,
         );
@@ -98,6 +117,7 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
         downloadDataUrl(png, `十指平铺_${doc.shape}.png`);
       }
       toast.success('PNG 已导出');
+      onFirstOutcome();
     } catch {
       toast.error('导出失败。请重试。');
     } finally {
@@ -122,16 +142,16 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
   };
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-3">
       <div className="flex min-w-0 items-center gap-3">
         <button
           onClick={requestLeave}
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
         >
           <ArrowLeft size={14} />
-          返回
+          {text('返回', 'Back')}
         </button>
-        <span className="flex items-center gap-1 text-xs text-gray-600">
+        <span className="hidden items-center gap-1 text-xs text-gray-600 xl:flex">
           <User size={13} className="text-gray-400" />
           {customerName(doc.customerId)}
         </span>
@@ -157,11 +177,20 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1.5">
+        <Button size="sm" variant="ghost" disabled={readOnly || historyCount === 0} onClick={undo} title="撤销 ⌘Z">
+          <Undo2 size={13} />
+        </Button>
+        <Button size="sm" variant="ghost" disabled={readOnly || futureCount === 0} onClick={redo} title="重做 ⌘⇧Z">
+          <Redo2 size={13} />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onOpenHelp} title="重新打开新手引导">
+          <HelpCircle size={13} />
+        </Button>
         {status === 'draft' && !readOnly && (
           <Button size="sm" variant="secondary" onClick={() => setConfirmOpen(true)}>
             <CheckCircle2 size={13} />
-            顾客已确认
+            {text('顾客已确认', 'Customer approved')}
           </Button>
         )}
         <div className="relative" ref={exportRef}>
@@ -172,7 +201,7 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
             onClick={() => setExportOpen((v) => !v)}
           >
             <Download size={13} />
-            导出 PNG
+            {text('导出 PNG', 'Export PNG')}
             <ChevronDown size={12} />
           </Button>
           {exportOpen && (
@@ -181,25 +210,29 @@ export function EditorTopBar(props: { onOpenTiled: () => void }) {
                 onClick={() => exportPng('single')}
                 className="w-full rounded-button px-2.5 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50"
               >
-                单甲 PNG（当前指）
+                {text('单甲 PNG（当前指）', 'Current nail PNG')}
               </button>
               <button
                 onClick={() => exportPng('tiled')}
                 className="w-full rounded-button px-2.5 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50"
               >
-                十指平铺 PNG
+                {text('十指平铺 PNG', 'All 10 PNG')}
               </button>
             </div>
           )}
         </div>
         <Button size="sm" variant="secondary" onClick={onOpenTiled}>
           <LayoutGrid size={13} />
-          十指平铺预览
+          {text('十指预览', 'All 10 preview')}
+        </Button>
+        <Button size="sm" variant="secondary" onClick={onOpenPresentation}>
+          <Presentation size={13} />
+          {text('顾客展示', 'Present')}
         </Button>
         {!readOnly && (
           <Button size="sm" onClick={doSave} loading={saveState === 'saving'}>
             <Save size={13} />
-            保存
+            {text('保存', 'Save')}
           </Button>
         )}
       </div>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7F2ED"/>
+      <stop offset="1" stop-color="#E9DED6"/>
+    </linearGradient>
+    <linearGradient id="base" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#E9D0C9"/>
+      <stop offset="1" stop-color="#F7E7E2"/>
+    </linearGradient>
+    <clipPath id="n1"><path d="M250 570 C225 430 230 230 320 155 C410 230 415 430 390 570 Q320 610 250 570Z"/></clipPath>
+    <clipPath id="n2"><path d="M455 575 C425 395 440 155 550 78 C660 155 675 395 645 575 Q550 635 455 575Z"/></clipPath>
+    <clipPath id="n3"><path d="M690 575 C660 395 675 155 785 78 C895 155 910 395 880 575 Q785 635 690 575Z"/></clipPath>
+    <clipPath id="n4"><path d="M925 570 C900 430 905 230 995 155 C1085 230 1090 430 1065 570 Q995 610 925 570Z"/></clipPath>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <g fill="url(#base)" stroke="#D3C2BC" stroke-width="3">
+    <path d="M250 570 C225 430 230 230 320 155 C410 230 415 430 390 570 Q320 610 250 570Z"/>
+    <path d="M455 575 C425 395 440 155 550 78 C660 155 675 395 645 575 Q550 635 455 575Z"/>
+    <path d="M690 575 C660 395 675 155 785 78 C895 155 910 395 880 575 Q785 635 690 575Z"/>
+    <path d="M925 570 C900 430 905 230 995 155 C1085 230 1090 430 1065 570 Q995 610 925 570Z"/>
+  </g>
+  <g fill="#FFFDF9">
+    <path clip-path="url(#n1)" d="M225 275 Q320 150 415 275 L415 80 L225 80Z"/>
+    <path clip-path="url(#n2)" d="M420 235 Q550 65 680 235 L680 20 L420 20Z"/>
+    <path clip-path="url(#n3)" d="M655 235 Q785 65 915 235 L915 20 L655 20Z"/>
+    <path clip-path="url(#n4)" d="M900 275 Q995 150 1090 275 L1090 80 L900 80Z"/>
+  </g>
+  <text x="80" y="95" fill="#634B45" font-family="system-ui,sans-serif" font-size="34" font-weight="600">Classic Smile French</text>
+  <text x="82" y="136" fill="#92766E" font-family="system-ui,sans-serif" font-size="22">Oval · tip-hugging smile line</text>
+</svg>

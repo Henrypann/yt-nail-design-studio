@@ -80,7 +80,7 @@ export function PresentationMode({
   useEffect(() => {
     if (!open) return;
     loadShapeParams()
-      .then((p) => setShapeLabel(`${p.shapes[shape]?.name ?? shape} · ${p.lengths[length].name}（${p.lengths[length].lengthMm}mm）`))
+      .then((p) => setShapeLabel(`${p.shapes[shape]?.name_en ?? shape} · ${p.lengths[length].name}（${p.lengths[length].lengthMm}mm）`))
       .catch(() => undefined);
     loadFinishes()
       .then((fs) => setFinishLabel(fs.find((f) => f.id === finish)?.name ?? finish))

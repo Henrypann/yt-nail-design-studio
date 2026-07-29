@@ -38,7 +38,7 @@ export function FingerDetailPanel({
   onExpand,
 }: FingerDetailPanelProps) {
   const assets = useNailDesignAssets(shape, length, templateId);
-  const { status, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
+  const { status, silhouette, patternMarkup, patternError, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
 
   const decorationById = useMemo(() => {
     const map = new Map<string, DecorationAsset>();
@@ -69,6 +69,11 @@ export function FingerDetailPanel({
           </button>
         )}
       </div>
+      {patternError && (
+        <p role="alert" className="rounded-button border border-error/20 bg-error-soft px-2 py-1.5 text-[10px] text-error">
+          {patternError}
+        </p>
+      )}
 
       {!selectedFinger ? (
         <p className="py-6 text-center text-xs leading-relaxed text-gray-400">

@@ -3,7 +3,7 @@
  *
  * 从 TenFingerPreview 抽取的加载逻辑，行为保持一致：
  * - 基础资产：silhouette + shape-params + decorations（可选 Back V2 plate/slots）
- * - 模板图案：淡出 150ms → 新渲染淡入 200ms；失败降级为纯底色
+ * - 模板图案：淡出 150ms → 新渲染淡入 200ms；失败显式报错并允许重试
  * - Mock 场景注入：render.failAll / render.timeout / render.failFinger
  * 全部 fetch 走 nail-assets / material-library 的模块级缓存，多视图挂载不重复拉取。
  */
@@ -35,6 +35,9 @@ export interface NailDesignAssets {
   decorations: DecorationAsset[];
   /** 模板图案内部标记（已 id 唯一化），无模板 / 加载失败降级为 null */
   patternMarkup: string | null;
+  /** 选中了模板但对应甲型图案缺失或加载失败；不得静默冒充纯色成功。 */
+  patternError: string | null;
+  retryPattern: () => void;
   patternVisible: boolean;
   patternFadeMs: number;
   failedFingers: Set<FingerCode>;
@@ -105,6 +108,8 @@ export function useNailDesignAssets(
   /** 已渲染图案的 key：`${templateId}/${shape}`（图案按甲型独立适配，改甲型需重载） */
   const [patternKey, setPatternKey] = useState<string | null>(null);
   const [patternVisible, setPatternVisible] = useState(true);
+  const [patternError, setPatternError] = useState<string | null>(null);
+  const [patternRetryKey, setPatternRetryKey] = useState(0);
   const patternFadeMs = patternVisible ? 200 : 150;
 
   useEffect(() => {
@@ -122,6 +127,7 @@ export function useNailDesignAssets(
               setPatternMarkup(null);
               setPatternKey(null);
               setPatternVisible(true);
+              setPatternError(null);
             }
             return;
           }
@@ -131,12 +137,13 @@ export function useNailDesignAssets(
             setPatternMarkup(p.innerMarkup);
             setPatternKey(nextKey);
             setPatternVisible(true);
+            setPatternError(null);
           } catch {
-            // 图案加载失败：降级为纯底色（不清空已选模板，Mock 面板可注入整体失败）
             if (!cancelled) {
               setPatternMarkup(null);
               setPatternKey(nextKey);
               setPatternVisible(true);
+              setPatternError(`模板 ${templateId} 缺少 ${shape} 图案资产或加载失败。`);
             }
           }
         })();
@@ -148,7 +155,7 @@ export function useNailDesignAssets(
       window.clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId, shape, status]);
+  }, [templateId, shape, status, patternRetryKey]);
 
   const lengthMm = base?.params.lengths[length].lengthMm ?? PATTERN_BASE_LENGTH_MM;
   const widthMm = base?.params.lengths[length].widthMm ?? 11;
@@ -168,6 +175,11 @@ export function useNailDesignAssets(
     params: base?.params ?? null,
     decorations: base?.decorations ?? [],
     patternMarkup,
+    patternError,
+    retryPattern: () => {
+      setPatternKey(null);
+      setPatternRetryKey((key) => key + 1);
+    },
     patternVisible,
     patternFadeMs,
     failedFingers,

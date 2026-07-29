@@ -11,7 +11,7 @@
     { "id": "luxe", "name": "奢华", "name_en": "Luxe" },
     { "id": "holiday", "name": "节日", "name_en": "Holiday" }
   ],
-  "shape_ids": ["almond", "coffin", "squoval", "round", "square", "stiletto"],
+  "shape_ids": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"],
   "templates": [
     {
       "id": "t_liquid_velvet_cat_eye",
@@ -21,7 +21,7 @@
       "default_base_color": "#8A625A",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "coffin", "squoval"],
+        "highly_compatible": ["almond", "oval", "coffin", "squoval"],
         "neutral": ["round", "stiletto"],
         "not_recommended": {
           "square": "平直宽甲面会让纵向磁光发散，侧弧金属流线也难以形成连续拉长感"
@@ -39,7 +39,7 @@
       "default_base_color": "#F2E4DA",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "round", "squoval"],
+        "highly_compatible": ["almond", "oval", "round", "squoval"],
         "neutral": ["coffin", "square"],
         "not_recommended": {
           "stiletto": "极尖甲面会压缩法式弧与低浮雕花的留白，削弱轻柔比例"
@@ -57,7 +57,7 @@
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "squoval", "coffin"],
+        "highly_compatible": ["almond", "oval", "squoval", "coffin"],
         "neutral": ["square", "round"],
         "not_recommended": {
           "stiletto": "极尖甲面上法式弧线比例失衡，白边视觉效果不理想"
@@ -75,7 +75,7 @@
       "default_base_color": "#F7D9CF",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "round", "squoval"],
+        "highly_compatible": ["almond", "oval", "round", "squoval"],
         "neutral": ["coffin", "square"],
         "not_recommended": {
           "stiletto": "渐变过渡在尖端被截断，色彩层次不完整"
@@ -93,7 +93,7 @@
       "default_base_color": "#E8D5C4",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "coffin", "squoval"],
+        "highly_compatible": ["almond", "oval", "coffin", "squoval"],
         "neutral": ["round"],
         "not_recommended": {
           "square": "猫眼光带需要纵向弧面支撑，平直甲面光带发散不集中",
@@ -113,7 +113,7 @@
       "default_finish": "gloss",
       "shape_compatibility": {
         "highly_compatible": ["coffin", "almond", "stiletto"],
-        "neutral": ["squoval"],
+        "neutral": ["oval", "squoval"],
         "not_recommended": {
           "round": "短圆甲面气场不足，冰川碎线比例失衡",
           "square": "短平甲面气场不足，冰川碎线显得局促"
@@ -132,7 +132,7 @@
       "default_finish": "gloss",
       "shape_compatibility": {
         "highly_compatible": ["stiletto", "coffin", "almond"],
-        "neutral": ["squoval"],
+        "neutral": ["oval", "squoval"],
         "not_recommended": {
           "round": "渐变需要长度支撑，短圆甲面色彩过渡仓促",
           "square": "渐变需要长度支撑，短平甲面色彩过渡仓促"
@@ -151,7 +151,7 @@
       "default_finish": "gloss",
       "shape_compatibility": {
         "highly_compatible": ["stiletto", "coffin"],
-        "neutral": ["almond", "squoval"],
+        "neutral": ["almond", "oval", "squoval"],
         "not_recommended": {
           "round": "镜面效果在大圆弧平面上显廉价，长甲面反光更集中",
           "square": "镜面效果在大平面上显廉价，窄长甲面反光更集中"
@@ -170,7 +170,7 @@
       "default_finish": "matte",
       "shape_compatibility": {
         "highly_compatible": ["square", "coffin"],
-        "neutral": ["almond", "squoval"],
+        "neutral": ["almond", "oval", "squoval"],
         "not_recommended": {
           "round": "格子在圆弧边上变形，图案边缘被裁切",
           "stiletto": "格子在收窄的曲边上变形，图案边缘被裁切"
@@ -188,7 +188,7 @@
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "round"],
+        "highly_compatible": ["almond", "oval", "round"],
         "neutral": ["coffin", "squoval"],
         "not_recommended": {
           "square": "水滴造型与直边轮廓冲突，视觉风格不协调",
@@ -207,7 +207,7 @@
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "coffin", "squoval", "round", "square", "stiletto"],
+        "highly_compatible": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"],
         "neutral": [],
         "not_recommended": {}
       },
@@ -223,7 +223,7 @@
       "default_base_color": "#7E2A44",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "coffin", "round"],
+        "highly_compatible": ["almond", "oval", "coffin", "round"],
         "neutral": ["squoval", "square"],
         "not_recommended": {
           "stiletto": "闪粉在尖端堆积过厚，封层易起翘"

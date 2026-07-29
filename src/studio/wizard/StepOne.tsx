@@ -84,7 +84,7 @@ export function StepOne() {
     await enterCanvas();
   };
 
-  /** 选用风格：进入画布后自动应用映射模板（best-effort，模板缺失不阻断） */
+  /** 选用风格：模板映射必须存在；缺失时显式报错，不把纯底色冒充选款成功。 */
   const handleStyleSelect = async (st: StyleRecommendation) => {
     setStyle(st.id, st.name);
     setStyleModalOpen(false);
@@ -97,9 +97,13 @@ export function StepOne() {
       try {
         const index = await loadLibraryIndex();
         const template = index.templates.find((t) => t.id === st.template_id);
-        if (template) applyTemplate(template);
+        if (!template) {
+          toast.error(`风格「${st.name}」引用的模板不存在，请选择其他风格。`);
+          return;
+        }
+        applyTemplate(template);
       } catch {
-        /* 模板映射失败不阻断：用户仍可在模板墙手动选择 */
+        toast.error('模板目录加载失败。可在模板库刷新后重新选择。');
       }
     }
   };

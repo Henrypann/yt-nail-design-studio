@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes as RouterRoutes } from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
 import { DebugPanel } from '@/lib/debug-panel';
+import { LocaleProvider } from '@/lib/i18n';
 import { AppLayout } from './layouts/AppLayout';
 import { Routes } from './routes';
 import DashboardPage from './pages/DashboardPage';
@@ -20,8 +21,9 @@ import NotFoundPage from './pages/NotFoundPage';
 /** 应用根：路由（PRD §1.4 全 13 条）+ 全局 Toast + 调试面板（仅 DEV，v1.5.1） */
 export function App() {
   return (
-    <ToastProvider>
-      <BrowserRouter>
+    <LocaleProvider>
+      <ToastProvider>
+        <BrowserRouter>
         <RouterRoutes>
           {/* 登录前 */}
           <Route path={Routes.login} element={<LoginPage />} />
@@ -44,7 +46,8 @@ export function App() {
           <Route path="*" element={<NotFoundPage />} />
         </RouterRoutes>
         <DebugPanel />
-      </BrowserRouter>
-    </ToastProvider>
+        </BrowserRouter>
+      </ToastProvider>
+    </LocaleProvider>
   );
 }

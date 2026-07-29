@@ -67,31 +67,39 @@ try {
   await page.getByText('应用 → 预览十指').waitFor();
   step('Wizard 客户选择器', true);
 
-  /* 4b. 能力注册表 UI：Tier 1 常驻 5 个，Tier 2 折叠 10 个；Oval 阶段 2 仍受模板门禁 */
+  /* 4b. 能力注册表 UI：Tier 1 五个、Tier 2 十个；开放 Almond / Oval / Coffin */
   const tierOneShapes = page.locator('[data-shape-tier="1"]');
   await tierOneShapes.first().waitFor({ timeout: 10000 });
   const tierOneCount = await tierOneShapes.count();
-  const ovalCard = page.locator('[data-shape-id="oval"]');
-  await ovalCard.waitFor({ timeout: 10000 });
-  const ovalDisabled = (await ovalCard.getAttribute('aria-disabled')) === 'true';
+  const enabledShapeStates = await Promise.all(
+    ['almond', 'oval', 'coffin'].map(async (shape) =>
+      (await page.locator(`[data-shape-id="${shape}"]`).getAttribute('aria-disabled')) !== 'true'),
+  );
+  const tierOneDisabled = await Promise.all(
+    ['squoval', 'square'].map(async (shape) =>
+      (await page.locator(`[data-shape-id="${shape}"]`).getAttribute('aria-disabled')) === 'true'),
+  );
   await page.getByRole('button', { name: '更多甲型（10）' }).click();
   const tierTwoCount = await page.locator('[data-shape-tier="2"]').count();
   step(
     '甲型能力目录 = Tier 1 五个 + Tier 2 十个',
-    tierOneCount === 5 && tierTwoCount === 10 && ovalDisabled,
-    `Tier1=${tierOneCount}, Tier2=${tierTwoCount}, Oval门禁=${ovalDisabled}`,
+    tierOneCount === 5 && tierTwoCount === 10 && enabledShapeStates.every(Boolean) && tierOneDisabled.every(Boolean),
+    `Tier1=${tierOneCount}, Tier2=${tierTwoCount}, 已开放=${enabledShapeStates.filter(Boolean).length}`,
   );
   await page.getByRole('button', { name: '更多甲型（10）' }).click();
 
   /* 5. STEP 1：选甲型 + 长度 → 应用（v1.3.0：先弹风格推荐） */
-  await page.getByRole('button', { name: /杏仁形/ }).first().click();
-  await page.getByRole('button', { name: /^中/ }).first().click();
+  await page.getByRole('button', { name: /Coffin/ }).first().click();
+  await page.getByRole('button', { name: '中', exact: true }).click();
   await page.getByRole('button', { name: '应用 → 预览十指' }).click();
 
   /* 5b. 风格推荐弹窗：选用第一款（TOP 1，自动应用映射模板） */
-  await page.getByText('为杏仁形推荐当下流行风格').waitFor({ timeout: 10000 });
-  step('风格推荐弹窗弹出', true);
-  await page.getByRole('button', { name: /选用此风格/ }).first().click();
+  await page.getByText('为 Coffin 推荐当下流行风格').waitFor({ timeout: 10000 });
+  const coffinRecommendationButtons = page.getByRole('button', { name: /选用此风格/ });
+  await coffinRecommendationButtons.first().waitFor({ timeout: 10000 });
+  const coffinRecommendations = await coffinRecommendationButtons.count();
+  step('Coffin 三款风格推荐弹窗弹出', coffinRecommendations === 3, `推荐数=${coffinRecommendations}`);
+  await coffinRecommendationButtons.first().click();
 
   await page.getByRole('tab', { name: /整体搭配/ }).waitFor({ timeout: 20000 });
   step('STEP 1 甲型/长度 + 风格 → 进入 STEP 2', true);
@@ -237,6 +245,12 @@ try {
   await page.getByText('💾 已保存').waitFor({ timeout: 10000 });
   step('保存 → 💾 已保存', true);
 
+  /* 8b. Coffin v4 导出链路：隐藏 plate 注册源生成 PNG */
+  const downloadPromise = page.waitForEvent('download', { timeout: 15000 });
+  await page.getByRole('button', { name: '导出预览 PNG' }).dispatchEvent('click');
+  const pngDownload = await downloadPromise;
+  step('Coffin v4 导出 PNG', pngDownload.suggestedFilename().endsWith('.png'), pngDownload.suggestedFilename());
+
   /* 9. [打开自由画布] 桥接：不可逆警告弹窗 */
   await page.getByRole('button', { name: /打开自由画布|返回自由画布/ }).click();
   await page.waitForURL('**/design/canvas?bridge=**', { timeout: 15000 });
@@ -249,12 +263,91 @@ try {
   await page.waitForTimeout(1500);
   step('进入 Editor 画布', !page.url().includes('bridge='), page.url());
 
-  /* 10b. 桥接保真：Editor 十指平铺出现解锁标记（v2 桥接修复：逐指覆写不丢失） */
-  await page.getByRole('button', { name: '十指平铺预览' }).click();
+  /* 10a. E1 工作区：非阻塞引导、左右工作区、Inspector、十指条 */
+  await page.getByTestId('editor-context-drawer').waitFor({ timeout: 5000 });
+  await page.getByTestId('editor-inspector').waitFor({ timeout: 5000 });
+  await page.getByTestId('editor-finger-strip').waitFor({ timeout: 5000 });
+  const singleScope = page.getByRole('button', { name: /仅当前指 R4/ });
+  await singleScope.waitFor({ timeout: 5000 });
+  const noHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+  );
+  step('E1 专业工作区 + 默认单甲编辑 + 1280 无横向滚动', noHorizontalOverflow && (await singleScope.getAttribute('aria-pressed')) === 'true');
+
+  /* 10b. E2 Recipe → Layer：法式入口直接暴露在画布，不再要求先猜到图层入口 */
+  await page.getByRole('button', { name: /常规法式/ }).click();
+  const frenchCanvasEntry = page.getByTestId('edit-french-curve');
+  await frenchCanvasEntry.waitFor({ timeout: 5000 });
+  await frenchCanvasEntry.click();
+  const frenchHandles = await page.locator('[data-testid="classic-french-handles"]').count();
+  const layerPanel = page.getByTestId('layer-panel');
+  const classicLayer = layerPanel.getByText('经典法式', { exact: true }).last();
+  await classicLayer.waitFor({ timeout: 5000 });
+  const layerName = layerPanel.getByLabel('图层名称');
+  await layerName.fill('Coffin 法式主层');
+  const patternSection = layerPanel.locator('section').filter({ hasText: '图案' }).first();
+  await patternSection.getByTitle('复制').last().click();
+  const duplicateCount = await layerPanel.getByText(/Coffin 法式主层/).count();
+  await patternSection.getByTitle('上移').last().click();
+  await patternSection.getByTitle('下移').last().click();
+  await patternSection.getByTitle('隐藏').last().click();
+  await patternSection.getByTitle('锁定').last().click();
+  step('法式画布入口 + 三点控制 + Layer 元数据操作', duplicateCount === 2 && frenchHandles === 1, `法式层=${duplicateCount}, 控制柄组=${frenchHandles}`);
+
+  /* 10c. 显式切换十指同步；Recipe 写入共享基底，单甲法式保留在 R4 override */
+  await page.getByRole('button', { name: '十指同步' }).click();
+  await page.getByRole('button', { name: /裸色渐变/ }).click();
+
+  /* 10d. 保存重开：Schema v2 同时保留 shared gradient 与 R4 French override */
+  await page.getByRole('button', { name: /^保存$/ }).click();
+  await page.getByText('💾 已保存').waitFor({ timeout: 10000 });
+  const scopePersistence = await page.evaluate(() => {
+    const envelope = JSON.parse(window.localStorage.getItem('nail-studio:editor.docs') ?? '{}');
+    const docs = envelope.data ?? {};
+    const doc = Object.values(docs).at(-1);
+    return {
+      shape: doc?.shape,
+      sharedGradient: doc?.pattern?.some((element) => element.kind === 'gradient') ?? false,
+      r4French: doc?.fingerLocks?.R4?.pattern?.some((element) => element.kind === 'french_edge') ?? false,
+    };
+  });
+  step(
+    'Coffin 桥接 + 当前指 / 十指同步写入不同数据分区',
+    scopePersistence.shape === 'coffin' && scopePersistence.sharedGradient && scopePersistence.r4French,
+    `shape=${scopePersistence.shape}`,
+  );
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.getByTestId('editor-inspector').waitFor({ timeout: 5000 });
+  await page.getByRole('tab', { name: '图层' }).click();
+  const restoredLayers = await page.getByTestId('layer-panel').getByText(/Coffin 法式主层/).count();
+  step('Editor Schema v2 保存并重开', restoredLayers === 2, `恢复单甲法式层=${restoredLayers}`);
+
+  /* 10e. Editor / Wizard 甲型同源：Coffin 在两端均正式开放 */
+  await page.getByRole('tab', { name: '设计' }).click();
+  const coffinEnabled = !(await page.getByRole('button', { name: 'Coffin' }).isDisabled());
+  const squareStillDisabled = await page.getByRole('button', { name: 'Square' }).isDisabled();
+  const squovalStillDisabled = await page.getByRole('button', { name: 'Squoval' }).isDisabled();
+  step('Editor 同步开放 Coffin；Squoval / Square 保持灰态', coffinEnabled && squareStillDisabled && squovalStillDisabled);
+
+  /* 10f. 全局中英文切换；甲型名称保持英文 */
+  await page.getByTestId('language-toggle').getByRole('button', { name: 'EN' }).click();
+  await page.getByTestId('editor-finger-strip').getByText('EDIT SCOPE').first().waitFor({ timeout: 5000 });
+  const ovalStillEnglish = await page.getByTestId('editor-design-inspector').getByRole('button', { name: 'Oval' }).first().isVisible();
+  step('全局文案切换至英文；甲型保持英文', ovalStillEnglish);
+  await page.getByTestId('language-toggle').getByRole('button', { name: '中文' }).click();
+
+  /* 10g. 桥接保真：Editor 十指平铺出现 L3 + R4 两个解锁标记 */
+  await page.getByRole('button', { name: '十指预览' }).click();
   await page.locator('span[title="已解锁独立编辑"]').first().waitFor({ timeout: 5000 });
   const unlockBadges = await page.locator('span[title="已解锁独立编辑"]').count();
-  step('桥接后逐指覆写保留（Editor 解锁指）', unlockBadges === 1, `🔓 数量=${unlockBadges}`);
+  step('桥接覆写 + Editor 单甲编辑均保留', unlockBadges === 2, `🔓 数量=${unlockBadges}`);
   await page.getByRole('button', { name: '返回单甲' }).click();
+
+  /* 10h. 顾客展示只读，Esc 返回 */
+  await page.getByRole('button', { name: '顾客展示' }).click();
+  await page.getByText('顾客确认展示').waitFor({ timeout: 5000 });
+  await page.keyboard.press('Escape');
+  step('Editor 顾客展示模式 + Esc', (await page.getByText('顾客确认展示').count()) === 0);
 
   /* 11. 设计列表可见 */
   await page.goto(`${BASE}/design`, { waitUntil: 'networkidle' });

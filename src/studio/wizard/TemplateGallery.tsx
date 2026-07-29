@@ -51,7 +51,7 @@ export function TemplateGallery() {
         if (cancelled) return;
         setIndex(idx);
         setShapeNames(
-          Object.fromEntries(Object.entries(params.shapes).map(([k, v]) => [k, v.name])),
+          Object.fromEntries(Object.entries(params.shapes).map(([k, v]) => [k, v.name_en ?? k])),
         );
         setState('ready');
       } catch {

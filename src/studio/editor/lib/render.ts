@@ -10,7 +10,14 @@ import type { FingerCode, NailShape } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
 import { getDecorationInner, getPatternArtwork, getSilhouette, type SilhouetteInfo } from './material';
 import { buildFrenchEdgePaths } from './french-edge';
-import type { AttachmentElement, EditorDoc, FingerData, PatternElement, Transform } from './model';
+import type {
+  AttachmentElement,
+  EditorDoc,
+  FingerData,
+  PatternElement,
+  SurfaceAppearance,
+  Transform,
+} from './model';
 import { resolveFingerData } from './model';
 
 /** 每个 nail 实例的 clip id 前缀，防止同页多实例冲突 */
@@ -75,6 +82,13 @@ function patternElementSvg(
       const h = el.height > 0 ? (80 * el.height) / el.width : 80;
       return `<g transform="${transformAttr(el.transform)}"><image href="${el.dataUrl}" x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}"/></g>`;
     }
+    case 'gradient': {
+      const gradientId = `recipe-gradient-${uid}-${el.id.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+      return `<defs><linearGradient id="${gradientId}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-200">
+        <stop offset="0" stop-color="${el.rootColor}" stop-opacity="${el.rootOpacity}"/>
+        <stop offset="1" stop-color="${el.tipColor}" stop-opacity="${el.tipOpacity}"/>
+      </linearGradient></defs><rect x="-400" y="-600" width="800" height="900" fill="url(#${gradientId})"/>`;
+    }
     case 'eraser':
       return ''; // 橡皮不直接渲染，进入 mask
   }
@@ -95,6 +109,7 @@ export interface NailRenderInput {
   /** 正在绘制中的草稿笔画/橡皮（画布实时预览） */
   liveStroke?: BrushEl | null;
   liveEraser?: EraserEl | null;
+  appearance?: SurfaceAppearance;
 }
 
 function parseViewBox(viewBox: string): [number, number, number, number] {
@@ -105,8 +120,12 @@ function parseViewBox(viewBox: string): [number, number, number, number] {
 /** 单个指甲的 SVG 内容（不含外层 <svg>），可嵌入任意容器 */
 export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): string {
   const uid = input.uid;
-  const erasers = input.data.pattern.filter((el): el is EraserEl => el.kind === 'eraser');
-  const drawables = input.data.pattern.filter((el) => el.kind !== 'eraser');
+  const visiblePattern = input.data.pattern
+    .filter((element) => element.visible)
+    .slice()
+    .sort((a, b) => a.order - b.order);
+  const erasers = visiblePattern.filter((el): el is EraserEl => el.kind === 'eraser');
+  const drawables = visiblePattern.filter((el) => el.kind !== 'eraser');
 
   const maskStrokes = erasers.map(eraserStroke).join('');
   const liveMask =
@@ -116,7 +135,20 @@ export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): str
     drawables.map((el) => patternElementSvg(el, input.shape, input.length, uid)).join('') +
     (input.liveStroke && input.liveStroke.points.length > 1 ? brushStroke(input.liveStroke) : '');
 
-  const attachments = input.data.attachments.map(attachmentSvg).join('');
+  const attachments = input.data.attachments
+    .filter((element) => element.visible)
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .map(attachmentSvg)
+    .join('');
+  const appearance = input.appearance ?? {
+    baseCoverage: 'opaque',
+    opticalEffect: 'none',
+    topFinish: 'gloss',
+  };
+  const baseOpacity = appearance.baseCoverage === 'translucent' ? 0.72 : 1;
+  const glossOpacity = appearance.topFinish === 'matte' ? 0.03 : 0.34;
+  const pearlOpacity = appearance.opticalEffect === 'pearl' ? 0.2 : 0;
 
   return `<defs>
     <clipPath id="clip-${uid}"><path d="${sil.pathD}"/></clipPath>
@@ -124,11 +156,32 @@ export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): str
       <rect x="-400" y="-600" width="800" height="900" fill="#fff"/>
       ${maskStrokes}${liveMask}
     </mask>
+    <linearGradient id="curve-${uid}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2D1720" stop-opacity="0.22"/>
+      <stop offset="0.22" stop-color="#FFFFFF" stop-opacity="0.02"/>
+      <stop offset="0.68" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#2D1720" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="gloss-${uid}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.47" stop-color="#FFFFFF" stop-opacity="${glossOpacity}"/>
+      <stop offset="0.58" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pearl-${uid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDEBFF" stop-opacity="${pearlOpacity}"/>
+      <stop offset="0.5" stop-color="#FFF7E7" stop-opacity="0"/>
+      <stop offset="1" stop-color="#DDEBFF" stop-opacity="${pearlOpacity}"/>
+    </linearGradient>
   </defs>
   <g clip-path="url(#clip-${uid})">
-    <rect x="-400" y="-600" width="800" height="900" fill="${input.data.baseColor}"/>
+    <rect x="-400" y="-600" width="800" height="900" fill="${input.data.baseColor}" opacity="${baseOpacity}"/>
     <g mask="url(#eraser-${uid})">${patternSvg}</g>
     ${attachments}
+    <path d="${sil.pathD}" fill="url(#curve-${uid})" opacity="0.48" pointer-events="none"/>
+    <path d="${sil.pathD}" fill="url(#gloss-${uid})" pointer-events="none"/>
+    <path d="${sil.pathD}" fill="url(#pearl-${uid})" pointer-events="none"/>
   </g>
   <path d="${sil.pathD}" fill="none" stroke="#8A8A92" stroke-width="2" stroke-linejoin="round"/>`;
 }
@@ -182,7 +235,7 @@ export function composeTiledSvg(doc: EditorDoc, opts: TiledRenderOpts): string |
 
     const data = resolveFingerData(doc, finger);
     const content = nailContentSvg(
-      { shape: doc.shape, length: doc.length, data, uid: `t-${finger}` },
+      { shape: doc.shape, length: doc.length, data, uid: `t-${finger}`, appearance: doc.appearance },
       sil,
     );
     const badge = opts.markBadges

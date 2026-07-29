@@ -1,23 +1,26 @@
 /**
- * Editor 三栏壳（模块 4 · PRD §13.2）
- * 顶栏 + 左工具栏 + 中 2D 画布 + 右面板（图层 / 十指编排 / 检查）。
+ * Editor 专业工作区（E1）
+ * 顶栏 + 56px 工具轨道 + 260px 上下文抽屉 + 中央画布 + 320px Inspector + 十指条。
  * 只读态（confirmed/submitted）：画布冻结，顶栏替换操作入口。
  * 快捷键：⌘Z 撤销 / ⌘⇧Z 重做 / B 画笔 / E 橡皮。
  */
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, ScanSearch } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { NailCanvas } from './NailCanvas';
-import { ToolPanel } from './ToolPanel';
-import { LayerPanel } from './LayerPanel';
-import { FingerPanel } from './FingerPanel';
 import { EditorTopBar } from './EditorTopBar';
 import { TiledPreview } from './TiledPreview';
 import { RiskScreen } from './RiskScreen';
+import { EditorToolRail, type EditorToolSection } from './EditorToolRail';
+import { EditorContextDrawer } from './EditorContextDrawer';
+import { EditorInspector, type InspectorTab } from './EditorInspector';
+import { FingerStrip } from './FingerStrip';
 import { useEditorStore } from '../store';
+
+const ONBOARDING_KEY = 'nail-studio:editor-onboarding-complete:v1';
 
 export function EditorShell() {
   const navigate = useNavigate();
@@ -29,7 +32,25 @@ export function EditorShell() {
   const setTool = useEditorStore((s) => s.setTool);
 
   const [tiledOpen, setTiledOpen] = useState(false);
+  const [presentationOpen, setPresentationOpen] = useState(false);
   const [riskOpen, setRiskOpen] = useState(false);
+  const [activeToolSection, setActiveToolSection] = useState<EditorToolSection>('looks');
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [inspectorTab, setInspectorTab] = useState<InspectorTab>('design');
+  const [onboardingOpen, setOnboardingOpen] = useState(
+    () => window.localStorage.getItem(ONBOARDING_KEY) !== '1',
+  );
+
+  const finishOnboarding = () => {
+    window.localStorage.setItem(ONBOARDING_KEY, '1');
+    setOnboardingOpen(false);
+  };
+
+  const reopenGuide = () => {
+    setActiveToolSection('looks');
+    setDrawerOpen(true);
+    setOnboardingOpen(true);
+  };
 
   /* 快捷键：⌘Z / ⌘⇧Z / B / E */
   useEffect(() => {
@@ -64,7 +85,12 @@ export function EditorShell() {
 
   return (
     <div className="flex h-[calc(100vh-8.5rem)] flex-col overflow-hidden rounded-card border border-gray-200 bg-white" data-debug-id="studio.editor.shell">
-      <EditorTopBar onOpenTiled={() => setTiledOpen(true)} />
+      <EditorTopBar
+        onOpenTiled={() => setTiledOpen(true)}
+        onOpenPresentation={() => setPresentationOpen(true)}
+        onOpenHelp={reopenGuide}
+        onFirstOutcome={finishOnboarding}
+      />
 
       {/* 只读冻结横幅（confirmed / submitted） */}
       {readOnly && (
@@ -81,28 +107,42 @@ export function EditorShell() {
       )}
 
       <div className="flex min-h-0 flex-1">
-        <ToolPanel />
+        <EditorToolRail
+          active={activeToolSection}
+          drawerOpen={drawerOpen}
+          onSelect={(section) => {
+            if (activeToolSection === section) setDrawerOpen(true);
+            else {
+              setActiveToolSection(section);
+              setDrawerOpen(true);
+            }
+          }}
+          onToggleDrawer={() => setDrawerOpen((open) => !open)}
+        />
+        {drawerOpen && (
+          <EditorContextDrawer
+            active={activeToolSection}
+            onboardingOpen={onboardingOpen}
+            onClose={() => setDrawerOpen(false)}
+            onOpenInspector={setInspectorTab}
+            onFinishOnboarding={finishOnboarding}
+          />
+        )}
         <div className="min-w-0 flex-1">
           <NailCanvas />
         </div>
-        <aside className="flex w-72 shrink-0 flex-col gap-3 overflow-y-auto border-l border-gray-200 bg-gray-50 p-3">
-          <LayerPanel />
-          <FingerPanel />
-
-          {/* 检查区：P0 风险筛查（Mock）。固定半椭球假 3D 检查入口已移除（源文件 Nail3DCheck.tsx 保留） */}
-          <section className="rounded-panel border border-gray-200 bg-white p-3">
-            <h3 className="mb-2 text-xs font-semibold text-gray-800">检查</h3>
-            <div className="flex flex-col gap-1.5">
-              <Button size="sm" variant="secondary" onClick={() => setRiskOpen(true)}>
-                <ScanSearch size={13} />
-                P0 风险筛查 · MOCK
-              </Button>
-            </div>
-          </section>
-        </aside>
+        <EditorInspector
+          tab={inspectorTab}
+          onTabChange={setInspectorTab}
+          onOpenRisk={() => setRiskOpen(true)}
+        />
       </div>
+      <FingerStrip />
 
       {tiledOpen && <TiledPreview onClose={() => setTiledOpen(false)} />}
+      {presentationOpen && (
+        <TiledPreview presentation onClose={() => setPresentationOpen(false)} />
+      )}
       <RiskScreen open={riskOpen} onClose={() => setRiskOpen(false)} />
     </div>
   );

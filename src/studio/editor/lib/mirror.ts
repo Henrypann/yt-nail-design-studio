@@ -49,6 +49,8 @@ export function mirrorPatternElement(el: PatternElement, targetFinger: FingerCod
         ? 'el_eraser'
         : el.kind === 'image'
           ? 'el_img'
+          : el.kind === 'gradient'
+            ? 'el_gradient'
           : el.kind === 'french_edge'
             ? 'el_french'
             : 'el_tpl';
@@ -71,6 +73,8 @@ export function mirrorPatternElement(el: PatternElement, targetFinger: FingerCod
           : undefined,
         transform: { ...el.transform },
       };
+    case 'gradient':
+      return { ...el, id: genId(idPrefix) };
     case 'template_pattern':
     case 'image':
       return {

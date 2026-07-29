@@ -26,6 +26,12 @@ export type NailLength = 'short' | 'medium' | 'long' | 'extra-long';
 
 /** 封层质感 */
 export type Finish = 'gloss' | 'matte' | 'pearl';
+export type DesignLengthPreset = 'natural' | 'short-extension' | 'medium' | 'long';
+export interface DesignSurface {
+  baseCoverage: 'opaque' | 'translucent';
+  opticalEffect: 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';
+  topFinish: 'gloss' | 'matte';
+}
 
 /** Twin 三态 Mock 值（PRD §5.1，展示时标 MOCK） */
 export type TwinStatus = 'MOCK_VALID' | 'MOCK_LOW_CONFIDENCE' | 'NO_DATA';
@@ -99,9 +105,13 @@ export interface DesignSummary {
   title?: string;
   shape: NailShape;
   length: NailLength;
+  /** Editor v2 的扫描相对长度语义；旧设计缺失时由 length 迁移。 */
+  lengthPreset?: DesignLengthPreset;
   templateId?: string; // Wizard 应用的模板（material-library/templates/index.json）
   baseColor: string; // hex
   finish: Finish;
+  /** Editor v2 表面结构；finish 作为 Wizard/旧设计兼容字段保留。 */
+  surface?: DesignSurface;
   fingerOverrides?: FingerOverrides;
   status: DesignStatus;
   confirmation?: Confirmation;

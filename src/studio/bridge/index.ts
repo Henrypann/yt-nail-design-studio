@@ -17,9 +17,23 @@
 
 import { Routes } from '@/app/routes';
 import type { DesignSummary, FingerCode } from '@/lib/types';
-import { getDesign, getEditorDoc, saveEditorDoc } from '@/studio/editor/lib/repo';
+import {
+  getDesign,
+  getEditorDocResult,
+  hasEditorDocRaw,
+  saveEditorDoc,
+} from '@/studio/editor/lib/repo';
 import { DECORATIONS, templateById } from '@/studio/editor/lib/material';
-import { genId, type AttachmentElement, type EditorDoc, type FingerData, type PatternElement } from '@/studio/editor/lib/model';
+import {
+  LENGTH_PRESET_BY_GEOMETRY,
+  appearanceFromLegacyFinish,
+  createLayerMeta,
+  genId,
+  type AttachmentElement,
+  type EditorDoc,
+  type FingerData,
+  type PatternElement,
+} from '@/studio/editor/lib/model';
 
 /** §15.3 不可逆警告文案（完整展示后才可进入；内容须与 Editor 真实能力一致） */
 export const BRIDGE_WARNING_TITLE = '打开自由画布后：';
@@ -37,8 +51,8 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
         {
           id: `el_tpl_${template.id}_${Date.now().toString(36)}`,
           kind: 'template_pattern',
+          ...createLayerMeta(template.name, 0),
           templateId: template.id,
-          name: template.name,
           transform: { x: 0, y: 0, scale: 1, rotation: 0 },
           editable: true,
         },
@@ -64,8 +78,8 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
           {
             id: genId('el_att'),
             kind: 'attachment',
+            ...createLayerMeta(deco.name, 0),
             decorationId: deco.id,
-            name: deco.name,
             transform: {
               x: deco.defaults.x,
               y: deco.defaults.y,
@@ -84,12 +98,13 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
   }
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     designId: design.id,
     customerId: design.customerId,
     shape: design.shape,
     length: design.length,
-    finish: design.finish,
+    lengthPreset: LENGTH_PRESET_BY_GEOMETRY[design.length],
+    appearance: appearanceFromLegacyFinish(design.finish),
     // base 层锁定（只能改色）：EditorDoc 中 baseColor 独立于元素列表，UI 仅暴露选色
     baseColor: design.baseColor,
     pattern: sharedPattern,
@@ -103,7 +118,7 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
 
 export interface BridgeResult {
   ok: boolean;
-  reason?: 'design_not_found' | 'read_only';
+  reason?: 'design_not_found' | 'read_only' | 'editor_doc_invalid' | 'editor_doc_unsupported';
 }
 
 /**
@@ -117,8 +132,11 @@ export function openBridge(designId: string): BridgeResult {
   const design = getDesign(designId);
   if (!design) return { ok: false, reason: 'design_not_found' };
 
-  const existing = getEditorDoc(designId);
-  if (existing) {
+  if (hasEditorDocRaw(designId)) {
+    const existing = getEditorDocResult(designId);
+    if (existing.status === 'invalid') return { ok: false, reason: 'editor_doc_invalid' };
+    if (existing.status === 'unsupported') return { ok: false, reason: 'editor_doc_unsupported' };
+    if (existing.status !== 'ok') return { ok: false, reason: 'editor_doc_invalid' };
     // 已桥接：续进画布（保留 Editor 内的全部修改）
     window.location.assign(`${Routes.designCanvas}?design=${encodeURIComponent(designId)}`);
     return { ok: true };
