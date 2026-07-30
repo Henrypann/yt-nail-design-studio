@@ -35,6 +35,8 @@ export interface PresentationModeProps {
   initialFinger?: FingerCode | null;
   /** 指尖观察方向（继承 Wizard 当前选择，展示模式内不再提供第二个开关） */
   tipOrientation?: 'up' | 'down';
+  /** 手动标记「顾客已确认」（线下场景：客人当面点头后由美甲师操作；两段式防误触） */
+  onMarkConfirmed?: () => Promise<boolean>;
 }
 
 export function PresentationMode({
@@ -50,6 +52,7 @@ export function PresentationMode({
   status,
   initialFinger,
   tipOrientation = 'up',
+  onMarkConfirmed,
 }: PresentationModeProps) {
   const assets = useNailDesignAssets(shape, length, templateId);
   const { status: loadStatus, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
@@ -57,10 +60,15 @@ export function PresentationMode({
   const [focusFinger, setFocusFinger] = useState<FingerCode>(initialFinger ?? 'R4');
   const [shapeLabel, setShapeLabel] = useState('');
   const [finishLabel, setFinishLabel] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [marking, setMarking] = useState(false);
 
-  /* 打开时同步当前选中指 */
+  /* 打开时同步当前选中指并重置两段式确认 */
   useEffect(() => {
-    if (open) setFocusFinger(initialFinger ?? 'R4');
+    if (open) {
+      setFocusFinger(initialFinger ?? 'R4');
+      setConfirming(false);
+    }
   }, [open, initialFinger]);
 
   /* Esc 退出 */
@@ -108,7 +116,7 @@ export function PresentationMode({
       role="dialog"
       aria-label="顾客展示模式"
     >
-      {/* 顶栏：仅标题与退出，无编辑控件 */}
+      {/* 顶栏：标题 + 手动确认入口（draft 时）+ 退出，无编辑控件 */}
       <header className="flex shrink-0 items-center gap-3 px-8 py-4">
         <p className="text-sm font-medium text-gray-900">{templateName ?? '未命名设计'}</p>
         {confirmed && (
@@ -118,6 +126,41 @@ export function PresentationMode({
           </Badge>
         )}
         <div className="ml-auto flex items-center gap-3">
+          {/* 确认仪式显性化：客人当面点头后，美甲师在展示界面内直接标记（两段式防误触） */}
+          {!confirmed && onMarkConfirmed && (
+            confirming ? (
+              <span className="flex items-center gap-2 rounded-panel border border-primary/40 bg-white px-3 py-1.5 shadow-modal">
+                <span className="text-xs text-gray-700">客人已当面确认？标记后设计冻结为只读。</span>
+                <button
+                  disabled={marking}
+                  onClick={async () => {
+                    setMarking(true);
+                    const ok = await onMarkConfirmed();
+                    setMarking(false);
+                    if (ok) setConfirming(false);
+                  }}
+                  className="rounded-button bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-colors duration-fast hover:opacity-90 disabled:opacity-50"
+                >
+                  {marking ? '标记中…' : '确认标记'}
+                </button>
+                <button
+                  onClick={() => setConfirming(false)}
+                  className="rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100"
+                >
+                  再等等
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={() => setConfirming(true)}
+                className="flex items-center gap-1.5 rounded-button border border-primary/40 bg-white px-3 py-1.5 text-xs font-medium text-primary shadow-modal transition-colors duration-fast hover:bg-primary-soft"
+                data-debug-id="studio.presentation.mark-confirmed"
+              >
+                <Check size={13} />
+                顾客已确认
+              </button>
+            )
+          )}
           <span className="text-[11px] text-gray-400">Esc 退出</span>
           <button
             onClick={onClose}

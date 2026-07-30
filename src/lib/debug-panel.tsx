@@ -19,7 +19,6 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  ChevronUp,
   CircleDot,
   Copy,
   FileCode2,
@@ -551,7 +550,7 @@ export function DebugPanel() {
         aria-label="需求说明"
         title="需求说明"
         className={cx(
-          'fixed bottom-16 right-4 z-[75] flex h-10 w-10 items-center justify-center rounded-full border bg-white text-primary shadow-modal transition-colors hover:bg-primary-soft sm:bottom-4 sm:right-[19rem]',
+          'fixed bottom-4 left-[4.5rem] z-[75] flex h-10 w-10 items-center justify-center rounded-full border bg-white text-primary shadow-modal transition-colors hover:bg-primary-soft',
           requirementsOpen ? 'border-primary bg-primary-soft' : 'border-primary/30',
         )}
       >
@@ -559,24 +558,46 @@ export function DebugPanel() {
       </button>
       <RequirementsDrawer open={requirementsOpen} onClose={() => setRequirementsOpen(false)} />
 
-      <div data-debug-id="app.debug-panel" className="fixed bottom-4 right-4 z-[70] w-72 rounded-panel border border-warning/40 bg-white shadow-modal">
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="flex w-full items-center justify-between px-3 py-2 text-left"
-        >
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-warning">
-            <Bug size={14} />
-            调试面板
-            {activeCount > 0 && (
-              <span className="rounded-full bg-warning px-1.5 text-[10px] text-white tnum">
-                {activeCount} Mock
-              </span>
-            )}
+      {/* 折叠态：左缘圆形收纳（不遮挡右下主操作区）；展开态：面板从圆钮上方弹出 */}
+      <button
+        data-debug-id="app.debug-panel"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        aria-label="调试面板"
+        title="调试面板"
+        className={cx(
+          'fixed bottom-4 left-4 z-[70] flex h-10 w-10 items-center justify-center rounded-full border bg-white text-warning shadow-modal transition-colors hover:bg-warning-soft',
+          expanded ? 'border-warning' : 'border-warning/40',
+        )}
+      >
+        <Bug size={17} />
+        {activeCount > 0 && (
+          <span className="absolute -right-1 -top-1 rounded-full bg-warning px-1.5 text-[10px] text-white tnum">
+            {activeCount}
           </span>
-          {expanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-        </button>
+        )}
+      </button>
 
-        {expanded && (
+      {expanded && (
+        <div className="fixed bottom-16 left-4 z-[70] w-72 rounded-panel border border-warning/40 bg-white shadow-modal">
+          <div className="flex items-center justify-between px-3 py-2">
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-warning">
+              <Bug size={14} />
+              调试面板
+              {activeCount > 0 && (
+                <span className="rounded-full bg-warning px-1.5 text-[10px] text-white tnum">
+                  {activeCount} Mock
+                </span>
+              )}
+            </span>
+            <button
+              onClick={() => setExpanded(false)}
+              aria-label="收起"
+              className="rounded-button p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <ChevronDown size={14} />
+            </button>
+          </div>
           <div className="border-t border-gray-200">
             <div className="flex gap-1 px-3 pt-2">
               {TABS.map((t) => (
@@ -599,8 +620,8 @@ export function DebugPanel() {
               {tab === 'ids' && <ElementIdsTab />}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }

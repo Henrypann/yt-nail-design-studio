@@ -1,15 +1,18 @@
 /**
  * STEP 1 · 门禁（Studio-PRD §12.3）
  *
- * 客户卡片（Twin 三态）+ 甲型卡片 + 长度按钮 + [应用 → 预览十指] 五态按钮
- * （未选禁用 / 就绪 / 生成预览中 / 成功展开 / 失败 Toast）。
+ * 客户卡片（Twin 三态）+ 甲型卡片 + 长度按钮 + 右侧即时预览（所见即所得，
+ * 甲型/长度一变即重渲染）+ [下一步：选风格 →]（首次）/ [进入画布 →]（已选过风格）。
+ * 进入画布失败：持久内联错误条（常驻到重试成功，不再只依赖会消失的 toast）。
  */
 
-import { useState } from 'react';
-import { Badge, Button, Card, useToast } from '@/design-system';
-import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Card, cx, useToast } from '@/design-system';
+import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight, RefreshCw } from 'lucide-react';
 import type { Customer } from '@/lib/types';
-import { loadLibraryIndex } from '@/studio/preview/material-library';
+import { loadLibraryIndex, loadShapeParams } from '@/studio/preview/material-library';
+import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
+import { NailCellView } from '@/studio/preview/TiledNailsPreview';
 import { useWizardStore } from './wizard-store';
 import { ShapeLengthPicker } from './ShapeLengthPicker';
 import { StyleRecommendModal, type StyleRecommendation } from './StyleRecommendModal';
@@ -50,12 +53,88 @@ function TwinNotice({ customer }: { customer: Customer }) {
   }
 }
 
+/** 甲型/长度即时预览：选择一变即重新渲染（与 STEP 2 同一套单甲渲染器） */
+function LiveShapePreview() {
+  const shape = useWizardStore((s) => s.shape);
+  const length = useWizardStore((s) => s.length);
+  const [sil, setSil] = useState<SilhouetteAsset | null>(null);
+  const [label, setLabel] = useState('');
+
+  useEffect(() => {
+    if (!shape || !length) {
+      setSil(null);
+      setLabel('');
+      return;
+    }
+    let cancelled = false;
+    loadSilhouette(shape, length)
+      .then((asset) => {
+        if (!cancelled) setSil(asset);
+      })
+      .catch(() => {
+        if (!cancelled) setSil(null);
+      });
+    loadShapeParams()
+      .then((p) => {
+        if (cancelled) return;
+        const shapeName = p.shapes[shape]?.name_en ?? shape;
+        const len = p.lengths[length];
+        setLabel(`${shapeName} · ${len.name}（${len.lengthMm}mm）`);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [shape, length]);
+
+  return (
+    <div
+      className="flex w-full flex-col items-center justify-center gap-2 rounded-panel border border-gray-100 bg-gray-50/60 px-3 py-4 lg:w-[190px]"
+      data-debug-id="studio.wizard.step1.live-preview"
+    >
+      {sil ? (
+        <>
+          <NailCellView
+            finger="L3"
+            silhouetteD={sil.d}
+            viewBox={sil.viewBox}
+            baseColor="#F5E0D3"
+            finish="gloss"
+            patternMarkup={null}
+            patternK={1}
+            patternVisible={false}
+            patternFadeMs={0}
+            failed={false}
+            selected={false}
+            hasOverride={false}
+            strokeScale={120 / Number(sil.viewBox.split(/\s+/)[2] ?? 120)}
+            readOnly
+            size="md"
+          />
+          <p className="text-center text-[11px] text-gray-500">{label}</p>
+        </>
+      ) : (
+        <div className="flex h-full min-h-[140px] flex-col items-center justify-center gap-2 text-center">
+          <div className="flex h-16 w-12 items-center justify-center rounded-lg border border-dashed border-gray-300 text-gray-300">
+            💅
+          </div>
+          <p className="text-[11px] leading-relaxed text-gray-400">
+            选择甲型与长度
+            <br />
+            这里即时预览效果
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function StepOne() {
-  const toast = useToast();
   const customer = useWizardStore((s) => s.customer);
   const shape = useWizardStore((s) => s.shape);
   const length = useWizardStore((s) => s.length);
   const applying = useWizardStore((s) => s.applying);
+  const applyError = useWizardStore((s) => s.applyError);
   const stylePrompted = useWizardStore((s) => s.stylePrompted);
   const setShape = useWizardStore((s) => s.setShape);
   const setLength = useWizardStore((s) => s.setLength);
@@ -65,17 +144,18 @@ export function StepOne() {
   const applyTemplate = useWizardStore((s) => s.applyTemplate);
   const openPicker = useWizardStore((s) => s.openPicker);
   const [styleModalOpen, setStyleModalOpen] = useState(false);
+  const toast = useToast();
 
   if (!customer) return null;
 
   const ready = shape !== null && length !== null;
 
+  /** [进入画布]：失败由持久内联错误条呈现（applyError），样式/长度选择保留 */
   const enterCanvas = async (): Promise<void> => {
-    const ok = await applyAndEnter();
-    if (!ok) toast.error('预览生成失败，请重试。');
+    await applyAndEnter();
   };
 
-  /** [应用 → 预览十指]：先弹风格推荐（每设计一次），再进入画布 */
+  /** 首次点击：先弹风格推荐（每设计一次）；已选过风格则直接进入画布 */
   const handleApply = async () => {
     if (!stylePrompted) {
       setStyleModalOpen(true);
@@ -89,10 +169,7 @@ export function StepOne() {
     setStyle(st.id, st.name);
     setStyleModalOpen(false);
     const ok = await applyAndEnter();
-    if (!ok) {
-      toast.error('预览生成失败，请重试。');
-      return;
-    }
+    if (!ok) return; // 内联错误条已呈现
     if (st.template_id) {
       try {
         const index = await loadLibraryIndex();
@@ -115,7 +192,7 @@ export function StepOne() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[860px] flex-col gap-4" data-debug-id="studio.wizard.step1">
+    <div className="mx-auto flex h-full max-w-[860px] flex-col gap-4 overflow-y-auto" data-debug-id="studio.wizard.step1">
       {/* 客户卡片（Twin 三态 + 历史设计数） */}
       <Card padding="md" className="flex items-center gap-4" data-debug-id="studio.wizard.step1.customer-card">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
@@ -135,13 +212,42 @@ export function StepOne() {
         </Button>
       </Card>
 
-      {/* 甲型 + 长度 */}
+      {/* 甲型 + 长度 + 即时预览（所见即所得） */}
       <Card padding="lg" data-debug-id="studio.wizard.step1.shape-length-picker">
-        <ShapeLengthPicker shape={shape} length={length} onShapeChange={setShape} onLengthChange={setLength} />
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <div className="min-w-0 flex-1">
+            <ShapeLengthPicker shape={shape} length={length} onShapeChange={setShape} onLengthChange={setLength} />
+          </div>
+          <LiveShapePreview />
+        </div>
       </Card>
 
-      {/* [应用 → 预览十指] 五态 */}
-      <div className="flex justify-end">
+      {/* 进入画布失败：持久错误条（常驻到重试成功） */}
+      {applyError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between rounded-panel border border-error/20 bg-error-soft px-3 py-2 text-xs text-error"
+          data-debug-id="studio.wizard.step1.apply-error"
+        >
+          <span className="flex items-center gap-1.5">
+            <AlertTriangle size={13} />
+            {applyError}
+          </span>
+          <button
+            onClick={() => void handleApply()}
+            className={cx(
+              'flex items-center gap-1 rounded-button border border-error/30 bg-white px-2 py-1',
+              'transition-colors duration-fast hover:bg-error-soft',
+            )}
+          >
+            <RefreshCw size={11} />
+            重试
+          </button>
+        </div>
+      )}
+
+      {/* [下一步：选风格 →]（首次）/ [进入画布 →]（已选过风格）：吸底常驻，短视口不被顶出折叠线 */}
+      <div className="sticky bottom-0 -mx-1 mt-auto flex justify-end border-t border-gray-100 bg-white/95 px-1 py-2 backdrop-blur-sm">
         <Button
           size="md"
           disabled={!ready}
@@ -151,7 +257,7 @@ export function StepOne() {
         >
           {applying ? '生成预览中…' : (
             <>
-              应用 → 预览十指
+              {stylePrompted ? '进入画布' : '下一步：选风格'}
               <ArrowRight size={14} />
             </>
           )}

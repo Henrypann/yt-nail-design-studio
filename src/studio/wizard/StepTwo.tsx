@@ -60,8 +60,17 @@ export function StepTwo() {
   if (!s.appliedShape || !s.appliedLength) return null;
 
   const handleReapply = async () => {
-    const ok = await s.applyShapeLengthEdit();
-    if (!ok) toast.error('预览生成失败，请重试。');
+    await s.applyShapeLengthEdit(); // 失败由持久内联错误条呈现（applyError）
+  };
+
+  /** 「转给客人看看？」引导气泡关闭（每会话只提示一次） */
+  const dismissPresentNudge = () => {
+    try {
+      window.sessionStorage.setItem('ui.wizard-present-nudged', '1');
+    } catch {
+      /* sessionStorage 不可用时仅关闭当前气泡 */
+    }
+    s.setPresentNudge(false);
   };
 
   /** [打开自由画布]：等待进行中的自动保存 → 确保已保存 → openBridge（首次转化+警告 / 已桥接续进） */
@@ -139,17 +148,34 @@ export function StepTwo() {
                   onShapeChange={s.setShape}
                   onLengthChange={s.setLength}
                 />
-                <div className="mt-4 flex justify-end gap-2">
-                  <Button variant="ghost" onClick={s.cancelEditShapeLength} disabled={s.applying}>
-                    取消
-                  </Button>
-                  <Button
-                    loading={s.applying}
-                    disabled={!s.shape || !s.length}
-                    onClick={handleReapply}
-                  >
-                    {s.applying ? '生成预览中…' : '应用 → 重新生成'}
-                  </Button>
+                <div className="mt-4 flex flex-col items-end gap-2">
+                  {s.applyError && (
+                    <div
+                      role="alert"
+                      className="flex w-full items-center justify-between rounded-panel border border-error/20 bg-error-soft px-3 py-2 text-xs text-error"
+                      data-debug-id="studio.wizard.step2.apply-error"
+                    >
+                      <span>{s.applyError}</span>
+                      <button
+                        onClick={() => void handleReapply()}
+                        className="rounded-button border border-error/30 bg-white px-2 py-1 transition-colors duration-fast hover:bg-error-soft"
+                      >
+                        重试
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" onClick={s.cancelEditShapeLength} disabled={s.applying}>
+                      取消
+                    </Button>
+                    <Button
+                      loading={s.applying}
+                      disabled={!s.shape || !s.length}
+                      onClick={handleReapply}
+                    >
+                      {s.applying ? '生成预览中…' : '应用 → 重新生成'}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
@@ -204,10 +230,45 @@ export function StepTwo() {
                     </div>
                   )}
                   <span className="hidden text-[10px] text-gray-400 xl:inline">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
-                  <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
-                    <Presentation size={13} />
-                    顾客展示
-                  </Button>
+                  <span className="relative">
+                    <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
+                      <Presentation size={13} />
+                      顾客展示
+                    </Button>
+                    {/* 保存成功后的「转给客人看看？」引导（每会话一次，确认仪式显性化） */}
+                    {s.presentNudge && !readOnly && (
+                      <div
+                        className="absolute right-0 top-9 z-30 w-64 rounded-panel border border-primary/30 bg-white p-3 shadow-modal animate-fade-in"
+                        data-debug-id="studio.wizard.present-nudge"
+                        role="status"
+                      >
+                        <p className="text-xs font-medium text-gray-900">已保存 ✓ 转给客人看看效果？</p>
+                        <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">
+                          顾客展示会全屏呈现设计，客人点头后可直接标记「顾客已确认」。
+                        </p>
+                        <div className="mt-2 flex justify-end gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              dismissPresentNudge();
+                            }}
+                          >
+                            知道了
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              dismissPresentNudge();
+                              setPresentOpen(true);
+                            }}
+                          >
+                            打开顾客展示
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </span>
                 </div>
               </div>
 
@@ -288,7 +349,7 @@ export function StepTwo() {
         </Button>
       </footer>
 
-      {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向） */}
+      {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向 · 展示内可手动标记顾客已确认） */}
       <PresentationMode
         open={presentOpen}
         onClose={() => setPresentOpen(false)}
@@ -302,6 +363,7 @@ export function StepTwo() {
         status={s.status}
         initialFinger={s.selectedFinger}
         tipOrientation={s.tipOrientation}
+        onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
       />
     </div>
   );

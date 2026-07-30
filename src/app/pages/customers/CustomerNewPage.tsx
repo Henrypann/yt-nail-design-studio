@@ -209,8 +209,11 @@ export default function CustomerNewPage() {
             </span>
           </label>
         )}
+      </Card>
 
-        <div className="flex justify-end gap-2 pt-1">
+      {/* 吸底操作条：13 寸笔电短视口下提交按钮始终可见可点 */}
+      <div className="sticky bottom-0 z-10 -mx-1 border-t border-gray-200 bg-white/95 px-1 py-3 backdrop-blur-sm">
+        <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={() => navigate(Routes.customers)}>
             取消
           </Button>
@@ -221,7 +224,7 @@ export default function CustomerNewPage() {
             {mode === 'full' ? '提交' : '创建客户'}
           </Button>
         </div>
-      </Card>
+      </div>
 
       {/* 同名警告弹窗 */}
       <Modal

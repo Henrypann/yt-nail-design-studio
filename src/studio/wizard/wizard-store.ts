@@ -103,6 +103,10 @@ interface WizardState {
   appliedLength: NailLength | null;
   editingShapeLength: boolean;
   applying: boolean;
+  /** 进入画布/重新生成失败的持久错误（toast 会消失，内联错误条常驻到重试成功） */
+  applyError: string | null;
+  /** 手动保存成功后的「转给客人看看？」引导气泡（UI 瞬态，不持久化） */
+  presentNudge: boolean;
   /* 设计参数 */
   templateId: string | null;
   templateName: string | null;
@@ -132,6 +136,8 @@ interface WizardState {
   startEditShapeLength: () => void;
   cancelEditShapeLength: () => void;
   applyShapeLengthEdit: () => Promise<boolean>;
+  clearApplyError: () => void;
+  setPresentNudge: (v: boolean) => void;
   applyTemplate: (t: TemplateEntry) => void;
   setBaseColor: (hex: string) => void;
   setFinish: (f: Finish) => void;
@@ -220,11 +226,11 @@ export const useWizardStore = create<WizardState>((set, get) => {
     scheduleAutosave(() => void performSave(), delayMs);
   }
 
-  /** STEP 1 [应用→预览十指] / 顶栏 [应用→重新生成] 公共逻辑 */
+  /** STEP 1 [下一步：选风格] / 顶栏 [应用→重新生成] 公共逻辑 */
   async function applyShapeLength(enterStep2: boolean): Promise<boolean> {
     const s = get();
     if (!s.shape || !s.length || s.applying) return false;
-    set({ applying: true });
+    set({ applying: true, applyError: null });
     try {
       if (isScenarioOn(useMockScenarios.getState().flags, 'render.failAll')) {
         throw new Error('预览生成失败（MOCK）');
@@ -248,12 +254,13 @@ export const useWizardStore = create<WizardState>((set, get) => {
         step: enterStep2 ? 2 : s.step,
         editingShapeLength: false,
         applying: false,
+        applyError: null,
         baseColor: s.baseColor ?? palette[0]?.hex ?? '#F5E0D3',
       });
       markDirty(2000);
       return true;
     } catch {
-      set({ applying: false });
+      set({ applying: false, applyError: '预览生成失败。甲型与长度选择已保留，请重试。' });
       return false;
     }
   }
@@ -273,6 +280,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
     appliedLength: null,
     editingShapeLength: false,
     applying: false,
+    applyError: null,
+    presentNudge: false,
     templateId: null,
     templateName: null,
     baseColor: null,
@@ -311,6 +320,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
     markStylePrompted: () => set({ stylePrompted: true }),
 
     applyAndEnter: () => applyShapeLength(true),
+    clearApplyError: () => set({ applyError: null }),
+    setPresentNudge: (presentNudge) => set({ presentNudge }),
 
     startEditShapeLength: () => {
       const s = get();

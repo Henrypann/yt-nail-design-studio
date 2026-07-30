@@ -64,7 +64,7 @@ try {
   await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: new RegExp(CUSTOMER) }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
-  await page.getByText('应用 → 预览十指').waitFor();
+  await page.getByText('下一步：选风格').waitFor();
   step('Wizard 客户选择器', true);
 
   /* 4b. 能力注册表 UI：Tier 1 五个、Tier 2 十个；开放 Almond / Oval / Coffin */
@@ -109,7 +109,7 @@ try {
     coffinLengthSignals.join(' → '),
   );
   await page.getByRole('button', { name: '中', exact: true }).click();
-  await page.getByRole('button', { name: '应用 → 预览十指' }).click();
+  await page.getByRole('button', { name: '下一步：选风格' }).click();
 
   /* 5b. 风格推荐弹窗：选用第一款（TOP 1，自动应用映射模板） */
   await page.getByText('为 Coffin 推荐当下流行风格').waitFor({ timeout: 10000 });

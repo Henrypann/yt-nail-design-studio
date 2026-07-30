@@ -143,7 +143,19 @@ export default function WizardPage() {
               variant="secondary"
               disabled={s.step !== 2 || s.status !== 'draft'}
               loading={s.saveState === 'saving'}
-              onClick={() => void s.saveNow({ manual: true })}
+              onClick={async () => {
+                const ok = await s.saveNow({ manual: true });
+                // 确认仪式显性化：保存成功后引导「转给客人看看？」（每会话一次）
+                if (ok && useWizardStore.getState().status === 'draft') {
+                  let nudged = false;
+                  try {
+                    nudged = window.sessionStorage.getItem('ui.wizard-present-nudged') === '1';
+                  } catch {
+                    nudged = false;
+                  }
+                  if (!nudged) s.setPresentNudge(true);
+                }
+              }}
             >
               <Save size={13} />
               保存
