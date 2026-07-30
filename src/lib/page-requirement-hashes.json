@@ -1,6 +1,6 @@
 {
   "src/app/pages/design/DesignListPage.tsx#DesignListPage": "sha256:97f68d9f20ff6d5934b7eb085277518e6eb98de8e7998bbcb19203ae57e943d0",
-  "src/app/pages/design/WizardPage.tsx#WizardPage": "sha256:61a7efbe51de61868e0811cefd809d56d21e9fb55143456525c7b1106b618e73",
+  "src/app/pages/design/WizardPage.tsx#WizardPage": "sha256:18b5dda0ae2659ca218f75c221725072dd2f9421489b2a1db16e64dca474eafc",
   "src/studio/bridge/index.ts#openBridge": "sha256:73995ce8edcc69e7eb312593754f44de183feb75c81d53a424f2835738fd26c8",
   "src/studio/compatibility.ts#getShapeLengthCompatibility": "sha256:780d7d257c2d354e4fb4731cae8d1dc2f34b5d771af41ecdf2612924769fd1f3",
   "src/studio/editor/components/EditorContextDrawer.tsx#EditorContextDrawer": "sha256:8e8e08082426a617459980e142dd8fa21911e88ccf7928bf10bbd45743e98156",
@@ -26,11 +26,11 @@
   "src/studio/wizard/CustomerPickerModal.tsx#CustomerPickerModal": "sha256:e22cc99654ed8188f4949d7396f14078d272e866f4b781ff49ae63920d31958d",
   "src/studio/wizard/FingerDetailPanel.tsx#FingerDetailPanel": "sha256:8f69a5790ddf33a251fe4e828b51932975ebc19e385706cc8447d67c9c47a9f4",
   "src/studio/wizard/ParamsPanel.tsx#ParamsPanel": "sha256:30950780b867aa3260fe9128d429937be286fe2476bf09ba0acf4f9f08dc188c",
-  "src/studio/wizard/PresentationMode.tsx#PresentationMode": "sha256:9e1b2b2a4780db4aa17889d2efef7543d975966a79d0258aad5ae6dcad60a73b",
+  "src/studio/wizard/PresentationMode.tsx#PresentationMode": "sha256:bf9341fc833e80d9b4246b88cfc1554c7e4b0ec118b2f9a47ff285ec7ee493e3",
   "src/studio/wizard/ShapeLengthPicker.tsx#ShapeLengthPicker": "sha256:b96597cc495bebcff7f9cf117a686cdaee347fb2ed315cae61782487ccb191e5",
-  "src/studio/wizard/StepOne.tsx#StepOne": "sha256:1f0b14d2f8cb14c67b3e9da7dd5dde850b16a13a0f9f71ea7165fae0cedd5f2b",
-  "src/studio/wizard/StepTwo.tsx#StepTwo": "sha256:d577f07904f5346baba43b001f4c556825a405f5a417b196c3658c60bbc228ea",
+  "src/studio/wizard/StepOne.tsx#StepOne": "sha256:978062b044687ab51640110d620a00e20b11c1c300bfe64e8b735f66e3fb15f0",
+  "src/studio/wizard/StepTwo.tsx#StepTwo": "sha256:1f6ecfa35c4e6ab95f006182108c471aae7d36fa70c3b9342a2bee1cb8ab4c82",
   "src/studio/wizard/StyleRecommendModal.tsx#StyleRecommendModal": "sha256:b1551f31b841127b6fb90b5706f1951bb063724eeda1e5879cd49c26a932ffa1",
   "src/studio/wizard/TemplateGallery.tsx#TemplateGallery": "sha256:ffdcb0b24c0bfcd971547458ad620adb505b5e0371b9584aad22c3b9600c8bb5",
-  "src/studio/wizard/wizard-store.ts#useWizardStore": "sha256:0a0e54f77e323b1c30c323373a53d243e6e8dc570183e5f0319fb7f79e190ca2"
+  "src/studio/wizard/wizard-store.ts#useWizardStore": "sha256:6adf469e6a53cc5cea5e6a36942420d0afe6810609edb19d469d9d4edd47ec5b"
 }
