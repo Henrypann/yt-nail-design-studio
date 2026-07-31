@@ -57,6 +57,8 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
             data: resolveFingerData(doc, finger),
             uid: `pv-${finger}`,
             appearance: doc.appearance,
+            recipe: doc.recipe,
+            finger,
           },
           sil,
         ),

@@ -16,3 +16,6 @@ export {
 } from './lib/repo';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
+export * from './lib/recipe-model';
+export { compileRecipeToFingerRenderModel } from './lib/mercury-renderer';
+export { createNailSurfaceMapper } from './lib/surface-mapper';

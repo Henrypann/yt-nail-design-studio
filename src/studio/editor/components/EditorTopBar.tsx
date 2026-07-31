@@ -104,6 +104,8 @@ export function EditorTopBar(props: {
             data: resolveFingerData(doc, currentFinger),
             uid: `export-${currentFinger}`,
             appearance: doc.appearance,
+            recipe: doc.recipe,
+            finger: doc.masterFinger,
           },
           4,
         );

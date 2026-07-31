@@ -146,6 +146,8 @@ export function NailCanvas() {
         liveStroke,
         liveEraser,
         appearance: doc.appearance,
+        recipe: doc.recipe,
+        finger: currentFinger,
       },
       sil,
     );

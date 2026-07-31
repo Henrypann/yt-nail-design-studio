@@ -485,6 +485,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         data,
         uid: `thumb-${doc.designId}`,
         appearance: doc.appearance,
+        recipe: doc.recipe,
+        finger: doc.masterFinger,
       },
       2,
     );
