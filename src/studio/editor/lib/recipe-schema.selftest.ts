@@ -4,6 +4,8 @@ import { createMercuryInstance } from './recipe-model.ts';
 
 assert.equal(MERCURY_DEW_DEFINITION.identity.id, 'mercury-dew');
 assert.equal(MERCURY_DEW_DEFINITION.version, '1.0.0');
+assert.deepEqual(MERCURY_DEW_DEFINITION.compatibility.lengthPresets, ['natural', 'short-extension', 'medium', 'long']);
+assert.deepEqual(MERCURY_DEW_DEFINITION.compatibility.geometryLengths, ['short', 'medium', 'long', 'extra-long']);
 assert.equal(RECIPE_REGISTRY.recipes[0]?.manufacturing_command_allowed, false);
 const instance = createMercuryInstance('signature');
 assertRecipeReference(instance);

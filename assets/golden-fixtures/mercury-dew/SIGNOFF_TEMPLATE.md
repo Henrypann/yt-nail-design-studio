@@ -1,6 +1,7 @@
 # Mercury Dew · M4 视觉签收
 
 这些 fixture 只记录 Canonical Renderer 的签收矩阵，不把概念封面或占位图当作 Golden Output。
+`lengthPreset` 是产品侧长度枚举；`geometryLength` 是轮廓文件枚举，二者必须通过映射关联，不能互换。
 
 ## 签收矩阵
 

@@ -21,13 +21,14 @@ export const FINGER_CODES: readonly FingerCode[] = [
 export type { NailShape } from '@/generated/shape-types';
 import type { NailShape } from '@/generated/shape-types';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import type { DesignLengthPreset as TaxonomyDesignLengthPreset } from '@/studio/editor/lib/taxonomy-model';
 
 /** 四档长度 */
 export type NailLength = 'short' | 'medium' | 'long' | 'extra-long';
 
 /** 封层质感 */
 export type Finish = 'gloss' | 'matte' | 'pearl';
-export type DesignLengthPreset = 'natural' | 'short-extension' | 'medium' | 'long';
+export type DesignLengthPreset = TaxonomyDesignLengthPreset;
 export interface DesignSurface {
   baseCoverage: 'opaque' | 'translucent';
   opticalEffect: 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';

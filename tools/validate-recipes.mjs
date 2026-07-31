@@ -10,6 +10,8 @@ const semver = /^\d+\.\d+\.\d+$/;
 if (!Array.isArray(index.recipes) || index.recipes.length === 0) errors.push('recipes index is empty');
 if (!semver.test(definition.version)) errors.push('definition version must be semver');
 if (definition.identity?.id !== 'mercury-dew') errors.push('mercury definition id mismatch');
+if (JSON.stringify(definition.compatibility?.lengthPresets) !== JSON.stringify(['natural', 'short-extension', 'medium', 'long'])) errors.push('compatibility.lengthPresets 枚举不完整');
+if (JSON.stringify(definition.compatibility?.geometryLengths) !== JSON.stringify(['short', 'medium', 'long', 'extra-long'])) errors.push('compatibility.geometryLengths 枚举不完整');
 if (definition.outputPolicy?.manufacturing_command_allowed !== false) errors.push('manufacturing commands must remain disabled');
 if (definition.constraints?.safe_clearance_mm < 0.8) errors.push('safe clearance must be >= 0.8mm');
 if (definition.constraints?.max_droplets > 6) errors.push('droplet count exceeds 6');

@@ -1,11 +1,18 @@
 import type { FingerCode, NailLength, NailShape } from '@/lib/types';
+import type { BaseCoverage, DesignLengthPreset, OpticalEffect, TopFinish } from './taxonomy-model';
 
 export type RecipePresetId = 'subtle' | 'signature' | 'statement';
 export type RecipeComponentId = 'magnetic_beam' | 'chrome_ribbon' | 'clear_droplet';
+export type RecipeComponentRole = 'appearance' | 'relief' | 'accent';
+export type RecipeRoute = 'L1' | 'L2' | 'L3';
+export type RecipeLifecycle = 'draft' | 'concept' | 'simulated' | 'approved' | 'deprecated';
 export type UVPoint = { u: number; v: number };
 
 export interface MercuryDewParams {
   baseColor: string;
+  baseCoverage: BaseCoverage;
+  opticalEffect: Extract<OpticalEffect, 'cat-eye'>;
+  topFinish: Extract<TopFinish, 'gloss'>;
   catEyeAngleDeg: number;
   beamWidth: 'narrow' | 'standard' | 'wide';
   beamIntensity: 'soft' | 'standard' | 'strong';
@@ -31,10 +38,10 @@ export interface RecipeInstanceV1 {
 export interface RecipeDefinitionV1 {
   identity: { id: string; name: string; name_en: string };
   version: string;
-  lifecycle: string;
-  compatibility: { shapes: NailShape[]; lengths: NailLength[] };
+  lifecycle: RecipeLifecycle;
+  compatibility: { shapes: NailShape[]; lengthPresets: DesignLengthPreset[]; geometryLengths: NailLength[] };
   coordinateSpace: Record<string, string>;
-  components: Array<{ id: RecipeComponentId; role: string; route: string }>;
+  components: Array<{ id: RecipeComponentId; role: RecipeComponentRole; route: RecipeRoute }>;
   presets: Array<{ id: RecipePresetId; label: string; ribbon: boolean; droplets: number }>;
   composition: string[];
   constraints: { safe_clearance_mm: number; max_droplets: number; height_mm: { min: number; max: number }; manufacturing_command_allowed: false };
@@ -58,6 +65,9 @@ export interface ReliefElement {
 
 export const MERCURY_DEFAULT_PARAMS: MercuryDewParams = {
   baseColor: '#D9B5AB',
+  baseCoverage: 'opaque',
+  opticalEffect: 'cat-eye',
+  topFinish: 'gloss',
   catEyeAngleDeg: 8,
   beamWidth: 'standard',
   beamIntensity: 'standard',

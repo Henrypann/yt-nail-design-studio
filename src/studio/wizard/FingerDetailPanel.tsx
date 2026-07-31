@@ -12,6 +12,7 @@ import type { FingerCode, FingerOverrides, Finish, NailLength, NailShape } from 
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
 import { useNailDesignAssets } from '@/studio/preview/use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 import { FINGER_LABEL } from '@/studio/preview/TenFingerPreview';
 
 export interface FingerDetailPanelProps {
@@ -21,6 +22,7 @@ export interface FingerDetailPanelProps {
   baseColor: string;
   /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   selectedFinger: FingerCode | null;
   /** [放大查看] → 切到单指细节展开形态 */
@@ -33,6 +35,7 @@ export function FingerDetailPanel({
   templateId,
   baseColor,
   finish = 'gloss',
+  recipe,
   fingerOverrides,
   selectedFinger,
   onExpand,
@@ -92,6 +95,7 @@ export function FingerDetailPanel({
           viewBox={silhouette.viewBox}
           baseColor={baseColor}
           finish={finish}
+          recipe={recipe}
           override={fingerOverrides?.[selectedFinger]}
           patternMarkup={patternMarkup}
           patternK={patternK}
@@ -100,6 +104,8 @@ export function FingerDetailPanel({
           failed={failedFingers.has(selectedFinger)}
           decorationById={decorationById}
           strokeScale={strokeScale}
+          shape={shape}
+          length={length}
         />
       )}
     </section>
@@ -112,6 +118,9 @@ function FingerDetailBody({
   viewBox,
   baseColor,
   finish,
+  recipe,
+  shape,
+  length,
   override,
   patternMarkup,
   patternK,
@@ -126,6 +135,9 @@ function FingerDetailBody({
   viewBox: string;
   baseColor: string;
   finish: Finish;
+  recipe?: RecipeInstanceV1;
+  shape: NailShape;
+  length: NailLength;
   override?: { baseColor?: string; decorationId?: string | null };
   patternMarkup: string | null;
   patternK: number;
@@ -154,6 +166,9 @@ function FingerDetailBody({
             clipId={clipId}
             baseColor={color}
             finish={finish}
+            recipe={recipe}
+            shape={shape}
+            length={length}
             failed={failed}
             selected={false}
             patternMarkup={patternMarkup}

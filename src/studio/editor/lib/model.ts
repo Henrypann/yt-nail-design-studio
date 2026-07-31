@@ -9,6 +9,14 @@
 
 import type { FingerCode, Finish, NailLength, NailShape } from '../../../lib/types.ts';
 import type { RecipeInstanceV1, ReliefElement } from './recipe-model.ts';
+import type {
+  BaseCoverage as TaxonomyBaseCoverage,
+  DesignLengthPreset as TaxonomyDesignLengthPreset,
+  OccasionId,
+  OpticalEffect as TaxonomyOpticalEffect,
+  StyleDirection,
+  TopFinish as TaxonomyTopFinish,
+} from './taxonomy-model.ts';
 
 export interface Transform {
   x: number;
@@ -19,12 +27,12 @@ export interface Transform {
 
 export const IDENTITY_TRANSFORM: Transform = { x: 0, y: 0, scale: 1, rotation: 0 };
 
-export type LengthPreset = 'natural' | 'short-extension' | 'medium' | 'long';
-export type BaseCoverage = 'opaque' | 'translucent';
-export type OpticalEffect = 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';
-export type TopFinish = 'gloss' | 'matte';
-export type StyleDirection = 'classic' | 'fashion' | 'sweet' | 'art';
-export type Occasion = 'commute' | 'date' | 'wedding' | 'party' | 'vacation';
+export type LengthPreset = TaxonomyDesignLengthPreset;
+export type BaseCoverage = TaxonomyBaseCoverage;
+export type OpticalEffect = TaxonomyOpticalEffect;
+export type TopFinish = TaxonomyTopFinish;
+export type { StyleDirection };
+export type Occasion = OccasionId;
 
 export interface SurfaceAppearance {
   baseCoverage: BaseCoverage;

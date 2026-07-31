@@ -105,6 +105,7 @@ export function StepTwo() {
     templateId: s.templateId,
     baseColor: s.baseColor ?? '#F5E0D3',
     finish: s.finish,
+    recipe: s.recipe,
     fingerOverrides: s.fingerOverrides,
     readOnly,
   } as const;
@@ -116,6 +117,7 @@ export function StepTwo() {
       templateId={s.templateId}
       baseColor={s.baseColor ?? '#F5E0D3'}
       finish={s.finish}
+      recipe={s.recipe}
       fingerOverrides={s.fingerOverrides}
       selectedFinger={s.selectedFinger}
       onExpand={() => s.setViewMode('single')}

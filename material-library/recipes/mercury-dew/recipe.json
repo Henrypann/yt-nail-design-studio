@@ -2,7 +2,7 @@
   "identity": {"id": "mercury-dew", "name": "Mercury Dew", "name_en": "Mercury Dew"},
   "version": "1.0.0",
   "lifecycle": "simulated",
-  "compatibility": {"shapes": ["almond", "oval", "coffin"], "lengths": ["short", "medium", "long", "extra-long"]},
+  "compatibility": {"shapes": ["almond", "oval", "coffin"], "lengthPresets": ["natural", "short-extension", "medium", "long"], "geometryLengths": ["short", "medium", "long", "extra-long"]},
   "coordinateSpace": {"u": "0=left edge, 0.5=center, 1=right edge", "v": "0=tip, 1=root", "origin": "nail silhouette", "units": "normalized 0..1; relief sizes in mm"},
   "components": [
     {"id": "magnetic_beam", "role": "appearance", "route": "L1"},

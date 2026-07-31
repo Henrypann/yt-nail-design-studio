@@ -17,17 +17,21 @@ import type { DecorationAsset } from './nail-assets';
 import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
 import { FINGER_LABEL } from './TenFingerPreview';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 /* ── 单格渲染器（平铺格 / 搭配条共用） ───────────────────── */
 
 export interface NailCellViewProps {
   finger: FingerCode;
+  shape: NailShape;
+  length: NailLength;
   silhouetteD: string;
   /** 剪影 viewBox（0.1mm 坐标系，如 "-60 -200 120 220"） */
   viewBox: string;
   baseColor: string;
   /** 封层质感（高光带/弧面强度） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   patternMarkup: string | null;
   patternK: number;
   patternVisible: boolean;
@@ -48,10 +52,13 @@ export interface NailCellViewProps {
 
 export function NailCellView({
   finger,
+  shape,
+  length,
   silhouetteD,
   viewBox,
   baseColor,
   finish = 'gloss',
+  recipe,
   patternMarkup,
   patternK,
   patternVisible,
@@ -126,6 +133,9 @@ export function NailCellView({
             clipId={clipId}
             baseColor={baseColor}
             finish={finish}
+            recipe={recipe}
+            shape={shape}
+            length={length}
             failed={failed}
             selected={selected}
             patternMarkup={patternMarkup}
@@ -156,6 +166,7 @@ export interface TiledNailsPreviewProps {
   baseColor: string;
   /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   selectedFinger?: FingerCode | null;
   onFingerClick?: (finger: FingerCode) => void;
@@ -171,6 +182,7 @@ export function TiledNailsPreview({
   templateId,
   baseColor,
   finish = 'gloss',
+  recipe,
   fingerOverrides,
   selectedFinger = null,
   onFingerClick,
@@ -242,10 +254,13 @@ export function TiledNailsPreview({
             <NailCellView
               key={finger}
               finger={finger}
+              shape={shape}
+              length={length}
               silhouetteD={silhouette.d}
               viewBox={silhouette.viewBox}
               baseColor={override?.baseColor ?? baseColor}
               finish={finish}
+              recipe={recipe}
               patternMarkup={patternMarkup}
               patternK={patternK}
               patternVisible={patternVisible}

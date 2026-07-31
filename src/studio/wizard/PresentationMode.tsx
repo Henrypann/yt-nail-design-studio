@@ -187,6 +187,7 @@ export function PresentationMode({
               templateId={templateId}
               baseColor={baseColor}
               finish={finish}
+              recipe={recipe}
               fingerOverrides={fingerOverrides}
               registerExport={false}
               tipOrientation={tipOrientation}
@@ -217,6 +218,9 @@ export function PresentationMode({
                   clipId="present-focus-clip"
                   baseColor={focusColor}
                   finish={finish}
+                  recipe={recipe}
+                  shape={shape}
+                  length={length}
                   failed={failedFingers.has(focusFinger)}
                   selected={false}
                   patternMarkup={patternMarkup}
@@ -260,6 +264,8 @@ export function PresentationMode({
                 <NailCellView
                   key={fc}
                   finger={fc}
+                  shape={shape}
+                  length={length}
                   silhouetteD={silhouette.d}
                   viewBox={silhouette.viewBox}
                   baseColor={ov?.baseColor ?? baseColor}

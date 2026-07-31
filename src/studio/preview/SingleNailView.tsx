@@ -15,6 +15,7 @@ import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
 import { FINGER_LABEL } from './TenFingerPreview';
 import { NailCellView } from './TiledNailsPreview';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 export interface SingleNailViewProps {
   shape: NailShape;
@@ -23,6 +24,7 @@ export interface SingleNailViewProps {
   baseColor: string;
   /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   /** 当前焦点指（缺省 R4 主视觉指） */
   finger: FingerCode;
@@ -39,6 +41,7 @@ export function SingleNailView({
   templateId,
   baseColor,
   finish = 'gloss',
+  recipe,
   fingerOverrides,
   finger,
   onSelectFinger,
@@ -137,10 +140,13 @@ export function SingleNailView({
             </defs>
             <FingerNailContent
               finger={finger}
+              shape={shape}
+              length={length}
               silhouetteD={silhouette.d}
               clipId={clipId}
               baseColor={color}
               finish={finish}
+              recipe={recipe}
               failed={failed}
               selected={false}
               patternMarkup={patternMarkup}
@@ -186,10 +192,13 @@ export function SingleNailView({
             <NailCellView
               key={fc}
               finger={fc}
+              shape={shape}
+              length={length}
               silhouetteD={silhouette.d}
               viewBox={silhouette.viewBox}
               baseColor={ov?.baseColor ?? baseColor}
               finish={finish}
+              recipe={recipe}
               patternMarkup={patternMarkup}
               patternK={patternK}
               patternVisible={patternVisible}

@@ -96,6 +96,8 @@ function LiveShapePreview() {
         <>
           <NailCellView
             finger="L3"
+            shape={shape!}
+            length={length!}
             silhouetteD={sil.d}
             viewBox={sil.viewBox}
             baseColor="#F5E0D3"

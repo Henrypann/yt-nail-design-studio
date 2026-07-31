@@ -8,9 +8,11 @@
  * 组件本身不关心外层如何把设计单位投到屏幕。
  */
 
-import type { FingerCode, Finish } from '@/lib/types';
+import type { FingerCode, Finish, NailLength, NailShape } from '@/lib/types';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
 import { NailSurfaceBody, NailSurfaceDefs, NailTopcoatGloss } from './NailSurfaceFX';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import { compileRecipeToFingerRenderModel } from '@/studio/editor/lib/mercury-renderer';
 
 export interface FingerNailContentProps {
   finger: FingerCode;
@@ -21,6 +23,9 @@ export interface FingerNailContentProps {
   baseColor: string;
   /** 封层质感：驱动高光带与弧面强度（默认 gloss） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
+  shape?: NailShape;
+  length?: NailLength;
   failed: boolean;
   selected: boolean;
   patternMarkup: string | null;
@@ -42,6 +47,9 @@ export function FingerNailContent({
   clipId,
   baseColor,
   finish = 'gloss',
+  recipe,
+  shape,
+  length,
   failed,
   selected,
   patternMarkup,
@@ -89,6 +97,11 @@ export function FingerNailContent({
           <NailTopcoatGloss fxId={fxId} finish={finish} silhouetteD={silhouetteD} />
         </g>
       )}
+      {/* 参数化 Recipe（当前为 2.5D 模拟效果；不代表生产命令） */}
+      {recipe?.recipeRef.id === 'mercury-dew' && shape && length && !failed && (() => {
+        const compiled = compileRecipeToFingerRenderModel(recipe, { shape, length, finger });
+        return <g clipPath={`url(#${clipId})`} data-recipe="mercury-dew" data-renderer="svg-2.5d" dangerouslySetInnerHTML={{ __html: compiled.svg }} />;
+      })()}
       {/* 轮廓线 */}
       <path
         d={silhouetteD}
