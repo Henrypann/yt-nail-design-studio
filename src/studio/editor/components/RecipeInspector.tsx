@@ -24,7 +24,7 @@ export function RecipeInspector() {
   const params = mergeMercuryParams(doc.recipe, currentFinger);
   const enabled = doc.recipe.enabled !== false && doc.recipe.fingerOverrides[currentFinger]?.enabled !== false;
   return (
-    <section className="rounded-panel border border-[#D7B36A]/40 bg-[#FFFCF5] p-3" data-testid="recipe-inspector" data-debug-id="studio.editor.recipe-inspector">
+    <section className="rounded-panel border border-[#D7B36A]/40 bg-[#FFFCF5] p-3" data-testid="recipe-inspector">
       <header className="mb-2 flex items-center justify-between">
         <div><h3 className="text-xs font-semibold text-gray-900">Mercury Dew Recipe</h3><p className="text-[10px] text-gray-500">Appearance → Relief → Accent · 模拟效果</p></div>
         <button aria-label="切换 Mercury Recipe" disabled={readOnly} onClick={() => setEnabled(!enabled)} className={cx('h-5 w-9 rounded-full p-0.5 transition-colors', enabled ? 'bg-[#C2497A]' : 'bg-gray-300')}><span className={cx('block h-4 w-4 rounded-full bg-white transition-transform', enabled ? 'translate-x-4' : '')} /></button>

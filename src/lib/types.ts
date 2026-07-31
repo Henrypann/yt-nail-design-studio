@@ -20,6 +20,7 @@ export const FINGER_CODES: readonly FingerCode[] = [
 /** 产品甲型目录；由非几何能力注册表生成，轮廓参数仍只认 shape-params.json */
 export type { NailShape } from '@/generated/shape-types';
 import type { NailShape } from '@/generated/shape-types';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 /** 四档长度 */
 export type NailLength = 'short' | 'medium' | 'long' | 'extra-long';
@@ -121,6 +122,9 @@ export interface DesignSummary {
   parentId?: string;
   version: number;
   thumbnailDataUrl?: string; // PNG 缩略图（原型期唯一导出形态）
+  recipe?: RecipeInstanceV1;
+  outputPolicy?: { label: string; rendererVersion: string };
+  confirmationSnapshot?: { recipeRef?: { id: string; version: string }; definitionChecksum: string; rendererVersion: string };
   createdAt: string;
   updatedAt: string;
 }

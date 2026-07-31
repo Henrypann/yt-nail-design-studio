@@ -26,6 +26,14 @@ export interface TemplateEntry {
   id: string;
   name: string;
   name_en: string;
+  /** REAL 默认为正式可编辑模板；CONCEPT 仅提供高保真方向并降级到 render_template_id。 */
+  asset_status?: 'REAL' | 'CONCEPT';
+  render_template_id?: string;
+  asset_spec_url?: string;
+  capability_summary?: {
+    supported: string[];
+    pending: string[];
+  };
   style_tags: string[];
   default_base_color: string;
   default_finish: Finish;

@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "fixtureType": "visual-signoff-pending",
+  "renderer": "svg-2.5d/mercury-1",
+  "note": "由 Canonical Renderer 生成屏幕 SVG/PNG 后人工签收；本清单不把静态占位图冒充视觉基线。",
+  "fixtures": [
+    { "id": "almond-natural", "shape": "almond", "length": "short", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" },
+    { "id": "almond-medium", "shape": "almond", "length": "long", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" },
+    { "id": "oval-natural", "shape": "oval", "length": "short", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" },
+    { "id": "oval-medium", "shape": "oval", "length": "long", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" },
+    { "id": "coffin-natural", "shape": "coffin", "length": "short", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" },
+    { "id": "coffin-medium", "shape": "coffin", "length": "long", "recipeRef": { "id": "mercury-dew", "version": "1.0.0" }, "status": "pending_visual_signoff" }
+  ]
+}

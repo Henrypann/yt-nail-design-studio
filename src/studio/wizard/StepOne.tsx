@@ -179,6 +179,11 @@ export function StepOne() {
           return;
         }
         applyTemplate(template);
+        if (st.cover_status === 'CONCEPT') {
+          toast.warning(
+            `已应用「${st.base_template_name ?? template.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
+          );
+        }
       } catch {
         toast.error('模板目录加载失败。可在模板库刷新后重新选择。');
       }

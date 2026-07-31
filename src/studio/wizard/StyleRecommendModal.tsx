@@ -5,7 +5,11 @@
  * YouTube 封面式 16:9 大卡 + 适配长度 + 推荐理由。
  * 数据一律 fetch 自 /assets/styles/manifest.json（不硬编码）；
  * 选中风格 → 映射 material-library 模板自动应用；[暂不选择] 直接进入画布。
- * MOCK 封面强制标注，不得以占位图冒充正式图（入库红线）。
+ * 封面证据等级：
+ * - REAL：正式摄影/签收素材；
+ * - CONCEPT：高保真概念方向，画布只应用近似基础模板；
+ * - MOCK：程序占位图。
+ * 三者必须显式标注，不得把 Editorial Concept 冒充 Canonical Renderer 输出。
  */
 
 import { useEffect, useState } from 'react';
@@ -21,11 +25,16 @@ export interface StyleRecommendation {
   name: string;
   name_en: string;
   priority: number;
+  featured?: boolean;
   best_lengths: NailLength[];
   best_length_label: string;
   reason: string;
   cover_url: string;
-  cover_status: 'REAL' | 'MOCK';
+  cover_status: 'REAL' | 'CONCEPT' | 'MOCK';
+  preview_fidelity?: 'CANONICAL' | 'APPROXIMATE';
+  concept_note?: string;
+  base_template_name?: string;
+  asset_spec_url?: string;
   template_id: string | null;
 }
 
@@ -65,7 +74,9 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
       })
       .then((m) => {
         if (cancelled) return;
-        const list = [...(m.recommendations[shape] ?? [])].sort((a, b) => a.priority - b.priority);
+        const all = [...(m.recommendations[shape] ?? [])].sort((a, b) => a.priority - b.priority);
+        const featured = all.filter((item) => item.featured);
+        const list = featured.length >= 3 ? featured : all;
         setStyles(list);
         setLoadFailed(list.length === 0);
       })
@@ -155,6 +166,13 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                       <Badge variant="gray" className="text-[10px]">MOCK 占位图</Badge>
                     </span>
                   )}
+                  {st.cover_status === 'CONCEPT' && (
+                    <span className="absolute right-2 top-2">
+                      <Badge variant="warning" className="bg-white/90 text-[10px] backdrop-blur-sm">
+                        高保真概念
+                      </Badge>
+                    </span>
+                  )}
                 </div>
 
                 {/* 文案区 */}
@@ -170,9 +188,30 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                     )}
                   </div>
                   <p className="line-clamp-3 text-xs leading-relaxed text-gray-600">{st.reason}</p>
+                  {st.cover_status === 'CONCEPT' && (
+                    <div className="rounded-button border border-warning/20 bg-warning-soft px-2 py-1.5 text-[10px] leading-relaxed text-warning">
+                      <p>{st.concept_note ?? '概念封面用于审美方向；当前画布为近似基础方案。'}</p>
+                      {st.base_template_name && (
+                        <p className="mt-0.5 opacity-80">当前应用：{st.base_template_name}</p>
+                      )}
+                      {st.asset_spec_url && (
+                        <a
+                          href={st.asset_spec_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-1 inline-block font-medium underline underline-offset-2"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          查看 Asset Spec
+                        </a>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-auto pt-2">
                     <Button size="sm" className="w-full" onClick={() => onSelect(st)}>
-                      {text('选用此风格', 'Use this look')}
+                      {st.cover_status === 'CONCEPT'
+                        ? text('应用近似基础方案', 'Apply approximate base')
+                        : text('选用此风格', 'Use this look')}
                       <ArrowRight size={13} />
                     </Button>
                   </div>

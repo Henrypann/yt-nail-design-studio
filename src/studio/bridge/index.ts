@@ -109,6 +109,7 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
     baseColor: design.baseColor,
     pattern: sharedPattern,
     attachments: [],
+    recipe: design.recipe,
     relief: [],
     fingerLocks,
     masterFinger: 'R4',

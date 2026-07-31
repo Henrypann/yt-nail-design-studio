@@ -19,6 +19,8 @@
     "test:recipe-schema": "node --experimental-strip-types src/studio/editor/lib/recipe-schema.selftest.ts",
     "test:recipe-migrate": "node --experimental-strip-types src/studio/editor/lib/recipe-migrate.selftest.ts",
     "test:surface-mapper": "node --experimental-strip-types src/studio/editor/lib/surface-mapper.selftest.ts",
+    "test:mercury-fixtures": "node tools/validate-mercury-fixtures.mjs",
+    "test:recipe-output": "node --experimental-strip-types src/studio/editor/lib/recipe-output.selftest.ts",
     "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
   },
   "dependencies": {

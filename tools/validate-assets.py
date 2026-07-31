@@ -41,7 +41,8 @@ ASSETS = ROOT / "assets"
 LENGTH_IDS = {"short", "medium", "long", "extra-long"}
 FINISH_IDS = {"gloss", "matte", "pearl"}
 STYLE_TAGS = {"trending", "sweet", "minimal", "cool", "retro", "luxe", "holiday"}
-EXPECTED_TEMPLATE_COUNT = 12
+EXPECTED_CANONICAL_TEMPLATE_COUNT = 12
+EXPECTED_CONCEPT_TEMPLATE_COUNT = 1
 EXPECTED_TIER_ONE = {"almond", "oval", "squoval", "square", "coffin"}
 EXPECTED_WIZARD_ENABLED = {"almond", "oval", "coffin"}
 FINGER_CODES = {f"{h}{i}" for h in "LR" for i in range(1, 6)}
@@ -169,11 +170,22 @@ def check_templates() -> None:
             f"{sorted(template_shape_ids)}"
         )
     templates = index.get("templates", [])
-    if len(templates) != EXPECTED_TEMPLATE_COUNT:
-        err(f"index.json 模板数量 = {len(templates)}，应为 {EXPECTED_TEMPLATE_COUNT}")
+    canonical_templates = [t for t in templates if t.get("asset_status", "REAL") == "REAL"]
+    concept_templates = [t for t in templates if t.get("asset_status") == "CONCEPT"]
+    if len(canonical_templates) != EXPECTED_CANONICAL_TEMPLATE_COUNT:
+        err(
+            f"index.json 正式模板数量 = {len(canonical_templates)}，"
+            f"应为 {EXPECTED_CANONICAL_TEMPLATE_COUNT}"
+        )
+    if len(concept_templates) != EXPECTED_CONCEPT_TEMPLATE_COUNT:
+        err(
+            f"index.json Concept 模板数量 = {len(concept_templates)}，"
+            f"应为 {EXPECTED_CONCEPT_TEMPLATE_COUNT}"
+        )
 
     seen_ids: set[str] = set()
     all_viewboxes: set[str] = set()
+    all_ids = {t.get("id") for t in templates}
 
     for t in templates:
         tid = t.get("id", "<missing>")
@@ -217,6 +229,29 @@ def check_templates() -> None:
             err(f"{tid}: default_finish 非法: {t.get('default_finish')}")
         if not re.fullmatch(r"#[0-9A-Fa-f]{6}", t.get("default_base_color", "")):
             err(f"{tid}: default_base_color 非法: {t.get('default_base_color')}")
+
+        asset_status = t.get("asset_status", "REAL")
+        if asset_status not in {"REAL", "CONCEPT"}:
+            err(f"{tid}: asset_status 必须为 REAL 或 CONCEPT")
+        if asset_status == "CONCEPT":
+            render_template_id = t.get("render_template_id")
+            if not render_template_id or render_template_id == tid or render_template_id not in all_ids:
+                err(f"{tid}: CONCEPT 必须指向另一个已注册 render_template_id")
+            else:
+                render_target = next((item for item in templates if item.get("id") == render_template_id), None)
+                if render_target and render_target.get("asset_status", "REAL") != "REAL":
+                    err(f"{tid}: render_template_id 必须指向 REAL 模板")
+            spec_url = str(t.get("asset_spec_url", ""))
+            if not spec_url or not (ROOT / spec_url.lstrip("/")).exists():
+                err(f"{tid}: CONCEPT 的 Asset Spec 不存在: {spec_url}")
+            summary = t.get("capability_summary", {})
+            if not summary.get("supported") or not summary.get("pending"):
+                err(f"{tid}: CONCEPT 必须同时声明 supported 与 pending 能力")
+            turl = t.get("thumbnail_url")
+            if not turl or not (ROOT / turl.lstrip("/")).exists():
+                err(f"{tid}: Concept 缩略图不存在: {turl}")
+            # Concept 没有自己的 Canonical pattern；后续正式化时再进入下方几何资产校验。
+            continue
 
         # ---- §5.8-4 manifest 引用文件存在
         mpath = ROOT / t.get("manifest_url", f"material-library/templates/{tid}/manifest.json")
@@ -338,6 +373,9 @@ def check_styles() -> None:
         priorities = [item.get("priority") for item in items]
         if len(set(priorities)) != len(priorities):
             err(f"{sid}: 风格推荐 priority 必须唯一")
+        featured = [item for item in items if item.get("featured") is True]
+        if featured and len(featured) != 3:
+            err(f"{sid}: 启用 featured 后必须恰好有 3 个，实际 {len(featured)}")
         for item in items:
             style_id = item.get("id", "<missing>")
             template_id = item.get("template_id")
@@ -346,8 +384,18 @@ def check_styles() -> None:
             lengths = item.get("best_lengths", [])
             if not lengths or not set(lengths).issubset(valid_lengths):
                 err(f"{sid}/{style_id}: best_lengths 非法: {lengths}")
-            if item.get("cover_status") not in {"REAL", "MOCK"}:
-                err(f"{sid}/{style_id}: cover_status 必须为 REAL 或 MOCK")
+            cover_status = item.get("cover_status")
+            if cover_status not in {"REAL", "CONCEPT", "MOCK"}:
+                err(f"{sid}/{style_id}: cover_status 必须为 REAL、CONCEPT 或 MOCK")
+            if cover_status == "CONCEPT":
+                if item.get("preview_fidelity") != "APPROXIMATE":
+                    err(f"{sid}/{style_id}: CONCEPT 必须标记 preview_fidelity=APPROXIMATE")
+                if not str(item.get("concept_note", "")).strip():
+                    err(f"{sid}/{style_id}: CONCEPT 必须提供 concept_note，说明画布为近似基础方案")
+                spec_url = item.get("asset_spec_url", "")
+                spec = ROOT / str(spec_url).lstrip("/")
+                if not spec_url or not spec.exists():
+                    err(f"{sid}/{style_id}: CONCEPT 的 Asset Spec 不存在: {spec_url}")
             cover_url = item.get("cover_url", "")
             cover = ROOT / cover_url.lstrip("/")
             if not cover.exists():
@@ -574,8 +622,9 @@ def main() -> int:
         f"Wizard enabled = {sum(1 for item in (load_json(LIB / 'shapes' / 'shape-capabilities.json') or {}).get('shapes', []) if item.get('capabilities', {}).get('wizard') == 'enabled')}"
     )
     print(
-        f"  - {EXPECTED_TEMPLATE_COUNT} 模板 × {len(template_shape_ids)} 个模板就绪甲型 = "
-        f"{EXPECTED_TEMPLATE_COUNT * len(template_shape_ids)} 图案 SVG（viewBox 全库一致、nail-clip 齐备、引用文件齐全）"
+        f"  - {EXPECTED_CANONICAL_TEMPLATE_COUNT} 正式模板 × {len(template_shape_ids)} 个模板就绪甲型 = "
+        f"{EXPECTED_CANONICAL_TEMPLATE_COUNT * len(template_shape_ids)} 图案 SVG；"
+        f"{EXPECTED_CONCEPT_TEMPLATE_COUNT} 个 Concept 模板（明确降级渲染）"
     )
     print(
         f"  - {len(geometry_shape_ids)} 个几何甲型 × {len(LENGTH_IDS)} 长度 = "

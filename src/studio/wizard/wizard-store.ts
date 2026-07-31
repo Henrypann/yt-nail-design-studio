@@ -35,6 +35,8 @@ import {
 } from '@/studio/preview/material-library';
 import { renderThumbnailDataUrl } from '@/studio/preview/export-png';
 import { persistDesign } from './design-repository';
+import { createMercuryInstance, type RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import { recipeDefinitionChecksum } from '@/studio/editor/lib/recipe-checksum';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
 
@@ -113,6 +115,7 @@ interface WizardState {
   baseColor: string | null;
   finish: Finish;
   fingerOverrides: FingerOverrides;
+  recipe?: RecipeInstanceV1;
   selectedFinger: FingerCode | null;
   /* 持久化 */
   designId: string;
@@ -189,6 +192,9 @@ export const useWizardStore = create<WizardState>((set, get) => {
       source: 'wizard',
       version: s.version,
       thumbnailDataUrl,
+      recipe: s.recipe,
+      outputPolicy: s.recipe ? { label: '模拟效果 · 尚未完成生产验证', rendererVersion: 'svg-2.5d/mercury-1' } : undefined,
+      confirmationSnapshot: s.confirmation && s.recipe ? { recipeRef: s.recipe.recipeRef, definitionChecksum: recipeDefinitionChecksum(s.recipe.recipeRef.id), rendererVersion: 'svg-2.5d/mercury-1' } : undefined,
       createdAt: s.createdAt,
       updatedAt: new Date().toISOString(),
     };
@@ -287,6 +293,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     baseColor: null,
     finish: 'gloss',
     fingerOverrides: {},
+    recipe: undefined,
     selectedFinger: null,
     designId: initialDesignId(),
     createdAt: new Date().toISOString(),
@@ -337,10 +344,12 @@ export const useWizardStore = create<WizardState>((set, get) => {
     applyTemplate: (t) => {
       if (get().status !== 'draft') return;
       set({
-        templateId: t.id,
+        // Concept 卡片保留自己的产品身份，但当前渲染只消费已签收的基础模板。
+        templateId: t.render_template_id ?? t.id,
         templateName: t.name,
         baseColor: t.default_base_color,
         finish: t.default_finish,
+        recipe: t.name.includes('Mercury Dew') || t.id === 't_mercury_dew_concept' ? createMercuryInstance('signature', t.default_base_color) : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存
     },
@@ -387,8 +396,16 @@ export const useWizardStore = create<WizardState>((set, get) => {
       if (!summary) return false;
       try {
         const confirmed = confirmDesign(summary, confirmedByFromSession());
+        const frozen = confirmed.recipe
+          ? {
+              recipeRef: confirmed.recipe.recipeRef,
+              definitionChecksum: recipeDefinitionChecksum(confirmed.recipe.recipeRef.id),
+              rendererVersion: 'svg-2.5d/mercury-1',
+            }
+          : undefined;
+        const frozenDesign = frozen ? { ...confirmed, confirmationSnapshot: frozen } : confirmed;
         const simulateFailure = isScenarioOn(useMockScenarios.getState().flags, 'save.fail');
-        await persistDesign(confirmed, { simulateFailure });
+        await persistDesign(frozenDesign, { simulateFailure });
         set({ status: 'confirmed', confirmation: confirmed.confirmation, saveState: 'saved' });
         notifier?.success('已标记「顾客已确认」，设计已冻结。');
         return true;

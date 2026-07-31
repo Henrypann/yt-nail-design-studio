@@ -359,6 +359,7 @@ export function StepTwo() {
         templateName={s.templateName}
         baseColor={s.baseColor ?? '#F5E0D3'}
         finish={s.finish}
+        recipe={s.recipe}
         fingerOverrides={s.fingerOverrides}
         status={s.status}
         initialFinger={s.selectedFinger}

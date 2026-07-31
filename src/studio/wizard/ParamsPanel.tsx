@@ -64,6 +64,11 @@ export function ParamsPanel() {
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">
+      {s.recipe?.recipeRef.id === 'mercury-dew' && (
+        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-[11px] text-warning" data-testid="mercury-output-policy">
+          模拟效果 · 尚未完成生产验证
+        </div>
+      )}
       {readOnly && (
         <div className="rounded-panel border border-info/30 bg-info-soft px-3 py-2 text-xs text-info">
           设计已冻结（顾客已确认），画布只读。如需修改，请在设计列表基于已确认设计创建新版本。
