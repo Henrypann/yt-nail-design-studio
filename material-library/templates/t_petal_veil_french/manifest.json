@@ -1,6 +1,14 @@
 {
   "template_id": "t_petal_veil_french",
-  "version": 1,
+  "version": 2,
+  "asset_status": "CONCEPT",
+  "renderer_id": "three-pbr/petal-veil-1",
+  "visual_signoff": "pending",
+  "manufacturing": "blocked/unvalidated",
+  "compatibility": {
+    "shape": "almond",
+    "length": "medium"
+  },
   "patterns": {
     "almond": "patterns/almond.svg",
     "oval": "patterns/oval.svg",

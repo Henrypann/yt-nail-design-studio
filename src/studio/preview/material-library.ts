@@ -26,8 +26,8 @@ export interface TemplateEntry {
   id: string;
   name: string;
   name_en: string;
-  /** REAL 默认为正式可编辑模板；CONCEPT 仅提供高保真方向并降级到 render_template_id。 */
-  asset_status?: 'REAL' | 'CONCEPT';
+  /** SIMULATED 仅表示 Canonical Renderer 已由人类视觉签收，不代表可制造。 */
+  asset_status?: 'REAL' | 'CONCEPT' | 'SIMULATED';
   render_template_id?: string;
   asset_spec_url?: string;
   capability_summary?: {

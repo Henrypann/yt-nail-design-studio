@@ -16,7 +16,8 @@ import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { isReadOnly } from '@/lib/state-machine';
 import { loadDecorations, type DecorationAsset } from '@/studio/preview/nail-assets';
 import { loadFinishes, loadPalette, type FinishMeta, type PaletteColor } from '@/studio/preview/material-library';
-import { downloadBlob, hasPreviewSvg, renderPreviewPng } from '@/studio/preview/export-png';
+import { downloadBlob, hasPreview, renderPreviewPng } from '@/studio/preview/export-png';
+import { isPetalVeilRecipe } from '@/studio/editor/lib/recipe-model';
 import { FINGER_LABEL } from '@/studio/preview/TenFingerPreview';
 import { useWizardStore } from './wizard-store';
 
@@ -25,6 +26,7 @@ export function ParamsPanel() {
   const s = useWizardStore();
   const mockFlags = useMockScenarios((s2) => s2.flags);
   const readOnly = isReadOnly(s.status);
+  const petalP0 = isPetalVeilRecipe(s.recipe);
 
   const [palette, setPalette] = useState<PaletteColor[]>([]);
   const [finishes, setFinishes] = useState<FinishMeta[]>([]);
@@ -33,16 +35,17 @@ export function ParamsPanel() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
+    if (petalP0) return;
     loadPalette().then(setPalette).catch(() => toast.error('色板加载失败。'));
     loadFinishes().then(setFinishes).catch(() => undefined);
     loadDecorations().then(setDecorations).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [petalP0]);
 
   /* ── 导出 PNG ── */
   const handleExport = async () => {
     if (exporting) return;
-    if (!hasPreviewSvg()) {
+    if (!hasPreview()) {
       toast.warning('预览尚未就绪，请稍候再导出。');
       return;
     }
@@ -61,6 +64,67 @@ export function ParamsPanel() {
   };
 
   const fingerOverride = s.selectedFinger ? s.fingerOverrides[s.selectedFinger] : undefined;
+
+  if (petalP0) {
+    return (
+      <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">
+        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-[11px] leading-relaxed text-warning">
+          高保真候选 · 待视觉签收<br />
+          Canonical Renderer 不代表生产或制造可用。
+        </div>
+        {readOnly && (
+          <div className="rounded-panel border border-info/30 bg-info-soft px-3 py-2 text-xs text-info">
+            设计已冻结（顾客已确认），画布只读。
+          </div>
+        )}
+        <section className="rounded-panel border border-gray-200 p-3">
+          <p className="text-xs font-medium text-gray-900">Petal Veil Signature · 已锁定</p>
+          <dl className="mt-3 grid grid-cols-[72px_1fr] gap-y-2 text-[11px]">
+            <dt className="text-gray-400">规格</dt><dd className="text-gray-700">Almond · Medium</dd>
+            <dt className="text-gray-400">底层</dt><dd className="text-gray-700">奶雾裸透 · 0.92</dd>
+            <dt className="text-gray-400">法式</dt><dd className="text-gray-700">柔边微法式 · 0.75</dd>
+            <dt className="text-gray-400">重音指</dt><dd className="text-gray-700">仅 R4 · 五瓣低浮雕花</dd>
+            <dt className="text-gray-400">渲染器</dt><dd className="break-all text-gray-700">three-pbr/petal-veil-1</dd>
+          </dl>
+          <p className="mt-3 text-[10px] leading-relaxed text-gray-400">
+            P0 不开放底色、质感、逐指换色或附件枚举。
+          </p>
+        </section>
+        <section className="mt-auto flex flex-col gap-2 border-t border-gray-100 pt-3">
+          <Button variant="secondary" loading={exporting} onClick={handleExport}>
+            <Download size={14} />
+            导出 HQ PNG
+          </Button>
+          {s.status === 'draft' ? (
+            <Button onClick={() => setConfirmOpen(true)}>
+              <Check size={14} />
+              顾客已确认
+            </Button>
+          ) : (
+            <div className="flex items-center justify-center gap-1.5 rounded-button bg-info-soft py-2 text-xs text-info">
+              <Check size={13} /> 已标记「顾客已确认」
+            </div>
+          )}
+        </section>
+        <Modal
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          title="标记顾客已确认"
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setConfirmOpen(false)}>取消</Button>
+              <Button onClick={async () => {
+                const ok = await s.markConfirmed();
+                if (ok) setConfirmOpen(false);
+              }}>标记已确认</Button>
+            </>
+          }
+        >
+          顾客已在店内确认该方案？确认后设计将冻结；资产视觉签收仍保持 pending。
+        </Modal>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">

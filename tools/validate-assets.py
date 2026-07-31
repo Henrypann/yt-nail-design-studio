@@ -41,8 +41,8 @@ ASSETS = ROOT / "assets"
 LENGTH_IDS = {"short", "medium", "long", "extra-long"}
 FINISH_IDS = {"gloss", "matte", "pearl"}
 STYLE_TAGS = {"trending", "sweet", "minimal", "cool", "retro", "luxe", "holiday"}
-EXPECTED_CANONICAL_TEMPLATE_COUNT = 12
-EXPECTED_CONCEPT_TEMPLATE_COUNT = 1
+EXPECTED_CANONICAL_TEMPLATE_COUNT = 11
+EXPECTED_CONCEPT_TEMPLATE_COUNT = 2
 EXPECTED_TIER_ONE = {"almond", "oval", "squoval", "square", "coffin"}
 EXPECTED_WIZARD_ENABLED = {"almond", "oval", "coffin"}
 FINGER_CODES = {f"{h}{i}" for h in "LR" for i in range(1, 6)}
@@ -231,13 +231,14 @@ def check_templates() -> None:
             err(f"{tid}: default_base_color 非法: {t.get('default_base_color')}")
 
         asset_status = t.get("asset_status", "REAL")
-        if asset_status not in {"REAL", "CONCEPT"}:
-            err(f"{tid}: asset_status 必须为 REAL 或 CONCEPT")
+        if asset_status not in {"REAL", "CONCEPT", "SIMULATED"}:
+            err(f"{tid}: asset_status 必须为 REAL、CONCEPT 或 SIMULATED")
         if asset_status == "CONCEPT":
             render_template_id = t.get("render_template_id")
-            if not render_template_id or render_template_id == tid or render_template_id not in all_ids:
-                err(f"{tid}: CONCEPT 必须指向另一个已注册 render_template_id")
-            else:
+            owns_candidate_renderer = bool(t.get("capability_summary", {}).get("supported")) and render_template_id == tid
+            if (not render_template_id or render_template_id not in all_ids) or (render_template_id == tid and not owns_candidate_renderer):
+                err(f"{tid}: CONCEPT 必须指向已注册基础模板，或声明自己的候选 Renderer")
+            elif render_template_id != tid:
                 render_target = next((item for item in templates if item.get("id") == render_template_id), None)
                 if render_target and render_target.get("asset_status", "REAL") != "REAL":
                     err(f"{tid}: render_template_id 必须指向 REAL 模板")

@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "fixtureType": "canonical-renderer-visual-signoff-pending",
+  "rendererId": "three-pbr/petal-veil-1",
+  "recipeRef": { "id": "petal-veil-french", "version": "1.0.0" },
+  "shape": "almond",
+  "length": "medium",
+  "assetStatus": "CONCEPT",
+  "visualSignoff": "pending",
+  "manufacturing": "blocked/unvalidated",
+  "fixtures": [
+    { "id": "r4-single", "path": "r4-single.png", "width": 1280, "height": 720, "status": "pending_visual_signoff" },
+    { "id": "ten-finger-tiled", "path": "ten-finger-tiled.png", "width": 1280, "height": 720, "status": "pending_visual_signoff" },
+    { "id": "presentation", "path": "presentation.png", "width": 1440, "height": 900, "status": "pending_visual_signoff" }
+  ],
+  "checksums": "checksums.sha256"
+}

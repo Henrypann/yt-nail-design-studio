@@ -2,11 +2,39 @@ import type { FingerCode, NailLength, NailShape } from '@/lib/types';
 import type { BaseCoverage, DesignLengthPreset, OpticalEffect, TopFinish } from './taxonomy-model';
 
 export type RecipePresetId = 'subtle' | 'signature' | 'statement';
-export type RecipeComponentId = 'magnetic_beam' | 'chrome_ribbon' | 'clear_droplet';
+export type RecipeComponentId =
+  | 'magnetic_beam'
+  | 'chrome_ribbon'
+  | 'clear_droplet'
+  | 'milky_base'
+  | 'micro_french'
+  | 'relief_flower';
 export type RecipeComponentRole = 'appearance' | 'relief' | 'accent';
 export type RecipeRoute = 'L1' | 'L2' | 'L3';
 export type RecipeLifecycle = 'draft' | 'concept' | 'simulated' | 'approved' | 'deprecated';
 export type UVPoint = { u: number; v: number };
+
+export interface PetalVeilSignatureV1 {
+  rendererId: 'three-pbr/petal-veil-1';
+  renderStatus: 'candidate';
+  editingPolicy: 'locked-signature';
+  base: { color: '#F2E4DA'; opacity: 0.92 };
+  french: {
+    color: '#FBF7F2';
+    opacity: 0.75;
+    anchors: [UVPoint, UVPoint, UVPoint];
+  };
+  flower: {
+    finger: 'R4';
+    uv: UVPoint;
+    petals: 5;
+    scale: 0.18;
+    rotationDeg: 18;
+    heightMm: 0.18;
+    color: '#F7EDE6';
+    centerColor: '#E8C9A0';
+  };
+}
 
 export interface MercuryDewParams {
   baseColor: string;
@@ -27,13 +55,22 @@ export interface MercuryDewParams {
 
 export interface RecipeRef { id: string; version: string; }
 export interface MercuryFingerOverride { enabled?: boolean; params?: Partial<MercuryDewParams>; }
-export interface RecipeInstanceV1 {
-  recipeRef: RecipeRef;
+interface RecipeInstanceCompatFields {
   presetId: RecipePresetId;
   params: MercuryDewParams;
   fingerOverrides: Partial<Record<FingerCode, MercuryFingerOverride>>;
   enabled?: boolean;
 }
+export interface MercuryRecipeInstanceV1 extends RecipeInstanceCompatFields {
+  recipeRef: { id: 'mercury-dew'; version: string };
+  petalVeil?: never;
+}
+export interface PetalVeilRecipeInstanceV1 extends RecipeInstanceCompatFields {
+  recipeRef: { id: 'petal-veil-french'; version: '1.0.0' };
+  /** Legacy params envelope remains readable while the discriminated Signature is canonical. */
+  petalVeil: PetalVeilSignatureV1;
+}
+export type RecipeInstanceV1 = MercuryRecipeInstanceV1 | PetalVeilRecipeInstanceV1;
 
 export interface RecipeDefinitionV1 {
   identity: { id: string; name: string; name_en: string };
@@ -89,6 +126,49 @@ export function createMercuryInstance(presetId: RecipePresetId = 'signature', ba
     heightMm: 0.18,
   }));
   return { recipeRef: { id: 'mercury-dew', version: '1.0.0' }, presetId, params: { ...MERCURY_DEFAULT_PARAMS, baseColor, droplets }, fingerOverrides: {} };
+}
+
+export const PETAL_VEIL_SIGNATURE: PetalVeilSignatureV1 = {
+  rendererId: 'three-pbr/petal-veil-1',
+  renderStatus: 'candidate',
+  editingPolicy: 'locked-signature',
+  base: { color: '#F2E4DA', opacity: 0.92 },
+  french: {
+    color: '#FBF7F2',
+    opacity: 0.75,
+    anchors: [{ u: 0.1, v: 0.34 }, { u: 0.5, v: 0.1 }, { u: 0.9, v: 0.34 }],
+  },
+  flower: {
+    finger: 'R4',
+    uv: { u: 0.62, v: 0.56 },
+    petals: 5,
+    scale: 0.18,
+    rotationDeg: 18,
+    heightMm: 0.18,
+    color: '#F7EDE6',
+    centerColor: '#E8C9A0',
+  },
+};
+
+export function createPetalVeilInstance(): PetalVeilRecipeInstanceV1 {
+  return {
+    recipeRef: { id: 'petal-veil-french', version: '1.0.0' },
+    presetId: 'signature',
+    params: {
+      ...MERCURY_DEFAULT_PARAMS,
+      baseColor: PETAL_VEIL_SIGNATURE.base.color,
+      baseCoverage: 'translucent',
+      beamIntensity: 'soft',
+      dropletDensity: 'off',
+      droplets: [],
+    },
+    fingerOverrides: {},
+    petalVeil: structuredClone(PETAL_VEIL_SIGNATURE),
+  };
+}
+
+export function isPetalVeilRecipe(instance?: RecipeInstanceV1): instance is PetalVeilRecipeInstanceV1 {
+  return instance?.recipeRef.id === 'petal-veil-french' && Boolean(instance.petalVeil);
 }
 
 export function mergeMercuryParams(instance: RecipeInstanceV1, finger?: FingerCode): MercuryDewParams {

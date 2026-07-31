@@ -1,5 +1,5 @@
 /**
- * 十指预览 SVG → PNG 导出（Studio-PRD §12.4 右栏 [导出预览 PNG]）
+ * renderer-agnostic 预览导出。
  *
  * 原型期 PNG 为唯一导出形态（§9 红线），也是线下确认的展示载体。
  * 渲染器 svg 通过 registerPreviewSvg 注册；导出时序列化内联 SVG（皮肤色 token
@@ -7,6 +7,19 @@
  */
 
 let currentSvg: SVGSVGElement | null = null;
+let currentExporter: PreviewExporter | null = null;
+
+export interface PreviewExporter {
+  rendererId: string;
+  isReady(): boolean;
+  renderPng(scale?: number): Promise<Blob>;
+  renderThumbnail(): Promise<Blob>;
+}
+
+/** HQ 渲染器挂载时注册；SVG 模板继续使用兼容适配器。 */
+export function registerPreviewExporter(exporter: PreviewExporter | null): void {
+  currentExporter = exporter;
+}
 
 /** 渲染器挂载时注册当前预览 svg（卸载/切换时更新） */
 export function registerPreviewSvg(el: SVGSVGElement | null): void {
@@ -16,6 +29,10 @@ export function registerPreviewSvg(el: SVGSVGElement | null): void {
 /** 当前是否有可导出的预览 */
 export function hasPreviewSvg(): boolean {
   return currentSvg !== null;
+}
+
+export function hasPreview(): boolean {
+  return Boolean(currentExporter?.isReady() || currentSvg);
 }
 
 /** 序列化预览 svg（展开 CSS 变量回退值，保证离屏栅格化一致） */
@@ -67,6 +84,7 @@ async function rasterizePreview(
 
 /** 预览 svg → PNG Blob（scale=2 高清导出，顾客确认展示载体） */
 export async function renderPreviewPng(scale = 2): Promise<Blob> {
+  if (currentExporter?.isReady()) return currentExporter.renderPng(scale);
   return rasterizePreview(serializePreview(), 1200 * scale, 900 * scale, 'image/png');
 }
 
@@ -77,7 +95,9 @@ export async function renderPreviewPng(scale = 2): Promise<Blob> {
  */
 export async function renderThumbnailDataUrl(): Promise<string | undefined> {
   try {
-    const blob = await rasterizePreview(serializePreview(), 320, 240, 'image/jpeg', 0.72);
+    const blob = currentExporter?.isReady()
+      ? await currentExporter.renderThumbnail()
+      : await rasterizePreview(serializePreview(), 320, 240, 'image/jpeg', 0.72);
     return await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);

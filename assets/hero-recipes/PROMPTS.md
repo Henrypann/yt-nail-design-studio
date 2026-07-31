@@ -72,3 +72,42 @@ quiet luxury rather than childish kawaii.
 No giant bows, dangling jewelry, hands, text, logo or watermark.
 ```
 
+## Petal Veil French P0｜16:9 cover
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten separate Almond Medium press-on nails,
+arranged as two clean rows of five with every nail fully visible.
+Use a translucent warm milky nude base, a soft warm-white micro French smile line,
+and exactly one five-petal low-relief flower on the right-hand ring-finger nail only.
+Warm ivory studio surface, softbox reflections, contact shadows, restrained bridal quiet luxury.
+No hands, text, logo, watermark, pearls, gold lines, multiple flowers or extra decorations.
+```
+
+## Petal Veil French P0｜16:9 editorial
+
+```text
+Photorealistic editorial beauty still life of exactly ten coordinated Almond Medium press-on nails,
+milky translucent nude with refined warm-white micro French tips.
+Only one accent nail has a single sculpted five-petal flower with a tiny warm center.
+Two elegant arcs on a warm neutral studio set, raking softbox light reveals clearcoat and low relief.
+No hands, packaging, text, logo, pearls, metallic lines or additional flowers.
+```
+
+## Petal Veil French P0｜4:5 editorial
+
+```text
+Vertical 4:5 luxury product photograph of exactly ten separate Almond Medium press-on nails,
+five on the top row and five on the bottom row.
+Sheer milky nude base, warm-white micro French, one and only one five-petal low-relief flower accent.
+All nails separated and fully visible, refined bridal quiet luxury, soft contact shadows.
+No hands, text, logo, watermark, pearls, gold lines or multiple flowers.
+```
+
+## Petal Veil French P0｜material progression
+
+```text
+Square photorealistic macro material progression using separate Almond nail tips:
+milky translucent nude base, then soft micro French, then the finished nail with one five-petal low-relief flower.
+Warm neutral background and raking studio light showing clearcoat, translucency, petal thickness and contact shadow.
+No hands, text, logo, pearls, metallic lines or extra flowers.
+```

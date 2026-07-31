@@ -1,0 +1,45 @@
+{
+  "asset_pack_id": "petal_veil_french_p0_v1",
+  "recipe_id": "petal-veil-french",
+  "version": "1.0.0",
+  "generated_at": "2026-07-31",
+  "generator": "openai-built-in-imagegen",
+  "asset_status": "CONCEPT",
+  "canonical_renderer_output": false,
+  "visual_signoff": "pending",
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "petal-veil-cover-16x9-v1",
+      "kind": "cover",
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "7e40449417f0aeadb8397476dc1abc5c7b98271d15674a2c38858261a640abcb"
+    },
+    {
+      "asset_id": "petal-veil-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "9a0d0fad068dbd354eaf32d79926d8dba034c7dfa357bc62e847093b2b259050"
+    },
+    {
+      "asset_id": "petal-veil-editorial-4x5-v1",
+      "kind": "editorial-cover",
+      "path": "editorial-cover-4x5-v1.png",
+      "width": 1122,
+      "height": 1402,
+      "sha256": "6ee8ba70df1a501276f279de1d21b1d5b94007502231eee9ff967741f0e65767"
+    },
+    {
+      "asset_id": "petal-veil-material-progression-v1",
+      "kind": "material-reference",
+      "path": "material-progression-1x1-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "3eca52e07c268f175423f1c68ddc7f4e3e135e2b24f4c87b757cdd679a1c5741"
+    }
+  ]
+}

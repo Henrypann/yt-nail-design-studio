@@ -1,14 +1,21 @@
 import definitionJson from '../../../../material-library/recipes/mercury-dew/recipe.json' with { type: 'json' };
+import petalDefinitionJson from '../../../../material-library/recipes/petal-veil-french/recipe.json' with { type: 'json' };
 import indexJson from '../../../../material-library/recipes/index.json' with { type: 'json' };
 import type { RecipeDefinitionV1, RecipeInstanceV1 } from './recipe-model';
 
 export const MERCURY_DEW_DEFINITION = definitionJson as RecipeDefinitionV1;
+export const PETAL_VEIL_DEFINITION = petalDefinitionJson as RecipeDefinitionV1;
 export const RECIPE_REGISTRY = indexJson as { version: string; recipes: Array<{ id: string; version: string; definition: string; lifecycle: string; manufacturing_command_allowed: false }> };
 
 export function getRecipeDefinition(id: string, version?: string): RecipeDefinitionV1 | null {
-  if (id !== MERCURY_DEW_DEFINITION.identity.id) return null;
-  if (version && version !== MERCURY_DEW_DEFINITION.version) return null;
-  return MERCURY_DEW_DEFINITION;
+  const definition =
+    id === MERCURY_DEW_DEFINITION.identity.id
+      ? MERCURY_DEW_DEFINITION
+      : id === PETAL_VEIL_DEFINITION.identity.id
+        ? PETAL_VEIL_DEFINITION
+        : null;
+  if (!definition || (version && version !== definition.version)) return null;
+  return definition;
 }
 
 export function assertRecipeReference(instance: RecipeInstanceV1): void {

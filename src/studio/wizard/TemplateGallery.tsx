@@ -24,6 +24,7 @@ import {
   type TemplateEntry,
 } from '@/studio/preview/material-library';
 import { useWizardStore } from './wizard-store';
+import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -76,10 +77,13 @@ export function TemplateGallery() {
 
   const visible = useMemo(() => {
     if (!index) return [];
+    const enabledTemplates = PETAL_VEIL_P0_ENABLED
+      ? index.templates
+      : index.templates.filter((template) => template.id !== 't_petal_veil_french');
     const filtered =
       tagFilter === 'all'
-        ? index.templates
-        : index.templates.filter((t) => t.style_tags.includes(tagFilter));
+        ? enabledTemplates
+        : enabledTemplates.filter((t) => t.style_tags.includes(tagFilter));
     return appliedShape
       ? sortTemplatesForShape(filtered, appliedShape)
       : [...filtered].sort((a, b) => a.sort_order - b.sort_order);
@@ -139,9 +143,9 @@ export function TemplateGallery() {
                 onApply={() => {
                   applyTemplate(t);
                   if (t.asset_status === 'CONCEPT') {
-                    toast.warning(
-                      `已应用「${t.name}」近似基础层：猫眼底层已支持；金属浮雕与水滴待实现。`,
-                    );
+                    toast.warning(t.id === 't_petal_veil_french'
+                      ? '已应用 Petal Veil HQ 候选。Canonical Fixture 尚待人工视觉签收，制造状态未验证。'
+                      : `已应用「${t.name}」概念基础层。`);
                   }
                 }}
               />
@@ -200,9 +204,9 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
             推荐
           </span>
         )}
-        {template.asset_status === 'CONCEPT' && (
+        {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
           <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
-            高保真概念
+            {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
           </span>
         )}
       </div>
@@ -259,8 +263,8 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
           >
             {template.asset_status === 'CONCEPT'
               ? selected
-                ? '已应用近似基础层'
-                : '应用近似基础层'
+                ? template.id === 't_petal_veil_french' ? '已应用 HQ 候选' : '已应用概念基础层'
+                : template.id === 't_petal_veil_french' ? '应用 HQ 候选' : '应用概念基础层'
               : selected
                 ? '已应用 · 再次应用'
                 : '应用此模板'}
