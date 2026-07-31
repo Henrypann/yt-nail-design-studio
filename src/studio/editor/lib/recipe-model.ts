@@ -25,6 +25,7 @@ export interface RecipeInstanceV1 {
   presetId: RecipePresetId;
   params: MercuryDewParams;
   fingerOverrides: Partial<Record<FingerCode, MercuryFingerOverride>>;
+  enabled?: boolean;
 }
 
 export interface RecipeDefinitionV1 {
@@ -83,4 +84,9 @@ export function createMercuryInstance(presetId: RecipePresetId = 'signature', ba
 export function mergeMercuryParams(instance: RecipeInstanceV1, finger?: FingerCode): MercuryDewParams {
   const override = finger ? instance.fingerOverrides[finger]?.params : undefined;
   return { ...instance.params, ...(override ?? {}) };
+}
+
+export function isMercuryEnabled(instance: RecipeInstanceV1, finger?: FingerCode): boolean {
+  if (instance.enabled === false) return false;
+  return finger ? instance.fingerOverrides[finger]?.enabled !== false : true;
 }

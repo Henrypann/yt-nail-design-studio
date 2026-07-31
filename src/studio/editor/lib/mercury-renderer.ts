@@ -1,7 +1,7 @@
 import type { FingerCode, NailLength, NailShape } from '@/lib/types';
 import { createNailSurfaceMapper } from './surface-mapper';
 import type { MercuryDewParams, RecipeInstanceV1 } from './recipe-model';
-import { mergeMercuryParams } from './recipe-model';
+import { isMercuryEnabled, mergeMercuryParams } from './recipe-model';
 
 export interface FingerRenderModel {
   recipeRef: RecipeInstanceV1['recipeRef'];
@@ -56,6 +56,9 @@ export function renderClearDroplet(params: MercuryDewParams, shape: NailShape, l
 
 export function compileRecipeToFingerRenderModel(recipe: RecipeInstanceV1, context: { shape: NailShape; length: NailLength; finger: FingerCode }): FingerRenderModel {
   const params = mergeMercuryParams(recipe, context.finger);
+  if (!isMercuryEnabled(recipe, context.finger)) {
+    return { recipeRef: recipe.recipeRef, shape: context.shape, length: context.length, finger: context.finger, components: { magneticBeam: false, chromeRibbon: false, clearDroplets: 0 }, warnings: [], svg: '' };
+  }
   const beam = renderMagneticBeam(params, context.shape, context.length, `m-${context.finger}`);
   const ribbon = renderChromeRibbon(params, context.shape, context.length, `m-${context.finger}`);
   const drops = renderClearDroplet(params, context.shape, context.length, `m-${context.finger}`);
