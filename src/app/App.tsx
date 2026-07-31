@@ -17,6 +17,7 @@ import MobileBindPage from './pages/devices/MobileBindPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
+import PetalVeilFixturePage from '@/studio/petal-veil/PetalVeilFixturePage';
 
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
@@ -24,6 +25,7 @@ const DevDebugPanel = import.meta.env.DEV
 
 /** 应用根：路由（PRD §1.4 全 13 条）+ 全局 Toast + 调试面板（仅 DEV，v1.5.1） */
 export function App() {
+  const internalFixture = window.location.pathname === '/internal/petal-veil-fixture';
   return (
     <LocaleProvider>
       <ToastProvider>
@@ -34,6 +36,7 @@ export function App() {
           <Route path={Routes.register} element={<RegisterPage />} />
           {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
           <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
+          <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
           {/* 登录后（侧栏 + 顶栏布局） */}
           <Route element={<AppLayout />}>
             <Route path={Routes.dashboard} element={<DashboardPage />} />
@@ -49,7 +52,7 @@ export function App() {
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </RouterRoutes>
-        {DevDebugPanel && (
+        {DevDebugPanel && !internalFixture && (
           <Suspense fallback={null}>
             <DevDebugPanel />
           </Suspense>

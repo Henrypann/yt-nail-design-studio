@@ -310,6 +310,13 @@ export function LayerPanel() {
 
   return (
     <div className="flex flex-col gap-3" data-testid="layer-panel" data-debug-id="studio.editor.layers">
+      {doc.recipe?.recipeRef.id === 'mercury-dew' && (
+        <section className="rounded-panel border border-[#D7B36A]/40 bg-[#FFFCF5] p-3" data-testid="recipe-layer-group">
+          <header className="mb-2 flex items-center justify-between"><h3 className="text-xs font-semibold text-gray-800">Mercury Dew Recipe</h3><span className="text-[10px] text-gray-400">虚拟图层 · 真源</span></header>
+          <div className="flex flex-col gap-1 text-[11px] text-gray-600"><span>① Jelly Base</span><span>② Cat-eye Appearance</span><span>③ Chrome Ribbon Relief</span><span>④ Droplets Accent</span></div>
+          <p className="mt-2 text-[10px] leading-relaxed text-gray-400">Recipe 参数由设计面板编辑；此处展示组件顺序，不重复持久化派生图层。</p>
+        </section>
+      )}
       {/* ① 底色层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">

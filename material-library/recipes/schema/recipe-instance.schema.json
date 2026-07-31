@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nextgen://recipes/recipe-instance.schema.json",
+  "oneOf": [
+    { "$ref": "#/$defs/mercury" },
+    { "$ref": "#/$defs/petalVeil" }
+  ],
+  "$defs": {
+    "compatParams": {
+      "type": "object",
+      "required": ["baseColor", "baseCoverage", "opticalEffect", "topFinish", "catEyeAngleDeg", "beamWidth", "beamIntensity", "ribbonMaterial", "ribbonWidthMm", "ribbonHeightMm", "ribbonAnchors", "dropletDensity", "dropletSizeMm", "droplets"],
+      "properties": {
+        "baseColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "baseCoverage": { "enum": ["opaque", "translucent"] },
+        "opticalEffect": { "const": "cat-eye" },
+        "topFinish": { "const": "gloss" },
+        "catEyeAngleDeg": { "type": "number", "minimum": -90, "maximum": 90 },
+        "beamWidth": { "enum": ["narrow", "standard", "wide"] },
+        "beamIntensity": { "enum": ["soft", "standard", "strong"] },
+        "ribbonMaterial": { "enum": ["silver", "champagne"] },
+        "ribbonWidthMm": { "enum": [0.35, 0.5, 0.7] },
+        "ribbonHeightMm": { "enum": [0.12, 0.18, 0.24] },
+        "ribbonAnchors": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "nextgen://recipes/uv.schema.json" } },
+        "dropletDensity": { "enum": ["off", "subtle", "standard"] },
+        "dropletSizeMm": { "enum": [0.8, 1.2, 1.8] },
+        "droplets": { "type": "array", "maxItems": 6 }
+      }
+    },
+    "common": {
+      "type": "object",
+      "required": ["recipeRef", "presetId", "params", "fingerOverrides"],
+      "properties": {
+        "presetId": { "enum": ["subtle", "signature", "statement"] },
+        "params": { "$ref": "#/$defs/compatParams" },
+        "fingerOverrides": { "type": "object" }
+      }
+    },
+    "mercury": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "properties": {
+            "recipeRef": {
+              "type": "object",
+              "required": ["id", "version"],
+              "properties": {
+                "id": { "const": "mercury-dew" },
+                "version": { "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "petalVeil": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "required": ["petalVeil"],
+          "properties": {
+            "recipeRef": {
+              "type": "object",
+              "required": ["id", "version"],
+              "properties": {
+                "id": { "const": "petal-veil-french" },
+                "version": { "const": "1.0.0" }
+              }
+            },
+            "petalVeil": {
+              "type": "object",
+              "required": ["rendererId", "renderStatus", "editingPolicy", "base", "french", "flower"],
+              "properties": {
+                "rendererId": { "const": "three-pbr/petal-veil-1" },
+                "renderStatus": { "const": "candidate" },
+                "editingPolicy": { "const": "locked-signature" },
+                "base": {
+                  "type": "object",
+                  "required": ["color", "opacity"],
+                  "properties": {
+                    "color": { "const": "#F2E4DA" },
+                    "opacity": { "const": 0.92 }
+                  }
+                },
+                "french": {
+                  "type": "object",
+                  "required": ["color", "opacity", "anchors"],
+                  "properties": {
+                    "color": { "const": "#FBF7F2" },
+                    "opacity": { "const": 0.75 },
+                    "anchors": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "nextgen://recipes/uv.schema.json" } }
+                  }
+                },
+                "flower": {
+                  "type": "object",
+                  "required": ["finger", "uv", "petals", "scale", "rotationDeg", "heightMm"],
+                  "properties": {
+                    "finger": { "const": "R4" },
+                    "uv": { "$ref": "nextgen://recipes/uv.schema.json" },
+                    "petals": { "const": 5 },
+                    "scale": { "const": 0.18 },
+                    "rotationDeg": { "const": 18 },
+                    "heightMm": { "const": 0.18 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

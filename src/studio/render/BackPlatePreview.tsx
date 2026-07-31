@@ -10,12 +10,13 @@
  */
 
 import type { RefObject } from 'react';
-import type { FingerCode, FingerOverrides, Finish } from '@/lib/types';
+import type { FingerCode, FingerOverrides, Finish, NailLength, NailShape } from '@/lib/types';
 import type { NailSlotV2 } from '@/studio/slots';
 import { formatSvgMatrix, uvToStage } from '@/studio/slots';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
 import { FingerNailContent } from './FingerNailContent';
 import { contentUvTransform, pxPerDesignUnit, type BackPlateV2 } from './slots-v2';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 export interface BackPlatePreviewProps {
   plate: BackPlateV2;
@@ -29,11 +30,14 @@ export interface BackPlatePreviewProps {
    */
   fitContainer?: boolean;
   silhouetteD: string;
+  shape: NailShape;
+  length: NailLength;
   widthMm: number;
   lengthMm: number;
   baseColor: string;
   /** 封层质感（高光带/弧面强度） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   patternMarkup: string | null;
   patternK: number;
@@ -56,10 +60,13 @@ export function BackPlatePreview({
   viewBox,
   fitContainer = false,
   silhouetteD,
+  shape,
+  length,
   widthMm,
   lengthMm,
   baseColor,
   finish = 'gloss',
+  recipe,
   fingerOverrides,
   patternMarkup,
   patternK,
@@ -123,6 +130,9 @@ export function BackPlatePreview({
                   clipId={`nailclip-${rawId}-${fc}`}
                   baseColor={color}
                   finish={finish}
+                  recipe={recipe}
+                  shape={shape}
+                  length={length}
                   failed={failed}
                   selected={selectedFinger === fc}
                   patternMarkup={patternMarkup}

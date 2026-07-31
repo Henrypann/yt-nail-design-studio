@@ -18,6 +18,7 @@ import { registerPreviewSvg } from './export-png';
 import { useNailDesignAssets } from './use-nail-design-assets';
 import { BackPlatePreview, slotsForLength } from '@/studio/render';
 import type { NailLengthMm, NailSlotV2 } from '@/studio/slots';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 /** 十指中文标签（UI 展示用） */
 export const FINGER_LABEL: Record<FingerCode, string> = {
@@ -57,6 +58,7 @@ export interface TenFingerPreviewProps {
   baseColor: string;
   /** 封层质感（gloss/matte/pearl，驱动高保真甲面效果层） */
   finish?: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   selectedFinger?: FingerCode | null;
   onFingerClick?: (finger: FingerCode) => void;
@@ -81,6 +83,7 @@ export function TenFingerPreview({
   templateId,
   baseColor,
   finish = 'gloss',
+  recipe,
   fingerOverrides,
   selectedFinger = null,
   onFingerClick,
@@ -168,6 +171,9 @@ export function TenFingerPreview({
                   lengthMm={lengthMm}
                   baseColor={baseColor}
                   finish={finish}
+                  recipe={recipe}
+                  shape={shape}
+                  length={length}
                   fingerOverrides={fingerOverrides}
                   patternMarkup={patternMarkup}
                   patternK={patternK}

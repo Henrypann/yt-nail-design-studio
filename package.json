@@ -15,6 +15,14 @@
     "test:render-brush": "node tools/test-handdraw.mjs",
     "requirements:audit": "node --experimental-strip-types tools/audit-page-requirements.mjs",
     "requirements:refresh": "node --experimental-strip-types tools/audit-page-requirements.mjs --refresh",
+    "validate-recipes": "node tools/validate-recipes.mjs",
+    "test:recipe-schema": "node --experimental-strip-types src/studio/editor/lib/recipe-schema.selftest.ts",
+    "test:recipe-migrate": "node --experimental-strip-types src/studio/editor/lib/recipe-migrate.selftest.ts",
+    "test:surface-mapper": "node --experimental-strip-types src/studio/editor/lib/surface-mapper.selftest.ts",
+    "test:mercury-fixtures": "node tools/validate-mercury-fixtures.mjs",
+    "test:petal-veil": "node tools/validate-petal-veil.mjs",
+    "test:recipe-output": "node --experimental-strip-types src/studio/editor/lib/recipe-output.selftest.ts",
+    "test:taxonomy-enums": "node --experimental-strip-types src/studio/editor/lib/taxonomy-enums.selftest.ts",
     "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
   },
   "dependencies": {
@@ -23,12 +31,14 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
+    "three": "^0.185.1",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "playwright": "^1.61.1",

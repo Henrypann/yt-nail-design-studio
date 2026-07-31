@@ -1,0 +1,41 @@
+{
+  "asset_pack_id": "hero_mercury_dew_v1",
+  "recipe_id": "hero_mercury_dew",
+  "version": 1,
+  "generated_at": "2026-07-31",
+  "generator": "openai-built-in-imagegen",
+  "maturity": "concept-approved",
+  "customer_visible": true,
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "mercury-dew-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "39216296e7bfbf6685536a5bad855e3d58f39290aeeb67397fbe655f394a7617"
+    },
+    {
+      "asset_id": "mercury-dew-editorial-4x5-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "presentation-direction"],
+      "path": "editorial-cover-4x5-v1.png",
+      "width": 1122,
+      "height": 1402,
+      "sha256": "9a02592d71f16bb94b6107209e35ab5789d43907d9004970279f7455402f0051"
+    },
+    {
+      "asset_id": "mercury-dew-material-progression-v1",
+      "kind": "material-reference",
+      "intent": ["internal-spec", "visual-qa"],
+      "path": "material-progression-1x1-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "46460963cace8d21756b12442edf3911f3b93748b8272c31466f175ffb0e710c"
+    }
+  ]
+}
+

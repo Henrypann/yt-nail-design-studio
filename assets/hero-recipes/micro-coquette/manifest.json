@@ -1,0 +1,22 @@
+{
+  "asset_pack_id": "hero_micro_coquette_v1",
+  "recipe_id": "hero_micro_coquette",
+  "version": 1,
+  "generated_at": "2026-07-31",
+  "generator": "openai-built-in-imagegen",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "micro-coquette-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "c04a6b268586910309f9b5a317902177fde6911dc52924cf369b4de5a22dc50e"
+    }
+  ]
+}
+

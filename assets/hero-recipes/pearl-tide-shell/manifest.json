@@ -1,0 +1,22 @@
+{
+  "asset_pack_id": "hero_pearl_tide_shell_v1",
+  "recipe_id": "hero_pearl_tide_shell",
+  "version": 1,
+  "generated_at": "2026-07-31",
+  "generator": "openai-built-in-imagegen",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "pearl-tide-shell-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "e5b4eae89bcd9fa532254995a9092a17229b0bc0a08ab83e5e6c1770d1509b5c"
+    }
+  ]
+}
+

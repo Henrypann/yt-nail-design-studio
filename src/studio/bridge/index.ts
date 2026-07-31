@@ -98,7 +98,7 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
   }
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     designId: design.id,
     customerId: design.customerId,
     shape: design.shape,
@@ -109,6 +109,8 @@ export function wizardToEditorDoc(design: DesignSummary): EditorDoc {
     baseColor: design.baseColor,
     pattern: sharedPattern,
     attachments: [],
+    recipe: design.recipe,
+    relief: [],
     fingerLocks,
     masterFinger: 'R4',
     updatedAt: new Date().toISOString(),

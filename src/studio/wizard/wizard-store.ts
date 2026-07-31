@@ -35,6 +35,14 @@ import {
 } from '@/studio/preview/material-library';
 import { renderThumbnailDataUrl } from '@/studio/preview/export-png';
 import { persistDesign } from './design-repository';
+import {
+  createMercuryInstance,
+  createPetalVeilInstance,
+  isPetalVeilRecipe,
+  type RecipeInstanceV1,
+} from '@/studio/editor/lib/recipe-model';
+import { recipeDefinitionChecksum } from '@/studio/editor/lib/recipe-checksum';
+import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
 
@@ -113,6 +121,7 @@ interface WizardState {
   baseColor: string | null;
   finish: Finish;
   fingerOverrides: FingerOverrides;
+  recipe?: RecipeInstanceV1;
   selectedFinger: FingerCode | null;
   /* 持久化 */
   designId: string;
@@ -167,6 +176,8 @@ function confirmedByFromSession(): string {
 }
 
 const initialDesignId = (): string => `d_${crypto.randomUUID()}`;
+const rendererVersionFor = (recipe?: RecipeInstanceV1): string =>
+  isPetalVeilRecipe(recipe) ? 'three-pbr/petal-veil-1' : 'svg-2.5d/mercury-1';
 
 export const useWizardStore = create<WizardState>((set, get) => {
   /** 由当前状态组装 DesignSummary（缩略图 best-effort，不阻断保存） */
@@ -189,6 +200,22 @@ export const useWizardStore = create<WizardState>((set, get) => {
       source: 'wizard',
       version: s.version,
       thumbnailDataUrl,
+      recipe: s.recipe,
+      outputPolicy: s.recipe
+        ? {
+            label: isPetalVeilRecipe(s.recipe)
+              ? '高保真候选 · 待视觉签收 · 制造未验证'
+              : '模拟效果 · 尚未完成生产验证',
+            rendererVersion: rendererVersionFor(s.recipe),
+          }
+        : undefined,
+      confirmationSnapshot: s.confirmation && s.recipe
+        ? {
+            recipeRef: s.recipe.recipeRef,
+            definitionChecksum: recipeDefinitionChecksum(s.recipe.recipeRef.id),
+            rendererVersion: rendererVersionFor(s.recipe),
+          }
+        : undefined,
       createdAt: s.createdAt,
       updatedAt: new Date().toISOString(),
     };
@@ -287,6 +314,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     baseColor: null,
     finish: 'gloss',
     fingerOverrides: {},
+    recipe: undefined,
     selectedFinger: null,
     designId: initialDesignId(),
     createdAt: new Date().toISOString(),
@@ -336,29 +364,42 @@ export const useWizardStore = create<WizardState>((set, get) => {
 
     applyTemplate: (t) => {
       if (get().status !== 'draft') return;
+      const petalP0 = PETAL_VEIL_P0_ENABLED && t.id === 't_petal_veil_french';
       set({
-        templateId: t.id,
+        templateId: petalP0 ? t.id : (t.render_template_id ?? t.id),
         templateName: t.name,
-        baseColor: t.default_base_color,
-        finish: t.default_finish,
+        baseColor: petalP0 ? '#F2E4DA' : t.default_base_color,
+        finish: petalP0 ? 'gloss' : t.default_finish,
+        shape: petalP0 ? 'almond' : get().shape,
+        length: petalP0 ? 'medium' : get().length,
+        appliedShape: petalP0 ? 'almond' : get().appliedShape,
+        appliedLength: petalP0 ? 'medium' : get().appliedLength,
+        selectedFinger: petalP0 ? 'R4' : get().selectedFinger,
+        fingerOverrides: petalP0 ? {} : get().fingerOverrides,
+        viewMode: petalP0 ? 'tiled' : get().viewMode,
+        recipe: petalP0
+          ? createPetalVeilInstance()
+          : t.name.includes('Mercury Dew') || t.id === 't_mercury_dew_concept'
+            ? createMercuryInstance('signature', t.default_base_color)
+            : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存
     },
 
     setBaseColor: (hex) => {
-      if (get().status !== 'draft') return;
+      if (get().status !== 'draft' || isPetalVeilRecipe(get().recipe)) return;
       set({ baseColor: hex });
       markDirty(3000); // 改底色后 3s 防抖自动保存
     },
 
     setFinish: (finish) => {
-      if (get().status !== 'draft') return;
+      if (get().status !== 'draft' || isPetalVeilRecipe(get().recipe)) return;
       set({ finish });
       markDirty(2000);
     },
 
     setFingerOverride: (fc, patch) => {
-      if (get().status !== 'draft') return;
+      if (get().status !== 'draft' || isPetalVeilRecipe(get().recipe)) return;
       const prev = get().fingerOverrides;
       const merged: FingerOverride = { ...prev[fc], ...patch };
       const next: FingerOverrides = { ...prev, [fc]: merged };
@@ -370,7 +411,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     },
 
     clearFingerOverride: (fc) => {
-      if (get().status !== 'draft') return;
+      if (get().status !== 'draft' || isPetalVeilRecipe(get().recipe)) return;
       const next = { ...get().fingerOverrides };
       delete next[fc];
       set({ fingerOverrides: next });
@@ -387,8 +428,16 @@ export const useWizardStore = create<WizardState>((set, get) => {
       if (!summary) return false;
       try {
         const confirmed = confirmDesign(summary, confirmedByFromSession());
+        const frozen = confirmed.recipe
+          ? {
+              recipeRef: confirmed.recipe.recipeRef,
+              definitionChecksum: recipeDefinitionChecksum(confirmed.recipe.recipeRef.id),
+              rendererVersion: rendererVersionFor(confirmed.recipe),
+            }
+          : undefined;
+        const frozenDesign = frozen ? { ...confirmed, confirmationSnapshot: frozen } : confirmed;
         const simulateFailure = isScenarioOn(useMockScenarios.getState().flags, 'save.fail');
-        await persistDesign(confirmed, { simulateFailure });
+        await persistDesign(frozenDesign, { simulateFailure });
         set({ status: 'confirmed', confirmation: confirmed.confirmation, saveState: 'saved' });
         notifier?.success('已标记「顾客已确认」，设计已冻结。');
         return true;

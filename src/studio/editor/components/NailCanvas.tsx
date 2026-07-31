@@ -17,6 +17,8 @@ import {
   type ClassicFrenchHandle,
 } from '../lib/french-edge';
 import { getSilhouette } from '../lib/material';
+import { mergeMercuryParams } from '../lib/recipe-model';
+import { createNailSurfaceMapper } from '../lib/surface-mapper';
 import { nailContentSvg } from '../lib/render';
 import {
   genId,
@@ -38,6 +40,7 @@ interface FrenchDrag {
   handle: ClassicFrenchHandle;
   controls: ClassicFrenchControls;
 }
+interface MercuryDrag { index: 0 | 1 | 2; anchors: [{ u: number; v: number }, { u: number; v: number }, { u: number; v: number }]; }
 
 export function NailCanvas() {
   const { text } = useLocale();
@@ -66,6 +69,8 @@ export function NailCanvas() {
   const [liveEraser, setLiveEraser] = useState<EraserElement | null>(null);
   const [liveFrenchDrag, setLiveFrenchDrag] = useState<FrenchDrag | null>(null);
   const liveFrenchDragRef = useRef<FrenchDrag | null>(null);
+  const [liveMercuryDrag, setLiveMercuryDrag] = useState<MercuryDrag | null>(null);
+  const liveMercuryDragRef = useRef<MercuryDrag | null>(null);
   const drawing = useRef(false);
 
   const sil = doc ? getSilhouette(doc.shape, doc.length) : null;
@@ -137,6 +142,9 @@ export function NailCanvas() {
             ),
           }
         : fingerData;
+    const recipeForRender = doc.recipe && liveMercuryDrag
+      ? { ...doc.recipe, params: { ...mergeMercuryParams(doc.recipe, currentFinger), ribbonAnchors: liveMercuryDrag.anchors } }
+      : doc.recipe;
     const nailSvg = nailContentSvg(
       {
         shape: doc.shape,
@@ -146,10 +154,20 @@ export function NailCanvas() {
         liveStroke,
         liveEraser,
         appearance: doc.appearance,
+        recipe: recipeForRender,
+        finger: currentFinger,
       },
       sil,
     );
-    if (!selectedClassic || readOnly) return nailSvg;
+    const mercuryHandles = recipeForRender && !readOnly
+      ? (() => {
+          const mapper = createNailSurfaceMapper(doc.shape, doc.length);
+          const anchors = mergeMercuryParams(recipeForRender, currentFinger).ribbonAnchors;
+          if (!mapper) return '';
+          return `<g data-testid="mercury-ribbon-handles">${anchors.map((uv, index) => { const p = mapper.point(uv); return `<g data-mercury-handle="${index}" style="cursor:move"><circle cx="${p.x}" cy="${p.y}" r="11" fill="transparent"/><circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#D7A94F" stroke="#FFFFFF" stroke-width="2" pointer-events="none"/></g>`; }).join('')}</g>`;
+        })()
+      : '';
+    if (!selectedClassic || readOnly) return `${nailSvg}${mercuryHandles}`;
 
     const controls =
       liveFrenchDrag?.id === selectedClassic.id
@@ -173,7 +191,7 @@ export function NailCanvas() {
           `</g>`,
       )
       .join('');
-    return `${nailSvg}<g data-testid="classic-french-handles">${handleSvg}</g>`;
+    return `${nailSvg}${mercuryHandles}<g data-testid="classic-french-handles">${handleSvg}</g>`;
   }, [
     doc,
     sil,
@@ -183,6 +201,8 @@ export function NailCanvas() {
     liveFrenchDrag,
     selectedClassic,
     readOnly,
+    liveMercuryDrag,
+    currentFinger,
   ]);
 
   /* ── 空格平移 ───────────────────────────────────────── */
@@ -263,6 +283,17 @@ export function NailCanvas() {
       e.preventDefault();
       return;
     }
+    const mercuryNode = (e.target as Element).closest?.('[data-mercury-handle]') as SVGElement | null;
+    const mercuryIndex = mercuryNode?.dataset.mercuryHandle;
+    if (mercuryIndex !== undefined && doc?.recipe) {
+      const anchors = [...mergeMercuryParams(doc.recipe, currentFinger).ribbonAnchors] as MercuryDrag['anchors'];
+      const drag: MercuryDrag = { index: Number(mercuryIndex) as 0 | 1 | 2, anchors };
+      liveMercuryDragRef.current = drag;
+      setLiveMercuryDrag(drag);
+      e.currentTarget.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      return;
+    }
     const p = toSvgPoint(e.clientX, e.clientY);
     if (!p) return;
     drawing.current = true;
@@ -312,6 +343,18 @@ export function NailCanvas() {
       setLiveFrenchDrag(nextDrag);
       return;
     }
+    const mercuryDrag = liveMercuryDragRef.current;
+    if (mercuryDrag && sil && doc?.recipe) {
+      const p = toSvgPoint(e.clientX, e.clientY);
+      if (!p) return;
+      const [vx, vy, vw, vh] = sil.viewBox.split(/\s+/).map(Number);
+      const nextAnchors = [...mercuryDrag.anchors] as MercuryDrag['anchors'];
+      nextAnchors[mercuryDrag.index] = { u: Math.min(1, Math.max(0, (p.x - vx) / vw)), v: Math.min(1, Math.max(0, (p.y - vy) / vh)) };
+      const next = { ...mercuryDrag, anchors: nextAnchors };
+      liveMercuryDragRef.current = next;
+      setLiveMercuryDrag(next);
+      return;
+    }
     if (!drawing.current) return;
     const p = toSvgPoint(e.clientX, e.clientY);
     if (!p) return;
@@ -355,6 +398,13 @@ export function NailCanvas() {
         );
         if (element) element.classicControls = frenchDrag.controls;
       });
+      return;
+    }
+    const mercuryDrag = liveMercuryDragRef.current;
+    if (mercuryDrag) {
+      liveMercuryDragRef.current = null;
+      setLiveMercuryDrag(null);
+      useEditorStore.getState().updateMercuryRibbonAnchor(mercuryDrag.index, mercuryDrag.anchors[mercuryDrag.index]);
       return;
     }
     if (!drawing.current) return;

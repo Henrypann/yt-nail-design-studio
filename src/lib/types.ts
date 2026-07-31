@@ -20,13 +20,15 @@ export const FINGER_CODES: readonly FingerCode[] = [
 /** 产品甲型目录；由非几何能力注册表生成，轮廓参数仍只认 shape-params.json */
 export type { NailShape } from '@/generated/shape-types';
 import type { NailShape } from '@/generated/shape-types';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import type { DesignLengthPreset as TaxonomyDesignLengthPreset } from '@/studio/editor/lib/taxonomy-model';
 
 /** 四档长度 */
 export type NailLength = 'short' | 'medium' | 'long' | 'extra-long';
 
 /** 封层质感 */
 export type Finish = 'gloss' | 'matte' | 'pearl';
-export type DesignLengthPreset = 'natural' | 'short-extension' | 'medium' | 'long';
+export type DesignLengthPreset = TaxonomyDesignLengthPreset;
 export interface DesignSurface {
   baseCoverage: 'opaque' | 'translucent';
   opticalEffect: 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';
@@ -121,11 +123,14 @@ export interface DesignSummary {
   parentId?: string;
   version: number;
   thumbnailDataUrl?: string; // PNG 缩略图（原型期唯一导出形态）
+  recipe?: RecipeInstanceV1;
+  outputPolicy?: { label: string; rendererVersion: string };
+  confirmationSnapshot?: { recipeRef?: { id: string; version: string }; definitionChecksum: string; rendererVersion: string };
   createdAt: string;
   updatedAt: string;
 }
 
-/* ── ProjectV3（画布数据 envelope 载荷） ──────────────── */
+/* ── ProjectV3 / ProjectV4（画布数据 envelope 载荷） ──── */
 
 /** 五层底层结构（不重构；对用户呈现三层制造语义） */
 export type LayerType = 'base' | 'texture' | 'pattern' | 'decoration' | 'finish';
@@ -161,6 +166,15 @@ export interface ProjectV3 {
   /** Editor 逐指解锁（空 = 十指同步） */
   fingerLocks?: Partial<Record<FingerCode, boolean>>;
   updatedAt: string;
+}
+
+/** ProjectV4：Recipe 真源 + 手工 pattern + L2 relief 的工作副本。 */
+export interface ProjectV4 extends Omit<ProjectV3, 'schemaVersion' | 'layers'> {
+  schemaVersion: 4;
+  recipeRef?: { id: string; version: string };
+  recipe?: unknown;
+  relief: unknown[];
+  layers: ProjectLayer[];
 }
 
 /* ── DesignSet 契约层（v1.4.0 · DEV-PLAN §5.11 / 备忘录 §11） ─────────────

@@ -19,6 +19,11 @@ import { SingleNailView } from '@/studio/preview/SingleNailView';
 import { loadShapeParams } from '@/studio/preview/material-library';
 import { openBridge } from '@/studio/bridge';
 import { getEditorDoc } from '@/studio/editor';
+import { isPetalVeilRecipe } from '@/studio/editor/lib/recipe-model';
+import {
+  PetalVeilSinglePreview,
+  PetalVeilTiledPreview,
+} from '@/studio/petal-veil/PetalVeilPreview';
 import { useEffect, useState } from 'react';
 import { useWizardStore, type WizardViewMode } from './wizard-store';
 import { ShapeLengthPicker } from './ShapeLengthPicker';
@@ -26,6 +31,7 @@ import { TemplateGallery } from './TemplateGallery';
 import { ParamsPanel } from './ParamsPanel';
 import { FingerDetailPanel } from './FingerDetailPanel';
 import { PresentationMode } from './PresentationMode';
+import { PetalVeilPresentationMode } from './PetalVeilPresentationMode';
 
 const VIEW_TABS: { key: WizardViewMode; label: string }[] = [
   { key: 'ensemble', label: '整体搭配 · Back 手背' },
@@ -40,6 +46,8 @@ export function StepTwo() {
   const [shapeNames, setShapeNames] = useState<{ shape: string; length: string; mm: number } | null>(null);
   const [bridging, setBridging] = useState(false);
   const [presentOpen, setPresentOpen] = useState(false);
+  const petalP0 = isPetalVeilRecipe(s.recipe);
+  const viewTabs = petalP0 ? VIEW_TABS.filter((tab) => tab.key !== 'ensemble') : VIEW_TABS;
 
   /* 已桥接判定：EditorDoc 存在即该设计已转入自由画布（PRD §15 不可逆） */
   const bridged = getEditorDoc(s.designId) !== undefined;
@@ -56,6 +64,10 @@ export function StepTwo() {
       )
       .catch(() => undefined);
   }, [s.appliedShape, s.appliedLength]);
+
+  useEffect(() => {
+    if (petalP0 && s.viewMode === 'ensemble') s.setViewMode('tiled');
+  }, [petalP0, s.setViewMode, s.viewMode]);
 
   if (!s.appliedShape || !s.appliedLength) return null;
 
@@ -105,17 +117,27 @@ export function StepTwo() {
     templateId: s.templateId,
     baseColor: s.baseColor ?? '#F5E0D3',
     finish: s.finish,
+    recipe: s.recipe,
     fingerOverrides: s.fingerOverrides,
     readOnly,
   } as const;
 
-  const detailPanel = (
+  const detailPanel = petalP0 ? (
+    <div className="rounded-card border border-gray-200 bg-white p-4">
+      <p className="text-sm font-medium text-gray-900">R4 · Signature 重音指</p>
+      <p className="mt-1 text-xs leading-relaxed text-gray-500">
+        五瓣低浮雕花 · 0.18mm · UV 0.62 / 0.56。其余九指固定为奶雾微法式。
+      </p>
+      <p className="mt-3 text-[10px] text-warning">Canonical Fixture 待人工视觉签收 · 制造未验证</p>
+    </div>
+  ) : (
     <FingerDetailPanel
       shape={s.appliedShape}
       length={s.appliedLength}
       templateId={s.templateId}
       baseColor={s.baseColor ?? '#F5E0D3'}
       finish={s.finish}
+      recipe={s.recipe}
       fingerOverrides={s.fingerOverrides}
       selectedFinger={s.selectedFinger}
       onExpand={() => s.setViewMode('single')}
@@ -124,7 +146,12 @@ export function StepTwo() {
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="grid min-h-0 flex-1 grid-cols-[240px_minmax(0,1fr)_300px] gap-4">
+      <div className={cx(
+        'grid min-h-0 flex-1 gap-4',
+        petalP0
+          ? 'grid-cols-[180px_minmax(0,1fr)_260px]'
+          : 'grid-cols-[240px_minmax(0,1fr)_300px]',
+      )}>
         {/* 左：模板库（窄栏 · 风格标签 + 单列图文卡片） */}
         <aside data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 rounded-card border border-gray-200 bg-white p-3">
           <TemplateGallery />
@@ -184,7 +211,7 @@ export function StepTwo() {
               {/* 视图切换 tab（UI 瞬态，不写入设计文档） */}
               <div className="flex items-center justify-between">
                 <div className="flex rounded-button border border-gray-200 bg-white p-0.5" role="tablist">
-                  {VIEW_TABS.map((tab) => (
+                  {viewTabs.map((tab) => (
                     <button
                       key={tab.key}
                       role="tab"
@@ -229,7 +256,9 @@ export function StepTwo() {
                       ))}
                     </div>
                   )}
-                  <span className="hidden text-[10px] text-gray-400 xl:inline">NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节</span>
+                  <span className="hidden text-[10px] text-gray-400 xl:inline">
+                    {petalP0 ? 'Canonical Three.js PBR · 双击 R4 看单指细节' : 'NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节'}
+                  </span>
                   <span className="relative">
                     <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
                       <Presentation size={13} />
@@ -287,23 +316,44 @@ export function StepTwo() {
                   </div>
                 )}
                 {s.viewMode === 'tiled' && (
-                  <TiledNailsPreview
-                    {...previewProps}
-                    selectedFinger={s.selectedFinger}
-                    onFingerClick={(fc) => s.setSelectedFinger(fc)}
-                    onOpenSingle={(fc) => {
-                      s.setSelectedFinger(fc);
-                      s.setViewMode('single');
-                    }}
-                  />
+                  petalP0 && s.recipe ? (
+                    <PetalVeilTiledPreview
+                      recipe={s.recipe}
+                      selectedFinger={s.selectedFinger}
+                      onFingerClick={(fc) => s.setSelectedFinger(fc)}
+                      onOpenSingle={(fc) => {
+                        s.setSelectedFinger(fc);
+                        s.setViewMode('single');
+                      }}
+                    />
+                  ) : (
+                    <TiledNailsPreview
+                      {...previewProps}
+                      selectedFinger={s.selectedFinger}
+                      onFingerClick={(fc) => s.setSelectedFinger(fc)}
+                      onOpenSingle={(fc) => {
+                        s.setSelectedFinger(fc);
+                        s.setViewMode('single');
+                      }}
+                    />
+                  )
                 )}
                 {s.viewMode === 'single' && (
-                  <SingleNailView
-                    {...previewProps}
-                    finger={s.selectedFinger ?? 'R4'}
-                    onSelectFinger={s.setSelectedFinger}
-                    onExit={() => s.setViewMode('tiled')}
-                  />
+                  petalP0 && s.recipe ? (
+                    <PetalVeilSinglePreview
+                      recipe={s.recipe}
+                      finger={s.selectedFinger ?? 'R4'}
+                      registerExport
+                      onExit={() => s.setViewMode('tiled')}
+                    />
+                  ) : (
+                    <SingleNailView
+                      {...previewProps}
+                      finger={s.selectedFinger ?? 'R4'}
+                      onSelectFinger={s.setSelectedFinger}
+                      onExit={() => s.setViewMode('tiled')}
+                    />
+                  )
                 )}
               </div>
 
@@ -311,9 +361,11 @@ export function StepTwo() {
                 导出/缩略图专用：整幅 plate 的隐藏挂载实例（唯一 registerExport 源）。
                 与当前视图解耦——无论停在哪个视图，导出 PNG 与列表缩略图语义稳定。
               */}
-              <div className="pointer-events-none h-0 overflow-hidden" aria-hidden="true">
-                <TenFingerPreview {...previewProps} readOnly />
-              </div>
+              {!petalP0 && (
+                <div className="pointer-events-none h-0 overflow-hidden" aria-hidden="true">
+                  <TenFingerPreview {...previewProps} readOnly />
+                </div>
+              )}
             </>
           )}
         </section>
@@ -328,7 +380,7 @@ export function StepTwo() {
       </div>
 
       {/* 底部：桥接入口（PRD §15：首次转化 + 不可逆警告；已桥接续进画布） */}
-      <footer
+      {!petalP0 && <footer
         className="flex justify-center border-t border-gray-100 pt-3"
         data-debug-id="studio.wizard.bridge"
       >
@@ -347,24 +399,35 @@ export function StepTwo() {
         >
           {bridged ? '返回自由画布' : '打开自由画布'}
         </Button>
-      </footer>
+      </footer>}
 
       {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向 · 展示内可手动标记顾客已确认） */}
-      <PresentationMode
-        open={presentOpen}
-        onClose={() => setPresentOpen(false)}
-        shape={s.appliedShape}
-        length={s.appliedLength}
-        templateId={s.templateId}
-        templateName={s.templateName}
-        baseColor={s.baseColor ?? '#F5E0D3'}
-        finish={s.finish}
-        fingerOverrides={s.fingerOverrides}
-        status={s.status}
-        initialFinger={s.selectedFinger}
-        tipOrientation={s.tipOrientation}
-        onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
-      />
+      {petalP0 && s.recipe ? (
+        <PetalVeilPresentationMode
+          open={presentOpen}
+          onClose={() => setPresentOpen(false)}
+          recipe={s.recipe}
+          status={s.status}
+          onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
+        />
+      ) : (
+        <PresentationMode
+          open={presentOpen}
+          onClose={() => setPresentOpen(false)}
+          shape={s.appliedShape}
+          length={s.appliedLength}
+          templateId={s.templateId}
+          templateName={s.templateName}
+          baseColor={s.baseColor ?? '#F5E0D3'}
+          finish={s.finish}
+          recipe={s.recipe}
+          fingerOverrides={s.fingerOverrides}
+          status={s.status}
+          initialFinger={s.selectedFinger}
+          tipOrientation={s.tipOrientation}
+          onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
+        />
+      )}
     </div>
   );
 }

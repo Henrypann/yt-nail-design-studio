@@ -26,6 +26,14 @@ export interface TemplateEntry {
   id: string;
   name: string;
   name_en: string;
+  /** SIMULATED 仅表示 Canonical Renderer 已由人类视觉签收，不代表可制造。 */
+  asset_status?: 'REAL' | 'CONCEPT' | 'SIMULATED';
+  render_template_id?: string;
+  asset_spec_url?: string;
+  capability_summary?: {
+    supported: string[];
+    pending: string[];
+  };
   style_tags: string[];
   default_base_color: string;
   default_finish: Finish;

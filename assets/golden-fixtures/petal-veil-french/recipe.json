@@ -1,0 +1,19 @@
+{
+  "recipeRef": { "id": "petal-veil-french", "version": "1.0.0" },
+  "presetId": "signature",
+  "rendererId": "three-pbr/petal-veil-1",
+  "shape": "almond",
+  "length": "medium",
+  "base": { "color": "#F2E4DA", "opacity": 0.92 },
+  "french": { "color": "#FBF7F2", "opacity": 0.75 },
+  "reliefByFinger": {
+    "R4": {
+      "kind": "five-petal-flower",
+      "uv": [0.62, 0.56],
+      "petals": 5,
+      "scale": 0.18,
+      "rotationDeg": 18,
+      "heightMm": 0.18
+    }
+  }
+}

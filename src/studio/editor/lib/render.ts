@@ -20,6 +20,8 @@ import type {
   Transform,
 } from './model';
 import { resolveFingerData } from './model';
+import type { RecipeInstanceV1 } from './recipe-model';
+import { compileRecipeToFingerRenderModel } from './mercury-renderer';
 
 /** 每个 nail 实例的 clip id 前缀，防止同页多实例冲突 */
 function renameInternalIds(inner: string, uid: string): string {
@@ -111,6 +113,8 @@ export interface NailRenderInput {
   liveStroke?: BrushEl | null;
   liveEraser?: EraserEl | null;
   appearance?: SurfaceAppearance;
+  recipe?: RecipeInstanceV1;
+  finger?: FingerCode;
 }
 
 function parseViewBox(viewBox: string): [number, number, number, number] {
@@ -150,6 +154,9 @@ export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): str
   const baseOpacity = appearance.baseCoverage === 'translucent' ? 0.72 : 1;
   const glossOpacity = appearance.topFinish === 'matte' ? 0.03 : 0.34;
   const pearlOpacity = appearance.opticalEffect === 'pearl' ? 0.2 : 0;
+  const recipeModel = input.recipe?.recipeRef.id === 'mercury-dew'
+    ? compileRecipeToFingerRenderModel(input.recipe, { shape: input.shape, length: input.length, finger: input.finger ?? 'R4' })
+    : null;
 
   return `<defs>
     <clipPath id="clip-${uid}"><path d="${sil.pathD}"/></clipPath>
@@ -180,6 +187,7 @@ export function nailContentSvg(input: NailRenderInput, sil: SilhouetteInfo): str
     <rect x="-400" y="-600" width="800" height="900" fill="${input.data.baseColor}" opacity="${baseOpacity}"/>
     <g mask="url(#eraser-${uid})">${patternSvg}</g>
     ${attachments}
+    ${recipeModel ? `<g data-recipe="mercury-dew" data-renderer="svg-2.5d">${recipeModel.svg}</g>` : ''}
     <path d="${sil.pathD}" fill="url(#curve-${uid})" opacity="0.48" pointer-events="none"/>
     <path d="${sil.pathD}" fill="url(#gloss-${uid})" pointer-events="none"/>
     <path d="${sil.pathD}" fill="url(#pearl-${uid})" pointer-events="none"/>
@@ -238,7 +246,7 @@ export function composeTiledSvg(doc: EditorDoc, opts: TiledRenderOpts): string |
 
     const data = resolveFingerData(doc, finger);
     const content = nailContentSvg(
-      { shape: doc.shape, length: doc.length, data, uid: `t-${finger}`, appearance: doc.appearance },
+      { shape: doc.shape, length: doc.length, data, uid: `t-${finger}`, appearance: doc.appearance, recipe: doc.recipe, finger },
       sil,
     );
     const badge = opts.markBadges

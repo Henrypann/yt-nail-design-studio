@@ -8,6 +8,7 @@ import {
   type PatternElement,
   type SurfaceAppearance,
 } from './model.ts';
+import type { ReliefElement, RecipeInstanceV1 } from './recipe-model.ts';
 
 export type EditorDocMigrationResult =
   | { status: 'ok'; doc: EditorDoc; migrated: boolean }
@@ -151,7 +152,7 @@ function migrateKnown(raw: UnknownRecord, migrated: boolean): EditorDocMigration
     status: 'ok',
     migrated,
     doc: {
-      schemaVersion: 2,
+      schemaVersion: 3,
       designId: raw.designId,
       customerId: typeof raw.customerId === 'string' ? raw.customerId : undefined,
       shape: raw.shape as NailShape,
@@ -162,6 +163,8 @@ function migrateKnown(raw: UnknownRecord, migrated: boolean): EditorDocMigration
       baseColor: raw.baseColor,
       pattern,
       attachments,
+      recipe: undefined,
+      relief: [],
       fingerLocks,
       masterFinger: (typeof raw.masterFinger === 'string' ? raw.masterFinger : 'R4') as FingerCode,
       updatedAt: raw.updatedAt,
@@ -169,14 +172,26 @@ function migrateKnown(raw: UnknownRecord, migrated: boolean): EditorDocMigration
   };
 }
 
-/** 纯迁移：读取不写回；只有用户显式保存/复制时才持久化 v2。 */
+function normalizeV3(raw: UnknownRecord): EditorDocMigrationResult {
+  const result = migrateKnown(raw, false);
+  if (result.status !== 'ok') return result;
+  const recipe = raw.recipe && typeof raw.recipe === 'object' ? raw.recipe as RecipeInstanceV1 : undefined;
+  const relief = Array.isArray(raw.relief) ? raw.relief.filter((item): item is ReliefElement => {
+    const value = record(item);
+    return Boolean(value && typeof value.id === 'string' && typeof value.kind === 'string' && typeof value.heightMm === 'number');
+  }) : [];
+  return { status: 'ok', migrated: false, doc: { ...result.doc, recipe, relief } };
+}
+
+/** 纯迁移：读取不写回；只有用户显式保存/复制时才持久化 v3。 */
 export function migrateEditorDoc(value: unknown): EditorDocMigrationResult {
   if (value === undefined || value === null) return { status: 'missing' };
   const raw = record(value);
   if (!raw) return { status: 'invalid', reason: 'Editor 文档不是对象' };
   const version = Number(raw.schemaVersion);
   if (version === 1) return migrateKnown(raw, true);
-  if (version === 2) return migrateKnown(raw, false);
-  if (Number.isFinite(version) && version > 2) return { status: 'unsupported', version };
+  if (version === 2) return migrateKnown(raw, true);
+  if (version === 3) return normalizeV3(raw);
+  if (Number.isFinite(version) && version > 3) return { status: 'unsupported', version };
   return { status: 'invalid', reason: 'Editor 文档版本无效' };
 }

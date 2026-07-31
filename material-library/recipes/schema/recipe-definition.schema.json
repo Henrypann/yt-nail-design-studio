@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nextgen://recipes/recipe-definition.schema.json",
+  "type": "object",
+  "required": ["identity", "version", "lifecycle", "compatibility", "coordinateSpace", "components", "presets", "composition", "constraints", "outputPolicy"],
+  "properties": {
+    "identity": {"type": "object", "required": ["id", "name", "name_en"], "properties": {"id": {"type": "string"}, "name": {"type": "string"}, "name_en": {"type": "string"}}},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "lifecycle": {"enum": ["draft", "concept", "simulated", "approved", "deprecated"]},
+    "compatibility": {"type": "object", "required": ["shapes", "lengthPresets", "geometryLengths"], "properties": {
+      "shapes": {"type": "array", "items": {"enum": ["almond", "oval", "coffin"]}},
+      "lengthPresets": {"type": "array", "items": {"enum": ["natural", "short-extension", "medium", "long"]}},
+      "geometryLengths": {"type": "array", "items": {"enum": ["short", "medium", "long", "extra-long"]}}
+    }},
+    "coordinateSpace": {"type": "object", "required": ["u", "v", "origin", "units"]},
+    "components": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "role", "route"], "properties": {
+      "id": {"enum": ["magnetic_beam", "chrome_ribbon", "clear_droplet"]},
+      "role": {"enum": ["appearance", "relief", "accent"]},
+      "route": {"enum": ["L1", "L2", "L3"]}
+    }}},
+    "presets": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "label", "ribbon", "droplets"], "properties": {
+      "id": {"enum": ["subtle", "signature", "statement"]},
+      "label": {"type": "string"},
+      "ribbon": {"type": "boolean"},
+      "droplets": {"type": "integer", "minimum": 0, "maximum": 6}
+    }}},
+    "composition": {"type": "array", "minItems": 1},
+    "constraints": {"type": "object", "required": ["safe_clearance_mm", "max_droplets", "height_mm", "manufacturing_command_allowed"], "properties": {
+      "safe_clearance_mm": {"type": "number", "minimum": 0.8},
+      "max_droplets": {"type": "integer", "maximum": 6},
+      "height_mm": {"type": "object", "required": ["min", "max"], "properties": {"min": {"type": "number", "minimum": 0.05}, "max": {"type": "number", "maximum": 0.3}}},
+      "manufacturing_command_allowed": {"const": false}
+    }},
+    "outputPolicy": {"type": "object", "required": ["renderer", "manufacturing_command_allowed"]}
+  }
+}

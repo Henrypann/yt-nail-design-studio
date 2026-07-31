@@ -12,6 +12,7 @@ import { isEditorShapeEnabled, TIER_ONE_EDITOR_SHAPES } from '../lib/material';
 import { GEOMETRY_LENGTH_BY_PRESET, resolveFingerData, type LengthPreset } from '../lib/model';
 import { useEditorStore } from '../store';
 import { LayerPanel } from './LayerPanel';
+import { RecipeInspector } from './RecipeInspector';
 
 export type InspectorTab = 'design' | 'layers' | 'check';
 
@@ -212,7 +213,7 @@ export function EditorInspector(props: {
         ))}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        {props.tab === 'design' && <DesignInspector />}
+        {props.tab === 'design' && <div className="flex flex-col gap-3"><RecipeInspector /><DesignInspector /></div>}
         {props.tab === 'layers' && <LayerPanel />}
         {props.tab === 'check' && (
           <div className="flex flex-col gap-3" data-debug-id="studio.editor.inspector.check">

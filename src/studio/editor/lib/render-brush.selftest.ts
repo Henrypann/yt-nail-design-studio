@@ -45,7 +45,7 @@ assert(svg.includes('<polyline'), 'nailContentSvg renders brush polyline');
 assert(svg.includes('#C2497A'), 'brush color preserved');
 
 const doc: EditorDoc = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   designId: 'test-design',
   shape: 'almond',
   length: 'medium',
@@ -54,6 +54,7 @@ const doc: EditorDoc = {
   baseColor: '#FBF5F0',
   pattern: fingerData.pattern,
   attachments: [],
+  relief: [],
   fingerLocks: {},
   masterFinger: 'R4',
   updatedAt: new Date().toISOString(),

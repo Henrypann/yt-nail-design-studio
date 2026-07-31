@@ -1,7 +1,7 @@
 {
-  "version": 1,
-  "updated_at": "2026-07-27T00:00:00Z",
-  "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码（DEV-PLAN §2.3-8）。not_recommended 的每个条目必须带人类可读 reason（入库强制，tools/validate-assets.py 检查）。路径均相对于仓库根目录。",
+  "version": 2,
+  "updated_at": "2026-07-31T00:00:00Z",
+  "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。REAL 为正式可编辑模板；CONCEPT 为独立产品卡片，但必须通过 render_template_id 降级到已签收基础层，并显示未实现能力。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码。not_recommended 的每个条目必须带人类可读 reason。",
   "style_tags": [
     { "id": "trending", "name": "当下流行", "name_en": "Trending Now" },
     { "id": "sweet", "name": "甜美", "name_en": "Sweet" },
@@ -13,6 +13,32 @@
   ],
   "shape_ids": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"],
   "templates": [
+    {
+      "id": "t_mercury_dew_concept",
+      "name": "Mercury Dew · Concept",
+      "name_en": "Mercury Dew · Concept",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_liquid_velvet_cat_eye",
+      "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": ["猫眼底层已支持"],
+        "pending": ["金属浮雕待实现", "透明水滴待实现"]
+      },
+      "style_tags": ["trending", "luxe", "minimal"],
+      "default_base_color": "#D9B5AB",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["almond", "coffin"],
+        "neutral": ["oval", "squoval", "round"],
+        "not_recommended": {
+          "square": "当前纵向猫眼与液态流线构图尚未针对宽平甲面完成视觉签收",
+          "stiletto": "尖端安全区过窄，透明水滴与金属浮雕的侧壁间距尚未验证"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "sort_order": -1
+    },
     {
       "id": "t_liquid_velvet_cat_eye",
       "name": "裸透猫眼金属流线",
@@ -35,6 +61,13 @@
       "id": "t_petal_veil_french",
       "name": "奶雾法式立体花",
       "name_en": "Petal Veil French",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_petal_veil_french",
+      "asset_spec_url": "/assets/hero-recipes/petal-veil-french/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": ["Almond × Medium", "R4 单重音指", "Three.js HQ 三视图"],
+        "pending": ["人工视觉签收", "生产验证"]
+      },
       "style_tags": ["trending", "sweet", "minimal"],
       "default_base_color": "#F2E4DA",
       "default_finish": "gloss",
@@ -45,7 +78,7 @@
           "stiletto": "极尖甲面会压缩法式弧与低浮雕花的留白，削弱轻柔比例"
         }
       },
-      "thumbnail_url": "material-library/templates/t_petal_veil_french/thumbnails/default.png",
+      "thumbnail_url": "assets/hero-recipes/petal-veil-french/cover-16x9-1280x720-v1.png",
       "manifest_url": "material-library/templates/t_petal_veil_french/manifest.json",
       "sort_order": 1
     },

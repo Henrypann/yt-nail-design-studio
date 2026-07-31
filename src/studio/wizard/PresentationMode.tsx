@@ -19,6 +19,7 @@ import { useNailDesignAssets } from '@/studio/preview/use-nail-design-assets';
 import { TenFingerPreview, FINGER_LABEL } from '@/studio/preview/TenFingerPreview';
 import { NailCellView } from '@/studio/preview/TiledNailsPreview';
 import { FingerNailContent } from '@/studio/render';
+import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 
 export interface PresentationModeProps {
   open: boolean;
@@ -29,6 +30,7 @@ export interface PresentationModeProps {
   templateName: string | null;
   baseColor: string;
   finish: Finish;
+  recipe?: RecipeInstanceV1;
   fingerOverrides?: FingerOverrides;
   status: DesignStatus;
   /** 初始重点指（进入时同步 Wizard 当前选中指，缺省 R4 主视觉指） */
@@ -48,6 +50,7 @@ export function PresentationMode({
   templateName,
   baseColor,
   finish,
+  recipe,
   fingerOverrides,
   status,
   initialFinger,
@@ -119,6 +122,7 @@ export function PresentationMode({
       {/* 顶栏：标题 + 手动确认入口（draft 时）+ 退出，无编辑控件 */}
       <header className="flex shrink-0 items-center gap-3 px-8 py-4">
         <p className="text-sm font-medium text-gray-900">{templateName ?? '未命名设计'}</p>
+        {recipe?.recipeRef.id === 'mercury-dew' && <Badge variant="warning">模拟效果 · 尚未完成生产验证</Badge>}
         {confirmed && (
           <Badge variant="blue">
             <Check size={11} className="mr-0.5" />
@@ -183,6 +187,7 @@ export function PresentationMode({
               templateId={templateId}
               baseColor={baseColor}
               finish={finish}
+              recipe={recipe}
               fingerOverrides={fingerOverrides}
               registerExport={false}
               tipOrientation={tipOrientation}
@@ -213,6 +218,9 @@ export function PresentationMode({
                   clipId="present-focus-clip"
                   baseColor={focusColor}
                   finish={finish}
+                  recipe={recipe}
+                  shape={shape}
+                  length={length}
                   failed={failedFingers.has(focusFinger)}
                   selected={false}
                   patternMarkup={patternMarkup}
@@ -256,6 +264,8 @@ export function PresentationMode({
                 <NailCellView
                   key={fc}
                   finger={fc}
+                  shape={shape}
+                  length={length}
                   silhouetteD={silhouette.d}
                   viewBox={silhouette.viewBox}
                   baseColor={ov?.baseColor ?? baseColor}

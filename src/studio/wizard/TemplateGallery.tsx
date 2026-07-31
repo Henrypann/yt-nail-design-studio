@@ -24,6 +24,7 @@ import {
   type TemplateEntry,
 } from '@/studio/preview/material-library';
 import { useWizardStore } from './wizard-store';
+import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -31,6 +32,7 @@ export function TemplateGallery() {
   const toast = useToast();
   const appliedShape = useWizardStore((s) => s.appliedShape);
   const templateId = useWizardStore((s) => s.templateId);
+  const templateName = useWizardStore((s) => s.templateName);
   const applyTemplate = useWizardStore((s) => s.applyTemplate);
   const readOnly = useWizardStore((s) => s.status !== 'draft');
   const mockFlags = useMockScenarios((s) => s.flags);
@@ -75,10 +77,13 @@ export function TemplateGallery() {
 
   const visible = useMemo(() => {
     if (!index) return [];
+    const enabledTemplates = PETAL_VEIL_P0_ENABLED
+      ? index.templates
+      : index.templates.filter((template) => template.id !== 't_petal_veil_french');
     const filtered =
       tagFilter === 'all'
-        ? index.templates
-        : index.templates.filter((t) => t.style_tags.includes(tagFilter));
+        ? enabledTemplates
+        : enabledTemplates.filter((t) => t.style_tags.includes(tagFilter));
     return appliedShape
       ? sortTemplatesForShape(filtered, appliedShape)
       : [...filtered].sort((a, b) => a.sort_order - b.sort_order);
@@ -133,9 +138,16 @@ export function TemplateGallery() {
                 shape={appliedShape}
                 shapeNames={shapeNames}
                 tagNameById={tagNameById}
-                selected={templateId === t.id}
+                selected={templateId === (t.render_template_id ?? t.id) && templateName === t.name}
                 disabled={readOnly}
-                onApply={() => applyTemplate(t)}
+                onApply={() => {
+                  applyTemplate(t);
+                  if (t.asset_status === 'CONCEPT') {
+                    toast.warning(t.id === 't_petal_veil_french'
+                      ? '已应用 Petal Veil HQ 候选。Canonical Fixture 尚待人工视觉签收，制造状态未验证。'
+                      : `已应用「${t.name}」概念基础层。`);
+                  }
+                }}
               />
             ))}
             {visible.length === 0 && (
@@ -176,7 +188,7 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
       )}
     >
       {selected && (
-        <span className="absolute right-1.5 top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
+        <span className="absolute bottom-1.5 right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
           <Check size={10} />
         </span>
       )}
@@ -190,6 +202,11 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
         {tier === 'high' && (
           <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-[10px] font-medium text-white">
             推荐
+          </span>
+        )}
+        {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
+          <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+            {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
           </span>
         )}
       </div>
@@ -220,6 +237,22 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
             ⚠ {reason}。仍可选择。
           </p>
         )}
+        {template.asset_status === 'CONCEPT' && template.capability_summary && (
+          <div className="space-y-0.5 rounded-button bg-amber-50 px-1.5 py-1 text-[10px] leading-snug">
+            <p className="text-success">✓ {template.capability_summary.supported.join(' / ')}</p>
+            <p className="text-amber-800">○ {template.capability_summary.pending.join(' / ')}</p>
+            {template.asset_spec_url && (
+              <a
+                href={template.asset_spec_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block font-medium text-primary underline underline-offset-2"
+              >
+                查看 Asset Spec
+              </a>
+            )}
+          </div>
+        )}
         <div className="mt-auto pt-1">
           <Button
             size="sm"
@@ -228,7 +261,13 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
             onClick={onApply}
             className="h-7 w-full text-[11px]"
           >
-            {selected ? '已应用 · 再次应用' : '应用此模板'}
+            {template.asset_status === 'CONCEPT'
+              ? selected
+                ? template.id === 't_petal_veil_french' ? '已应用 HQ 候选' : '已应用概念基础层'
+                : template.id === 't_petal_veil_french' ? '应用 HQ 候选' : '应用概念基础层'
+              : selected
+                ? '已应用 · 再次应用'
+                : '应用此模板'}
           </Button>
         </div>
       </div>

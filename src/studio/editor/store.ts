@@ -8,6 +8,8 @@ import type { DesignStatus, FingerCode } from '@/lib/types';
 import { isReadOnly } from '@/lib/state-machine';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import type { AttachmentElement, EditorDoc, FingerData, FrenchEdgeVariant, PatternElement, Transform } from './lib/model';
+import { createMercuryInstance, type MercuryDewParams, type RecipePresetId, type UVPoint } from './lib/recipe-model';
+import { createNailSurfaceMapper } from './lib/surface-mapper';
 import {
   createLayerMeta,
   genId,
@@ -112,6 +114,13 @@ interface EditorState {
     strokeWidth: number;
   }) => 'ok' | 'no-silhouette' | 'readonly';
   applyRecipe: (recipe: EditorRecipeId) => 'ok' | 'no-silhouette' | 'readonly';
+  setMercuryPreset: (preset: RecipePresetId) => void;
+  updateMercuryParams: (patch: Partial<MercuryDewParams>) => void;
+  setMercuryEnabled: (enabled: boolean) => void;
+  updateMercuryRibbonAnchor: (index: 0 | 1 | 2, uv: UVPoint) => void;
+  addMercuryDroplet: (uv?: UVPoint) => void;
+  removeMercuryDroplet: (id: string) => void;
+  resetMercury: () => void;
 
   /** 编辑当前手指的显示数据（解锁指改副本，否则改共享基指数据 → 十指同步） */
   editCurrentFingerData: (mutate: (data: {
@@ -367,6 +376,91 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return 'ok';
   },
 
+  setMercuryPreset: (preset) => {
+    const { doc, readOnly } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      const next = createMercuryInstance(preset, draft.baseColor);
+      draft.recipe = draft.recipe ? { ...next, params: { ...next.params, ...draft.recipe.params }, fingerOverrides: draft.recipe.fingerOverrides, enabled: draft.recipe.enabled } : next;
+      if (draft.recipe) draft.recipe.presetId = preset;
+    });
+  },
+
+  updateMercuryParams: (patch) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      if (!draft.recipe) draft.recipe = createMercuryInstance('signature', draft.baseColor);
+      if (editScope === 'all') draft.recipe.params = { ...draft.recipe.params, ...patch };
+      else draft.recipe.fingerOverrides[currentFinger] = { ...(draft.recipe.fingerOverrides[currentFinger] ?? {}), params: { ...(draft.recipe.fingerOverrides[currentFinger]?.params ?? {}), ...patch } };
+    });
+  },
+
+  setMercuryEnabled: (enabled) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      if (!draft.recipe) draft.recipe = createMercuryInstance('signature', draft.baseColor);
+      if (editScope === 'all') draft.recipe.enabled = enabled;
+      else draft.recipe.fingerOverrides[currentFinger] = { ...(draft.recipe.fingerOverrides[currentFinger] ?? {}), enabled };
+    });
+  },
+
+  updateMercuryRibbonAnchor: (index, uv) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    const safe = createNailSurfaceMapper(doc.shape, doc.length)?.safePoint(uv, 0.8);
+    const safeUv = safe?.clamped ? { u: Math.min(0.96, Math.max(0.04, uv.u)), v: Math.min(0.96, Math.max(0.04, uv.v)) } : uv;
+    get().commit((draft) => {
+      if (!draft.recipe) draft.recipe = createMercuryInstance('signature', draft.baseColor);
+      if (editScope === 'all') {
+        const anchors = [...draft.recipe.params.ribbonAnchors] as typeof draft.recipe.params.ribbonAnchors;
+        anchors[index] = safeUv;
+        draft.recipe.params.ribbonAnchors = anchors;
+      } else {
+        const current = draft.recipe.fingerOverrides[currentFinger]?.params ?? {};
+        const anchors = [...(current.ribbonAnchors ?? draft.recipe.params.ribbonAnchors)] as typeof draft.recipe.params.ribbonAnchors;
+        anchors[index] = safeUv;
+        draft.recipe.fingerOverrides[currentFinger] = { ...(draft.recipe.fingerOverrides[currentFinger] ?? {}), params: { ...current, ribbonAnchors: anchors } };
+      }
+    });
+  },
+
+  addMercuryDroplet: (uv = { u: 0.5, v: 0.42 }) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      if (!draft.recipe) draft.recipe = createMercuryInstance('signature', draft.baseColor);
+      const current = editScope === 'all' ? draft.recipe.params : { ...draft.recipe.params, ...(draft.recipe.fingerOverrides[currentFinger]?.params ?? {}) };
+      if (current.droplets.length >= 6) return;
+      const drops = [...current.droplets, { id: genId('mercury-drop'), uv, radiusMm: current.dropletSizeMm, heightMm: 0.18 }];
+      if (editScope === 'all') draft.recipe.params.droplets = drops;
+      else draft.recipe.fingerOverrides[currentFinger] = { ...(draft.recipe.fingerOverrides[currentFinger] ?? {}), params: { ...(draft.recipe.fingerOverrides[currentFinger]?.params ?? {}), droplets: drops } };
+    });
+  },
+
+  removeMercuryDroplet: (id) => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      if (!draft.recipe) return;
+      const current = editScope === 'all' ? draft.recipe.params : { ...draft.recipe.params, ...(draft.recipe.fingerOverrides[currentFinger]?.params ?? {}) };
+      const drops = current.droplets.filter((drop) => drop.id !== id);
+      if (editScope === 'all') draft.recipe.params.droplets = drops;
+      else draft.recipe.fingerOverrides[currentFinger] = { ...(draft.recipe.fingerOverrides[currentFinger] ?? {}), params: { ...(draft.recipe.fingerOverrides[currentFinger]?.params ?? {}), droplets: drops } };
+    });
+  },
+
+  resetMercury: () => {
+    const { doc, readOnly, currentFinger, editScope } = get();
+    if (!doc || readOnly) return;
+    get().commit((draft) => {
+      if (!draft.recipe) draft.recipe = createMercuryInstance('signature', draft.baseColor);
+      if (editScope === 'all') draft.recipe = createMercuryInstance(draft.recipe.presetId, draft.baseColor);
+      else delete draft.recipe.fingerOverrides[currentFinger];
+    });
+  },
+
   editCurrentFingerData: (mutate) => {
     const { doc, currentFinger, editScope } = get();
     if (!doc) return;
@@ -485,6 +579,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         data,
         uid: `thumb-${doc.designId}`,
         appearance: doc.appearance,
+        recipe: doc.recipe,
+        finger: doc.masterFinger,
       },
       2,
     );

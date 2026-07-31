@@ -7,6 +7,15 @@
  */
 
 import type { Finish, NailLength, NailShape } from '@/lib/types';
+import type {
+  BaseCoverage,
+  ColorPresetId,
+  LookPresetId,
+  OpticalEffect,
+  StyleDirection,
+  SurfacePresetId,
+  TopFinish,
+} from './taxonomy-model';
 
 /* ── raw 资产装载 ─────────────────────────────────────── */
 
@@ -153,25 +162,25 @@ interface ShapeCapabilitiesFile {
 }
 
 export interface TaxonomyColorPreset {
-  id: string;
+  id: ColorPresetId;
   name: string;
   hex: string;
-  base_coverage: 'opaque' | 'translucent';
+  base_coverage: BaseCoverage;
 }
 
 export interface TaxonomySurfacePreset {
-  id: 'gloss' | 'matte' | 'cat-eye' | 'aurora' | 'silk';
+  id: SurfacePresetId;
   name: string;
   appearance: {
-    optical_effect: 'none' | 'cat-eye' | 'aurora' | 'silk' | 'pearl';
-    top_finish: 'gloss' | 'matte';
+    optical_effect: OpticalEffect;
+    top_finish: TopFinish;
   };
 }
 
 export interface TaxonomyLookPreset {
-  id: string;
+  id: LookPresetId;
   name: string;
-  direction: 'classic' | 'fashion' | 'sweet' | 'art';
+  direction: StyleDirection;
   recipe: string;
   surface: string;
   color_preset?: string;
