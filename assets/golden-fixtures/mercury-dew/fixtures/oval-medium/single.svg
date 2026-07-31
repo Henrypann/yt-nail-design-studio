@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-59 -224 118 241" width="472" height="964"><defs>
+    <clipPath id="clip-fx-oval-medium-R4"><path d="M -47.9 0 C -51.3 -3.5 -55 -22.4 -55 -37.4 C -55 -92.2 -49.7 -220 0 -220 C 49.7 -220 55 -92.2 55 -37.4 C 55 -22.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z"/></clipPath>
+    <mask id="eraser-fx-oval-medium-R4" maskUnits="userSpaceOnUse" x="-400" y="-600" width="800" height="900">
+      <rect x="-400" y="-600" width="800" height="900" fill="#fff"/>
+      
+    </mask>
+    <linearGradient id="curve-fx-oval-medium-R4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2D1720" stop-opacity="0.22"/>
+      <stop offset="0.22" stop-color="#FFFFFF" stop-opacity="0.02"/>
+      <stop offset="0.68" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#2D1720" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="gloss-fx-oval-medium-R4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.47" stop-color="#FFFFFF" stop-opacity="0.34"/>
+      <stop offset="0.58" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pearl-fx-oval-medium-R4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDEBFF" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#FFF7E7" stop-opacity="0"/>
+      <stop offset="1" stop-color="#DDEBFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#clip-fx-oval-medium-R4)">
+    <rect x="-400" y="-600" width="800" height="900" fill="#D9B5AB" opacity="1"/>
+    <g mask="url(#eraser-fx-oval-medium-R4)"></g>
+    
+    <g data-recipe="mercury-dew" data-renderer="svg-2.5d"><defs><linearGradient id="mercury-beam-m-R4" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(8 7.105427357601002e-15 -104.5)"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.42" stop-color="#FFF7E8" stop-opacity="0.5"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.92"/><stop offset="0.58" stop-color="#FFF7E8" stop-opacity="0.5"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient></defs><rect x="-44.248889756944436" y="-600" width="88.49777951388887" height="900" fill="url(#mercury-beam-m-R4)" opacity="0.9"/><defs><linearGradient id="mercury-ribbon-m-R4" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="0.45" stop-color="#D8B16E"/><stop offset="0.7" stop-color="#FFF7D5"/><stop offset="1" stop-color="#8A5F35"/></linearGradient></defs><path d="M 30.80 -39.82 L 18.96 -104.50 L 3.35 -173.80" fill="none" stroke="#4C3542" stroke-opacity="0.24" stroke-width="5.5" stroke-linecap="round"/><path d="M 30.80 -39.82 L 18.96 -104.50 L 3.35 -173.80" fill="none" stroke="url(#mercury-ribbon-m-R4)" stroke-width="2.5" stroke-linecap="round"/><path d="M 30.80 -39.82 L 18.96 -104.50 L 3.35 -173.80" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1.2" stroke-linecap="round"/><defs><radialGradient id="m-R4-drop-0" cx="35%" cy="28%"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/><stop offset="0.35" stop-color="#E9F4FF" stop-opacity="0.45"/><stop offset="0.82" stop-color="#7E9CB5" stop-opacity="0.28"/><stop offset="1" stop-color="#593F54" stop-opacity="0.42"/></radialGradient></defs><ellipse cx="-18.78" cy="-141.46" rx="3.12" ry="2.16" fill="url(#m-R4-drop-0)" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="1"/><ellipse cx="-19.62" cy="-142.18" rx="0.42" ry="0.24" fill="#FFFFFF" fill-opacity="0.86"/><defs><radialGradient id="m-R4-drop-1" cx="35%" cy="28%"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/><stop offset="0.35" stop-color="#E9F4FF" stop-opacity="0.45"/><stop offset="0.82" stop-color="#7E9CB5" stop-opacity="0.28"/><stop offset="1" stop-color="#593F54" stop-opacity="0.42"/></radialGradient></defs><ellipse cx="18.78" cy="-141.46" rx="3.12" ry="2.16" fill="url(#m-R4-drop-1)" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="1"/><ellipse cx="17.94" cy="-142.18" rx="0.42" ry="0.24" fill="#FFFFFF" fill-opacity="0.86"/><defs><radialGradient id="m-R4-drop-2" cx="35%" cy="28%"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/><stop offset="0.35" stop-color="#E9F4FF" stop-opacity="0.45"/><stop offset="0.82" stop-color="#7E9CB5" stop-opacity="0.28"/><stop offset="1" stop-color="#593F54" stop-opacity="0.42"/></radialGradient></defs><ellipse cx="-19.68" cy="-118.36" rx="3.12" ry="2.16" fill="url(#m-R4-drop-2)" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="1"/><ellipse cx="-20.52" cy="-119.08" rx="0.42" ry="0.24" fill="#FFFFFF" fill-opacity="0.86"/><defs><radialGradient id="m-R4-drop-3" cx="35%" cy="28%"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/><stop offset="0.35" stop-color="#E9F4FF" stop-opacity="0.45"/><stop offset="0.82" stop-color="#7E9CB5" stop-opacity="0.28"/><stop offset="1" stop-color="#593F54" stop-opacity="0.42"/></radialGradient></defs><ellipse cx="19.68" cy="-118.36" rx="3.12" ry="2.16" fill="url(#m-R4-drop-3)" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="1"/><ellipse cx="18.84" cy="-119.08" rx="0.42" ry="0.24" fill="#FFFFFF" fill-opacity="0.86"/></g>
+    <path d="M -47.9 0 C -51.3 -3.5 -55 -22.4 -55 -37.4 C -55 -92.2 -49.7 -220 0 -220 C 49.7 -220 55 -92.2 55 -37.4 C 55 -22.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z" fill="url(#curve-fx-oval-medium-R4)" opacity="0.48" pointer-events="none"/>
+    <path d="M -47.9 0 C -51.3 -3.5 -55 -22.4 -55 -37.4 C -55 -92.2 -49.7 -220 0 -220 C 49.7 -220 55 -92.2 55 -37.4 C 55 -22.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z" fill="url(#gloss-fx-oval-medium-R4)" pointer-events="none"/>
+    <path d="M -47.9 0 C -51.3 -3.5 -55 -22.4 -55 -37.4 C -55 -92.2 -49.7 -220 0 -220 C 49.7 -220 55 -92.2 55 -37.4 C 55 -22.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z" fill="url(#pearl-fx-oval-medium-R4)" pointer-events="none"/>
+  </g>
+  <path d="M -47.9 0 C -51.3 -3.5 -55 -22.4 -55 -37.4 C -55 -92.2 -49.7 -220 0 -220 C 49.7 -220 55 -92.2 55 -37.4 C 55 -22.4 51.3 -3.5 47.9 0 C 44 3.9 21.5 11 0 11 C -21.5 11 -44 3.9 -47.9 0 Z" fill="none" stroke="#8A8A92" stroke-width="2" stroke-linejoin="round"/></svg>

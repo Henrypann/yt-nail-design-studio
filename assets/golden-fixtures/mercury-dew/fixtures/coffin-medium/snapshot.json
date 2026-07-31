@@ -1,0 +1,46 @@
+{
+  "id": "coffin-medium",
+  "shape": "coffin",
+  "lengthPreset": "medium",
+  "geometryLength": "long",
+  "recipeRef": {
+    "id": "mercury-dew",
+    "version": "1.0.0"
+  },
+  "presetId": "signature",
+  "renderer": "svg-2.5d/mercury-1",
+  "manufacturing": "unvalidated",
+  "manufacturing_command_allowed": false,
+  "components": {
+    "magneticBeam": true,
+    "chromeRibbon": true,
+    "clearDroplets": 4
+  },
+  "warnings": [],
+  "previewSize": {
+    "width": 944,
+    "height": 1904
+  },
+  "tiledSize": {
+    "width": 3000,
+    "height": 1760
+  },
+  "checksums": {
+    "recipeDefinition": "fnv1a:25bc1799",
+    "recipeInstance": "fnv1a:1fb94c97",
+    "singleSvg": "sha256:73748bc6a0e99bff25aba3afa737e245988489fccaf8d27e5110ec32a55ba913",
+    "tiledSvg": "sha256:e1ee355cbb37d522c652488cc07700e9e39c19f0dfade028ac458bf0dab1812b",
+    "previewPng": "sha256:14401bed7c2860c7ed64e00b678bf9d3f2bc7805b4ab4bee98744ed76f1a5664",
+    "tiledPng": "sha256:223aa67aa57ffd70b7f36ec4307b3d9b4f417bd214086313d14085fe4fafebd9"
+  },
+  "outputs": {
+    "recipe": "recipe.json",
+    "single": "single.svg",
+    "tiled": "tiled.svg",
+    "preview": "preview.png",
+    "tiledPng": "tiled.png",
+    "snapshot": "snapshot.json"
+  },
+  "generatedAt": "2026-07-31T00:00:00.000Z",
+  "note": "屏幕 SVG 与 PNG 同源构图；2.5D 模拟效果，非生产可制造结果。"
+}

@@ -3,7 +3,7 @@
 更新时间：2026-07-31  
 工作区：`/Users/henry.macbook/Documents/kimi/Workspaces/nextGen-beauty-cursor`  
 分支：`exp/cursor-studio-mvp`  
-当前 HEAD：`a355d82 fix(recipe): align taxonomy enums and wizard outputs`
+当前 HEAD：`3f9c33d docs: add Mercury Dew Cursor handoff`（父提交 `a355d82 fix(recipe): align taxonomy enums and wizard outputs`）
 
 ## 1. 接管目标
 
@@ -118,8 +118,10 @@ Recipe Definition 已使用：
 
 已有：
 
-- `index.json`：六项签收矩阵，全部为 `pending_visual_signoff`
-- `SIGNOFF_TEMPLATE.md`：人工签收清单
+- `index.json`：六项签收矩阵，全部为 `approved`，`fixtureType: visual-signoff-approved`，含 `outputs` / `checksum` / `signoff` 溯源
+- `SIGNOFF_TEMPLATE.md`：人工签收清单（已签收）
+- `CONTACT_SHEET.md`：12 张 PNG 汇总 + 逐组勾选（已签收）
+- `fixtures/<id>/`：六组真实 `recipe.json` / `single.svg` / `tiled.svg` / `preview.png` / `tiled.png` / `snapshot.json`
 
 六项组合：
 
@@ -132,47 +134,43 @@ Recipe Definition 已使用：
 | coffin-natural | coffin | natural | short |
 | coffin-medium | coffin | medium | long |
 
-当前**还没有**以下文件：
+M4-A 已生成真实产物（Canonical Renderer，非占位图）：
 
-- 六组单甲 SVG
-- 六组十指 SVG
-- 六组 PNG
-- 参数快照
-- Renderer checksum
+```text
+assets/golden-fixtures/mercury-dew/fixtures/<fixture-id>/
+  recipe.json · single.svg · tiled.svg · preview.png · tiled.png · snapshot.json
+```
 
-因此不要修改：
+M4-B 人工视觉签收已完成（Henry MacBook（workspace owner），2026-07-31，`manual-visual`），六项均为 `approved`。
 
-- `material-library/index.json` 中 Mercury 的 `asset_status: CONCEPT`
-- Fixture 状态 `pending_visual_signoff`
+重新生成产物（会作废签收并重置为 `pending_visual_signoff`）：
+
+```bash
+PLAYWRIGHT_BROWSERS_PATH="$HOME/Library/Caches/ms-playwright" npm run generate:mercury-fixtures
+```
+
+`material-library/index.json` 中 Mercury 仍为 `asset_status: CONCEPT`——Gallery 升级已解锁但尚未执行，见 §5 M4-C。
 
 ## 5. Cursor 下一步任务
 
-### M4-A · 生成真实 Fixture 输出
+### M4-A · 生成真实 Fixture 输出 — 已完成
 
-使用当前 Canonical Renderer 和真实轮廓资产生成六组 fixture，不能生成 1×1 占位图或静态伪造图。
+六组真实 SVG/PNG/快照已由 `tools/generate-mercury-fixtures.mjs` 经 Canonical Renderer 产出；`tools/validate-mercury-fixtures.mjs` 已升级为反造假门禁（检查产物存在性、`data-recipe` 标记、PNG 尺寸、checksum 一致性），并实现 `pending_visual_signoff → approved` 状态机：`approved` 必须携带签收人、日期与被审阅产物 checksum，`fixtureType` 必须与聚合状态一致。
 
-每组至少包含：
+每组包含：
 
 ```text
 fixtures/<fixture-id>/recipe.json
 fixtures/<fixture-id>/single.svg
 fixtures/<fixture-id>/tiled.svg
 fixtures/<fixture-id>/preview.png
+fixtures/<fixture-id>/tiled.png
 fixtures/<fixture-id>/snapshot.json
 ```
 
-要求：
+### M4-B · 人工视觉签收 — 已完成
 
-- 输出必须来自当前 Recipe Instance。
-- 轮廓必须来自当前 shape SVG 真源。
-- 屏幕 SVG 与 PNG 使用同一构图。
-- 每组记录 renderer checksum。
-- 输出中明确 `renderer: svg-2.5d/mercury-1`。
-- 仍然标记制造状态为 `unvalidated`，不得输出生产命令。
-
-### M4-B · 人工视觉签收
-
-逐组检查：
+签收人 Henry MacBook（workspace owner），2026-07-31，方式 `manual-visual`。逐组核对项：
 
 - Cat-eye 光带方向和宽度
 - Chrome Ribbon 是否贴合甲型且不越界
@@ -182,13 +180,30 @@ fixtures/<fixture-id>/snapshot.json
 - 单甲、十指、顾客展示、PNG 是否一致
 - `lengthPreset` 与 `geometryLength` 是否正确映射
 
-人工签收后再把对应 Fixture 改为 `approved`。六项全部通过后，才允许：
+六项均为 `approved`，`index.json` 每项记录了签收人、日期与被审阅产物 checksum。
 
-```text
-Gallery: CONCEPT → SIMULATED
+记录/复核命令：
+
+```bash
+node tools/signoff-mercury-fixtures.mjs --by "<name>" [--fixture <id>]
+npm run test:mercury-fixtures
 ```
 
-并保留 Liquid Velvet fallback 一个版本周期。
+### M4-C · Gallery CONCEPT → SIMULATED（已解锁，未执行）
+
+签收已满足前置条件，但升级尚未执行，因为当前代码不可表示 `SIMULATED`：
+
+- `src/studio/preview/material-library.ts` 的 `asset_status?: 'REAL' | 'CONCEPT'` 需新增 `SIMULATED`
+- `tools/validate-assets.py` 硬编码 `EXPECTED_CANONICAL_TEMPLATE_COUNT = 12` / `EXPECTED_CONCEPT_TEMPLATE_COUNT = 1`，需同步
+- `src/studio/wizard/TemplateGallery.tsx` 有 4 处 CONCEPT 分支文案与徽标需要区分 SIMULATED
+
+升级时保留 Liquid Velvet fallback 一个版本周期。
+
+### 遗留独立任务
+
+- `material.ts` 拆分：分离 SVG 字符串解析与 Vite glob 载入，让 Node 直接 import 真模块，可顺带修复孤儿测试 `src/studio/editor/lib/render-brush.selftest.ts`（`node` 直跑即 `ERR_MODULE_NOT_FOUND`）
+- Mercury beam 的 `gradientTransform` 浮点残留（`7.105427357601002e-15`，应为 0）；修复会变动全部 fixture checksum，需重新生成与重新签收
+- Signature 实例无 `fingerOverrides`，十指外观一致；若产品要求「重音指」差异化需另开参数任务
 
 ## 6. 验证命令
 
@@ -209,7 +224,11 @@ npm run test:handdraw
 git diff --check
 ```
 
-`npm run requirements:audit` 当前会报告历史 `reviewedHash` 过期；这是需求审计基线未刷新，不是 Mercury 构建失败。不要未经人工审查直接执行刷新并掩盖差异。
+说明：
+
+- `npm run validate-assets` → `python3 tools/validate-assets.py`（已补 npm 别名）。
+- Agent shell 下 Playwright 若找不到浏览器，设置 `PLAYWRIGHT_BROWSERS_PATH="$HOME/Library/Caches/ms-playwright"`。
+- `npm run requirements:audit` 当前会报告历史 `reviewedHash` 过期；这是需求审计基线未刷新，不是 Mercury 构建失败。不要未经人工审查直接执行刷新并掩盖差异。
 
 ## 7. 红线
 
@@ -219,8 +238,9 @@ git diff --check
 - 不修改 Slot V2、甲型几何真源或法式控制点。
 - 不把概念封面当成 Golden Fixture。
 - 不因为自动化测试通过而跳过人工视觉签收。
+- 重新生成 fixture 产物后必须重新人工签收，不得沿用旧的 `approved`。
 - 不修改已确认设计的 Recipe 版本引用。
 
 ## 8. 交接提示词
 
-> 你正在接管 NextGen Beauty Studio Cursor worktree 的 Mercury Dew Recipe。请先阅读本 handoff，再检查 `git status` 和当前 HEAD。当前 M0-M3 已完成，M4 只有签收矩阵，尚未生成六组真实 SVG/PNG。请严格执行 M4-A 生成真实 fixture，再逐组人工视觉签收；在六项签收完成前，保持 Gallery 为 `CONCEPT`、Fixture 为 `pending_visual_signoff`。所有输出必须走 Recipe Definition → Recipe Instance → FingerRenderModel → Single/Tiled/Present/PNG 真源，不得用占位图，不得把模拟效果写成生产能力。完成后报告每组文件路径、checksum、视觉问题和验证命令结果。
+> 你正在接管 NextGen Beauty Studio Cursor worktree 的 Mercury Dew Recipe。请先阅读本 handoff，再检查 `git status` 和当前 HEAD。M0–M3、M4-A（六组真实 SVG/PNG 产物）与 M4-B（人工视觉签收，六项 `approved`）均已完成。下一步是 M4-C：把 Gallery 从 `CONCEPT` 升级为 `SIMULATED`，需同时处理 `asset_status` 类型、`tools/validate-assets.py` 的模板计数常量与 `TemplateGallery.tsx` 的 CONCEPT 分支文案，并保留 Liquid Velvet fallback 一个版本周期。所有输出必须走 Recipe Definition → Recipe Instance → FingerRenderModel → Single/Tiled/Present/PNG 真源，不得用占位图，不得把 2.5D 模拟效果写成生产能力；制造状态保持 `unvalidated`。
