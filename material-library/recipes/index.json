@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "recipes": [
+    {
+      "id": "mercury-dew",
+      "version": "1.0.0",
+      "definition": "mercury-dew/recipe.json",
+      "lifecycle": "simulated",
+      "manufacturing_command_allowed": false
+    }
+  ]
+}

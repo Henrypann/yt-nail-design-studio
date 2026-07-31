@@ -8,6 +8,7 @@
  */
 
 import type { FingerCode, Finish, NailLength, NailShape } from '../../../lib/types.ts';
+import type { RecipeInstanceV1, ReliefElement } from './recipe-model.ts';
 
 export interface Transform {
   x: number;
@@ -197,7 +198,7 @@ export function normalizeFingerLayerOrders(data: FingerData): void {
 /* ── Editor 文档 ─────────────────────────────────────── */
 
 export interface EditorDoc {
-  schemaVersion: 2;
+  schemaVersion: 3;
   designId: string;
   customerId?: string;
   shape: NailShape;
@@ -214,6 +215,10 @@ export interface EditorDoc {
   pattern: PatternElement[];
   /** 附件层（共享基指数据） */
   attachments: AttachmentElement[];
+  /** Recipe 真源；派生图层不重复持久化。 */
+  recipe?: RecipeInstanceV1;
+  /** 自定义 L2 浮雕，Recipe 之外的手工结构预留。 */
+  relief: ReliefElement[];
   /** 逐指解锁：存在条目 = 该指独立编辑；空 = 十指同步 */
   fingerLocks: Partial<Record<FingerCode, FingerData>>;
   /** 主视觉指（同步基指，典型 R4 无名指） */
@@ -255,7 +260,7 @@ export function createBlankDoc(opts: {
   finish?: Finish;
 }): EditorDoc {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     designId: opts.designId,
     customerId: opts.customerId,
     shape: opts.shape,
@@ -265,6 +270,7 @@ export function createBlankDoc(opts: {
     baseColor: opts.baseColor ?? '#FBF5F0',
     pattern: [],
     attachments: [],
+    relief: [],
     fingerLocks: {},
     masterFinger: 'R4',
     updatedAt: new Date().toISOString(),

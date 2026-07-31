@@ -15,6 +15,9 @@
     "test:render-brush": "node tools/test-handdraw.mjs",
     "requirements:audit": "node --experimental-strip-types tools/audit-page-requirements.mjs",
     "requirements:refresh": "node --experimental-strip-types tools/audit-page-requirements.mjs --refresh",
+    "validate-recipes": "node tools/validate-recipes.mjs",
+    "test:recipe-schema": "node --experimental-strip-types src/studio/editor/lib/recipe-schema.selftest.ts",
+    "test:recipe-migrate": "node --experimental-strip-types src/studio/editor/lib/recipe-migrate.selftest.ts",
     "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
   },
   "dependencies": {

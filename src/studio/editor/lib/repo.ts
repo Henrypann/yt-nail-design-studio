@@ -4,7 +4,7 @@
  */
 
 import { readData, writeEnvelope, removeKey, StorageKeys } from '@/lib/storage';
-import type { Customer, DesignSummary, NailLength, NailShape, ProjectV3 } from '@/lib/types';
+import type { Customer, DesignSummary, NailLength, NailShape, ProjectV4 } from '@/lib/types';
 import { createBlankDoc, genId, type EditorDoc } from './model';
 import { migrateEditorDoc, type EditorDocMigrationResult } from './migrate';
 
@@ -127,17 +127,20 @@ export function customerName(customerId: string | undefined): string {
   return readCustomers().find((c) => c.id === customerId)?.name ?? '未关联客户';
 }
 
-/* ── 数据桥：保存时同步写 ProjectV3 画布工作键 ──────────── */
+/* ── 数据桥：保存时同步写 ProjectV4 画布工作键 ──────────── */
 
-/** EditorDoc → ProjectV3 envelope 载荷（五层底层结构，三层用户语义映射） */
-export function docToProjectV3(doc: EditorDoc): ProjectV3 {
+/** EditorDoc → ProjectV4 envelope 载荷（五层底层结构，Recipe 为真源） */
+export function docToProjectV4(doc: EditorDoc): ProjectV4 {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     projectId: doc.designId,
     designId: doc.designId,
     customerId: doc.customerId,
     shape: doc.shape,
     length: doc.length,
+    recipeRef: doc.recipe?.recipeRef,
+    recipe: doc.recipe,
+    relief: doc.relief,
     layers: [
       { type: 'base', visible: true, locked: true, color: doc.baseColor, elements: [] },
       {
@@ -185,8 +188,11 @@ export function docToProjectV3(doc: EditorDoc): ProjectV3 {
 }
 
 export function writeCanvasEnvelope(doc: EditorDoc): void {
-  writeEnvelope(StorageKeys.canvas, docToProjectV3(doc));
+  writeEnvelope(StorageKeys.canvas, docToProjectV4(doc));
 }
+
+/** 兼容旧调用方；输出已升级为 ProjectV4。 */
+export const docToProjectV3 = docToProjectV4;
 
 /** 清空画布键（删除设计时避免脏数据回写） */
 export function clearCanvasEnvelope(): void {

@@ -1,0 +1,20 @@
+{
+  "identity": {"id": "mercury-dew", "name": "Mercury Dew", "name_en": "Mercury Dew"},
+  "version": "1.0.0",
+  "lifecycle": "simulated",
+  "compatibility": {"shapes": ["almond", "oval", "coffin"], "lengths": ["short", "medium", "long", "extra-long"]},
+  "coordinateSpace": {"u": "0=left edge, 0.5=center, 1=right edge", "v": "0=tip, 1=root", "origin": "nail silhouette", "units": "normalized 0..1; relief sizes in mm"},
+  "components": [
+    {"id": "magnetic_beam", "role": "appearance", "route": "L1"},
+    {"id": "chrome_ribbon", "role": "relief", "route": "L2"},
+    {"id": "clear_droplet", "role": "relief", "route": "L3"}
+  ],
+  "presets": [
+    {"id": "subtle", "label": "Subtle", "ribbon": true, "droplets": 2},
+    {"id": "signature", "label": "Signature", "ribbon": true, "droplets": 4},
+    {"id": "statement", "label": "Statement", "ribbon": true, "droplets": 6}
+  ],
+  "composition": ["base", "magnetic_beam", "chrome_ribbon", "clear_droplet", "finish"],
+  "constraints": {"safe_clearance_mm": 0.8, "max_droplets": 6, "height_mm": {"min": 0.05, "max": 0.3}, "manufacturing_command_allowed": false},
+  "outputPolicy": {"renderer": "svg-2.5d", "label": "模拟效果 · 尚未完成生产验证", "manufacturing_command_allowed": false}
+}

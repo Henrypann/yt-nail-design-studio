@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nextgen://recipes/uv.schema.json",
+  "type": "object",
+  "required": ["u", "v"],
+  "properties": {"u": {"type": "number", "minimum": 0, "maximum": 1}, "v": {"type": "number", "minimum": 0, "maximum": 1}}
+}

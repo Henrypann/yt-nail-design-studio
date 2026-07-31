@@ -125,7 +125,7 @@ export interface DesignSummary {
   updatedAt: string;
 }
 
-/* ── ProjectV3（画布数据 envelope 载荷） ──────────────── */
+/* ── ProjectV3 / ProjectV4（画布数据 envelope 载荷） ──── */
 
 /** 五层底层结构（不重构；对用户呈现三层制造语义） */
 export type LayerType = 'base' | 'texture' | 'pattern' | 'decoration' | 'finish';
@@ -161,6 +161,15 @@ export interface ProjectV3 {
   /** Editor 逐指解锁（空 = 十指同步） */
   fingerLocks?: Partial<Record<FingerCode, boolean>>;
   updatedAt: string;
+}
+
+/** ProjectV4：Recipe 真源 + 手工 pattern + L2 relief 的工作副本。 */
+export interface ProjectV4 extends Omit<ProjectV3, 'schemaVersion' | 'layers'> {
+  schemaVersion: 4;
+  recipeRef?: { id: string; version: string };
+  recipe?: unknown;
+  relief: unknown[];
+  layers: ProjectLayer[];
 }
 
 /* ── DesignSet 契约层（v1.4.0 · DEV-PLAN §5.11 / 备忘录 §11） ─────────────

@@ -29,7 +29,7 @@ const migrated = migrateEditorDoc(legacy);
 assert.equal(migrated.status, 'ok');
 if (migrated.status === 'ok') {
   assert.equal(migrated.migrated, true);
-  assert.equal(migrated.doc.schemaVersion, 2);
+  assert.equal(migrated.doc.schemaVersion, 3);
   assert.equal(migrated.doc.length, 'medium');
   assert.equal(migrated.doc.lengthPreset, 'short-extension');
   assert.deepEqual(migrated.doc.appearance, {

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nextgen://recipes/recipe-instance.schema.json",
+  "type": "object",
+  "required": ["recipeRef", "presetId", "params", "fingerOverrides"],
+  "properties": {
+    "recipeRef": {"type": "object", "required": ["id", "version"], "properties": {"id": {"type": "string"}, "version": {"type": "string"}}},
+    "presetId": {"enum": ["subtle", "signature", "statement"]},
+    "params": {"type": "object"},
+    "fingerOverrides": {"type": "object", "additionalProperties": {"type": "object"}}
+  }
+}
