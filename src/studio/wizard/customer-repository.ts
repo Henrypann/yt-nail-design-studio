@@ -7,7 +7,7 @@
  */
 
 import type { Customer } from '@/lib/types';
-import { readData, writeEnvelope, StorageKeys } from '@/lib/storage';
+import { createClientId, readData, writeEnvelope, StorageKeys } from '@/lib/storage';
 
 export function listCustomers(): Customer[] {
   return (readData<Customer[]>(StorageKeys.customers) ?? []).filter((c) => !c.deleted);
@@ -27,7 +27,7 @@ export interface QuickCreateInput {
 export function quickCreateCustomer(input: QuickCreateInput): Customer {
   const now = new Date().toISOString();
   const customer: Customer = {
-    id: `c_${crypto.randomUUID()}`,
+    id: createClientId('c_'),
     name: input.name.trim(),
     privacyConsentAt: input.privacyConsentAt,
     twinConsent: false,

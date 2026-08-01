@@ -22,7 +22,7 @@ import type {
   NailShape,
 } from '@/lib/types';
 import { confirmDesign } from '@/lib/state-machine';
-import { readData, StorageKeys } from '@/lib/storage';
+import { createClientId, readData, StorageKeys } from '@/lib/storage';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { loadSilhouette } from '@/studio/preview/nail-assets';
 import { loadBackPlateV2 } from '@/studio/render';
@@ -175,7 +175,7 @@ function confirmedByFromSession(): string {
   return session?.userName ?? session?.email ?? '美甲师';
 }
 
-const initialDesignId = (): string => `d_${crypto.randomUUID()}`;
+const initialDesignId = (): string => createClientId('d_');
 const rendererVersionFor = (recipe?: RecipeInstanceV1): string =>
   isPetalVeilRecipe(recipe) ? 'three-pbr/petal-veil-1' : 'svg-2.5d/mercury-1';
 

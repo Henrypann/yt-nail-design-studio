@@ -14,11 +14,20 @@ const PREFIX = 'nail-studio:';
 const ENVELOPE_VERSION = 1;
 export const POLL_INTERVAL_MS = 2000;
 
+/**
+ * 生成客户端临时 id，不假设页面处于 HTTPS 安全上下文。
+ * Safari/Chromium 在公网 HTTP 下可能不提供 crypto.randomUUID()。
+ */
+export function createClientId(prefix = ''): string {
+  const value =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}${value}`;
+}
+
 /** 当前标签页 id（跨标签回环保护） */
-export const TAB_ID: string =
-  typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : `tab-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+export const TAB_ID: string = createClientId('tab-');
 
 /** 业务键注册表（约定：全部 localStorage 键经由此处命名，禁止散落硬编码） */
 export const StorageKeys = {
