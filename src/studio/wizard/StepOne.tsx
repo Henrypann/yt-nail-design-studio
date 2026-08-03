@@ -7,9 +7,11 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Button, Card, cx, useToast } from '@/design-system';
 import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight, RefreshCw } from 'lucide-react';
 import type { Customer } from '@/lib/types';
+import { Routes } from '@/app/routes';
 import { loadLibraryIndex, loadShapeParams } from '@/studio/preview/material-library';
 import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
 import { NailCellView } from '@/studio/preview/TiledNailsPreview';
@@ -147,14 +149,17 @@ export function StepOne() {
   const openPicker = useWizardStore((s) => s.openPicker);
   const [styleModalOpen, setStyleModalOpen] = useState(false);
   const toast = useToast();
+  const navigate = useNavigate();
 
   if (!customer) return null;
 
   const ready = shape !== null && length !== null;
 
-  /** [进入画布]：失败由持久内联错误条呈现（applyError），样式/长度选择保留 */
+  /** [进入画布]：失败由持久内联错误条呈现（applyError），样式/长度选择保留。
+   *  成功后先跳选款页（社区demo入口），已选过模板的路径直接进画布。 */
   const enterCanvas = async (): Promise<void> => {
-    await applyAndEnter();
+    const ok = await applyAndEnter();
+    if (ok) navigate(Routes.designTemplates);
   };
 
   /** 首次点击：先弹风格推荐（每设计一次）；已选过风格则直接进入画布 */
@@ -166,7 +171,8 @@ export function StepOne() {
     await enterCanvas();
   };
 
-  /** 选用风格：模板映射必须存在；缺失时显式报错，不把纯底色冒充选款成功。 */
+  /** 选用风格：模板映射必须存在；缺失时显式报错，不把纯底色冒充选款成功。
+   *  已经选定具体模板，跳过选款页直接进画布。 */
   const handleStyleSelect = async (st: StyleRecommendation) => {
     setStyle(st.id, st.name);
     setStyleModalOpen(false);
@@ -178,6 +184,7 @@ export function StepOne() {
         const template = index.templates.find((t) => t.id === st.template_id);
         if (!template) {
           toast.error(`风格「${st.name}」引用的模板不存在，请选择其他风格。`);
+          navigate(Routes.designTemplates);
           return;
         }
         applyTemplate(template);
@@ -186,9 +193,13 @@ export function StepOne() {
             `已应用「${st.base_template_name ?? template.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
           );
         }
+        navigate(Routes.designNew);
       } catch {
         toast.error('模板目录加载失败。可在模板库刷新后重新选择。');
+        navigate(Routes.designTemplates);
       }
+    } else {
+      navigate(Routes.designTemplates);
     }
   };
 

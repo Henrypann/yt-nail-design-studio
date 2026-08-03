@@ -10,6 +10,8 @@ import CustomerNewPage from './pages/customers/CustomerNewPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
 import DesignListPage from './pages/design/DesignListPage';
 import WizardPage from './pages/design/WizardPage';
+import TemplateGalleryPage from './pages/design/TemplateGalleryPage';
+import CommunityPage from './pages/design/CommunityPage';
 import EditorPage from './pages/design/EditorPage';
 import DeviceListPage from './pages/devices/DeviceListPage';
 import DeviceBindPage from './pages/devices/DeviceBindPage';
@@ -45,6 +47,8 @@ export function App() {
             <Route path={Routes.customerDetailPath} element={<CustomerDetailPage />} />
             <Route path={Routes.designs} element={<DesignListPage />} />
             <Route path={Routes.designNew} element={<WizardPage />} />
+            <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
+            <Route path={Routes.designCommunity} element={<CommunityPage />} />
             <Route path={Routes.designCanvas} element={<EditorPage />} />
             <Route path={Routes.devices} element={<DeviceListPage />} />
             <Route path={Routes.deviceBind} element={<DeviceBindPage />} />

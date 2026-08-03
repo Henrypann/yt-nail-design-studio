@@ -9,6 +9,8 @@ export const Routes = {
   customerDetailPath: '/customers/:id',
   designs: '/design',
   designNew: '/design/new', // Studio Wizard（默认入口）
+  designTemplates: '/design/templates', // 选款页（甲型/长度确认后的模板选择，社区demo入口）
+  designCommunity: '/design/community', // 社区页（基础 mock，未接真实数据）
   designCanvas: '/design/canvas', // Studio Editor
   devices: '/devices',
   deviceBind: '/devices/bind',
