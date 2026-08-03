@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Bell, Home, Users, Palette, Monitor, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Bell, Compass, Home, Users, Palette, Monitor, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useState } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
@@ -24,7 +24,7 @@ interface NavGroup {
   items: NavItem[];
 }
 
-/** 侧栏结构（PRD §1.2）：首页 / 客户管理 / 设计工作台 / 设备管理，无门店设置组 */
+/** 侧栏结构（PRD §1.2）：门店 SaaS / Studio / Community 三域全局互通，无门店设置组 */
 /** 登录后全局布局：侧栏 + 顶栏（门店名纯文本 / 通知 / 用户名 / 退出）
  *  v1.5.1：侧栏支持收起/展开（持久化 localStorage，收起后仅图标 + tooltip） */
 export function AppLayout() {
@@ -68,6 +68,14 @@ export function AppLayout() {
       items: [
         { to: '/design/new', label: text('新建设计', 'New design') },
         { to: '/design', label: text('我的设计', 'My designs'), end: true },
+      ],
+    },
+    {
+      key: 'community',
+      label: 'Community',
+      icon: Compass,
+      items: [
+        { to: '/design/community', label: text('社区广场', 'Discover'), end: true },
       ],
     },
     {
