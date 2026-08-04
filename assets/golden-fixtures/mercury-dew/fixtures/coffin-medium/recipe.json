@@ -1,0 +1,74 @@
+{
+  "recipeRef": {
+    "id": "mercury-dew",
+    "version": "1.0.0"
+  },
+  "presetId": "signature",
+  "params": {
+    "baseColor": "#D9B5AB",
+    "baseCoverage": "opaque",
+    "opticalEffect": "cat-eye",
+    "topFinish": "gloss",
+    "catEyeAngleDeg": 8,
+    "beamWidth": "standard",
+    "beamIntensity": "standard",
+    "ribbonMaterial": "champagne",
+    "ribbonWidthMm": 0.5,
+    "ribbonHeightMm": 0.18,
+    "ribbonAnchors": [
+      {
+        "u": 0.78,
+        "v": 0.78
+      },
+      {
+        "u": 0.68,
+        "v": 0.5
+      },
+      {
+        "u": 0.54,
+        "v": 0.2
+      }
+    ],
+    "dropletDensity": "standard",
+    "dropletSizeMm": 1.2,
+    "droplets": [
+      {
+        "id": "mercury-drop-1",
+        "uv": {
+          "u": 0.31,
+          "v": 0.34
+        },
+        "radiusMm": 1.2,
+        "heightMm": 0.18
+      },
+      {
+        "id": "mercury-drop-2",
+        "uv": {
+          "u": 0.69,
+          "v": 0.34
+        },
+        "radiusMm": 1.2,
+        "heightMm": 0.18
+      },
+      {
+        "id": "mercury-drop-3",
+        "uv": {
+          "u": 0.31,
+          "v": 0.44000000000000006
+        },
+        "radiusMm": 1.2,
+        "heightMm": 0.18
+      },
+      {
+        "id": "mercury-drop-4",
+        "uv": {
+          "u": 0.69,
+          "v": 0.44000000000000006
+        },
+        "radiusMm": 1.2,
+        "heightMm": 0.18
+      }
+    ]
+  },
+  "fingerOverrides": {}
+}

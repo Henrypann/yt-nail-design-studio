@@ -1,0 +1,46 @@
+{
+  "id": "almond-natural",
+  "shape": "almond",
+  "lengthPreset": "natural",
+  "geometryLength": "short",
+  "recipeRef": {
+    "id": "mercury-dew",
+    "version": "1.0.0"
+  },
+  "presetId": "signature",
+  "renderer": "svg-2.5d/mercury-1",
+  "manufacturing": "unvalidated",
+  "manufacturing_command_allowed": false,
+  "components": {
+    "magneticBeam": true,
+    "chromeRibbon": true,
+    "clearDroplets": 4
+  },
+  "warnings": [],
+  "previewSize": {
+    "width": 944,
+    "height": 1288
+  },
+  "tiledSize": {
+    "width": 3000,
+    "height": 1760
+  },
+  "checksums": {
+    "recipeDefinition": "fnv1a:25bc1799",
+    "recipeInstance": "fnv1a:1fb94c97",
+    "singleSvg": "sha256:f0a536e4754a160cbb6e2c4c4e1893d06b887cc06bd3879964d5c0d82c4e0cd7",
+    "tiledSvg": "sha256:aa810a5613b39c56551d4657b6f0e197ee1a3b8f43f5f99301c21ebd51487501",
+    "previewPng": "sha256:680981ea682114331e21144c4d232c6b9a7da0c68b8b4fe22cbc97ac1f746203",
+    "tiledPng": "sha256:dc30975fe22f60fee29489c9fbbd315edee22a74c3db101293e3395e32ceac6b"
+  },
+  "outputs": {
+    "recipe": "recipe.json",
+    "single": "single.svg",
+    "tiled": "tiled.svg",
+    "preview": "preview.png",
+    "tiledPng": "tiled.png",
+    "snapshot": "snapshot.json"
+  },
+  "generatedAt": "2026-07-31T00:00:00.000Z",
+  "note": "屏幕 SVG 与 PNG 同源构图；2.5D 模拟效果，非生产可制造结果。"
+}
