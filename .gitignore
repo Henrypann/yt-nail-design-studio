@@ -12,3 +12,4 @@ test-results/
 !.env.example
 __pycache__/
 *.py[cod]
+dogfood-output/
