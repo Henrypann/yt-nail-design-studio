@@ -16,6 +16,8 @@
     "sourceHeight": 900,
     "notes": "Asset-native pixels. Responsive stage applies ONE transform to plate+slots; do not rescale slots independently."
   },
+  "referenceLengthMm": 14,
+  "reference_length_note": "线稿画的是裸甲（自然甲床），对应最短产品档 14mm。v=1 甲根固定，14mm 时甲尖正好落在线稿甲尖线上，更长档位向甲尖延伸（延长甲）。此值必填：若按 18 处理，14mm 会缩到线稿甲床的 78%，十指都会露出甲尖轮廓。",
   "local_uv_contract": {
     "rootCenter": [
       0.5,
@@ -26,7 +28,7 @@
       0
     ],
     "transform": "SVG matrix(a b c d tx ty): x=a*u+c*v+tx; y=b*u+d*v+ty",
-    "length_rule": "Root fixed (v=1). Longer lengths extend toward tip only (tools/slot-calibrator lengthScaleTowardTip).",
+    "length_rule": "Root fixed (v=1). Longer lengths extend toward tip only. Scale factor = targetMm / referenceLengthMm (14 = bare natural nail drawn on this plate).",
     "legacy": "Do NOT use nailScale()/PX_PER_MM/fingerWidthMm for placement on this plate."
   },
   "handedness": "First-person dorsal: image left=L1–L5; image right=R1–R5; 1=thumb … 5=pinky.",

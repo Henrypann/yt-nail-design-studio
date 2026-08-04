@@ -19,13 +19,19 @@ function scaleFromRoot(root: PointPx, tip: PointPx, factor: number): PointPx {
 
 /**
  * Extend/retract a calibrated slot to a target manufacturing length (mm).
- * `referenceLengthMm` is the mm value represented by the illustrated plate nail
- * (default 18 = medium). Width landmarks stay put; only tip moves.
+ *
+ * `referenceLengthMm` is the mm value the illustrated plate nail represents, and
+ * it is required: a wrong value silently retracts the nail inside the drawn nail
+ * bed (or overshoots it) on every finger, which reads as a rendering defect
+ * rather than a data problem. The plate line art draws a bare natural nail, so
+ * the reference is the shortest product length — see slots.back.v2.json.
+ *
+ * Width landmarks stay put; only the tip moves.
  */
 export function extendSlotToLengthMm(
   slot: NailSlotV2,
   targetMm: NailLengthMm,
-  referenceLengthMm: NailLengthMm = 18,
+  referenceLengthMm: NailLengthMm,
 ): NailSlotV2 {
   const factor = targetMm / referenceLengthMm;
   const rootCenter = midpoint(slot.rootLeft, slot.rootRight);
@@ -66,7 +72,7 @@ export function extendSlotToLengthMm(
 export function extendSlotToNailLength(
   slot: NailSlotV2,
   lengthId: keyof typeof NAIL_LENGTH_MM,
-  referenceLengthMm: NailLengthMm = 18,
+  referenceLengthMm: NailLengthMm,
 ): NailSlotV2 {
   return extendSlotToLengthMm(slot, NAIL_LENGTH_MM[lengthId], referenceLengthMm);
 }

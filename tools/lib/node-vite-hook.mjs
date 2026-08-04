@@ -5,6 +5,7 @@
  * - Appends .ts to bare relative imports (Vite-style extensionless)
  */
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
@@ -35,16 +36,29 @@ export async function resolve(specifier, context, nextResolve) {
     return { url: MATERIAL_SHIM, shortCircuit: true, format: 'module' };
   }
 
+  // Vite resolves a bare path to either <p>.ts or <p>/index.ts
+  const withTsOrIndex = (abs) => {
+    if (HAS_EXT.test(abs) || HAS_JSON.test(abs)) return abs;
+    try {
+      if (fs.statSync(abs).isDirectory()) return path.join(abs, 'index.ts');
+    } catch {
+      /* not a directory */
+    }
+    return `${abs}.ts`;
+  };
+
   // @/* → src/*
   if (specifier.startsWith('@/')) {
-    const rel = specifier.slice(2);
-    const withExt = HAS_EXT.test(rel) || HAS_JSON.test(rel) ? rel : `${rel}.ts`;
-    const abs = path.join(SRC, withExt);
+    const abs = withTsOrIndex(path.join(SRC, specifier.slice(2)));
     return nextResolve(pathToFileURL(abs).href, context);
   }
 
-  // Extensionless relative imports → .ts (Vite bundler convention)
+  // Extensionless relative imports (Vite bundler convention)
   if (specifier.startsWith('.') && !HAS_EXT.test(specifier) && !HAS_JSON.test(specifier) && !specifier.includes('?')) {
+    if (context.parentURL?.startsWith('file:')) {
+      const abs = withTsOrIndex(path.resolve(path.dirname(fileURLToPath(context.parentURL)), specifier));
+      return nextResolve(pathToFileURL(abs).href, context);
+    }
     return nextResolve(`${specifier}.ts`, context);
   }
 

@@ -22,7 +22,7 @@ export interface BackPlateV2 {
   plateDataUrl: string;
   sourceWidth: number;
   sourceHeight: number;
-  /** 线稿甲代表的物理长度（缺省 18 = medium，见 local_uv_contract） */
+  /** 线稿甲代表的物理长度（必填，见 slots.back.v2.json referenceLengthMm） */
   referenceLengthMm: NailLengthMm;
   slots: NailSlotV2[];
   calibrationVersion: string;
@@ -59,11 +59,17 @@ export function loadBackPlateV2(): Promise<BackPlateV2> {
       if (!platePath) throw new Error('slots.back.v2.json 缺少 plate.file');
       const plateDataUrl = await fetchDataUrl(`/${platePath.replace(/^\//, '')}`);
       const calibration = (file as { calibration?: { calibrationVersion?: string } }).calibration;
+      if (!file.referenceLengthMm) {
+        throw new Error(
+          'slots.back.v2.json 缺少 referenceLengthMm：线稿甲代表的物理长度必须显式标定，' +
+            '否则长度切换会让甲片缩进/超出线稿甲床。',
+        );
+      }
       return {
         plateDataUrl,
         sourceWidth: file.plate.sourceWidth,
         sourceHeight: file.plate.sourceHeight,
-        referenceLengthMm: file.referenceLengthMm ?? 18,
+        referenceLengthMm: file.referenceLengthMm,
         slots: file.slots,
         calibrationVersion: calibration?.calibrationVersion ?? 'unknown',
       };
