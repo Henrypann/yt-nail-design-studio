@@ -28,7 +28,13 @@
     "test:petal-veil": "node tools/validate-petal-veil.mjs",
     "test:recipe-output": "node --experimental-strip-types src/studio/editor/lib/recipe-output.selftest.ts",
     "test:taxonomy-enums": "node --experimental-strip-types src/studio/editor/lib/taxonomy-enums.selftest.ts",
-    "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts"
+    "test:handdraw": "node tools/test-handdraw.mjs && node --experimental-strip-types src/studio/finger-display.selftest.ts && node --experimental-strip-types src/studio/editor/lib/french-edge.selftest.ts && node --experimental-strip-types src/studio/editor/lib/mirror.selftest.ts && node --experimental-strip-types src/studio/editor/lib/migrate.selftest.ts && node --experimental-strip-types src/studio/editor/lib/recipes.selftest.ts",
+    "dogfood:walkthrough": "node tools/review-walkthrough.mjs",
+    "dogfood:mock-scenarios": "node tools/review-mock-scenarios.mjs",
+    "dogfood:creator-path": "node tools/review-creator-path.mjs",
+    "dogfood:single-degrade": "node tools/review-single-degrade.mjs",
+    "dogfood:final-shots": "node tools/final-shots.mjs",
+    "dogfood:verify-render-fail-toast": "node tools/verify-render-fail-toast.mjs"
   },
   "dependencies": {
     "immer": "^10.1.1",
