@@ -9,6 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Button, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { useWizardStore } from '@/studio/wizard/wizard-store';
 
 interface CommunityMockEntry {
   id: string;
@@ -30,6 +31,13 @@ const COMMUNITY_MOCK: CommunityMockEntry[] = [
 export default function CommunityPage() {
   const navigate = useNavigate();
   const toast = useToast();
+  const appliedShape = useWizardStore((s) => s.appliedShape);
+  const appliedLength = useWizardStore((s) => s.appliedLength);
+  /* 全局侧栏「Community」入口没有 Wizard 上下文，此时不应回跳选款页（appliedShape 为空会被
+   * TemplateGalleryPage 兜底逐出到 /design/new）；只有从选款页跳转过来时才回选款页。 */
+  const hasWizardContext = Boolean(appliedShape && appliedLength);
+  const backTarget = hasWizardContext ? Routes.designTemplates : Routes.designs;
+  const backLabel = hasWizardContext ? '返回选款' : '返回我的设计';
 
   const handleCardClick = () => {
     toast.info('社区功能目前仅为演示，暂未接入真实模板与线上分享能力。');
@@ -39,11 +47,11 @@ export default function CommunityPage() {
     <div className="mx-auto flex max-w-[1100px] flex-col gap-4" data-debug-id="studio.design-community">
       <header className="flex items-center gap-3">
         <button
-          onClick={() => navigate(Routes.designTemplates)}
+          onClick={() => navigate(backTarget)}
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
         >
           <ArrowLeft size={14} />
-          返回选款
+          {backLabel}
         </button>
         <span className="h-4 w-px bg-gray-200" />
         <div>
@@ -72,8 +80,8 @@ export default function CommunityPage() {
       <p className="pt-2 text-center text-[10px] text-gray-400">社区示例 · Mock 数据，仅用于演示页面结构，不代表真实上线功能</p>
 
       <div className="flex justify-center pb-2">
-        <Button variant="ghost" onClick={() => navigate(Routes.designTemplates)}>
-          返回选款
+        <Button variant="ghost" onClick={() => navigate(backTarget)}>
+          {backLabel}
         </Button>
       </div>
     </div>
