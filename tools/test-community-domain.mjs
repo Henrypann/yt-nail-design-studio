@@ -18,6 +18,14 @@ const {
   publisherBadgeLabel,
   cardBadgeSummary,
 } = await import(pathToFileURL(path.join(root, 'src/community/domain/badges.ts')).href);
+const {
+  allowsCommunityDemoContent,
+  visibleCommunityContents,
+  visibleCommunityPublishers,
+} = await import(pathToFileURL(path.join(root, 'src/community/domain/visibility.ts')).href);
+const { communityInternalHref, studioReturnPath } = await import(
+  pathToFileURL(path.join(root, 'src/community/lib/entry-link.ts')).href
+);
 
 const index = JSON.parse(fs.readFileSync(path.join(root, 'public/community/content-index.json'), 'utf8'));
 const publishers = JSON.parse(fs.readFileSync(path.join(root, 'public/community/publishers.json'), 'utf8'));
@@ -25,6 +33,45 @@ const published = index.contents.filter((c) => c.status === 'PUBLISHED');
 assert.ok(published.length > 0);
 assert.ok(!published.some((c) => c.status !== 'PUBLISHED'));
 assert.ok(index.contents.some((c) => c.status === 'DRAFT'));
+
+/** Integration shows demo creators; public production hides them. */
+assert.equal(allowsCommunityDemoContent('integration'), true);
+assert.equal(allowsCommunityDemoContent('development'), true);
+assert.equal(allowsCommunityDemoContent('production'), false);
+assert.equal(
+  visibleCommunityContents(index.contents, 'integration').filter(
+    (c) => c.publisherType === 'VERIFIED_CREATOR',
+  ).length,
+  7,
+);
+assert.equal(
+  visibleCommunityContents(index.contents, 'production').filter(
+    (c) => c.publisherType === 'VERIFIED_CREATOR',
+  ).length,
+  0,
+);
+assert.equal(visibleCommunityPublishers(publishers, 'integration').length, 4);
+assert.equal(visibleCommunityPublishers(publishers, 'production').length, 1);
+
+/** Community internal navigation preserves the product return context. */
+const entryContext = new URLSearchParams({
+  entry: 'wizard',
+  return_to: '/design/new?fresh=1',
+  shape: 'almond',
+  length: 'medium',
+  style: 'ST-01',
+});
+const officialHref = communityInternalHref('/community/official', entryContext);
+const officialUrl = new URL(officialHref, 'https://local.test');
+assert.equal(officialUrl.pathname, '/community/official');
+assert.equal(officialUrl.searchParams.get('entry'), 'wizard');
+assert.equal(officialUrl.searchParams.get('return_to'), '/design/new?fresh=1');
+assert.equal(officialUrl.searchParams.get('shape'), 'almond');
+assert.equal(officialUrl.searchParams.get('length'), 'medium');
+assert.equal(officialUrl.searchParams.has('style'), false);
+assert.equal(studioReturnPath(officialUrl.searchParams), '/design/new?fresh=1');
+assert.equal(studioReturnPath(new URLSearchParams({ return_to: '//evil.example' })), '/design');
+assert.equal(studioReturnPath(new URLSearchParams({ return_to: '/community' })), '/design');
 
 /** 多条件 filter：同维 OR、跨维 AND */
 const multi = filterContents(published, {

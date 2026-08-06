@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Routes } from '@/app/routes';
 import { useLocale } from '@/lib/i18n';
+import { communityInternalHref } from '../lib/entry-link';
 import type { CommunityContentV1, CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
 import { PublisherBadge } from './PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from './CapabilityBadge';
@@ -19,6 +20,7 @@ function pickLabel(item: { label: string; labelEn?: string } | undefined, locale
 
 export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { locale } = useLocale();
   const [coverFailed, setCoverFailed] = useState(false);
   const style = taxonomy.mainStyles.find((s) => s.id === content.mainStyleId);
@@ -38,7 +40,9 @@ export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
       type="button"
       data-content-id={content.contentId}
       data-testid="community-content-card"
-      onClick={() => navigate(Routes.communityContent(content.contentId))}
+      onClick={() =>
+        navigate(communityInternalHref(Routes.communityContent(content.contentId), searchParams))
+      }
       className="flex flex-col overflow-hidden rounded-card border border-gray-200 bg-white text-left transition hover:border-primary/40 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <div className="aspect-[16/10] bg-gray-100">

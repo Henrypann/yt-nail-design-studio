@@ -8,8 +8,12 @@ import type {
   CommunityPublisherV1,
   CommunityTaxonomyV1,
 } from '../domain/types';
+import {
+  visibleCommunityContents,
+  visibleCommunityPublishers,
+} from '../domain/visibility';
 
-const isProd = import.meta.env.PROD;
+const runtimeMode = import.meta.env.MODE;
 
 export async function loadTaxonomy(): Promise<CommunityTaxonomyV1> {
   const res = await fetch('/community/taxonomy.json');
@@ -21,21 +25,17 @@ export async function loadPublishers(): Promise<CommunityPublisherV1[]> {
   const res = await fetch('/community/publishers.json');
   if (!res.ok) throw new Error('publishers load failed');
   const all = (await res.json()) as CommunityPublisherV1[];
-  if (isProd) return all.filter((p) => !p.demo && p.verification !== 'DEMO_VERIFIED_CREATOR');
-  return all;
+  return visibleCommunityPublishers(all, runtimeMode);
 }
 
 export async function loadContentIndex(): Promise<CommunityContentIndexV1> {
   const res = await fetch('/community/content-index.json');
   if (!res.ok) throw new Error('content-index load failed');
   const index = (await res.json()) as CommunityContentIndexV1;
-  if (isProd) {
-    return {
-      ...index,
-      contents: index.contents.filter((c) => !c.demo && c.publisherType === 'OFFICIAL'),
-    };
-  }
-  return index;
+  return {
+    ...index,
+    contents: visibleCommunityContents(index.contents, runtimeMode),
+  };
 }
 
 export async function loadPublishedContents(): Promise<CommunityContentV1[]> {

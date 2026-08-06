@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Badge, Button } from '@/design-system';
 import { Routes } from '@/app/routes';
@@ -17,10 +17,12 @@ import type {
 } from '../domain/types';
 import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
+import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
 
 export default function CommunityContentPage() {
   const { contentId } = useParams<{ contentId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { locale } = useLocale();
   const [content, setContent] = useState<CommunityContentV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
@@ -80,7 +82,10 @@ export default function CommunityContentPage() {
           <ArrowLeft size={14} />
           返回
         </Button>
-        <Link to={Routes.community} className="text-xs text-gray-500 hover:text-gray-800">
+        <Link
+          to={communityInternalHref(Routes.community, searchParams)}
+          className="text-xs text-gray-500 hover:text-gray-800"
+        >
           Discover
         </Link>
       </div>
@@ -150,7 +155,7 @@ export default function CommunityContentPage() {
               size="sm"
               variant="secondary"
               data-testid="community-open-studio"
-              onClick={() => navigate(Routes.designNew)}
+              onClick={() => navigate(studioReturnPath(searchParams, Routes.designNew))}
             >
               进入 Studio
             </Button>

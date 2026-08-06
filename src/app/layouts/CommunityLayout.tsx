@@ -8,28 +8,7 @@ import { useState } from 'react';
 import { Button, cx } from '@/design-system';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
-
-function safeReturnPath(searchParams: URLSearchParams, fallback: string): string {
-  const raw = searchParams.get('return_to');
-  if (!raw) return fallback;
-  try {
-    const decoded = decodeURIComponent(raw);
-    if (decoded.startsWith('/') && !decoded.startsWith('//')) return decoded;
-  } catch {
-    /* ignore */
-  }
-  return fallback;
-}
-
-function studioReturnPath(searchParams: URLSearchParams): string {
-  const candidate = safeReturnPath(searchParams, Routes.designs);
-  // 「进入 Studio」不得落到 Dashboard / Community；仅接受 Studio 路径。
-  if (candidate === Routes.dashboard || candidate.startsWith('/community')) {
-    return Routes.designs;
-  }
-  if (candidate.startsWith('/design')) return candidate;
-  return Routes.designs;
-}
+import { communityInternalHref, studioReturnPath } from '@/community/lib/entry-link';
 
 export function CommunityLayout() {
   const { text } = useLocale();
@@ -39,9 +18,21 @@ export function CommunityLayout() {
   const studioReturn = studioReturnPath(searchParams);
 
   const navItems = [
-    { to: Routes.community, label: text('发现', 'Discover'), end: true },
-    { to: Routes.communityOfficial, label: text('官方', 'Official'), end: true },
-    { to: Routes.communityCreators, label: text('认证创作者', 'Creators'), end: true },
+    {
+      to: communityInternalHref(Routes.community, searchParams),
+      label: text('发现', 'Discover'),
+      end: true,
+    },
+    {
+      to: communityInternalHref(Routes.communityOfficial, searchParams),
+      label: text('官方', 'Official'),
+      end: true,
+    },
+    {
+      to: communityInternalHref(Routes.communityCreators, searchParams),
+      label: text('认证创作者', 'Creators'),
+      end: true,
+    },
   ] as const;
 
   return (

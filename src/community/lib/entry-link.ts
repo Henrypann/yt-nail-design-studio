@@ -4,6 +4,8 @@
 
 import { Routes } from '@/app/routes';
 
+const COMMUNITY_CONTEXT_KEYS = ['entry', 'return_to', 'shape', 'length'] as const;
+
 export type CommunityEntry =
   | 'product_switcher'
   | 'dashboard'
@@ -28,4 +30,25 @@ export function communityHref(opts: {
   if (opts.shape) params.set('shape', opts.shape);
   if (opts.length) params.set('length', opts.length);
   return `${path}?${params.toString()}`;
+}
+
+/** Preserve only product-entry context while navigating inside Community. */
+export function communityInternalHref(path: string, current: URLSearchParams): string {
+  const params = new URLSearchParams();
+  for (const key of COMMUNITY_CONTEXT_KEYS) {
+    const value = current.get(key);
+    if (value) params.set(key, value);
+  }
+  const query = params.toString();
+  return query ? `${path}?${query}` : path;
+}
+
+/** Resolve a local Studio return path without accepting external or Community targets. */
+export function studioReturnPath(
+  params: URLSearchParams,
+  fallback: string = Routes.designs,
+): string {
+  const candidate = params.get('return_to');
+  if (!candidate || candidate.startsWith('//')) return fallback;
+  return candidate.startsWith('/design') ? candidate : fallback;
 }

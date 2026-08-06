@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Bell, Compass, Home, Users, Palette, Monitor, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
@@ -36,6 +36,18 @@ export function AppLayout() {
   const [collapsed, setCollapsed] = useState(
     () => readData<{ collapsed: boolean }>(StorageKeys.sidebarCollapsed)?.collapsed ?? false,
   );
+  const [compactViewport, setCompactViewport] = useState(
+    () => window.matchMedia('(max-width: 767px)').matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const update = () => setCompactViewport(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  const sidebarCollapsed = collapsed || compactViewport;
 
   const toggleCollapsed = () => {
     const next = !collapsed;
@@ -102,29 +114,31 @@ export function AppLayout() {
         data-debug-id="app.layout.sidebar"
         className={cx(
           'flex shrink-0 flex-col border-r border-gray-200 bg-white transition-[width] duration-normal ease-out',
-          collapsed ? 'w-14' : 'w-60',
+          sidebarCollapsed ? 'w-14' : 'w-60',
         )}
       >
         <div
           className={cx(
             'flex h-14 items-center border-b border-gray-200',
-            collapsed ? 'justify-center px-2' : 'justify-between px-4',
+            sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4',
           )}
         >
-          {!collapsed && <span className="text-sm font-bold text-primary">NextGen Beauty Studio</span>}
-          <button
-            onClick={toggleCollapsed}
-            title={collapsed ? '展开导航' : '收起导航'}
-            aria-label={collapsed ? '展开导航' : '收起导航'}
-            className="rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
+          {!sidebarCollapsed && <span className="text-sm font-bold text-primary">NextGen Beauty Studio</span>}
+          {!compactViewport && (
+            <button
+              onClick={toggleCollapsed}
+              title={collapsed ? '展开导航' : '收起导航'}
+              aria-label={collapsed ? '展开导航' : '收起导航'}
+              className="rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
+            >
+              {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+            </button>
+          )}
         </div>
-        <nav className={cx('flex-1 overflow-y-auto py-4', collapsed ? 'px-2' : 'px-3')}>
+        <nav className={cx('flex-1 overflow-y-auto py-4', sidebarCollapsed ? 'px-2' : 'px-3')}>
           {navGroups.map((group) => (
             <div key={group.key} className="mb-4">
-              {collapsed ? (
+              {sidebarCollapsed ? (
                 <p className="mb-1 flex justify-center text-gray-300" title={group.label}>
                   <group.icon size={14} />
                 </p>
@@ -139,19 +153,19 @@ export function AppLayout() {
                   key={item.to}
                   to={item.to}
                   end={item.end}
-                  title={collapsed ? item.label : undefined}
+                  title={sidebarCollapsed ? item.label : undefined}
                   data-testid={group.key === 'community' ? 'nav-community' : undefined}
                   className={({ isActive }) =>
                     cx(
                       'block rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',
-                      collapsed ? 'px-1 text-center text-[11px] leading-tight' : 'px-2.5',
+                      sidebarCollapsed ? 'px-1 text-center text-[11px] leading-tight' : 'px-2.5',
                       isActive
                         ? 'bg-primary-soft font-medium text-primary'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                     )
                   }
                 >
-                  {collapsed ? item.label.slice(0, 2) : item.label}
+                  {sidebarCollapsed ? item.label.slice(0, 2) : item.label}
                 </NavLink>
               ))}
             </div>
@@ -164,12 +178,12 @@ export function AppLayout() {
         {/* 顶栏（PRD §1.3）：门店名纯文本，无跳转 */}
         <header
           data-debug-id="app.layout.topbar"
-          className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6"
+          className="flex h-14 items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 sm:px-6"
         >
-          <span className="text-sm font-medium text-gray-800">
+          <span className="min-w-0 truncate text-sm font-medium text-gray-800">
             {session.storeName ?? '未命名门店'}
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <LanguageToggle />
             <button
               className="rounded-button p-2 text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
@@ -177,17 +191,20 @@ export function AppLayout() {
             >
               <Bell size={16} />
             </button>
-            <span className="text-sm text-gray-700">{session.userName ?? text('美甲师', 'Nail artist')}</span>
+            <span className="hidden text-sm text-gray-700 lg:inline">
+              {session.userName ?? text('美甲师', 'Nail artist')}
+            </span>
             <button
               onClick={handleLogout}
+              aria-label={text('退出', 'Sign out')}
               className="flex items-center gap-1 rounded-button px-2 py-1.5 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
             >
               <LogOut size={13} />
-              {text('退出', 'Sign out')}
+              <span className="hidden sm:inline">{text('退出', 'Sign out')}</span>
             </button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-6">
+        <main className="min-w-0 flex-1 p-3 sm:p-6">
           <Outlet />
         </main>
       </div>

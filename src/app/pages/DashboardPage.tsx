@@ -76,7 +76,7 @@ export default function DashboardPage() {
       </header>
 
       {/* 概览统计 */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {[
           { label: '客户', value: activeCustomers, to: Routes.customers },
           { label: '设计稿', value: designCount, to: Routes.designs },
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       {pendingCards.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-medium text-gray-700">开始你的第一次配置</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {pendingCards.map((card) => (
               <Card
                 key={card.key}

@@ -4,14 +4,16 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Routes } from '@/app/routes';
 import { loadPublishers, loadPublishedContents } from '../data/content-repository';
 import type { CommunityContentV1, CommunityPublisherV1 } from '../domain/types';
 import { PublisherBadge } from '../components/PublisherBadge';
+import { communityInternalHref } from '../lib/entry-link';
 
 export default function CommunityProfilePage() {
   const { handle } = useParams<{ handle: string }>();
+  const [searchParams] = useSearchParams();
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null | undefined>(undefined);
   const [works, setWorks] = useState<CommunityContentV1[]>([]);
 
@@ -46,7 +48,10 @@ export default function CommunityProfilePage() {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6" data-testid="community-profile-missing">
         <h1 className="text-lg font-semibold text-gray-900">未找到发布者</h1>
-        <Link to={Routes.communityCreators} className="mt-3 inline-block text-sm text-primary">
+        <Link
+          to={communityInternalHref(Routes.communityCreators, searchParams)}
+          className="mt-3 inline-block text-sm text-primary"
+        >
           返回 Creators
         </Link>
       </div>
@@ -72,7 +77,7 @@ export default function CommunityProfilePage() {
             {works.map((c) => (
               <li key={c.contentId}>
                 <Link
-                  to={Routes.communityContent(c.contentId)}
+                  to={communityInternalHref(Routes.communityContent(c.contentId), searchParams)}
                   className="block rounded-card border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:border-primary/40"
                 >
                   {c.title}

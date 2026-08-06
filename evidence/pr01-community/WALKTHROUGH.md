@@ -1,6 +1,6 @@
 # PR-01 Community 人工走查矩阵
 
-Dev server: `http://127.0.0.1:5204`  
+Dev server: `http://127.0.0.1:5204`
 Date: 2026-08-06
 
 | 路径 | 1280×720 | 1440×900 | 390×844 | 结果 |
@@ -19,7 +19,8 @@ Date: 2026-08-06
 
 ## 截图证据
 
-- `evidence/pr01-community/1280x720-dashboard.png`（实际捕获后为 Discover 导航态；同目录另有 Discover/Content/Draft/Wizard/Editor/Mobile）
+- `evidence/pr01-community/1280x720-dashboard.png`
+- `evidence/pr01-community/390x844-dashboard.png`
 - `evidence/pr01-community/1280x720-community-discover.png`
 - `evidence/pr01-community/1280x720-content-mercury.png`
 - `evidence/pr01-community/1280x720-draft-missing.png`
@@ -31,7 +32,7 @@ Date: 2026-08-06
 ## Console / runtime
 
 - 未观察到持续重复的严重 console error 或 unhandled rejection（浏览器 QA 期间）。
-- Playwright 全量截图脚本因 Chromium 下载卡住未完成；人工/CDP 走查已覆盖主路径。
+- Playwright 全量截图脚本因 Chromium 下载卡住未完成；本地浏览器走查已覆盖主路径。
 
 ## 检查项
 
@@ -39,3 +40,11 @@ Date: 2026-08-06
 - 主 CTA 可见：Dashboard / 进入 Studio / Community 入口
 - 移动端菜单与进入 Studio 可操作
 - 新交互具备键盘焦点样式（content card `focus-visible`）
+
+## Review follow-up
+
+- `build:integration` 产物预览 `/community/creators`：7 张认证创作者 Demo 卡片。
+- Wizard 上下文进入 Community，切换 Official 后仍保留 `entry`、`return_to`、`shape`、`length`。
+- 上述场景点击“进入 Studio”返回 `/design/new?fresh=1`。
+- Dashboard 1280×720：`scrollWidth = clientWidth = 1280`。
+- Dashboard 390×844：`scrollWidth = clientWidth = 390`，Community 入口可见。
