@@ -1,0 +1,18 @@
+{
+  "consoleErrors": [],
+  "pageErrors": [],
+  "unhandledRejections": [],
+  "failedNetwork": [
+    {
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "error": "net::ERR_ABORTED",
+      "judgment": "External Google Fonts asset; not an app production path. Page remains usable with fallback fonts."
+    }
+  ],
+  "resolved404": {
+    "url": "http://127.0.0.1:5205/favicon.ico",
+    "judgment": "Browser default favicon probe. Mitigated by data-URI rel=icon in index.html.",
+    "evidence": "network-404-investigation.json"
+  },
+  "note": "Primary walkthrough on 127.0.0.1:5205 after review fixes."
+}

@@ -30,6 +30,7 @@ const {
   createStudioImportIntent,
   getStudioImportIntent,
   isAllowlistedReturnTo,
+  parseStudioImportIntent,
   peekStudioImportIntentRaw,
   sanitizeReturnTo,
   validateStudioImportIntent,
@@ -56,9 +57,30 @@ assert.equal(canTryInStudio(missingAsset), false);
 assert.equal(isAllowlistedReturnTo('/community/content/x'), true);
 assert.equal(isAllowlistedReturnTo('/design/new'), true);
 assert.equal(isAllowlistedReturnTo('/'), true);
+assert.equal(isAllowlistedReturnTo('/community'), true);
+assert.equal(isAllowlistedReturnTo('/design'), true);
+assert.equal(isAllowlistedReturnTo('/community-evil'), false);
+assert.equal(isAllowlistedReturnTo('/designer'), false);
 assert.equal(isAllowlistedReturnTo('https://evil.example'), false);
 assert.equal(isAllowlistedReturnTo('//evil'), false);
+assert.equal(isAllowlistedReturnTo('community/x'), false);
 assert.equal(sanitizeReturnTo('https://evil.example', '/community'), '/community');
+assert.equal(sanitizeReturnTo('/community-evil', '/community'), '/community');
+
+assert.equal(parseStudioImportIntent(null).ok, false);
+assert.equal(
+  parseStudioImportIntent({
+    v: 1,
+    intentId: 'x',
+    source: 'COMMUNITY',
+    contentId: 'c',
+    publisherId: 'p',
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 1000).toISOString(),
+    applicationLevel: 'STRUCTURED_EDITABLE',
+  }).ok,
+  false,
+);
 
 mem.clear();
 const blocked = createStudioImportIntent({ content: inspiration });
@@ -106,6 +128,7 @@ const created3 = createStudioImportIntent({ content: tryable });
 assert.equal(created3.ok, true);
 const raw = peekStudioImportIntentRaw(created3.intentId);
 assert.ok(raw);
+raw.createdAt = new Date(Date.now() - 60_000).toISOString();
 raw.expiresAt = new Date(Date.now() - 1000).toISOString();
 const storeKey = 'nail-studio:community.studio-import-intent';
 const envelope = JSON.parse(localStorage.getItem(storeKey));

@@ -5,94 +5,78 @@
 
 import { hasEditorDoc } from '@/studio/editor/lib/repo';
 import { useWizardStore } from '@/studio/wizard/wizard-store';
+import { getContentById } from '@/community/data/content-repository';
+import { clearStudioImportIntent } from '@/community/domain/studio-import-intent';
+import { loadLibraryIndex } from '@/studio/preview/material-library';
 import {
-  clearStudioImportIntent,
-  type StudioImportIntentV1,
-} from '@/community/domain/studio-import-intent';
-import { loadLibraryIndex, type TemplateEntry } from '@/studio/preview/material-library';
-import type { NailLength, NailShape } from '@/lib/types';
+  consumeCommunityImportIntent as consumeWithDeps,
+  type CommunityIntentConsumeDeps,
+  type ConsumeCommunityIntentResult,
+} from '@/studio/wizard/community-intent-apply';
 import {
   detectCommunityIntentConflictFromSnapshot,
   type CommunityIntentConflictKind,
 } from '@/studio/wizard/community-intent-conflict';
 
-export type { CommunityIntentConflictKind };
-
-const SHAPES = new Set<NailShape>(['almond', 'oval', 'coffin', 'squoval', 'square']);
-const LENGTHS = new Set<NailLength>(['short', 'medium', 'long', 'extra-long']);
-
-function asShape(value: string | undefined): NailShape | undefined {
-  return value && SHAPES.has(value as NailShape) ? (value as NailShape) : undefined;
-}
-
-function asLength(value: string | undefined): NailLength | undefined {
-  return value && LENGTHS.has(value as NailLength) ? (value as NailLength) : undefined;
-}
+export type { CommunityIntentConflictKind, ConsumeCommunityIntentResult };
 
 /** 是否存在需显式选择的 Wizard 工作态（草稿 / 冻结 / 已有 Editor raw）。 */
 export function detectCommunityIntentConflict(): CommunityIntentConflictKind {
   return detectCommunityIntentConflictFromSnapshot(useWizardStore.getState());
 }
 
-export async function resolveIntentTemplate(
-  intent: StudioImportIntentV1,
-): Promise<TemplateEntry | null> {
-  const index = await loadLibraryIndex();
-  return (
-    index.templates.find(
-      (t) => t.id === intent.assetRef.templateId || t.id === intent.assetRef.renderTemplateId,
-    ) ?? null
-  );
+function liveWizardApi(): CommunityIntentConsumeDeps['wizard'] {
+  return {
+    getSnapshot: () => useWizardStore.getState(),
+    hasEditorDoc,
+    resetForNewDesign: () => useWizardStore.getState().resetForNewDesign(),
+    setShapeLengthDraft: ({ shape, length, enterStep2 }) => {
+      if (enterStep2) {
+        useWizardStore.setState({
+          shape,
+          length,
+          appliedShape: shape,
+          appliedLength: length,
+          step: 2,
+          pickerOpen: false,
+        });
+      } else {
+        useWizardStore.setState({ shape, length, step: 1 });
+      }
+    },
+    applyTemplate: (template) => useWizardStore.getState().applyTemplate(template),
+  };
 }
 
-export type ApplyCommunityIntentResult =
-  | { ok: true }
-  | { ok: false; reason: 'frozen' | 'editor_doc' | 'template_missing' };
+export function createLiveConsumeDeps(
+  overrides?: Partial<CommunityIntentConsumeDeps>,
+): CommunityIntentConsumeDeps {
+  return {
+    getContentById: overrides?.getContentById ?? getContentById,
+    loadLibraryIndex: overrides?.loadLibraryIndex ?? loadLibraryIndex,
+    wizard: overrides?.wizard ?? liveWizardApi(),
+  };
+}
 
 /**
- * 应用 Intent：current 不得覆盖 frozen / editor_doc；
- * new 先 resetForNewDesign 再 applyTemplate。
+ * 应用前最终校验 + 写入 Wizard。
+ * UI 与 clean 自动路径共用，避免行为漂移。
  */
-export async function applyCommunityImportIntent(
-  intent: StudioImportIntentV1,
+export async function consumeCommunityImportIntent(
+  intentId: string,
   mode: 'current' | 'new',
-): Promise<ApplyCommunityIntentResult> {
-  const conflict = detectCommunityIntentConflict();
-  if (mode === 'current') {
-    if (conflict === 'frozen') return { ok: false, reason: 'frozen' };
-    if (conflict === 'editor_doc') return { ok: false, reason: 'editor_doc' };
-  }
+  deps?: Partial<CommunityIntentConsumeDeps>,
+): Promise<ConsumeCommunityIntentResult> {
+  return consumeWithDeps(intentId, mode, createLiveConsumeDeps(deps));
+}
 
-  const template = await resolveIntentTemplate(intent);
-  if (!template) {
-    clearStudioImportIntent(intent.intentId);
-    return { ok: false, reason: 'template_missing' };
-  }
-
-  if (mode === 'new') {
-    useWizardStore.getState().resetForNewDesign();
-  }
-
-  const store = useWizardStore.getState();
-  const shape = asShape(intent.suggestedContext?.shape);
-  const length = asLength(intent.suggestedContext?.length);
-
-  if (shape && length && store.status === 'draft' && !hasEditorDoc(store.designId)) {
-    useWizardStore.setState({
-      shape,
-      length,
-      appliedShape: shape,
-      appliedLength: length,
-      step: 2,
-      pickerOpen: false,
-    });
-  } else if (store.status === 'draft' && !store.appliedShape && shape && length) {
-    useWizardStore.setState({ shape, length, step: 1 });
-  }
-
-  useWizardStore.getState().applyTemplate(template);
-  clearStudioImportIntent(intent.intentId);
-  return { ok: true };
+/** @deprecated 使用 consumeCommunityImportIntent；保留薄封装兼容旧调用。 */
+export async function applyCommunityImportIntent(
+  intent: { intentId: string },
+  mode: 'current' | 'new',
+  deps?: Partial<CommunityIntentConsumeDeps>,
+): Promise<ConsumeCommunityIntentResult> {
+  return consumeCommunityImportIntent(intent.intentId, mode, deps);
 }
 
 export function cancelCommunityImportIntent(intentId: string): void {

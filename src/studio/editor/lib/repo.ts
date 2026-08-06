@@ -7,6 +7,7 @@ import { readData, writeEnvelope, removeKey, StorageKeys } from '@/lib/storage';
 import type { Customer, DesignSummary, NailLength, NailShape, ProjectV4 } from '@/lib/types';
 import { createBlankDoc, genId, type EditorDoc } from './model';
 import { migrateEditorDoc, type EditorDocMigrationResult } from './migrate';
+import { classifyEditorDocSchemaVersion } from './editor-doc-schema-version';
 
 /* ── 设计集合 ─────────────────────────────────────────── */
 
@@ -80,19 +81,14 @@ export function inspectEditorDoc(designId: string): EditorDocProbe {
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
     return { present: true, schemaVersion: null, kind: 'invalid' };
   }
-  const version = (raw as { schemaVersion?: unknown }).schemaVersion;
-  if (typeof version !== 'number' || !Number.isFinite(version)) {
-    return { present: true, schemaVersion: null, kind: 'unknown' };
-  }
-  // Current integration Editor pipeline supports migrated legacy docs through current model;
-  // future schema versions are explicitly unsupported without data loss.
-  if (version > 4) {
-    return { present: true, schemaVersion: version, kind: 'unsupported' };
-  }
-  if (version >= 1 && version <= 4) {
-    return { present: true, schemaVersion: version, kind: 'supported' };
-  }
-  return { present: true, schemaVersion: version, kind: 'unknown' };
+  const classified = classifyEditorDocSchemaVersion(
+    (raw as { schemaVersion?: unknown }).schemaVersion,
+  );
+  return {
+    present: true,
+    schemaVersion: classified.schemaVersion,
+    kind: classified.kind,
+  };
 }
 
 export function saveEditorDoc(doc: EditorDoc): void {

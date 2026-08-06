@@ -7,7 +7,7 @@
 
 import { createClientId, readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { Routes } from '@/app/routes';
-import type { CommunityContentV1 } from './types';
+import type { ApplicationLevel, CommunityContentV1 } from './types';
 
 export const STUDIO_IMPORT_INTENT_TTL_MS = 30 * 60 * 1000;
 
@@ -35,20 +35,130 @@ export interface StudioImportIntentV1 {
 
 type IntentStore = Record<string, StudioImportIntentV1>;
 
-function readStore(): IntentStore {
-  return readData<IntentStore>(StorageKeys.communityStudioImportIntent) ?? {};
+const APPLICATION_LEVELS = new Set<ApplicationLevel>([
+  'INSPIRATION_ONLY',
+  'APPROXIMATE',
+  'STRUCTURED_EDITABLE',
+  'REPRODUCIBLE',
+]);
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function writeStore(store: IntentStore): void {
   writeEnvelope(StorageKeys.communityStudioImportIntent, store);
 }
 
-/** Allowlisted internal return targets for intent.returnTo / recovery navigation. */
+function readRawStore(): Record<string, unknown> {
+  const raw = readData<unknown>(StorageKeys.communityStudioImportIntent);
+  if (!isPlainObject(raw)) return {};
+  return raw as Record<string, unknown>;
+}
+
+/**
+ * Runtime schema guard：非法数据不抛异常，返回 typed failure。
+ * expectedIntentId：存储 key 必须与对象内 intentId 一致。
+ */
+export function parseStudioImportIntent(
+  value: unknown,
+  expectedIntentId?: string,
+): { ok: true; intent: StudioImportIntentV1 } | { ok: false; reason: 'invalid' } {
+  if (!isPlainObject(value)) return { ok: false, reason: 'invalid' };
+  if (value.v !== 1) return { ok: false, reason: 'invalid' };
+  if (value.source !== 'COMMUNITY') return { ok: false, reason: 'invalid' };
+  if (!isNonEmptyString(value.intentId)) return { ok: false, reason: 'invalid' };
+  if (!isNonEmptyString(value.contentId)) return { ok: false, reason: 'invalid' };
+  if (!isNonEmptyString(value.publisherId)) return { ok: false, reason: 'invalid' };
+  if (expectedIntentId !== undefined && value.intentId !== expectedIntentId) {
+    return { ok: false, reason: 'invalid' };
+  }
+
+  const createdAtMs = typeof value.createdAt === 'string' ? Date.parse(value.createdAt) : NaN;
+  const expiresAtMs = typeof value.expiresAt === 'string' ? Date.parse(value.expiresAt) : NaN;
+  if (!Number.isFinite(createdAtMs) || !Number.isFinite(expiresAtMs)) {
+    return { ok: false, reason: 'invalid' };
+  }
+  if (expiresAtMs <= createdAtMs) return { ok: false, reason: 'invalid' };
+
+  if (!isPlainObject(value.assetRef)) return { ok: false, reason: 'invalid' };
+  if (!isNonEmptyString(value.assetRef.templateId)) return { ok: false, reason: 'invalid' };
+  if (!isNonEmptyString(value.assetRef.assetVersion)) return { ok: false, reason: 'invalid' };
+  if (
+    value.assetRef.renderTemplateId !== undefined &&
+    !isNonEmptyString(value.assetRef.renderTemplateId)
+  ) {
+    return { ok: false, reason: 'invalid' };
+  }
+  if (value.assetRef.recipeId !== undefined && !isNonEmptyString(value.assetRef.recipeId)) {
+    return { ok: false, reason: 'invalid' };
+  }
+
+  if (
+    typeof value.applicationLevel !== 'string' ||
+    !APPLICATION_LEVELS.has(value.applicationLevel as ApplicationLevel)
+  ) {
+    return { ok: false, reason: 'invalid' };
+  }
+
+  let suggestedContext: StudioImportIntentV1['suggestedContext'];
+  if (value.suggestedContext !== undefined) {
+    if (!isPlainObject(value.suggestedContext)) return { ok: false, reason: 'invalid' };
+    const shape = value.suggestedContext.shape;
+    const length = value.suggestedContext.length;
+    if (shape !== undefined && typeof shape !== 'string') return { ok: false, reason: 'invalid' };
+    if (length !== undefined && typeof length !== 'string') return { ok: false, reason: 'invalid' };
+    suggestedContext = {
+      shape: typeof shape === 'string' ? shape : undefined,
+      length: typeof length === 'string' ? length : undefined,
+    };
+  }
+
+  let returnTo: string | undefined;
+  if (value.returnTo !== undefined) {
+    if (typeof value.returnTo !== 'string') return { ok: false, reason: 'invalid' };
+    returnTo = value.returnTo;
+  }
+
+  const intent: StudioImportIntentV1 = {
+    v: 1,
+    intentId: value.intentId,
+    createdAt: value.createdAt as string,
+    expiresAt: value.expiresAt as string,
+    source: 'COMMUNITY',
+    contentId: value.contentId,
+    publisherId: value.publisherId,
+    assetRef: {
+      templateId: value.assetRef.templateId,
+      renderTemplateId:
+        typeof value.assetRef.renderTemplateId === 'string'
+          ? value.assetRef.renderTemplateId
+          : undefined,
+      recipeId: typeof value.assetRef.recipeId === 'string' ? value.assetRef.recipeId : undefined,
+      assetVersion: value.assetRef.assetVersion,
+    },
+    applicationLevel: value.applicationLevel as ApplicationLevel,
+    suggestedContext,
+    returnTo,
+  };
+  return { ok: true, intent };
+}
+
+/**
+ * Allowlisted internal return targets.
+ * 仅 `/`、`/community`、`/community/...`、`/design`、`/design/...`。
+ */
 export function isAllowlistedReturnTo(path: string | undefined | null): path is string {
-  if (!path || path.startsWith('//') || !path.startsWith('/')) return false;
-  if (path === Routes.dashboard) return true;
-  if (path.startsWith('/community')) return true;
-  if (path.startsWith('/design')) return true;
+  if (!path || typeof path !== 'string') return false;
+  if (!path.startsWith('/') || path.startsWith('//')) return false;
+  if (path.includes('://')) return false;
+  if (path === '/') return true;
+  if (path === '/community' || path.startsWith('/community/')) return true;
+  if (path === '/design' || path.startsWith('/design/')) return true;
   return false;
 }
 
@@ -61,30 +171,41 @@ export function clearStudioImportIntent(intentId?: string): void {
     removeKey(StorageKeys.communityStudioImportIntent);
     return;
   }
-  const store = readStore();
+  const store = readRawStore();
   if (!(intentId in store)) return;
   delete store[intentId];
   if (Object.keys(store).length === 0) {
     removeKey(StorageKeys.communityStudioImportIntent);
   } else {
-    writeStore(store);
+    writeStore(store as IntentStore);
   }
 }
 
 export function getStudioImportIntent(intentId: string): StudioImportIntentV1 | null {
-  const intent = readStore()[intentId];
-  if (!intent || intent.v !== 1) return null;
-  if (Date.parse(intent.expiresAt) <= Date.now()) {
+  const raw = readRawStore()[intentId];
+  if (raw === undefined) return null;
+  const parsed = parseStudioImportIntent(raw, intentId);
+  if (!parsed.ok) {
     clearStudioImportIntent(intentId);
     return null;
   }
-  return intent;
+  if (Date.parse(parsed.intent.expiresAt) <= Date.now()) {
+    clearStudioImportIntent(intentId);
+    return null;
+  }
+  return parsed.intent;
 }
 
-/** Test/helper: read raw intent without TTL purge (for expired fixtures). */
+/** Test/helper: read raw after schema guard（不含 TTL purge）。 */
 export function peekStudioImportIntentRaw(intentId: string): StudioImportIntentV1 | null {
-  const intent = readStore()[intentId];
-  return intent?.v === 1 ? intent : null;
+  const raw = readRawStore()[intentId];
+  if (raw === undefined) return null;
+  const parsed = parseStudioImportIntent(raw, intentId);
+  if (!parsed.ok) {
+    clearStudioImportIntent(intentId);
+    return null;
+  }
+  return parsed.intent;
 }
 
 export type CreateIntentResult =
@@ -129,9 +250,9 @@ export function createStudioImportIntent(input: {
     returnTo: sanitizeReturnTo(input.returnTo, fallbackReturn),
   };
 
-  const store = readStore();
+  const store = readRawStore();
   store[intentId] = intent;
-  writeStore(store);
+  writeStore(store as IntentStore);
 
   const params = new URLSearchParams();
   params.set('communityIntent', intentId);
@@ -148,7 +269,8 @@ export type IntentValidation =
         | 'content_mismatch'
         | 'asset_mismatch'
         | 'inspiration_only'
-        | 'invalid_return';
+        | 'invalid_return'
+        | 'invalid';
     };
 
 /** Studio 消费前：对照最新 content 校验 contentId / assetVersion / templateId。 */
@@ -156,13 +278,21 @@ export function validateStudioImportIntent(
   intentId: string,
   content: CommunityContentV1 | null,
 ): IntentValidation {
-  const raw = peekStudioImportIntentRaw(intentId);
-  if (!raw || raw.v !== 1) return { ok: false, reason: 'missing' };
-  if (Date.parse(raw.expiresAt) <= Date.now()) {
+  const rawEntry = readRawStore()[intentId];
+  if (rawEntry === undefined) return { ok: false, reason: 'missing' };
+
+  const parsed = parseStudioImportIntent(rawEntry, intentId);
+  if (!parsed.ok) {
+    clearStudioImportIntent(intentId);
+    return { ok: false, reason: 'invalid' };
+  }
+
+  if (Date.parse(parsed.intent.expiresAt) <= Date.now()) {
     clearStudioImportIntent(intentId);
     return { ok: false, reason: 'expired' };
   }
-  const intent = raw;
+
+  const intent = parsed.intent;
   if (intent.returnTo && !isAllowlistedReturnTo(intent.returnTo)) {
     clearStudioImportIntent(intentId);
     return { ok: false, reason: 'invalid_return' };

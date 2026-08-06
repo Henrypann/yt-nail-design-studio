@@ -13,11 +13,9 @@ import { ArrowLeft, Compass, Save } from 'lucide-react';
 import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { communityHref } from '@/community/lib/entry-link';
-import { getContentById } from '@/community/data/content-repository';
 import {
-  getStudioImportIntent,
+  peekStudioImportIntentRaw,
   sanitizeReturnTo,
-  validateStudioImportIntent,
   type StudioImportIntentV1,
 } from '@/community/domain/studio-import-intent';
 import { StepOne } from '@/studio/wizard/StepOne';
@@ -26,13 +24,42 @@ import { CustomerPickerModal } from '@/studio/wizard/CustomerPickerModal';
 import { findCustomer } from '@/studio/wizard/customer-repository';
 import { setWizardNotifier, useWizardStore } from '@/studio/wizard/wizard-store';
 import {
-  applyCommunityImportIntent,
   cancelCommunityImportIntent,
+  consumeCommunityImportIntent,
   detectCommunityIntentConflict,
   type CommunityIntentConflictKind,
 } from '@/studio/wizard/consume-community-intent';
 import { hasEditorDoc } from '@/studio/editor';
 import { loadShapeParams } from '@/studio/preview/material-library';
+
+type IntentConflictUi = {
+  intentId: string;
+  contentId: string;
+  returnTo?: string;
+  kind: CommunityIntentConflictKind;
+  applicationLevel?: StudioImportIntentV1['applicationLevel'];
+};
+
+function validationToastMessage(reason?: string): string {
+  switch (reason) {
+    case 'expired':
+      return '试用意图已过期，请从 Community 重新试用。';
+    case 'missing':
+      return '试用意图不存在或已被清除。';
+    case 'invalid':
+      return '试用意图数据无效，已安全清除。';
+    case 'asset_mismatch':
+      return 'Community 资产已更新，请重新试用。';
+    case 'content_mismatch':
+      return 'Community 内容已变更，请重新试用。';
+    case 'inspiration_only':
+      return '该内容已改为灵感参考，不可试用到 Studio。';
+    case 'invalid_return':
+      return '试用返回路径非法，已中止导入。';
+    default:
+      return '试用意图校验失败，请从 Community 重新试用。';
+  }
+}
 
 export default function WizardPage() {
   const toast = useToast();
@@ -41,10 +68,8 @@ export default function WizardPage() {
   const s = useWizardStore();
   const [exitOpen, setExitOpen] = useState(false);
   const [summaryLabel, setSummaryLabel] = useState('');
-  const [intentConflict, setIntentConflict] = useState<{
-    intent: StudioImportIntentV1;
-    kind: CommunityIntentConflictKind;
-  } | null>(null);
+  const [intentConflict, setIntentConflict] = useState<IntentConflictUi | null>(null);
+  const [intentPending, setIntentPending] = useState(false);
   /** 已处理的 intentId，避免同一次落地重复消费；换新 intent 可再次进入。 */
   const intentHandledRef = useRef<string | null>(null);
 
@@ -64,6 +89,22 @@ export default function WizardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  const stripIntentParam = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('communityIntent');
+    setSearchParams(next, { replace: true });
+  };
+
+  const recoverFromIntent = (intent?: Pick<StudioImportIntentV1, 'returnTo' | 'contentId'> | null) => {
+    const fallback = intent?.contentId
+      ? Routes.communityContent(intent.contentId)
+      : Routes.community;
+    const target = sanitizeReturnTo(intent?.returnTo, fallback);
+    setIntentConflict(null);
+    stripIntentParam();
+    navigate(target, { replace: true });
+  };
+
   /* Community StudioImportIntent 消费（草稿冲突须显式选择） */
   useEffect(() => {
     const intentId = searchParams.get('communityIntent');
@@ -74,86 +115,161 @@ export default function WizardPage() {
     if (intentHandledRef.current === intentId) return;
     intentHandledRef.current = intentId;
 
-    const stripIntentParam = () => {
-      const next = new URLSearchParams(searchParams);
-      next.delete('communityIntent');
-      setSearchParams(next, { replace: true });
-    };
-
-    const recover = (intent?: StudioImportIntentV1 | null) => {
-      const target = sanitizeReturnTo(intent?.returnTo, Routes.community);
-      stripIntentParam();
-      navigate(target, { replace: true });
-    };
-
     void (async () => {
+      setIntentPending(true);
       try {
-        const raw = getStudioImportIntent(intentId);
+        const kind = detectCommunityIntentConflict();
+        if (kind === 'none') {
+          const applied = await consumeCommunityImportIntent(intentId, 'current');
+          if (applied.ok) {
+            if (applied.intent.applicationLevel === 'APPROXIMATE') {
+              toast.info('已导入近似应用方案，效果可能与 Community 预览有差异。');
+            }
+            stripIntentParam();
+            return;
+          }
+          if (applied.reason === 'validation') {
+            toast.warning(validationToastMessage(applied.validationReason));
+            recoverFromIntent(
+              applied.recovery?.contentId
+                ? {
+                    contentId: applied.recovery.contentId,
+                    returnTo: applied.recovery.returnTo,
+                  }
+                : null,
+            );
+            return;
+          }
+          if (applied.reason === 'load_failed') {
+            toast.error('加载 Studio 素材失败，请稍后重试或取消。');
+            const raw = peekStudioImportIntentRaw(intentId);
+            if (raw) {
+              setIntentConflict({
+                intentId,
+                contentId: raw.contentId,
+                returnTo: raw.returnTo,
+                kind: detectCommunityIntentConflict(),
+                applicationLevel: raw.applicationLevel,
+              });
+            } else {
+              stripIntentParam();
+            }
+            return;
+          }
+          if (applied.reason === 'frozen' || applied.reason === 'editor_doc') {
+            const raw = peekStudioImportIntentRaw(intentId) ?? applied.intent;
+            if (raw) {
+              setIntentConflict({
+                intentId,
+                contentId: raw.contentId,
+                returnTo: raw.returnTo,
+                kind: applied.reason,
+                applicationLevel: raw.applicationLevel,
+              });
+            } else {
+              toast.info('当前设计不可直接覆盖，请新建设计后再试用。');
+              stripIntentParam();
+            }
+            return;
+          }
+          toast.info('当前设计不可直接覆盖，请新建设计后再试用。');
+          stripIntentParam();
+          return;
+        }
+
+        const raw = peekStudioImportIntentRaw(intentId);
         if (!raw) {
           toast.warning('试用意图已过期或不存在。');
           stripIntentParam();
           return;
         }
-        const content = await getContentById(raw.contentId);
-        const validated = validateStudioImportIntent(intentId, content);
-        if (!validated.ok) {
-          toast.warning('试用意图校验失败，请从 Community 重新试用。');
-          recover(raw);
-          return;
-        }
-        const kind = detectCommunityIntentConflict();
-        if (kind === 'none') {
-          const applied = await applyCommunityImportIntent(validated.intent, 'current');
-          if (!applied.ok) {
-            toast.info('当前设计不可直接覆盖，请新建设计后再试用。');
-          } else if (validated.intent.applicationLevel === 'APPROXIMATE') {
-            toast.info('已导入近似应用方案，效果可能与 Community 预览有差异。');
-          }
-          stripIntentParam();
-          return;
-        }
-        setIntentConflict({ intent: validated.intent, kind });
+        // 冲突态仅暂存元数据；真正 apply 前会再次 validate
+        setIntentConflict({
+          intentId,
+          contentId: raw.contentId,
+          returnTo: raw.returnTo,
+          kind,
+          applicationLevel: raw.applicationLevel,
+        });
       } catch {
         toast.error('读取 Community 试用意图失败。');
         stripIntentParam();
+      } finally {
+        setIntentPending(false);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const resolveIntent = (choice: 'current' | 'new' | 'cancel') => {
-    if (!intentConflict) return;
-    const { intent, kind } = intentConflict;
-    const strip = () => {
-      const next = new URLSearchParams(searchParams);
-      next.delete('communityIntent');
-      setSearchParams(next, { replace: true });
-      setIntentConflict(null);
-    };
+    if (!intentConflict || intentPending) return;
+    const ui = intentConflict;
+
     if (choice === 'cancel') {
-      cancelCommunityImportIntent(intent.intentId);
-      strip();
-      navigate(sanitizeReturnTo(intent.returnTo, Routes.communityContent(intent.contentId)));
+      cancelCommunityImportIntent(ui.intentId);
+      setIntentConflict(null);
+      stripIntentParam();
+      navigate(
+        sanitizeReturnTo(ui.returnTo, Routes.communityContent(ui.contentId)),
+        { replace: true },
+      );
       return;
     }
-    if (choice === 'current' && (kind === 'frozen' || kind === 'editor_doc')) {
+
+    if (choice === 'current' && (ui.kind === 'frozen' || ui.kind === 'editor_doc')) {
       toast.info(
-        kind === 'frozen'
+        ui.kind === 'frozen'
           ? '设计已冻结，无法在当前草稿试用。请选择新建设计。'
           : '已存在自由画布文档，Community 不会覆盖。请选择新建设计。',
       );
       return;
     }
+
     void (async () => {
-      const applied = await applyCommunityImportIntent(intent, choice === 'new' ? 'new' : 'current');
-      if (!applied.ok) {
+      setIntentPending(true);
+      try {
+        const applied = await consumeCommunityImportIntent(ui.intentId, choice);
+        if (applied.ok) {
+          if (applied.intent.applicationLevel === 'APPROXIMATE') {
+            toast.info('已导入近似应用方案，效果可能与 Community 预览有差异。');
+          }
+          setIntentConflict(null);
+          stripIntentParam();
+          return;
+        }
+        if (applied.reason === 'validation') {
+          toast.warning(validationToastMessage(applied.validationReason));
+          recoverFromIntent(
+            applied.recovery?.contentId
+              ? {
+                  contentId: applied.recovery.contentId,
+                  returnTo: applied.recovery.returnTo ?? ui.returnTo,
+                }
+              : { contentId: ui.contentId, returnTo: ui.returnTo },
+          );
+          return;
+        }
+        if (applied.reason === 'load_failed') {
+          toast.error('加载 Studio 素材失败，请稍后重试或取消。');
+          return;
+        }
+        if (applied.reason === 'frozen' || applied.reason === 'editor_doc') {
+          toast.info(
+            applied.reason === 'frozen'
+              ? '设计已冻结，无法在当前草稿试用。请选择新建设计。'
+              : '已存在自由画布文档，Community 不会覆盖。请选择新建设计。',
+          );
+          setIntentConflict((prev) =>
+            prev ? { ...prev, kind: applied.reason as CommunityIntentConflictKind } : prev,
+          );
+          return;
+        }
         toast.info('无法应用到当前设计，请选择新建设计。');
-        return;
+      } catch {
+        toast.error('应用 Community 方案失败，请稍后重试或取消。');
+      } finally {
+        setIntentPending(false);
       }
-      if (intent.applicationLevel === 'APPROXIMATE') {
-        toast.info('已导入近似应用方案，效果可能与 Community 预览有差异。');
-      }
-      strip();
     })();
   };
 
@@ -361,6 +477,7 @@ export default function WizardPage() {
             <Button
               variant="ghost"
               data-testid="community-intent-cancel"
+              disabled={intentPending}
               onClick={() => resolveIntent('cancel')}
             >
               取消
@@ -368,13 +485,18 @@ export default function WizardPage() {
             <Button
               variant="secondary"
               data-testid="community-intent-new"
+              disabled={intentPending}
               onClick={() => resolveIntent('new')}
             >
               新建设计
             </Button>
             <Button
               data-testid="community-intent-current"
-              disabled={intentConflict?.kind === 'frozen' || intentConflict?.kind === 'editor_doc'}
+              disabled={
+                intentPending ||
+                intentConflict?.kind === 'frozen' ||
+                intentConflict?.kind === 'editor_doc'
+              }
               onClick={() => resolveIntent('current')}
             >
               在当前草稿试用
