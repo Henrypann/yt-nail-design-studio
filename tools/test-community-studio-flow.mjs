@@ -199,12 +199,12 @@ assert.deepEqual(inspectEditorDoc('d_v3'), {
 assert.deepEqual(inspectEditorDoc('d_v4'), {
   present: true,
   schemaVersion: 4,
-  kind: 'unsupported',
+  kind: 'supported',
 });
 assert.deepEqual(inspectEditorDoc('d_v5'), {
   present: true,
   schemaVersion: 5,
-  kind: 'unsupported',
+  kind: 'supported',
 });
 assert.deepEqual(inspectEditorDoc('d_future'), {
   present: true,
@@ -342,15 +342,15 @@ seedEditorDocs({ d_v3: { schemaVersion: 3, designId: 'd_v3' } });
   assert.equal(w.state.applyCount, 0);
 }
 
-/* 7) v4/v5/future present conflict */
-for (const [id, ver] of [
-  ['d_v4', 4],
-  ['d_v5', 5],
-  ['d_fut', 9],
+/* 7) v4/v5 present as known schemas; future remains unsupported; all conflict */
+for (const [id, ver, kind] of [
+  ['d_v4', 4, 'supported'],
+  ['d_v5', 5, 'supported'],
+  ['d_fut', 9, 'unsupported'],
 ]) {
   mem.clear();
   seedEditorDocs({ [id]: { schemaVersion: ver, designId: id } });
-  assert.equal(inspectEditorDoc(id).kind, 'unsupported');
+  assert.equal(inspectEditorDoc(id).kind, kind);
   assert.equal(
     detectCommunityIntentConflictFromSnapshot({ ...cleanSnap, designId: id }),
     'editor_doc',

@@ -10,6 +10,7 @@ import {
 } from './model.ts';
 import type { ReliefElement, RecipeInstanceV1 } from './recipe-model.ts';
 import {
+  EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION,
   EDITOR_DOC_MIGRATABLE_MAX_VERSION,
   classifyEditorDocSchemaVersion,
 } from './editor-doc-schema-version.ts';
@@ -202,11 +203,19 @@ export function migrateEditorDoc(value: unknown): EditorDocMigrationResult {
   if (classified.kind === 'supported' && classified.schemaVersion === 3) {
     return normalizeV3(raw);
   }
+  // v4–v6 are known to the v6 contract but not openable via the legacy v3 runtime path.
+  if (
+    classified.kind === 'supported' &&
+    classified.schemaVersion != null &&
+    classified.schemaVersion > EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION
+  ) {
+    return { status: 'unsupported', version: classified.schemaVersion };
+  }
   if (classified.kind === 'unsupported' && classified.schemaVersion != null) {
     return { status: 'unsupported', version: classified.schemaVersion };
   }
   return {
     status: 'invalid',
-    reason: `Editor 文档版本无效（可读上限 v${EDITOR_DOC_MIGRATABLE_MAX_VERSION}）`,
+    reason: `Editor 文档版本无效（遗留运行时上限 v${EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION}；已知家族上限 v${EDITOR_DOC_MIGRATABLE_MAX_VERSION}）`,
   };
 }

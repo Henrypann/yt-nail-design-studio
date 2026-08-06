@@ -8,6 +8,13 @@ import type { Customer, DesignSummary, NailLength, NailShape, ProjectV4 } from '
 import { createBlankDoc, genId, type EditorDoc } from './model';
 import { migrateEditorDoc, type EditorDocMigrationResult } from './migrate';
 import { classifyEditorDocSchemaVersion } from './editor-doc-schema-version';
+import type { EditorDocV6 } from '../v6/model';
+import {
+  getEditorDocV6Result as getEditorDocV6ResultFromMap,
+  saveEditorDocV6ToMap,
+  type EditorDocV6SaveResult,
+} from '../v6/repository-contract';
+import type { EditorDocV6MigrationResult } from '../v6/migrate';
 
 /* ── 设计集合 ─────────────────────────────────────────── */
 
@@ -52,6 +59,26 @@ export function getEditorDoc(designId: string): EditorDoc | undefined {
 export function getEditorDocResult(designId: string): EditorDocMigrationResult {
   return migrateEditorDoc(readEditorDocs()[designId]);
 }
+
+/** Pure v6 contract load: migrates raw → EditorDocV6 without writing storage. */
+export function getEditorDocV6Result(designId: string): EditorDocV6MigrationResult {
+  return getEditorDocV6ResultFromMap(readEditorDocs(), designId);
+}
+
+/**
+ * Explicit v6 save boundary. Rejects non-schema-6 candidates and does not
+ * fall back to blank create.
+ */
+export function saveEditorDocV6(candidate: unknown): EditorDocV6SaveResult {
+  const map = readEditorDocs();
+  const result = saveEditorDocV6ToMap(map, candidate);
+  if (result.status === 'ok') {
+    writeEnvelope(StorageKeys.editorDocs, map);
+  }
+  return result;
+}
+
+export type { EditorDocV6, EditorDocV6MigrationResult, EditorDocV6SaveResult };
 
 /** raw 存在与否独立于迁移结果，避免坏数据/未来版本被 Bridge 静默覆盖。 */
 export function hasEditorDocRaw(designId: string): boolean {

@@ -40,7 +40,9 @@
     "dogfood:creator-path": "node tools/review-creator-path.mjs",
     "dogfood:single-degrade": "node tools/review-single-degrade.mjs",
     "dogfood:final-shots": "node tools/final-shots.mjs",
-    "dogfood:verify-render-fail-toast": "node tools/verify-render-fail-toast.mjs"
+    "dogfood:verify-render-fail-toast": "node tools/verify-render-fail-toast.mjs",
+    "test:editor-v6-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v6-contract.mjs",
+    "test:editor-v6-migrate": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v6-migrate.mjs"
   },
   "dependencies": {
     "immer": "^10.1.1",

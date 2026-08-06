@@ -10,14 +10,25 @@ export * from './lib/model';
 export {
   createBlankEditorDesign,
   getEditorDoc,
+  getEditorDocV6Result,
   hasEditorDoc,
   hasEditorDocRaw,
   inspectEditorDoc,
   saveEditorDoc,
+  saveEditorDocV6,
   removeEditorDoc,
   duplicateEditorDoc,
 } from './lib/repo';
-export type { EditorDocProbe } from './lib/repo';
+export type {
+  EditorDocProbe,
+  EditorDocV6,
+  EditorDocV6MigrationResult,
+  EditorDocV6SaveResult,
+} from './lib/repo';
+export { createEmptyEditorDocV6 } from './v6/model';
+export { migrateEditorDocV6 } from './v6/migrate';
+export { validateEditorDocV6, parseEditorDocV6 } from './v6/schema';
+export { generateEditorId } from './v6/id';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';
