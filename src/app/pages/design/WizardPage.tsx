@@ -52,6 +52,12 @@ function validationToastMessage(reason?: string): string {
       return 'Community 资产已更新，请重新试用。';
     case 'content_mismatch':
       return 'Community 内容已变更，请重新试用。';
+    case 'not_published':
+      return '该 Community 内容已撤回，无法继续试用。';
+    case 'publisher_mismatch':
+      return 'Community 内容发布者已变更，请重新试用。';
+    case 'application_level_mismatch':
+      return 'Community 内容应用等级已变更，请重新确认后试用。';
     case 'inspiration_only':
       return '该内容已改为灵感参考，不可试用到 Studio。';
     case 'invalid_return':
@@ -130,6 +136,18 @@ export default function WizardPage() {
           }
           if (applied.reason === 'validation') {
             toast.warning(validationToastMessage(applied.validationReason));
+            recoverFromIntent(
+              applied.recovery?.contentId
+                ? {
+                    contentId: applied.recovery.contentId,
+                    returnTo: applied.recovery.returnTo,
+                  }
+                : null,
+            );
+            return;
+          }
+          if (applied.reason === 'template_missing') {
+            toast.warning('对应的 Studio 素材不可用，请从 Community 重新选择。');
             recoverFromIntent(
               applied.recovery?.contentId
                 ? {
@@ -239,6 +257,18 @@ export default function WizardPage() {
         }
         if (applied.reason === 'validation') {
           toast.warning(validationToastMessage(applied.validationReason));
+          recoverFromIntent(
+            applied.recovery?.contentId
+              ? {
+                  contentId: applied.recovery.contentId,
+                  returnTo: applied.recovery.returnTo ?? ui.returnTo,
+                }
+              : { contentId: ui.contentId, returnTo: ui.returnTo },
+          );
+          return;
+        }
+        if (applied.reason === 'template_missing') {
+          toast.warning('对应的 Studio 素材不可用，请从 Community 重新选择。');
           recoverFromIntent(
             applied.recovery?.contentId
               ? {

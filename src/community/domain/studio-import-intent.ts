@@ -267,6 +267,9 @@ export type IntentValidation =
         | 'missing'
         | 'expired'
         | 'content_mismatch'
+        | 'not_published'
+        | 'publisher_mismatch'
+        | 'application_level_mismatch'
         | 'asset_mismatch'
         | 'inspiration_only'
         | 'invalid_return'
@@ -301,9 +304,21 @@ export function validateStudioImportIntent(
     clearStudioImportIntent(intentId);
     return { ok: false, reason: 'content_mismatch' };
   }
+  if (content.status !== 'PUBLISHED') {
+    clearStudioImportIntent(intentId);
+    return { ok: false, reason: 'not_published' };
+  }
+  if (content.publisherId !== intent.publisherId) {
+    clearStudioImportIntent(intentId);
+    return { ok: false, reason: 'publisher_mismatch' };
+  }
   if (content.applicationLevel === 'INSPIRATION_ONLY') {
     clearStudioImportIntent(intentId);
     return { ok: false, reason: 'inspiration_only' };
+  }
+  if (content.applicationLevel !== intent.applicationLevel) {
+    clearStudioImportIntent(intentId);
+    return { ok: false, reason: 'application_level_mismatch' };
   }
   const asset = content.assetRef;
   if (

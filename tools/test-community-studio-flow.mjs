@@ -515,4 +515,22 @@ mem.clear();
   assert.equal(w.state.applyCount, 1);
 }
 
+/* 14) template missing：终止消费、不写 Wizard、清除 Intent */
+mem.clear();
+{
+  const w = makeWizard({ appliedShape: 'almond', step: 2, templateId: 'old' });
+  const intentId = putIntent();
+  const r = await consumeCommunityImportIntent(
+    intentId,
+    'new',
+    w.deps({ loadLibraryIndex: async () => ({ templates: [] }) }),
+  );
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'template_missing');
+  assert.equal(w.state.resetCount, 0);
+  assert.equal(w.state.applyCount, 0);
+  assert.equal(w.state.templateId, 'old');
+  assert.equal(getStudioImportIntent(intentId), null);
+}
+
 console.log('[test:community-studio-flow] PASS');

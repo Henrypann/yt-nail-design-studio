@@ -124,6 +124,39 @@ const assetMismatch = validateStudioImportIntent(created2.intentId, {
 assert.equal(assetMismatch.ok, false);
 assert.equal(assetMismatch.reason, 'asset_mismatch');
 
+const createdUnpublished = createStudioImportIntent({ content: tryable });
+assert.equal(createdUnpublished.ok, true);
+const unpublished = validateStudioImportIntent(createdUnpublished.intentId, {
+  ...tryable,
+  status: 'DEPRECATED',
+});
+assert.equal(unpublished.ok, false);
+assert.equal(unpublished.reason, 'not_published');
+assert.equal(getStudioImportIntent(createdUnpublished.intentId), null);
+
+const createdPublisherChanged = createStudioImportIntent({ content: tryable });
+assert.equal(createdPublisherChanged.ok, true);
+const publisherChanged = validateStudioImportIntent(createdPublisherChanged.intentId, {
+  ...tryable,
+  publisherId: 'pub_changed',
+});
+assert.equal(publisherChanged.ok, false);
+assert.equal(publisherChanged.reason, 'publisher_mismatch');
+assert.equal(getStudioImportIntent(createdPublisherChanged.intentId), null);
+
+const createdApplicationLevelChanged = createStudioImportIntent({ content: tryable });
+assert.equal(createdApplicationLevelChanged.ok, true);
+const applicationLevelChanged = validateStudioImportIntent(
+  createdApplicationLevelChanged.intentId,
+  {
+    ...tryable,
+    applicationLevel: 'APPROXIMATE',
+  },
+);
+assert.equal(applicationLevelChanged.ok, false);
+assert.equal(applicationLevelChanged.reason, 'application_level_mismatch');
+assert.equal(getStudioImportIntent(createdApplicationLevelChanged.intentId), null);
+
 const created3 = createStudioImportIntent({ content: tryable });
 assert.equal(created3.ok, true);
 const raw = peekStudioImportIntentRaw(created3.intentId);
