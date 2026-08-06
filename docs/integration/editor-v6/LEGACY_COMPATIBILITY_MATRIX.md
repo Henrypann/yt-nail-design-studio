@@ -1,7 +1,7 @@
 # EditorDoc v1–v6 legacy compatibility matrix
 
-Status: PR-03A evidence and interface-freeze input  
-Scope: document/model/migration/repository contracts only  
+Status: PR-03A evidence and interface-freeze input
+Scope: document/model/migration/repository contracts only
 Base inspected: `c4f13e7361cefedade4b98004acb1bdf69396402`
 
 This document separates observed repository facts from proposed v6 semantics. “Target v6” rows are interface-freeze recommendations, not claims that v6 already exists.
