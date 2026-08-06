@@ -36,13 +36,22 @@ export async function resolve(specifier, context, nextResolve) {
     return { url: MATERIAL_SHIM, shortCircuit: true, format: 'module' };
   }
 
-  // Vite resolves a bare path to either <p>.ts or <p>/index.ts
+  // Vite resolves a bare path to <p>.ts / <p>.tsx or <p>/index.ts(x)
   const withTsOrIndex = (abs) => {
     if (HAS_EXT.test(abs) || HAS_JSON.test(abs)) return abs;
     try {
-      if (fs.statSync(abs).isDirectory()) return path.join(abs, 'index.ts');
+      if (fs.statSync(abs).isDirectory()) {
+        for (const name of ['index.ts', 'index.tsx']) {
+          const candidate = path.join(abs, name);
+          if (fs.existsSync(candidate)) return candidate;
+        }
+        return path.join(abs, 'index.ts');
+      }
     } catch {
       /* not a directory */
+    }
+    for (const ext of ['.ts', '.tsx']) {
+      if (fs.existsSync(`${abs}${ext}`)) return `${abs}${ext}`;
     }
     return `${abs}.ts`;
   };

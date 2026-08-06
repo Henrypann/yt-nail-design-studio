@@ -148,6 +148,8 @@ interface WizardState {
   clearApplyError: () => void;
   setPresentNudge: (v: boolean) => void;
   applyTemplate: (t: TemplateEntry) => void;
+  /** Community Intent「新建设计」：新 designId + 清空工作态，保持 draft */
+  resetForNewDesign: () => void;
   setBaseColor: (hex: string) => void;
   setFinish: (f: Finish) => void;
   setFingerOverride: (fc: FingerCode, patch: FingerOverride) => void;
@@ -384,6 +386,42 @@ export const useWizardStore = create<WizardState>((set, get) => {
             : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存
+    },
+
+    resetForNewDesign: () => {
+      if (autosaveTimer !== null) {
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+      }
+      set({
+        step: 1,
+        pickerOpen: true,
+        customer: null,
+        shape: null,
+        length: null,
+        styleId: null,
+        styleName: null,
+        stylePrompted: false,
+        appliedShape: null,
+        appliedLength: null,
+        editingShapeLength: false,
+        applying: false,
+        applyError: null,
+        presentNudge: false,
+        templateId: null,
+        templateName: null,
+        baseColor: null,
+        finish: 'gloss',
+        fingerOverrides: {},
+        recipe: undefined,
+        selectedFinger: null,
+        designId: initialDesignId(),
+        createdAt: new Date().toISOString(),
+        version: 1,
+        status: 'draft',
+        confirmation: undefined,
+        saveState: 'saved',
+      });
     },
 
     setBaseColor: (hex) => {

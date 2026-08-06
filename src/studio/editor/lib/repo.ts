@@ -57,6 +57,44 @@ export function hasEditorDocRaw(designId: string): boolean {
   return Object.prototype.hasOwnProperty.call(readEditorDocs(), designId);
 }
 
+/** Version-neutral presence probe（PR-02）：不暴露 EditorDoc 类型。 */
+export function hasEditorDoc(designId: string): boolean {
+  return hasEditorDocRaw(designId);
+}
+
+export type EditorDocProbe =
+  | { present: false }
+  | {
+      present: true;
+      schemaVersion: number | null;
+      kind: 'supported' | 'unsupported' | 'invalid' | 'unknown';
+    };
+
+/**
+ * 只读 raw schema 元数据，不 migrate、不写 storage、不返回文档体。
+ * 供 Community→Studio 冲突探测使用。
+ */
+export function inspectEditorDoc(designId: string): EditorDocProbe {
+  if (!hasEditorDocRaw(designId)) return { present: false };
+  const raw = readEditorDocs()[designId];
+  if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { present: true, schemaVersion: null, kind: 'invalid' };
+  }
+  const version = (raw as { schemaVersion?: unknown }).schemaVersion;
+  if (typeof version !== 'number' || !Number.isFinite(version)) {
+    return { present: true, schemaVersion: null, kind: 'unknown' };
+  }
+  // Current integration Editor pipeline supports migrated legacy docs through current model;
+  // future schema versions are explicitly unsupported without data loss.
+  if (version > 4) {
+    return { present: true, schemaVersion: version, kind: 'unsupported' };
+  }
+  if (version >= 1 && version <= 4) {
+    return { present: true, schemaVersion: version, kind: 'supported' };
+  }
+  return { present: true, schemaVersion: version, kind: 'unknown' };
+}
+
 export function saveEditorDoc(doc: EditorDoc): void {
   const map = readEditorDocs();
   map[doc.designId] = doc;

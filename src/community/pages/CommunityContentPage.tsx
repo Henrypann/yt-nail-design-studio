@@ -1,12 +1,12 @@
 /**
- * `/community/content/:contentId` · 可分享详情（PR-01：无 Studio Import Intent）。
+ * `/community/content/:contentId` · 可分享详情 + StudioImportIntent 发布（PR-02）。
  * 禁止 import Wizard / Editor Store。
  */
 
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
-import { Badge, Button } from '@/design-system';
+import { Badge, Button, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { useLocale } from '@/lib/i18n';
 import { getContentById, getPublisherById, loadTaxonomy } from '../data/content-repository';
@@ -15,6 +15,10 @@ import type {
   CommunityPublisherV1,
   CommunityTaxonomyV1,
 } from '../domain/types';
+import {
+  canTryInStudio,
+  createStudioImportIntent,
+} from '../domain/studio-import-intent';
 import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
@@ -23,11 +27,13 @@ export default function CommunityContentPage() {
   const { contentId } = useParams<{ contentId: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const toast = useToast();
   const { locale } = useLocale();
   const [content, setContent] = useState<CommunityContentV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
   const [taxonomy, setTaxonomy] = useState<CommunityTaxonomyV1 | null>(null);
   const [coverFailed, setCoverFailed] = useState(false);
+  const [approxOpen, setApproxOpen] = useState(false);
 
   useEffect(() => {
     if (!contentId) return;
@@ -73,7 +79,38 @@ export default function CommunityContentPage() {
   }
 
   const style = taxonomy?.mainStyles.find((s) => s.id === content.mainStyleId);
-  const inspirationOnly = content.applicationLevel === 'INSPIRATION_ONLY';
+  const tryable = canTryInStudio(content);
+
+  const publishIntent = () => {
+    const result = createStudioImportIntent({
+      content,
+      returnTo: Routes.communityContent(content.contentId),
+      suggestedContext: {
+        shape: content.recommendedShapes[0],
+        length: content.supportedLengths[0],
+      },
+    });
+    if (!result.ok) {
+      if (result.reason === 'inspiration_only') {
+        toast.info('该内容仅供灵感参考，不可直接试用到 Studio。');
+      } else if (result.reason === 'missing_asset') {
+        toast.error('无法创建试用意图：缺少可应用资产。');
+      } else {
+        toast.error('无法创建试用意图：内容未发布。');
+      }
+      return;
+    }
+    navigate(result.href);
+  };
+
+  const onTryClick = () => {
+    if (!tryable) return;
+    if (content.applicationLevel === 'APPROXIMATE') {
+      setApproxOpen(true);
+      return;
+    }
+    publishIntent();
+  };
 
   return (
     <div className="mx-auto max-w-3xl space-y-4" data-testid="community-content-page">
@@ -137,18 +174,22 @@ export default function CommunityContentPage() {
           )}
 
           <p className="text-[11px] leading-relaxed text-gray-500">
-            预览通过 ≠ 可制造 ≠ 已下发生产。本阶段 Community 不会写入 Studio 导入意图，也不会改写 Wizard /
+            预览通过 ≠ 可制造 ≠ 已下发生产。试用仅写入 Studio 导入意图，不会由 Community 直接改写 Wizard /
             Editor。
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {inspirationOnly ? (
+            {tryable ? (
+              <Button onClick={onTryClick} data-testid="community-try-in-studio">
+                在 Studio 中试用
+              </Button>
+            ) : content.applicationLevel === 'INSPIRATION_ONLY' ? (
               <p className="text-xs text-gray-500" data-testid="community-inspiration-only">
                 灵感参考 · 不可直接试用到 Studio
               </p>
             ) : (
-              <p className="text-xs text-gray-500" data-testid="community-try-deferred">
-                Studio 试用导入将在后续 PR 提供；可先进入 Studio 自行创作。
+              <p className="text-xs text-gray-500" data-testid="community-missing-asset">
+                缺少可应用资产，暂不可试用
               </p>
             )}
             <Button
@@ -173,6 +214,32 @@ export default function CommunityContentPage() {
           </div>
         </div>
       </article>
+
+      <Modal
+        open={approxOpen}
+        onClose={() => setApproxOpen(false)}
+        title="近似应用说明"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setApproxOpen(false)}>
+              取消
+            </Button>
+            <Button
+              data-testid="community-approx-confirm"
+              onClick={() => {
+                setApproxOpen(false);
+                publishIntent();
+              }}
+            >
+              了解，继续试用
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-600">
+          该内容为「近似应用」：进入 Studio 后会尽量贴近官方效果，但可能与高保真预览存在差异，且不代表生产验证通过。
+        </p>
+      </Modal>
     </div>
   );
 }

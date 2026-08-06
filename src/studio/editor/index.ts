@@ -10,10 +10,14 @@ export * from './lib/model';
 export {
   createBlankEditorDesign,
   getEditorDoc,
+  hasEditorDoc,
+  hasEditorDocRaw,
+  inspectEditorDoc,
   saveEditorDoc,
   removeEditorDoc,
   duplicateEditorDoc,
 } from './lib/repo';
+export type { EditorDocProbe } from './lib/repo';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';

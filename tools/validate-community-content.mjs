@@ -150,16 +150,24 @@ assert.ok(communityFiles.length > 0);
 for (const file of communityFiles) {
   const src = fs.readFileSync(file, 'utf8');
   assert.doesNotMatch(src, /studio\/wizard|studio\/editor|useWizardStore|useEditorStore|useEditorV4Store/);
-  assert.doesNotMatch(src, /studio-import-intent|createStudioImportIntent|StudioImportIntent/);
 }
+
+const intentSrc = fs.readFileSync(
+  path.join(root, 'src/community/domain/studio-import-intent.ts'),
+  'utf8',
+);
+assert.match(intentSrc, /StudioImportIntentV1/);
+assert.match(intentSrc, /createStudioImportIntent|validateStudioImportIntent/);
+assert.doesNotMatch(intentSrc, /useWizardStore|useEditorStore|studio\/wizard|studio\/editor/);
 
 const contentPage = fs.readFileSync(
   path.join(root, 'src/community/pages/CommunityContentPage.tsx'),
   'utf8',
 );
-assert.doesNotMatch(contentPage, /createStudioImportIntent|community-try-in-studio/);
-assert.match(contentPage, /community-inspiration-only|community-try-deferred|community-open-studio/);
+assert.match(contentPage, /createStudioImportIntent/);
+assert.match(contentPage, /community-try-in-studio|community-inspiration-only|community-missing-asset/);
 assert.match(contentPage, /community-cover-fallback|onError/);
+assert.doesNotMatch(contentPage, /useWizardStore|useEditorStore/);
 
 const card = fs.readFileSync(
   path.join(root, 'src/community/components/CommunityContentCard.tsx'),
