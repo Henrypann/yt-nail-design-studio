@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "officialPgcTarget": 20,
+  "officialMetadataReadyCount": 4,
+  "officialGapCount": 16,
+  "contents": [
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_mercury_dew",
+      "contentType": "LOOK_SET",
+      "title": "Mercury Dew",
+      "titleEn": "Mercury Dew",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_mercury_dew_cover",
+          "url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-01",
+      "subStyleIds": [
+        "ST-10"
+      ],
+      "season": "winter",
+      "occasionIds": [
+        "party",
+        "date"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "cat-eye",
+        "chrome"
+      ],
+      "primaryColorIds": [
+        "nude",
+        "champagne"
+      ],
+      "recommendedShapes": [
+        "almond",
+        "oval"
+      ],
+      "supportedShapes": [
+        "almond",
+        "oval",
+        "coffin"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "short",
+        "medium",
+        "long"
+      ],
+      "applicationLevel": "STRUCTURED_EDITABLE",
+      "verificationLevel": "RENDER_VERIFIED",
+      "assetRef": {
+        "templateId": "t_mercury_dew_concept",
+        "renderTemplateId": "t_mercury_dew_concept",
+        "recipeId": "mercury-dew",
+        "assetVersion": "1.0.0",
+        "manifestUrl": "/assets/hero-recipes/mercury-dew/manifest.json"
+      },
+      "campaignTags": [
+        "recommended"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_petal_veil",
+      "contentType": "LOOK_SET",
+      "title": "Petal Veil French",
+      "titleEn": "Petal Veil French",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/petal-veil-french/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_petal_veil_cover",
+          "url": "/assets/hero-recipes/petal-veil-french/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-02",
+      "subStyleIds": [],
+      "occasionIds": [
+        "wedding",
+        "date"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "soft"
+      ],
+      "effectIds": [
+        "gloss"
+      ],
+      "primaryColorIds": [
+        "nude"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond",
+        "oval"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium",
+        "long"
+      ],
+      "applicationLevel": "STRUCTURED_EDITABLE",
+      "verificationLevel": "RENDER_VERIFIED",
+      "assetRef": {
+        "templateId": "t_petal_veil_french",
+        "renderTemplateId": "t_petal_veil_french",
+        "recipeId": "petal-veil-french",
+        "assetVersion": "1.0.0",
+        "manifestUrl": "/assets/hero-recipes/petal-veil-french/manifest.json"
+      },
+      "campaignTags": [
+        "recommended"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pearl_tide",
+      "contentType": "LOOK_SET",
+      "title": "Pearl Tide Shell",
+      "titleEn": "Pearl Tide Shell",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/pearl-tide-shell/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pearl_tide_cover",
+          "url": "/assets/hero-recipes/pearl-tide-shell/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-08",
+      "subStyleIds": [],
+      "occasionIds": [
+        "daily"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "calm"
+      ],
+      "effectIds": [
+        "pearl"
+      ],
+      "primaryColorIds": [
+        "ocean"
+      ],
+      "recommendedShapes": [
+        "oval"
+      ],
+      "supportedShapes": [
+        "oval",
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "short",
+        "medium"
+      ],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_micro_coquette",
+      "contentType": "LOOK_SET",
+      "title": "Micro Coquette",
+      "titleEn": "Micro Coquette",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/micro-coquette/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_micro_coquette_cover",
+          "url": "/assets/hero-recipes/micro-coquette/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-02",
+      "subStyleIds": [
+        "ST-04"
+      ],
+      "occasionIds": [
+        "date"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "sweet"
+      ],
+      "effectIds": [
+        "gloss"
+      ],
+      "primaryColorIds": [
+        "champagne"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond",
+        "coffin"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_luna_blush",
+      "contentType": "LOOK_SET",
+      "title": "压花玫瑰",
+      "publisherId": "pub_demo_luna",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st03-pressed-rose.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_luna_blush_cover",
+          "url": "/community/creator-covers/st03-pressed-rose.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-03",
+      "subStyleIds": [],
+      "occasionIds": [
+        "date"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "soft"
+      ],
+      "effectIds": [
+        "matte"
+      ],
+      "primaryColorIds": [
+        "champagne"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_luna_pearl",
+      "contentType": "LOOK_SET",
+      "title": "粉樱甜珠",
+      "publisherId": "pub_demo_luna",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st04-pastel-cherry.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_luna_pearl_cover",
+          "url": "/community/creator-covers/st04-pastel-cherry.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-04",
+      "subStyleIds": [],
+      "occasionIds": [
+        "party"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "sweet"
+      ],
+      "effectIds": [
+        "gloss"
+      ],
+      "primaryColorIds": [
+        "champagne"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_kai_circuit",
+      "contentType": "LOOK_SET",
+      "title": "铬光街头",
+      "publisherId": "pub_demo_kai",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st05-chrome-pop.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_kai_circuit_cover",
+          "url": "/community/creator-covers/st05-chrome-pop.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-05",
+      "subStyleIds": [],
+      "occasionIds": [
+        "party"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "chrome"
+      ],
+      "primaryColorIds": [
+        "silver"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_kai_oxblood",
+      "contentType": "LOOK_SET",
+      "title": "血色锁链",
+      "publisherId": "pub_demo_kai",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st06-oxblood-chain.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_kai_oxblood_cover",
+          "url": "/community/creator-covers/st06-oxblood-chain.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-06",
+      "subStyleIds": [],
+      "occasionIds": [
+        "party"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "matte"
+      ],
+      "primaryColorIds": [
+        "silver"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_kai_mirror",
+      "contentType": "LOOK_SET",
+      "title": "青电机械",
+      "publisherId": "pub_demo_kai",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st07-cyan-mech.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_kai_mirror_cover",
+          "url": "/community/creator-covers/st07-cyan-mech.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-07",
+      "subStyleIds": [],
+      "occasionIds": [
+        "party"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "chrome"
+      ],
+      "primaryColorIds": [
+        "ocean"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_mio_gallery",
+      "contentType": "LOOK_SET",
+      "title": "画廊笔触",
+      "publisherId": "pub_demo_mio",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st09-gallery-stroke.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_mio_gallery_cover",
+          "url": "/community/creator-covers/st09-gallery-stroke.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-09",
+      "subStyleIds": [],
+      "occasionIds": [
+        "daily"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "matte"
+      ],
+      "primaryColorIds": [
+        "nude"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_pugc_mio_jewel",
+      "contentType": "LOOK_SET",
+      "title": "酒红宝石",
+      "publisherId": "pub_demo_mio",
+      "publisherType": "VERIFIED_CREATOR",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/community/creator-covers/st10-burgundy-jewel.jpg",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_pugc_mio_jewel_cover",
+          "url": "/community/creator-covers/st10-burgundy-jewel.jpg",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-10",
+      "subStyleIds": [],
+      "occasionIds": [
+        "party"
+      ],
+      "subjectIds": [],
+      "moodIds": [
+        "bold"
+      ],
+      "effectIds": [
+        "gloss"
+      ],
+      "primaryColorIds": [
+        "sunset"
+      ],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "demo": true
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_draft_internal_gate",
+      "contentType": "LOOK_SET",
+      "title": "内部草稿（不得出现在 Discover）",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "NONE",
+      "cover": {
+        "url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_draft_internal_gate_cover",
+          "url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-01",
+      "subStyleIds": [],
+      "occasionIds": [],
+      "subjectIds": [],
+      "moodIds": [],
+      "effectIds": [],
+      "primaryColorIds": [],
+      "recommendedShapes": [
+        "almond"
+      ],
+      "supportedShapes": [
+        "almond"
+      ],
+      "notRecommendedShapes": {},
+      "supportedLengths": [
+        "medium"
+      ],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": [],
+      "status": "DRAFT",
+      "publishedAt": "2026-08-06T00:00:00.000Z"
+    }
+  ]
+}

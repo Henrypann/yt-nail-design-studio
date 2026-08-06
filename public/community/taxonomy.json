@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "mainStyles": [
+    { "id": "ST-01", "label": "极简/轻奢", "labelEn": "Minimal / Quiet Luxury" },
+    { "id": "ST-02", "label": "法式", "labelEn": "French" },
+    { "id": "ST-03", "label": "浪漫", "labelEn": "Romantic" },
+    { "id": "ST-04", "label": "可爱", "labelEn": "Cute" },
+    { "id": "ST-05", "label": "Y2K/复古/街头", "labelEn": "Y2K / Retro / Street" },
+    { "id": "ST-06", "label": "哥特/朋克", "labelEn": "Gothic / Punk" },
+    { "id": "ST-07", "label": "赛博/机甲", "labelEn": "Cyber / Mech" },
+    { "id": "ST-08", "label": "自然/海洋", "labelEn": "Nature / Ocean" },
+    { "id": "ST-09", "label": "艺术/抽象", "labelEn": "Art / Abstract" },
+    { "id": "ST-10", "label": "华丽/3D", "labelEn": "Ornate / 3D" }
+  ],
+  "occasions": [
+    { "id": "daily", "label": "日常", "labelEn": "Everyday" },
+    { "id": "wedding", "label": "婚礼", "labelEn": "Wedding" },
+    { "id": "date", "label": "约会", "labelEn": "Date" },
+    { "id": "party", "label": "派对", "labelEn": "Party" },
+    { "id": "work", "label": "通勤", "labelEn": "Work" }
+  ],
+  "moods": [
+    { "id": "sweet", "label": "甜美", "labelEn": "Sweet" },
+    { "id": "calm", "label": "安静", "labelEn": "Calm" },
+    { "id": "bold", "label": "大胆", "labelEn": "Bold" },
+    { "id": "soft", "label": "柔和", "labelEn": "Soft" }
+  ],
+  "effects": [
+    { "id": "pearl", "label": "珠光", "labelEn": "Pearlescent" },
+    { "id": "cat-eye", "label": "猫眼", "labelEn": "Cat-Eye" },
+    { "id": "chrome", "label": "镜面/金属", "labelEn": "Chrome" },
+    { "id": "aurora", "label": "极光", "labelEn": "Aura" },
+    { "id": "matte", "label": "哑光", "labelEn": "Matte" },
+    { "id": "gloss", "label": "亮面", "labelEn": "Glossy" },
+    { "id": "relief", "label": "浮雕", "labelEn": "Relief" }
+  ],
+  "colors": [
+    { "id": "nude", "label": "裸感", "labelEn": "Nude" },
+    { "id": "champagne", "label": "香槟", "labelEn": "Champagne" },
+    { "id": "ocean", "label": "海色", "labelEn": "Ocean" },
+    { "id": "sunset", "label": "暖橙", "labelEn": "Sunset" },
+    { "id": "silver", "label": "银色", "labelEn": "Silver" },
+    { "id": "butter", "label": "奶油黄", "labelEn": "Butter" }
+  ],
+  "seasons": [
+    { "id": "spring", "label": "春", "labelEn": "Spring" },
+    { "id": "summer", "label": "夏", "labelEn": "Summer" },
+    { "id": "autumn", "label": "秋", "labelEn": "Autumn" },
+    { "id": "winter", "label": "冬", "labelEn": "Winter" }
+  ],
+  "subjects": [
+    { "id": "french", "label": "法式线", "labelEn": "French Tip" },
+    { "id": "flower", "label": "花", "labelEn": "Floral" },
+    { "id": "marine", "label": "海洋元素", "labelEn": "Ocean Motif" },
+    { "id": "bow", "label": "蝴蝶结", "labelEn": "Bow" }
+  ]
+}

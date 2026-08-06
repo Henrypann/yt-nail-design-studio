@@ -8,9 +8,10 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Compass, Save } from 'lucide-react';
 import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { communityHref } from '@/community/lib/entry-link';
 import { StepOne } from '@/studio/wizard/StepOne';
 import { StepTwo } from '@/studio/wizard/StepTwo';
 import { CustomerPickerModal } from '@/studio/wizard/CustomerPickerModal';
@@ -118,6 +119,26 @@ export default function WizardPage() {
         {s.status === 'confirmed' && <Badge variant="blue">已确认 · 只读</Badge>}
 
         <div className="ml-auto flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            data-testid="wizard-community-entry"
+            title="进入 Community"
+            aria-label="进入 Community"
+            onClick={() =>
+              navigate(
+                communityHref({
+                  entry: 'wizard',
+                  returnTo: Routes.designNew,
+                  shape: s.appliedShape ?? undefined,
+                  length: s.appliedLength ?? undefined,
+                }),
+              )
+            }
+          >
+            <Compass size={13} />
+            Community
+          </Button>
           {/* 保存状态：💾 已保存 ↔ ● 未保存 */}
           <span
             className={cx(

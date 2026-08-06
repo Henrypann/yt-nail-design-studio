@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
+import { Routes } from '@/app/routes';
+import { communityHref } from '@/community/lib/entry-link';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
 interface SessionInfo {
@@ -45,6 +47,10 @@ export function AppLayout() {
     removeKey(StorageKeys.session);
     navigate('/login', { replace: true });
   };
+  const communityTo = communityHref({
+    entry: 'product_switcher',
+    returnTo: Routes.dashboard,
+  });
   const navGroups: NavGroup[] = [
     {
       key: 'home',
@@ -75,7 +81,7 @@ export function AppLayout() {
       label: 'Community',
       icon: Compass,
       items: [
-        { to: '/design/community', label: text('社区广场', 'Discover'), end: true },
+        { to: communityTo, label: text('社区', 'Community'), end: true },
       ],
     },
     {
@@ -134,6 +140,7 @@ export function AppLayout() {
                   to={item.to}
                   end={item.end}
                   title={collapsed ? item.label : undefined}
+                  data-testid={group.key === 'community' ? 'nav-community' : undefined}
                   className={({ isActive }) =>
                     cx(
                       'block rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',

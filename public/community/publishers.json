@@ -1,0 +1,37 @@
+[
+  {
+    "publisherId": "pub_nailstyle_official",
+    "type": "OFFICIAL",
+    "handle": "nailstyle",
+    "displayName": "官方",
+    "bio": "平台策展高保真灵感与可试用资产",
+    "verification": "OFFICIAL"
+  },
+  {
+    "publisherId": "pub_demo_luna",
+    "type": "CREATOR",
+    "handle": "luna.atelier",
+    "displayName": "Luna Atelier",
+    "bio": "柔光浪漫与法式细节（Demo 创作者）",
+    "verification": "DEMO_VERIFIED_CREATOR",
+    "demo": true
+  },
+  {
+    "publisherId": "pub_demo_kai",
+    "type": "CREATOR",
+    "handle": "kai.chrome",
+    "displayName": "Kai Chrome",
+    "bio": "金属与赛博质感实验（Demo 创作者）",
+    "verification": "DEMO_VERIFIED_CREATOR",
+    "demo": true
+  },
+  {
+    "publisherId": "pub_demo_mio",
+    "type": "CREATOR",
+    "handle": "mio.ocean",
+    "displayName": "Mio Ocean",
+    "bio": "海洋自然系灵感（Demo 创作者）",
+    "verification": "DEMO_VERIFIED_CREATOR",
+    "demo": true
+  }
+]
