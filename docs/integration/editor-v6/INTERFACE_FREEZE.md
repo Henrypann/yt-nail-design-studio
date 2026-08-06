@@ -1,7 +1,7 @@
 # EditorDocV6 interface freeze
 
-Status: frozen for PR-03 implementation  
-Base: `c4f13e7` + accepted compatibility matrix  
+Status: frozen for PR-03 implementation
+Base: `c4f13e7` + accepted compatibility matrix
 Evidence: `LEGACY_COMPATIBILITY_MATRIX.md`, Cursor model/migration commits `369d516` / `11f5348` / `9b748dd`, PR-03B fixtures
 
 This document resolves matrix §9 unknowns. Implementation must match these decisions.

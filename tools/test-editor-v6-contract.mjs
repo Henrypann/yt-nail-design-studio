@@ -112,6 +112,28 @@ assert.equal(callValidation(validate, clone(editorDocV6Fixture)), true);
 assert.equal(callValidation(validate, { ...clone(editorDocV6Fixture), schemaVersion: 5 }), false);
 assert.equal(callValidation(validate, { ...clone(editorDocV6Fixture), nails: {} }), false);
 
+{
+  const invalidShape = clone(editorDocV6Fixture);
+  invalidShape.defaultGeometry.shape = 'not-a-shape';
+  assert.equal(callValidation(validate, invalidShape), false);
+
+  const invalidOverride = clone(editorDocV6Fixture);
+  invalidOverride.nails.L1.geometryOverride = { shape: 'not-a-shape', length: 'gigantic' };
+  assert.equal(callValidation(validate, invalidOverride), false);
+
+  const danglingRecipe = clone(editorDocV6Fixture);
+  danglingRecipe.nails.L1.layers[1].recipeInstanceId = 'missing_recipe';
+  assert.equal(callValidation(validate, danglingRecipe), false);
+
+  const invalidCommunicationTime = clone(editorDocV6Fixture);
+  invalidCommunicationTime.communicationRefs[0].uploadedAt = 'not-a-date';
+  assert.equal(callValidation(validate, invalidCommunicationTime), false);
+
+  const invalidElementKind = clone(editorDocV6Fixture);
+  invalidElementKind.nails.L1.layers[1].elements[0].kind = 'mystery_blob';
+  assert.equal(callValidation(validate, invalidElementKind), false);
+}
+
 const idModule = await importFirst(
   ['./src/studio/editor/v6/id.ts', './src/studio/editor/v6/model.ts'],
   'a collision-resistant ID generator',

@@ -1,7 +1,7 @@
 # PR-03 Architecture Review — EditorDocV6 contract
 
-Status: Main Agent freeze + implementation gate input  
-Base: `c4f13e7`  
+Status: Main Agent freeze + implementation gate input
+Base: `c4f13e7`
 Scope: model / migration / repository boundary only (no UI/store rollout)
 
 ## Verdict

@@ -24,7 +24,14 @@ export function getEditorDocV6Result(
   if (!Object.prototype.hasOwnProperty.call(docs, designId)) {
     return { status: 'missing' };
   }
-  return migrateEditorDocV6(docs[designId]);
+  const result = migrateEditorDocV6(docs[designId]);
+  if (result.status === 'ok' && result.doc.designId !== designId) {
+    return {
+      status: 'invalid',
+      reason: `storage key/designId mismatch: ${designId} != ${result.doc.designId}`,
+    };
+  }
+  return result;
 }
 
 export function inspectEditorDocV6Raw(raw: unknown): {

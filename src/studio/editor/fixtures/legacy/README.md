@@ -10,8 +10,8 @@ real customer names, identifiers, images, or design payloads.
 | v1 | `f63de35` mainline `model.ts` | shared base/pattern/attachments, `finish`, per-finger lock copies |
 | v2 | `efc9d06` mainline `model.ts` | v1 plus `lengthPreset`, `appearance`, intent and layer metadata |
 | v3 | `75ff716` and current mainline | v2 plus canonical recipe instance and custom relief |
-| v4 | `369d516`, `11f5348` Cursor `model-v4.ts` | ten independent nail layer stacks, geometry overrides, recipe references and communication references |
-| v5 | `171d9e2`, `9b748dd` Cursor `model-v4.ts` | v4 storage shape with literal version 5 and optional layer `stepId` |
+| v4 | `369d516` Cursor `model-v4.ts` | ten independent nail layer stacks, geometry overrides and recipe references; no communication references |
+| v5 | `11f5348`, `171d9e2`, `9b748dd` Cursor `model-v4.ts` | v4 storage shape with literal version 5, communication references and optional layer `stepId` |
 | v6 | PR-03 target contract fixture | single writable format with literal version 6 |
 
 The historical v5 type was still named `EditorDocV4`; that mismatch is

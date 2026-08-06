@@ -44,6 +44,7 @@ const PATTERN_KINDS = new Set([
   'gradient',
   'french_edge',
 ]);
+const RELIEF_KINDS = new Set(['chrome_ribbon', 'clear_droplet', 'custom_relief']);
 const LENGTHS = new Set<NailLength>(['short', 'medium', 'long', 'extra-long']);
 const PRESETS = new Set<LengthPreset>(['natural', 'short-extension', 'medium', 'long']);
 
@@ -107,8 +108,8 @@ function toFlatElement(
   if (domain === 'attachment' && kind !== 'attachment') {
     return { ok: false, error: 'attachment element kind must be attachment' };
   }
-  if (domain === 'relief' && kind !== 'relief') {
-    return { ok: false, error: 'relief element kind must be relief' };
+  if (domain === 'relief' && !RELIEF_KINDS.has(kind)) {
+    return { ok: false, error: `unknown relief kind: ${kind || '(empty)'}` };
   }
   const { domain: _ignoredDomain, order: _ignoredOrder, ...rest } = rawElement;
   return {
@@ -155,7 +156,7 @@ function unwrapCursorElement(
   if (typeof raw.kind === 'string') {
     if (PATTERN_KINDS.has(raw.kind)) return toFlatElement('pattern', raw, order);
     if (raw.kind === 'attachment') return toFlatElement('attachment', raw, order);
-    if (raw.kind === 'relief') return toFlatElement('relief', raw, order);
+    if (RELIEF_KINDS.has(raw.kind)) return toFlatElement('relief', raw, order);
     return { ok: false, error: `unknown element kind: ${raw.kind}` };
   }
   return { ok: false, error: 'unrecognized element shape' };
@@ -187,6 +188,14 @@ function assertUniqueIds(doc: EditorDocV6): EditorDocV6MigrationResult | null {
     return { status: 'invalid', reason: 'duplicate layer/element ids after migration' };
   }
   return null;
+}
+
+function finalizeMigratedDoc(doc: EditorDocV6): EditorDocV6MigrationResult {
+  const duplicate = assertUniqueIds(doc);
+  if (duplicate) return duplicate;
+  const parsed = parseEditorDocV6(doc);
+  if (!parsed.ok) return { status: 'invalid', reason: parsed.reason };
+  return { status: 'ok', doc: parsed.doc, migrated: true };
 }
 
 function mapLegacyFingerData(
@@ -415,9 +424,7 @@ function migrateLegacySharedDoc(raw: UnknownRecord, version: 1 | 2 | 3): EditorD
     updatedAt: raw.updatedAt,
   };
 
-  const dup = assertUniqueIds(doc);
-  if (dup) return dup;
-  return { status: 'ok', doc, migrated: true };
+  return finalizeMigratedDoc(doc);
 }
 
 function migrateObservedLayered(raw: UnknownRecord, _version: 4 | 5): EditorDocV6MigrationResult {
@@ -556,9 +563,7 @@ function migrateObservedLayered(raw: UnknownRecord, _version: 4 | 5): EditorDocV
     updatedAt: raw.updatedAt,
   };
 
-  const dup = assertUniqueIds(doc);
-  if (dup) return dup;
-  return { status: 'ok', doc, migrated: true };
+  return finalizeMigratedDoc(doc);
 }
 
 function migrateV6(raw: UnknownRecord): EditorDocV6MigrationResult {

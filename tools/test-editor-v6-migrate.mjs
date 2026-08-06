@@ -1,6 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { migrateEditorDocV6 } from '../src/studio/editor/v6/migrate.ts';
 import { generateEditorId } from '../src/studio/editor/v6/id.ts';
+import { validateEditorDocV6 } from '../src/studio/editor/v6/schema.ts';
 import {
   getEditorDocV6Result,
   saveEditorDocV6ToMap,
@@ -10,6 +11,7 @@ import {
   FINGER_CODES,
   legacyEditorDocFixtures,
   editorDocV1Fixture,
+  editorDocV2Fixture,
   editorDocV3Fixture,
   editorDocV4Fixture,
   editorDocV5Fixture,
@@ -108,8 +110,21 @@ for (const fixture of legacyEditorDocFixtures) {
     const reliefLayer = result.doc.nails[finger].layers.find((layer) => layer.typeId === 'builtin.relief');
     assert.ok(reliefLayer, `relief layer on ${finger}`);
     assert.equal(reliefLayer.elements[0].id, `relief_legacy_01__${finger}`);
+    assert.equal(reliefLayer.elements[0].kind, 'custom_relief');
     assert.equal(reliefLayer.elements[0].heightMm, 0.1);
+    assert.deepEqual(reliefLayer.elements[0].uv, { u: 0.5, v: 0.4 });
   }
+}
+
+/* v2 sparse finger override is preserved as independent finger content */
+{
+  const result = migrateEditorDocV6(clone(editorDocV2Fixture));
+  assert.equal(result.status, 'ok');
+  const l1Base = result.doc.nails.L1.layers.find((layer) => layer.typeId === 'builtin.base_surface');
+  const l2Base = result.doc.nails.L2.layers.find((layer) => layer.typeId === 'builtin.base_surface');
+  assert.equal(l1Base.surface.baseColor, '#CFA89B');
+  assert.equal(l2Base.surface.baseColor, '#D8B7AA');
+  assert.equal(result.doc.nails.L1.layers.find((layer) => layer.typeId === 'builtin.draw').elements[0].id, 'brush_legacy_l1__L1');
 }
 
 /* v4/v5 appearance canonical + communication refs + stepId */
@@ -118,11 +133,22 @@ for (const fixture of legacyEditorDocFixtures) {
   assert.equal(v4.status, 'ok');
   assert.deepEqual(v4.doc.appearance, editorDocV4Fixture.appearance);
   assert.equal(v4.doc.nails.L1.layers[0].surface?.appearance, undefined);
-  assert.equal(v4.doc.communicationRefs[0].dataUrl, 'data:image/png;base64,AA==');
+  assert.deepEqual(v4.doc.communicationRefs, []);
+  const v4Draw = v4.doc.nails.L1.layers.find((layer) => layer.typeId === 'builtin.draw');
+  assert.equal(v4Draw.elements[0].id, 'brush_cursor_l1');
+  assert.deepEqual(v4Draw.elements[0].points, [{ x: 0, y: -8 }, { x: 2, y: -14 }]);
 
   const v5 = migrateEditorDocV6(clone(editorDocV5Fixture));
   assert.equal(v5.status, 'ok');
   assert.equal(v5.doc.nails.L1.layers[0].stepId, 'base_color');
+  assert.equal(v5.doc.communicationRefs[0].dataUrl, 'data:image/png;base64,AA==');
+}
+
+/* every successful legacy migration must satisfy the complete v6 validator */
+for (const fixture of legacyEditorDocFixtures) {
+  const result = migrateEditorDocV6(clone(fixture));
+  assert.equal(result.status, 'ok');
+  assert.equal(validateEditorDocV6(result.doc), true);
 }
 
 /* unknown element → invalid */
@@ -162,11 +188,11 @@ for (const fixture of legacyEditorDocFixtures) {
 /* repository: no write on read + save rejects non-v6 */
 {
   const map = {
-    a: clone(editorDocV3Fixture),
-    b: clone(editorDocV6Fixture),
+    [editorDocV3Fixture.designId]: clone(editorDocV3Fixture),
+    [editorDocV6Fixture.designId]: clone(editorDocV6Fixture),
   };
   const before = JSON.stringify(map);
-  const loaded = getEditorDocV6Result(map, 'a');
+  const loaded = getEditorDocV6Result(map, editorDocV3Fixture.designId);
   assert.equal(loaded.status, 'ok');
   assert.equal(JSON.stringify(map), before, 'read/migrate must not mutate storage map');
 
@@ -177,12 +203,45 @@ for (const fixture of legacyEditorDocFixtures) {
   const saved = saveEditorDocV6ToMap(map, clone(editorDocV6Fixture));
   assert.equal(saved.status, 'ok');
   assert.equal(map[editorDocV6Fixture.designId].schemaVersion, 6);
+
+  const mismatched = getEditorDocV6Result({ requested: clone(editorDocV6Fixture) }, 'requested');
+  assert.equal(mismatched.status, 'invalid');
+  assert.match(mismatched.reason, /key\/designId mismatch/);
 }
 
 /* collision-resistant generator smoke */
 {
   const ids = Array.from({ length: 1000 }, () => generateEditorId('layer'));
   assert.equal(new Set(ids).size, ids.length);
+}
+
+/* live repository boundary: read/migrate and rejected save do not write localStorage */
+{
+  const memory = new Map();
+  let writes = 0;
+  globalThis.localStorage = {
+    getItem: (key) => memory.get(key) ?? null,
+    setItem: (key, value) => {
+      writes += 1;
+      memory.set(key, String(value));
+    },
+    removeItem: (key) => memory.delete(key),
+  };
+  const { StorageKeys, writeEnvelope } = await import('../src/lib/storage.ts');
+  const { getEditorDocV6Result: getStoredEditorDocV6Result, saveEditorDocV6 } = await import(
+    '../src/studio/editor/lib/repo.ts'
+  );
+  writeEnvelope(StorageKeys.editorDocs, {
+    [editorDocV3Fixture.designId]: clone(editorDocV3Fixture),
+  });
+  const writesAfterSeed = writes;
+  const loaded = getStoredEditorDocV6Result(editorDocV3Fixture.designId);
+  assert.equal(loaded.status, 'ok');
+  assert.equal(writes, writesAfterSeed, 'live repository read/migrate must not write storage');
+
+  const rejected = saveEditorDocV6(clone(editorDocV3Fixture));
+  assert.equal(rejected.status, 'rejected');
+  assert.equal(writes, writesAfterSeed, 'rejected live save must not write storage');
 }
 
 console.log('test-editor-v6-migrate: migration and repository assertions passed');
