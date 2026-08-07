@@ -61,6 +61,20 @@ export type {
   EditorDocV7ParseResult,
 } from './v7/schema';
 export { isEditorDocV7, parseEditorDocV7, validateEditorDocV7 } from './v7/schema';
+export { migrateEditorDocV7 } from './v7/migrate';
+export type {
+  AssetResolutionInputV7,
+  EditorDocV7LegacyEvidence,
+  EditorDocV7MigrationDiagnostic,
+  EditorDocV7MigrationDiagnosticCode,
+  EditorDocV7MigrationResolvers,
+  EditorDocV7MigrationResult,
+  FinishPresetResolutionInputV7,
+  GeometryResolutionInputV7,
+  RecipeResolutionInputV7,
+  RecipeResolutionV7,
+} from './v7/migrate';
+export { getEditorDocV7Result } from './v7/repository-contract';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';
