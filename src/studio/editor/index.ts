@@ -6,14 +6,46 @@
 
 export { EditorShell } from './components/EditorShell';
 export { useEditorStore } from './store';
+export { useEditorV6Store } from './store-v6';
 export * from './lib/model';
 export {
   createBlankEditorDesign,
   getEditorDoc,
+  getEditorDocV6Result,
+  hasEditorDoc,
+  hasEditorDocRaw,
+  inspectEditorDoc,
   saveEditorDoc,
+  saveEditorDocV6,
   removeEditorDoc,
   duplicateEditorDoc,
 } from './lib/repo';
+export {
+  createBlankEditorDesignV6,
+  duplicateEditorDocV6,
+  getEditorDocV6Result as getEditorDocV6ResultV6,
+  hasEditorDoc as hasEditorDocV6,
+  hasEditorDocRaw as hasEditorDocRawV6,
+  inspectEditorDoc as inspectEditorDocV6,
+  removeEditorDoc as removeEditorDocV6,
+  removeDesign as removeDesignV6,
+  saveEditorDocV6ToLocalStorage,
+} from './lib/repo-v6';
+export type {
+  EditorDocProbe,
+  EditorDocV6,
+  EditorDocV6MigrationResult,
+  EditorDocV6SaveResult,
+} from './lib/repo';
+export type {
+  EditorDocV6 as EditorDocV6FromRepo,
+  EditorDocV6MigrationResult as EditorDocV6MigrationResultV6,
+  EditorDocV6SaveResult as EditorDocV6SaveResultV6,
+} from './lib/repo-v6';
+export { createEmptyEditorDocV6 } from './v6/model';
+export { migrateEditorDocV6 } from './v6/migrate';
+export { validateEditorDocV6, parseEditorDocV6 } from './v6/schema';
+export { generateEditorId } from './v6/id';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';

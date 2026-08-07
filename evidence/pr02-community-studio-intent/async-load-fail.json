@@ -1,0 +1,6 @@
+{
+  "hasFailToast": false,
+  "url": "http://127.0.0.1:5205/design/new",
+  "judgment": "Playwright aborted /material-library/** after the module already cached loadLibraryIndex in-page; UI toast did not re-fire. Behavioral coverage is test:community-studio-flow case 10 (loadLibraryIndex reject → load_failed, no store mutation, no unhandledRejection, intent retained).",
+  "screenshot": "1280x720-async-load-fail-recover.png"
+}

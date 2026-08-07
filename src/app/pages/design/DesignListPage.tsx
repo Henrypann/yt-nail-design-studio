@@ -21,12 +21,13 @@ import type { DesignStatus, DesignSummary } from '@/lib/types';
 import designsEmptyUrl from '../../../../assets/illustrations/designs-empty.svg?url';
 import {
   customerName,
-  duplicateEditorDoc,
-  getEditorDoc,
+  duplicateEditorDocV6,
+  getEditorDocV6Result,
   readDesigns,
   removeDesign,
+  removeEditorDoc,
   upsertDesign,
-} from '@/studio/editor/lib/repo';
+} from '@/studio/editor/lib/repo-v6';
 import { openBridge } from '@/studio/bridge';
 import { genId } from '@/studio/editor/lib/model';
 
@@ -70,8 +71,13 @@ export default function DesignListPage() {
   const refresh = () => setTick((t) => t + 1);
 
   const openDesign = (d: DesignSummary) => {
-    if (getEditorDoc(d.id)) {
+    const editorDoc = getEditorDocV6Result(d.id);
+    if (editorDoc.status === 'ok') {
       navigate(`${Routes.designCanvas}?design=${d.id}`);
+      return;
+    }
+    if (editorDoc.status === 'invalid' || editorDoc.status === 'unsupported') {
+      toast.error(editorDoc.status === 'unsupported' ? '设计来自更高版本，当前版本不会覆盖。' : '设计数据无效，原始数据已保留。');
       return;
     }
     // Wizard 来源且尚未桥接：经 openBridge 完成数据转化（首进弹不可逆警告）
@@ -82,30 +88,51 @@ export default function DesignListPage() {
   const duplicateDesign = (d: DesignSummary) => {
     const newId = genId('design');
     const now = new Date().toISOString();
-    upsertDesign({
-      ...d,
-      id: newId,
-      title: `${d.title ?? '未命名设计'} · 副本`,
-      status: 'draft',
-      confirmation: undefined,
-      parentId: d.id,
-      createdAt: now,
-      updatedAt: now,
-    });
-    duplicateEditorDoc(d.id, newId);
-    refresh();
-    toast.success('已复制为新草稿');
+    const source = getEditorDocV6Result(d.id);
+    if (source.status === 'invalid' || source.status === 'unsupported') {
+      toast.error('原设计文档不可安全复制，未创建副本。');
+      return;
+    }
+    if (source.status === 'ok' && duplicateEditorDocV6(d.id, newId) === null) {
+      toast.error('画布复制失败，未创建副本。');
+      return;
+    }
+    try {
+      upsertDesign({
+        ...d,
+        id: newId,
+        title: `${d.title ?? '未命名设计'} · 副本`,
+        status: 'draft',
+        confirmation: undefined,
+        parentId: d.id,
+        createdAt: now,
+        updatedAt: now,
+      });
+      refresh();
+      toast.success('已复制为新草稿');
+    } catch {
+      if (source.status === 'ok') {
+        try { removeEditorDoc(newId); } catch { /* preserve the original failure */ }
+      }
+      toast.error('设计摘要写入失败，未保留副本。');
+    }
   };
 
   const newVersion = (d: DesignSummary) => {
+    let newId: string | null = null;
     try {
-      const newId = genId('design');
+      newId = genId('design');
       const copy = createNewVersionFromConfirmed(d, newId);
+      if (duplicateEditorDocV6(d.id, newId) === null) {
+        throw new Error('原画布不可读取，未创建新版本');
+      }
       upsertDesign(copy);
-      duplicateEditorDoc(d.id, newId);
       refresh();
       toast.success(`已基于 v${d.version} 创建新版本 v${copy.version}（草稿）`);
     } catch (err) {
+      if (newId) {
+        try { removeEditorDoc(newId); } catch { /* preserve the original failure */ }
+      }
       toast.error(err instanceof Error ? err.message : '操作失败');
     }
   };

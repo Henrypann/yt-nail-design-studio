@@ -43,6 +43,12 @@ import {
 } from '@/studio/editor/lib/recipe-model';
 import { recipeDefinitionChecksum } from '@/studio/editor/lib/recipe-checksum';
 import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
+import {
+  canBuildWizardSummary,
+  missingWizardSummaryFields,
+  wizardSummaryCustomerId,
+} from './design-summary';
+import type { WizardDraftV1 } from './wizard-draft';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
 
@@ -148,6 +154,10 @@ interface WizardState {
   clearApplyError: () => void;
   setPresentNudge: (v: boolean) => void;
   applyTemplate: (t: TemplateEntry) => void;
+  /** Community Intent「新建设计」：新 designId + 清空工作态，保持 draft */
+  resetForNewDesign: () => void;
+  /** 恢复版本化活动草稿；Customer 始终从主数据重新解析。 */
+  restoreDraft: (draft: WizardDraftV1, customer: Customer | null) => void;
   setBaseColor: (hex: string) => void;
   setFinish: (f: Finish) => void;
   setFingerOverride: (fc: FingerCode, patch: FingerOverride) => void;
@@ -183,11 +193,17 @@ export const useWizardStore = create<WizardState>((set, get) => {
   /** 由当前状态组装 DesignSummary（缩略图 best-effort，不阻断保存） */
   async function buildSummary(): Promise<DesignSummary | null> {
     const s = get();
-    if (!s.customer || !s.appliedShape || !s.appliedLength || !s.baseColor) return null;
+    if (!canBuildWizardSummary(s)) {
+      notifier?.error(`无法保存：缺少${missingWizardSummaryFields(s).join('、')}。`);
+      return null;
+    }
     const thumbnailDataUrl = s.step === 2 ? await renderThumbnailDataUrl() : undefined;
     return {
       id: s.designId,
-      customerId: s.customer.id,
+      // Community trials and blank designs are allowed before a customer is
+      // selected. The Editor V6 repository already uses an empty summary ID
+      // to represent an unassigned design and omits it from EditorDocV6.
+      customerId: wizardSummaryCustomerId(s.customer),
       title: s.templateName ?? '未命名设计',
       shape: s.appliedShape,
       length: s.appliedLength,
@@ -384,6 +400,78 @@ export const useWizardStore = create<WizardState>((set, get) => {
             : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存
+    },
+
+    resetForNewDesign: () => {
+      if (autosaveTimer !== null) {
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+      }
+      set({
+        step: 1,
+        pickerOpen: true,
+        customer: null,
+        shape: null,
+        length: null,
+        styleId: null,
+        styleName: null,
+        stylePrompted: false,
+        appliedShape: null,
+        appliedLength: null,
+        editingShapeLength: false,
+        applying: false,
+        applyError: null,
+        presentNudge: false,
+        templateId: null,
+        templateName: null,
+        baseColor: null,
+        finish: 'gloss',
+        fingerOverrides: {},
+        recipe: undefined,
+        selectedFinger: null,
+        designId: initialDesignId(),
+        createdAt: new Date().toISOString(),
+        version: 1,
+        status: 'draft',
+        confirmation: undefined,
+        saveState: 'saved',
+      });
+    },
+
+    restoreDraft: (draft, customer) => {
+      if (autosaveTimer !== null) {
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+      }
+      set({
+        step: draft.step,
+        pickerOpen: !customer,
+        customer,
+        shape: draft.shape,
+        length: draft.length,
+        styleId: draft.styleId,
+        styleName: draft.styleName,
+        stylePrompted: draft.stylePrompted,
+        appliedShape: draft.appliedShape,
+        appliedLength: draft.appliedLength,
+        editingShapeLength: false,
+        applying: false,
+        applyError: null,
+        presentNudge: false,
+        templateId: draft.templateId,
+        templateName: draft.templateName,
+        baseColor: draft.baseColor,
+        finish: draft.finish,
+        fingerOverrides: structuredClone(draft.fingerOverrides),
+        recipe: draft.recipe ? structuredClone(draft.recipe) : undefined,
+        selectedFinger: null,
+        designId: draft.designId,
+        createdAt: draft.createdAt,
+        version: draft.version,
+        status: draft.status,
+        confirmation: draft.confirmation ? structuredClone(draft.confirmation) : undefined,
+        saveState: 'saved',
+      });
     },
 
     setBaseColor: (hex) => {

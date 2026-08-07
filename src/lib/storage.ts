@@ -52,6 +52,10 @@ export const StorageKeys = {
   deviceMobileTokens: 'device.mobile-tokens',
   /** UI 瞬态偏好：侧栏收起状态（v1.5.1） */
   sidebarCollapsed: 'ui.sidebar-collapsed',
+  /** Community → Studio Import Intent（PR-02）：仅 envelope，不写 Wizard/Editor */
+  communityStudioImportIntent: 'community.studio-import-intent',
+  /** Wizard 活动草稿（PR-05）：版本化恢复快照，不包含纯 UI 瞬态 */
+  wizardDraft: 'wizard.active-draft',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

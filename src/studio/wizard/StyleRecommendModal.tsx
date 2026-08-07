@@ -12,13 +12,15 @@
  * 三者必须显式标注，不得把 Editorial Concept 冒充 Canonical Renderer 输出。
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Sparkles, X } from 'lucide-react';
 import { Badge, Button, cx } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
 import type { NailLength, NailShape } from '@/lib/types';
-import { loadShapeCapabilities } from '@/studio/preview/material-library';
+import { loadLibraryIndex, loadShapeCapabilities } from '@/studio/preview/material-library';
+import { filterResolvableStyleRecommendations } from '@/studio/preview/resolve-template';
+import { createRecommendationRequestGate, partitionStyles } from './partition-styles';
 
 export interface StyleRecommendation {
   id: string;
@@ -46,7 +48,7 @@ export interface StyleRecommendModalProps {
   open: boolean;
   shape: NailShape | null;
   length: NailLength | null;
-  onSelect: (style: StyleRecommendation) => void;
+  onSelect: (style: StyleRecommendation) => void | Promise<void>;
   onSkip: () => void;
 }
 
@@ -55,48 +57,68 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
   const [styles, setStyles] = useState<StyleRecommendation[]>([]);
   const [loadFailed, setLoadFailed] = useState(false);
   const [shapeLabel, setShapeLabel] = useState('');
+  const [failedCovers, setFailedCovers] = useState<Set<string>>(() => new Set());
+  const [selectingId, setSelectingId] = useState<string | null>(null);
+  const requestGate = useRef(createRecommendationRequestGate());
 
   useEffect(() => {
     if (!open || !shape) return;
-    let cancelled = false;
+    const requestToken = requestGate.current.begin();
+    setStyles([]);
+    setLoadFailed(false);
+    setFailedCovers(new Set());
+    setSelectingId(null);
+    setShapeLabel(shape);
     loadShapeCapabilities()
       .then((registry) => {
-        if (cancelled) return;
+        if (!requestGate.current.isCurrent(requestToken)) return;
         setShapeLabel(registry.shapes.find((item) => item.id === shape)?.label_en ?? shape);
       })
       .catch(() => {
-        if (!cancelled) setShapeLabel(shape);
+        if (requestGate.current.isCurrent(requestToken)) setShapeLabel(shape);
       });
-    fetch('/assets/styles/manifest.json')
-      .then((res) => {
+    Promise.all([
+      fetch('/assets/styles/manifest.json').then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json() as Promise<StyleManifest>;
-      })
-      .then((m) => {
-        if (cancelled) return;
-        const all = [...(m.recommendations[shape] ?? [])].sort((a, b) => a.priority - b.priority);
-        const featured = all.filter((item) => item.featured);
-        const list = featured.length >= 3 ? featured : all;
+      }),
+      loadLibraryIndex(),
+    ])
+      .then(([manifest, index]) => {
+        if (!requestGate.current.isCurrent(requestToken)) return;
+        const valid = filterResolvableStyleRecommendations(manifest.recommendations[shape] ?? [], index);
+        const partitioned = partitionStyles(valid);
+        const list = [...partitioned.primary, ...partitioned.concept];
         setStyles(list);
         setLoadFailed(list.length === 0);
       })
       .catch(() => {
-        if (!cancelled) setLoadFailed(true);
+        if (requestGate.current.isCurrent(requestToken)) setLoadFailed(true);
       });
     return () => {
-      cancelled = true;
+      requestGate.current.invalidate(requestToken);
     };
   }, [open, shape]);
+
+  const selectStyle = async (style: StyleRecommendation) => {
+    if (selectingId) return;
+    setSelectingId(style.id);
+    try {
+      await onSelect(style);
+    } finally {
+      setSelectingId(null);
+    }
+  };
 
   /* Esc 跳过 */
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onSkip();
+      if (e.key === 'Escape' && selectingId === null) onSkip();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open, onSkip]);
+  }, [open, onSkip, selectingId]);
 
   if (!open) return null;
 
@@ -108,7 +130,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
       aria-label="风格推荐"
       data-debug-id="studio.wizard.style-recommend-modal"
     >
-      <div className="w-full max-w-[1060px] rounded-panel bg-white shadow-modal animate-modal-in">
+      <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-[1060px] flex-col overflow-hidden rounded-panel bg-white shadow-modal animate-modal-in">
         {/* 头部 */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div>
@@ -125,6 +147,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
           </div>
           <button
             onClick={onSkip}
+            disabled={selectingId !== null}
             className="rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
             aria-label="关闭"
           >
@@ -133,7 +156,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
         </div>
 
         {/* 卡片区：桌面 3 列，窄屏纵向 */}
-        <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-3">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto px-4 py-4 sm:grid-cols-3 sm:px-6 sm:py-5">
           {loadFailed && (
             <p className="col-span-full py-8 text-center text-sm text-gray-500">
               风格推荐加载失败，可直接进入画布自行搭配。
@@ -152,12 +175,19 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
               >
                 {/* 16:9 封面（YouTube 封面比例） */}
                 <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={st.cover_url}
-                    alt={`${st.name_en} 风格封面`}
-                    className="h-full w-full object-cover transition-transform duration-base ease-out group-hover:scale-[1.03]"
-                    loading="lazy"
-                  />
+                  {failedCovers.has(st.id) ? (
+                    <div className="flex h-full items-center justify-center px-4 text-center text-xs text-gray-500">
+                      {text('封面暂不可用，模板仍可安全应用', 'Cover unavailable; the validated template can still be applied')}
+                    </div>
+                  ) : (
+                    <img
+                      src={st.cover_url}
+                      alt={`${st.name_en} 风格封面`}
+                      className="h-full w-full object-cover transition-transform duration-base ease-out group-hover:scale-[1.03]"
+                      loading="lazy"
+                      onError={() => setFailedCovers((current) => new Set(current).add(st.id))}
+                    />
+                  )}
                   <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-amber-200">
                     TOP {st.priority}
                   </span>
@@ -208,7 +238,13 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                     </div>
                   )}
                   <div className="mt-auto pt-2">
-                    <Button size="sm" className="w-full" onClick={() => onSelect(st)}>
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      loading={selectingId === st.id}
+                      disabled={selectingId !== null && selectingId !== st.id}
+                      onClick={() => void selectStyle(st)}
+                    >
                       {st.cover_status === 'CONCEPT'
                         ? text('应用近似基础方案', 'Apply approximate base')
                         : text('选用此风格', 'Use this look')}
@@ -223,7 +259,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
 
         {/* 底部 */}
         <div className="flex items-center justify-end border-t border-gray-200 px-6 py-3">
-          <Button variant="ghost" size="sm" onClick={onSkip}>
+          <Button variant="ghost" size="sm" disabled={selectingId !== null} onClick={onSkip}>
             {text('暂不选择，直接进入画布', 'Skip and open canvas')}
           </Button>
         </div>

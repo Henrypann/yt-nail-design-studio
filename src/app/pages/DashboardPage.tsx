@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Monitor, Palette, Users, ArrowRight } from 'lucide-react';
+import { Compass, Monitor, Palette, Users, ArrowRight } from 'lucide-react';
 import { Card, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { communityHref } from '@/community/lib/entry-link';
 import { readOnboarding } from '@/platform/onboarding';
 import { useRequireAuth } from '@/platform/session';
 import { readAllDesigns } from '@/platform/designs';
@@ -75,7 +76,7 @@ export default function DashboardPage() {
       </header>
 
       {/* 概览统计 */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {[
           { label: '客户', value: activeCustomers, to: Routes.customers },
           { label: '设计稿', value: designCount, to: Routes.designs },
@@ -90,11 +91,30 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      <Card className="flex flex-wrap items-center justify-between gap-3" data-testid="dashboard-community-entry">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-panel bg-primary-soft text-primary">
+            <Compass size={18} />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-gray-900">浏览 Community</p>
+            <p className="mt-0.5 text-xs text-gray-500">独立灵感域 · 不依赖当前 Wizard 选择</p>
+          </div>
+        </div>
+        <Link
+          to={communityHref({ entry: 'dashboard', returnTo: Routes.dashboard })}
+          className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors duration-fast hover:text-primary-hover"
+        >
+          进入社区
+          <ArrowRight size={13} />
+        </Link>
+      </Card>
+
       {/* 引导卡片：全部完成后整组消失 */}
       {pendingCards.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-medium text-gray-700">开始你的第一次配置</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {pendingCards.map((card) => (
               <Card
                 key={card.key}

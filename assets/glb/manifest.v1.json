@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "manifestId": "nextgen-browser-preview-assets",
+  "manifestVersion": "1.0.0",
+  "updatedAt": "2026-08-07T00:00:00.000Z",
+  "coordinateContract": {
+    "unit": "mm",
+    "handedness": "right",
+    "origin": "nail_root_center",
+    "tipDirection": "negative_y",
+    "surfaceDirection": "positive_z"
+  },
+  "assets": [
+    {
+      "id": "shell-almond-medium",
+      "revision": "1.0.0-missing",
+      "category": "shell",
+      "evidence": "MISSING",
+      "renderSuitability": "fallback_only",
+      "manufacturingValidated": false,
+      "lods": [],
+      "statusNote": "No reviewed browser GLB is present in this integration branch; use the existing 2D silhouette."
+    },
+    {
+      "id": "mercury-dew-ribbon",
+      "revision": "1.0.0-missing",
+      "category": "ribbon",
+      "evidence": "MISSING",
+      "renderSuitability": "fallback_only",
+      "manufacturingValidated": false,
+      "lods": [],
+      "statusNote": "Reference geometry exists only outside the accepted branch and has not been signed off here."
+    },
+    {
+      "id": "mercury-dew-droplet",
+      "revision": "1.0.0-missing",
+      "category": "droplet",
+      "evidence": "MISSING",
+      "renderSuitability": "fallback_only",
+      "manufacturingValidated": false,
+      "lods": [],
+      "statusNote": "No reviewed browser GLB is present; Mercury Dew continues to use its simulated 2D renderer."
+    },
+    {
+      "id": "starfish-bloom-starfish",
+      "revision": "1.0.0-missing",
+      "category": "custom",
+      "evidence": "MISSING",
+      "renderSuitability": "fallback_only",
+      "manufacturingValidated": false,
+      "lods": [],
+      "statusNote": "Starfish Bloom component geometry has not been accepted into this branch."
+    }
+  ],
+  "rendererAdapters": [
+    {
+      "id": "three-pbr/mercury-dew-1",
+      "recipeRef": { "id": "mercury-dew", "version": "1.0.0" },
+      "requiredAssetIds": ["shell-almond-medium", "mercury-dew-ribbon", "mercury-dew-droplet"],
+      "fallbackRendererId": "svg-2.5d/mercury-1",
+      "evidence": "SIMULATED"
+    },
+    {
+      "id": "three-pbr/starfish-bloom-1",
+      "recipeRef": { "id": "starfish-bloom-elegance", "version": "1.0.0" },
+      "requiredAssetIds": ["shell-almond-medium", "starfish-bloom-starfish"],
+      "fallbackRendererId": "svg-2d/generic-nail-1",
+      "evidence": "SIMULATED"
+    }
+  ]
+}

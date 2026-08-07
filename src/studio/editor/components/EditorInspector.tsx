@@ -1,6 +1,7 @@
 import { ScanSearch } from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
+import { taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import {
   compatibilityLabel,
   compatibilityTitle,
@@ -22,20 +23,6 @@ const LENGTHS: { id: LengthPreset; label: string; extension: string }[] = [
   { id: 'medium', label: '中长度', extension: '+8mm' },
   { id: 'long', label: '长', extension: '+12mm' },
 ];
-const LENGTH_LABEL_EN: Record<LengthPreset, string> = {
-  natural: 'Natural',
-  'short-extension': 'Short extension',
-  medium: 'Medium',
-  long: 'Long',
-};
-const SURFACE_NAME_EN: Record<string, string> = {
-  gloss: 'Gloss',
-  matte: 'Matte',
-  'cat-eye': 'Cat-eye',
-  aurora: 'Aurora',
-  silk: 'Silk',
-};
-
 function DesignInspector() {
   const { locale, text } = useLocale();
   const doc = useEditorStore((state) => state.doc);
@@ -67,7 +54,7 @@ function DesignInspector() {
             <button
               key={capability.id}
               disabled={readOnly || !enabled}
-              title={enabled ? hint || capability.label_en : `${capability.label_en} · Pending geometry sign-off`}
+              title={enabled ? hint || shapeName(capability.id, locale) : `${shapeName(capability.id, locale)} · Pending geometry sign-off`}
               data-shape-id={capability.id}
               data-editor-enabled={enabled}
               data-compatibility={enabled ? compatibility.severity : undefined}
@@ -79,7 +66,7 @@ function DesignInspector() {
                 !enabled && 'cursor-not-allowed opacity-45',
               )}
             >
-              {shapeName(capability.id)}
+              {shapeName(capability.id, locale)}
               {enabled && !selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
             </button>
             );
@@ -117,7 +104,7 @@ function DesignInspector() {
                 )}
               >
                 <span>
-                  {locale === 'en' ? LENGTH_LABEL_EN[length.id] : length.label}
+                  {taxonomyLabel('design-length', length.id, locale, { zh: length.label })}
                   {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
                 </span>
                 <span className="tnum opacity-65">{length.extension}</span>
@@ -172,7 +159,11 @@ function DesignInspector() {
                   !available && 'cursor-not-allowed opacity-45',
                 )}
               >
-                <span>{locale === 'en' ? SURFACE_NAME_EN[surface.id] : surface.name}</span>
+                <span>
+                  {surface.id === 'gloss' || surface.id === 'matte'
+                    ? taxonomyLabel('top-finish', surface.id, locale, { zh: surface.name })
+                    : taxonomyLabel('optical-effect', surface.id, locale, { zh: surface.name })}
+                </span>
                 {!available && <span className="text-[9px]">E3</span>}
               </button>
             );

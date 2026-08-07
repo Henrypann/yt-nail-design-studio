@@ -13,6 +13,7 @@ import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight, Refres
 import type { Customer } from '@/lib/types';
 import { Routes } from '@/app/routes';
 import { loadLibraryIndex, loadShapeParams } from '@/studio/preview/material-library';
+import { applyValidatedStyleRecommendation } from '@/studio/preview/resolve-template';
 import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
 import { NailCellView } from '@/studio/preview/TiledNailsPreview';
 import { useWizardStore } from './wizard-store';
@@ -174,33 +175,27 @@ export function StepOne() {
   /** 选用风格：模板映射必须存在；缺失时显式报错，不把纯底色冒充选款成功。
    *  已经选定具体模板，跳过选款页直接进画布。 */
   const handleStyleSelect = async (st: StyleRecommendation) => {
-    setStyle(st.id, st.name);
-    setStyleModalOpen(false);
-    const ok = await applyAndEnter();
-    if (!ok) return; // 内联错误条已呈现
-    if (st.template_id) {
-      try {
-        const index = await loadLibraryIndex();
-        const template = index.templates.find((t) => t.id === st.template_id);
-        if (!template) {
-          toast.error(`风格「${st.name}」引用的模板不存在，请选择其他风格。`);
-          navigate(Routes.designTemplates);
-          return;
-        }
-        applyTemplate(template);
-        if (st.cover_status === 'CONCEPT') {
-          toast.warning(
-            `已应用「${st.base_template_name ?? template.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
-          );
-        }
-        navigate(Routes.designNew);
-      } catch {
-        toast.error('模板目录加载失败。可在模板库刷新后重新选择。');
-        navigate(Routes.designTemplates);
+    const result = await applyValidatedStyleRecommendation(st, {
+      loadIndex: loadLibraryIndex,
+      applyAndEnter,
+      setStyle,
+      applyTemplate,
+    });
+    if (result.status !== 'ok') {
+      if (result.status === 'missing_template') {
+        toast.error(`风格「${st.name}」引用的模板不存在，请选择其他风格。`);
+      } else if (result.status === 'load_failed') {
+        toast.error('模板目录加载失败。推荐未应用，可重试或跳过。');
       }
-    } else {
-      navigate(Routes.designTemplates);
+      return;
     }
+    setStyleModalOpen(false);
+    if (st.cover_status === 'CONCEPT') {
+      toast.warning(
+        `已应用「${st.base_template_name ?? result.entry.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
+      );
+    }
+    navigate(Routes.designNew);
   };
 
   const handleStyleSkip = async () => {

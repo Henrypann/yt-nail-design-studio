@@ -13,7 +13,9 @@ import { useEffect, useState } from 'react';
 import { Ban, Check, Download, RotateCcw } from 'lucide-react';
 import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
+import { useLocale } from '@/lib/i18n';
 import { isReadOnly } from '@/lib/state-machine';
+import { taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { loadDecorations, type DecorationAsset } from '@/studio/preview/nail-assets';
 import { loadFinishes, loadPalette, type FinishMeta, type PaletteColor } from '@/studio/preview/material-library';
 import { downloadBlob, hasPreview, renderPreviewPng } from '@/studio/preview/export-png';
@@ -23,6 +25,7 @@ import { useWizardStore } from './wizard-store';
 
 export function ParamsPanel() {
   const toast = useToast();
+  const { locale } = useLocale();
   const s = useWizardStore();
   const mockFlags = useMockScenarios((s2) => s2.flags);
   const readOnly = isReadOnly(s.status);
@@ -150,7 +153,7 @@ export function ParamsPanel() {
                 key={c.id}
                 disabled={readOnly}
                 onClick={() => s.setBaseColor(c.hex)}
-                title={`${c.name} ${c.hex}`}
+                title={`${taxonomyLabel('community-color', c.id, locale, { zh: c.name, en: c.name_en })} ${c.hex}`}
                 className={cx(
                   'flex flex-col items-center gap-1 rounded-button p-1 transition-all duration-fast',
                   active ? 'ring-2 ring-primary ring-offset-1' : 'hover:bg-gray-50',
@@ -161,7 +164,9 @@ export function ParamsPanel() {
                   className="h-7 w-7 rounded-full border border-gray-200"
                   style={{ backgroundColor: c.hex }}
                 />
-                <span className="text-[10px] text-gray-500">{c.name}</span>
+                <span className="text-[10px] text-gray-500">
+                  {taxonomyLabel('community-color', c.id, locale, { zh: c.name, en: c.name_en })}
+                </span>
               </button>
             );
           })}
@@ -179,7 +184,7 @@ export function ParamsPanel() {
         >
           {finishes.map((f) => (
             <option key={f.id} value={f.id}>
-              {f.name}（{f.name_en}）
+              {taxonomyLabel('wizard-finish', f.id, locale, { zh: f.name, en: f.name_en })}
             </option>
           ))}
         </select>
@@ -224,7 +229,7 @@ export function ParamsPanel() {
                       key={d.id}
                       disabled={readOnly}
                       onClick={() => s.setFingerOverride(s.selectedFinger!, { decorationId: d.id })}
-                      title={d.name}
+                      title={taxonomyLabel('attachment', d.id, locale, { zh: d.name })}
                       className={cx(
                         'flex h-9 items-center justify-center rounded-button border transition-colors duration-fast',
                         active ? 'border-primary bg-primary-soft' : 'border-gray-200 hover:border-gray-300',
@@ -248,7 +253,7 @@ export function ParamsPanel() {
                       key={c.id}
                       disabled={readOnly}
                       onClick={() => s.setFingerOverride(s.selectedFinger!, { baseColor: c.hex })}
-                      title={c.name}
+                      title={taxonomyLabel('community-color', c.id, locale, { zh: c.name, en: c.name_en })}
                       className={cx(
                         'h-6 w-6 rounded-full border transition-all duration-fast',
                         active ? 'border-primary ring-2 ring-primary ring-offset-1' : 'border-gray-200',

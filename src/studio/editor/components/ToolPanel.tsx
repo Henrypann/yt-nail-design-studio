@@ -6,6 +6,7 @@
 import { useRef, useState } from 'react';
 import { Brush, Eraser, ImagePlus, Palette, Spline } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { LENGTHS, loadRecentColors, PALETTE, SHAPES, lengthName, pushRecentColor, shapeName } from '../lib/material';
 import { createLayerMeta, genId } from '../lib/model';
 import { useEditorStore, type BrushPreset, type EditorTool } from '../store';
@@ -24,6 +25,7 @@ const PRESETS: { key: BrushPreset; label: string }[] = [
 ];
 
 export function ToolPanel() {
+  const { locale, text } = useLocale();
   const tool = useEditorStore((s) => s.tool);
   const setTool = useEditorStore((s) => s.setTool);
   const brushColor = useEditorStore((s) => s.brushColor);
@@ -269,11 +271,11 @@ export function ToolPanel() {
               })
             }
             className="w-full rounded-button border border-gray-300 px-1 py-1 text-[10px] disabled:opacity-40"
-            title={`甲型：${shapeName(doc.shape)}`}
+            title={`${text('甲型', 'Shape')}：${shapeName(doc.shape, locale)}`}
           >
             {SHAPES.map((s) => (
               <option key={s} value={s}>
-                {shapeName(s)}
+                {shapeName(s, locale)}
               </option>
             ))}
           </select>
@@ -286,11 +288,11 @@ export function ToolPanel() {
               })
             }
             className="w-full rounded-button border border-gray-300 px-1 py-1 text-[10px] disabled:opacity-40"
-            title="长度"
+            title={text('长度', 'Length')}
           >
             {LENGTHS.map((l) => (
               <option key={l} value={l}>
-                {lengthName(l)}
+                {lengthName(l, locale)}
               </option>
             ))}
           </select>

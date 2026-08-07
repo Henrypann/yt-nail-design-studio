@@ -9,6 +9,11 @@ import {
   type SurfaceAppearance,
 } from './model.ts';
 import type { ReliefElement, RecipeInstanceV1 } from './recipe-model.ts';
+import {
+  EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION,
+  EDITOR_DOC_MIGRATABLE_MAX_VERSION,
+  classifyEditorDocSchemaVersion,
+} from './editor-doc-schema-version.ts';
 
 export type EditorDocMigrationResult =
   | { status: 'ok'; doc: EditorDoc; migrated: boolean }
@@ -188,10 +193,29 @@ export function migrateEditorDoc(value: unknown): EditorDocMigrationResult {
   if (value === undefined || value === null) return { status: 'missing' };
   const raw = record(value);
   if (!raw) return { status: 'invalid', reason: 'Editor 文档不是对象' };
-  const version = Number(raw.schemaVersion);
-  if (version === 1) return migrateKnown(raw, true);
-  if (version === 2) return migrateKnown(raw, true);
-  if (version === 3) return normalizeV3(raw);
-  if (Number.isFinite(version) && version > 3) return { status: 'unsupported', version };
-  return { status: 'invalid', reason: 'Editor 文档版本无效' };
+  const classified = classifyEditorDocSchemaVersion(raw.schemaVersion);
+  if (classified.kind === 'supported' && classified.schemaVersion === 1) {
+    return migrateKnown(raw, true);
+  }
+  if (classified.kind === 'supported' && classified.schemaVersion === 2) {
+    return migrateKnown(raw, true);
+  }
+  if (classified.kind === 'supported' && classified.schemaVersion === 3) {
+    return normalizeV3(raw);
+  }
+  // v4–v6 are known to the v6 contract but not openable via the legacy v3 runtime path.
+  if (
+    classified.kind === 'supported' &&
+    classified.schemaVersion != null &&
+    classified.schemaVersion > EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION
+  ) {
+    return { status: 'unsupported', version: classified.schemaVersion };
+  }
+  if (classified.kind === 'unsupported' && classified.schemaVersion != null) {
+    return { status: 'unsupported', version: classified.schemaVersion };
+  }
+  return {
+    status: 'invalid',
+    reason: `Editor 文档版本无效（遗留运行时上限 v${EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION}；已知家族上限 v${EDITOR_DOC_MIGRATABLE_MAX_VERSION}）`,
+  };
 }

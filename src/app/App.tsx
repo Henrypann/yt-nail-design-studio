@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes as RouterRoutes } from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
 import { LocaleProvider } from '@/lib/i18n';
 import { AppLayout } from './layouts/AppLayout';
+import { CommunityLayout } from './layouts/CommunityLayout';
 import { Routes } from './routes';
 import DashboardPage from './pages/DashboardPage';
 import CustomerListPage from './pages/customers/CustomerListPage';
@@ -20,12 +21,17 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PetalVeilFixturePage from '@/studio/petal-veil/PetalVeilFixturePage';
+import CommunityDiscoverPage from '@/community/pages/CommunityDiscoverPage';
+import CommunityOfficialPage from '@/community/pages/CommunityOfficialPage';
+import CommunityCreatorsPage from '@/community/pages/CommunityCreatorsPage';
+import CommunityContentPage from '@/community/pages/CommunityContentPage';
+import CommunityProfilePage from '@/community/pages/CommunityProfilePage';
 
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
   : null;
 
-/** 应用根：路由（PRD §1.4 全 13 条）+ 全局 Toast + 调试面板（仅 DEV，v1.5.1） */
+/** 应用根：路由（PRD §1.4 + Community 独立域）+ 全局 Toast + 调试面板（仅 DEV） */
 export function App() {
   const internalFixture = window.location.pathname === '/internal/petal-veil-fixture';
   return (
@@ -39,6 +45,14 @@ export function App() {
           {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
           <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
           <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
+          {/* Community 独立产品壳（无 Studio 侧栏） */}
+          <Route element={<CommunityLayout />}>
+            <Route path={Routes.community} element={<CommunityDiscoverPage />} />
+            <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
+            <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
+            <Route path={Routes.communityContentPath} element={<CommunityContentPage />} />
+            <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
+          </Route>
           {/* 登录后（侧栏 + 顶栏布局） */}
           <Route element={<AppLayout />}>
             <Route path={Routes.dashboard} element={<DashboardPage />} />
