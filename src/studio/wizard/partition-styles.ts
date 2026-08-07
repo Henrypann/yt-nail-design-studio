@@ -14,12 +14,30 @@ export interface PartitionedStyles {
   concept: StyleRecommendation[];
 }
 
+/** Small request gate used by the modal to reject out-of-order async results. */
+export function createRecommendationRequestGate() {
+  let current = 0;
+  return {
+    begin(): number {
+      current += 1;
+      return current;
+    },
+    isCurrent(token: number): boolean {
+      return token === current;
+    },
+    invalidate(token: number): void {
+      if (token === current) current += 1;
+    },
+  };
+}
+
 /**
  * Partition style recommendations into curated (primary) and concept groups.
  * Returns at most 2 curated + 1 concept, sorted by priority.
  */
 export function partitionStyles(all: StyleRecommendation[]): PartitionedStyles {
-  const sorted = [...all].sort((a, b) => a.priority - b.priority);
+  // Deterministic tie-break: priority first, then id for stable ordering
+  const sorted = [...all].sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
 
   const curated = sorted.filter((s) => s.cover_status !== 'CONCEPT');
   const concepts = sorted.filter((s) => s.cover_status === 'CONCEPT');
