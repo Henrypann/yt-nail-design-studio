@@ -46,6 +46,21 @@ export { createEmptyEditorDocV6 } from './v6/model';
 export { migrateEditorDocV6 } from './v6/migrate';
 export { validateEditorDocV6, parseEditorDocV6 } from './v6/schema';
 export { generateEditorId } from './v6/id';
+export type * from './v7/model';
+export {
+  PREVIEW_FIDELITIES_V7,
+  PROCESS_STEP_KINDS_V7,
+  PROCESS_STEP_REGISTRY_V7,
+  PROCESS_STEP_TYPE_IDS_V7,
+  SURFACE_FINISH_TYPES_V7,
+  getProcessStepTypeDefinitionV7,
+} from './v7/registry';
+export type {
+  EditorDocV7Issue,
+  EditorDocV7IssueCode,
+  EditorDocV7ParseResult,
+} from './v7/schema';
+export { isEditorDocV7, parseEditorDocV7, validateEditorDocV7 } from './v7/schema';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';

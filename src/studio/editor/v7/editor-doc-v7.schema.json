@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextgen.beauty/schemas/editor-doc-v7.schema.json",
+  "title": "EditorDocV7",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "designId", "title", "nails", "recipeInstances", "sourceRefs", "communicationRefs", "outputIntent", "revision", "createdAt", "updatedAt"],
+  "properties": {
+    "schemaVersion": { "const": 7 },
+    "designId": { "$ref": "#/$defs/id" },
+    "customerRef": { "$ref": "#/$defs/id" },
+    "title": { "type": "string" },
+    "nails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["L1", "L2", "L3", "L4", "L5", "R1", "R2", "R3", "R4", "R5"],
+      "properties": {
+        "L1": { "$ref": "#/$defs/nail" }, "L2": { "$ref": "#/$defs/nail" },
+        "L3": { "$ref": "#/$defs/nail" }, "L4": { "$ref": "#/$defs/nail" },
+        "L5": { "$ref": "#/$defs/nail" }, "R1": { "$ref": "#/$defs/nail" },
+        "R2": { "$ref": "#/$defs/nail" }, "R3": { "$ref": "#/$defs/nail" },
+        "R4": { "$ref": "#/$defs/nail" }, "R5": { "$ref": "#/$defs/nail" }
+      }
+    },
+    "recipeInstances": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/recipeInstance" }
+    },
+    "compositionMeta": { "$ref": "#/$defs/compositionRef" },
+    "sourceRefs": { "type": "array", "items": { "$ref": "#/$defs/sourceRef" } },
+    "communicationRefs": { "type": "array", "items": { "$ref": "#/$defs/communicationRef" } },
+    "outputIntent": { "enum": ["design", "customer", "manufacturing"] },
+    "revision": { "type": "integer", "minimum": 1 },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "updatedAt": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "revision": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$" },
+    "color": {
+      "type": "object", "additionalProperties": false,
+      "required": ["colorSpace", "r", "g", "b", "a"],
+      "properties": {
+        "colorSpace": { "const": "srgb" },
+        "r": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "g": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "b": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "a": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "point": {
+      "type": "object", "additionalProperties": false,
+      "required": ["u", "v"],
+      "properties": {
+        "u": { "type": "number", "minimum": 0, "maximum": 1 },
+        "v": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "transform": {
+      "type": "object", "additionalProperties": false,
+      "required": ["position", "scaleX", "scaleY", "rotationDeg"],
+      "properties": {
+        "position": { "$ref": "#/$defs/point" },
+        "scaleX": { "type": "number", "exclusiveMinimum": 0 },
+        "scaleY": { "type": "number", "exclusiveMinimum": 0 },
+        "rotationDeg": { "type": "number", "minimum": -180, "exclusiveMaximum": 180 }
+      }
+    },
+    "versionedRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" } }
+    },
+    "geometryRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["assetId", "revision"],
+      "properties": { "assetId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" } }
+    },
+    "materialRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["materialId", "revision"],
+      "properties": { "materialId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" } }
+    },
+    "assetRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["assetId", "revision", "kind", "mimeType", "sha256"],
+      "properties": {
+        "assetId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" },
+        "kind": { "enum": ["raster", "vector", "mesh", "texture"] },
+        "mimeType": { "type": "string", "pattern": "^[a-zA-Z0-9.+-]+/[a-zA-Z0-9.+-]+$" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "widthPx": { "type": "integer", "minimum": 1 }, "heightPx": { "type": "integer", "minimum": 1 },
+        "colorSpace": { "enum": ["srgb", "display-p3"] },
+        "alphaMode": { "enum": ["straight", "premultiplied", "opaque"] }
+      }
+    },
+    "mask": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coordinateSpace", "pathData", "fillRule", "inverted"],
+      "properties": {
+        "coordinateSpace": { "const": "nail-local-v1" },
+        "pathData": { "type": "string", "minLength": 1, "maxLength": 100000, "pattern": "^[^<>]+$" },
+        "fillRule": { "enum": ["nonzero", "evenodd"] }, "inverted": { "type": "boolean" }
+      }
+    },
+    "gradientStop": {
+      "type": "object", "additionalProperties": false,
+      "required": ["offset", "color"],
+      "properties": { "offset": { "type": "number", "minimum": 0, "maximum": 1 }, "color": { "$ref": "#/$defs/color" } }
+    },
+    "background": {
+      "oneOf": [
+        { "$ref": "#/$defs/backgroundSolid" }, { "$ref": "#/$defs/backgroundTranslucent" },
+        { "$ref": "#/$defs/backgroundGradient" }, { "$ref": "#/$defs/backgroundCatEye" },
+        { "$ref": "#/$defs/backgroundGlitter" }
+      ]
+    },
+    "backgroundSolid": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "opacity", "color"],
+      "properties": { "mode": { "const": "solid" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "color": { "$ref": "#/$defs/color" } }
+    },
+    "backgroundTranslucent": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "opacity", "color"],
+      "properties": { "mode": { "const": "translucent" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "color": { "$ref": "#/$defs/color" }, "materialPresetRef": { "$ref": "#/$defs/versionedRef" } }
+    },
+    "backgroundGradient": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "opacity", "stops", "directionDeg"],
+      "properties": { "mode": { "const": "gradient" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "stops": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "$ref": "#/$defs/gradientStop" } }, "directionDeg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 } }
+    },
+    "backgroundCatEye": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "opacity", "color", "directionDeg", "intensity", "bandWidth", "previewFidelity"],
+      "properties": { "mode": { "const": "cat_eye" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "color": { "$ref": "#/$defs/color" }, "directionDeg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 }, "intensity": { "type": "number", "minimum": 0, "maximum": 1 }, "bandWidth": { "type": "number", "minimum": 0, "maximum": 1 }, "previewFidelity": { "$ref": "#/$defs/fidelity" } }
+    },
+    "backgroundGlitter": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "opacity", "colors", "density", "particleSizeMm", "seed", "previewFidelity"],
+      "properties": { "mode": { "const": "glitter" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "colors": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/color" } }, "density": { "type": "number", "minimum": 0, "maximum": 1 }, "particleSizeMm": { "type": "number", "minimum": 0.01, "maximum": 2 }, "seed": { "type": "string", "minLength": 1 }, "previewFidelity": { "$ref": "#/$defs/fidelity" } }
+    },
+    "fidelity": { "enum": ["exact", "approximate", "unavailable"] },
+    "elementBase": {
+      "type": "object",
+      "required": ["id", "kind", "visible", "locked", "opacity", "transform"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "type": "string" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" } }
+    },
+    "flatElement": {
+      "oneOf": [
+        { "$ref": "#/$defs/brushElement" }, { "$ref": "#/$defs/eraserElement" },
+        { "$ref": "#/$defs/vectorElement" }, { "$ref": "#/$defs/textElement" },
+        { "$ref": "#/$defs/imageElement" }, { "$ref": "#/$defs/frenchElement" },
+        { "$ref": "#/$defs/maskElement" }
+      ]
+    },
+    "brushElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "points", "color", "widthMm"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "brush_stroke" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "points": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/point" } }, "color": { "$ref": "#/$defs/color" }, "widthMm": { "type": "number", "minimum": 0.01, "maximum": 10 } } }] },
+    "eraserElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "path", "widthMm"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "eraser_mask" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "path": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/point" } }, "widthMm": { "type": "number", "minimum": 0.01, "maximum": 10 } } }] },
+    "vectorElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "pathData"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "vector_shape" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "pathData": { "type": "string", "minLength": 1 }, "fill": { "$ref": "#/$defs/color" }, "stroke": { "$ref": "#/$defs/color" }, "strokeWidthMm": { "type": "number", "minimum": 0, "maximum": 10 } } }] },
+    "textElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "text", "fontRef", "fontSizeMm", "color"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "text" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "text": { "type": "string" }, "fontRef": { "$ref": "#/$defs/versionedRef" }, "fontSizeMm": { "type": "number", "minimum": 0.1, "maximum": 30 }, "color": { "$ref": "#/$defs/color" } } }] },
+    "imageElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "role", "asset"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "image_2d" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "role": { "enum": ["sticker", "import", "stamp"] }, "asset": { "$ref": "#/$defs/assetRef" } } }] },
+    "frenchElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "widthRatio", "curvature", "color"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "french_edge" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "widthRatio": { "type": "number", "minimum": 0, "maximum": 1 }, "curvature": { "type": "number", "minimum": -1, "maximum": 1 }, "color": { "$ref": "#/$defs/color" } } }] },
+    "maskElement": { "allOf": [{ "$ref": "#/$defs/elementBase" }, { "type": "object", "additionalProperties": false, "required": ["id", "kind", "visible", "locked", "opacity", "transform", "mask"], "properties": { "id": { "$ref": "#/$defs/id" }, "kind": { "const": "region_mask" }, "visible": { "type": "boolean" }, "locked": { "type": "boolean" }, "opacity": { "type": "number", "minimum": 0, "maximum": 1 }, "transform": { "$ref": "#/$defs/transform" }, "mask": { "$ref": "#/$defs/mask" } } }] },
+    "effect": {
+      "type": "object", "additionalProperties": false,
+      "required": ["effectType", "previewFidelity"],
+      "properties": {
+        "effectType": { "enum": ["cat_eye", "glitter", "mirror", "ink_bloom"] },
+        "previewFidelity": { "$ref": "#/$defs/fidelity" },
+        "directionDeg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+        "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "bandWidth": { "type": "number", "minimum": 0, "maximum": 1 },
+        "density": { "type": "number", "minimum": 0, "maximum": 1 },
+        "particleSizeMm": { "type": "number", "minimum": 0.01, "maximum": 2 },
+        "seed": { "type": "string", "minLength": 1 }, "tint": { "$ref": "#/$defs/color" },
+        "reflectance": { "type": "number", "minimum": 0, "maximum": 1 },
+        "colors": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "$ref": "#/$defs/color" } },
+        "spread": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "allOf": [
+        { "if": { "properties": { "effectType": { "const": "cat_eye" } } }, "then": { "required": ["directionDeg", "intensity", "bandWidth"], "not": { "anyOf": [{ "required": ["density"] }, { "required": ["particleSizeMm"] }, { "required": ["seed"] }, { "required": ["tint"] }, { "required": ["reflectance"] }, { "required": ["colors"] }, { "required": ["spread"] }] } } },
+        { "if": { "properties": { "effectType": { "const": "glitter" } } }, "then": { "required": ["density", "particleSizeMm", "seed"], "not": { "anyOf": [{ "required": ["directionDeg"] }, { "required": ["intensity"] }, { "required": ["bandWidth"] }, { "required": ["tint"] }, { "required": ["reflectance"] }, { "required": ["colors"] }, { "required": ["spread"] }] } } },
+        { "if": { "properties": { "effectType": { "const": "mirror" } } }, "then": { "required": ["tint", "reflectance"], "not": { "anyOf": [{ "required": ["directionDeg"] }, { "required": ["intensity"] }, { "required": ["bandWidth"] }, { "required": ["density"] }, { "required": ["particleSizeMm"] }, { "required": ["seed"] }, { "required": ["colors"] }, { "required": ["spread"] }] } } },
+        { "if": { "properties": { "effectType": { "const": "ink_bloom" } } }, "then": { "required": ["colors", "spread", "seed"], "not": { "anyOf": [{ "required": ["directionDeg"] }, { "required": ["intensity"] }, { "required": ["bandWidth"] }, { "required": ["density"] }, { "required": ["particleSizeMm"] }, { "required": ["tint"] }, { "required": ["reflectance"] }] } } }
+      ]
+    },
+    "decoration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "visible", "locked", "transform", "heightMm", "previewFidelity"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "kind": { "enum": ["relief_2_5d", "attachment_3d"] },
+        "visible": { "type": "boolean" }, "locked": { "type": "boolean" },
+        "transform": { "$ref": "#/$defs/transform" }, "heightMm": { "type": "number", "minimum": 0.01, "maximum": 10 },
+        "materialRef": { "$ref": "#/$defs/materialRef" }, "previewFidelity": { "$ref": "#/$defs/fidelity" },
+        "outline": { "$ref": "#/$defs/mask" }, "asset": { "$ref": "#/$defs/assetRef" }, "anchor": { "$ref": "#/$defs/point" }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "relief_2_5d" } } }, "then": { "required": ["outline"], "not": { "anyOf": [{ "required": ["asset"] }, { "required": ["anchor"] }] } } },
+        { "if": { "properties": { "kind": { "const": "attachment_3d" } } }, "then": { "required": ["asset", "anchor"], "not": { "required": ["outline"] } } }
+      ]
+    },
+    "step": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "typeId", "name", "visible", "locked", "skipped", "materialRefs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "kind": { "enum": ["background", "flat_design", "surface_effect", "dimensional_decoration", "surface_finish"] },
+        "typeId": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "visible": { "type": "boolean" },
+        "locked": { "type": "boolean" }, "skipped": { "type": "boolean" }, "recipeInstanceId": { "$ref": "#/$defs/id" },
+        "materialRefs": { "type": "array", "items": { "$ref": "#/$defs/materialRef" } },
+        "background": { "$ref": "#/$defs/background" }, "elements": { "type": "array", "items": { "$ref": "#/$defs/flatElement" } },
+        "mask": { "$ref": "#/$defs/mask" }, "effect": { "$ref": "#/$defs/effect" },
+        "decorations": { "type": "array", "items": { "$ref": "#/$defs/decoration" } },
+        "finish": { "type": "object", "additionalProperties": false, "required": ["type", "materialPresetRef"], "properties": { "type": { "enum": ["gloss", "matte", "frosted"] }, "materialPresetRef": { "$ref": "#/$defs/versionedRef" } } }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "background" } } }, "then": { "required": ["background"], "properties": { "typeId": { "const": "builtin.v7.background" }, "skipped": { "const": false } }, "not": { "anyOf": [{ "required": ["elements"] }, { "required": ["mask"] }, { "required": ["effect"] }, { "required": ["decorations"] }, { "required": ["finish"] }] } } },
+        { "if": { "properties": { "kind": { "const": "flat_design" } } }, "then": { "required": ["elements"], "properties": { "typeId": { "const": "builtin.v7.flat_design" } }, "not": { "anyOf": [{ "required": ["background"] }, { "required": ["effect"] }, { "required": ["decorations"] }, { "required": ["finish"] }] } } },
+        { "if": { "properties": { "kind": { "const": "surface_effect" } } }, "then": { "required": ["effect", "mask"], "properties": { "typeId": { "const": "builtin.v7.surface_effect" } }, "not": { "anyOf": [{ "required": ["background"] }, { "required": ["elements"] }, { "required": ["decorations"] }, { "required": ["finish"] }] } } },
+        { "if": { "properties": { "kind": { "const": "dimensional_decoration" } } }, "then": { "required": ["decorations"], "properties": { "typeId": { "const": "builtin.v7.dimensional_decoration" } }, "not": { "anyOf": [{ "required": ["background"] }, { "required": ["elements"] }, { "required": ["mask"] }, { "required": ["effect"] }, { "required": ["finish"] }] } } },
+        { "if": { "properties": { "kind": { "const": "surface_finish" } } }, "then": { "required": ["finish"], "properties": { "typeId": { "const": "builtin.v7.surface_finish" }, "visible": { "const": true }, "skipped": { "const": false } }, "not": { "anyOf": [{ "required": ["background"] }, { "required": ["elements"] }, { "required": ["mask"] }, { "required": ["effect"] }, { "required": ["decorations"] }] } } }
+      ]
+    },
+    "sourceRef": {
+      "type": "object", "additionalProperties": false, "required": ["domain", "sourceId"],
+      "properties": { "domain": { "enum": ["community", "wizard", "manual", "legacy"] }, "sourceId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" } }
+    },
+    "compositionRef": {
+      "type": "object", "additionalProperties": false, "required": ["compositionId", "revision"],
+      "properties": { "compositionId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" }, "source": { "$ref": "#/$defs/sourceRef" } }
+    },
+    "compositionProvenance": {
+      "type": "object", "additionalProperties": false, "required": ["compositionId", "revision", "syncState"],
+      "properties": { "compositionId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/revision" }, "syncState": { "enum": ["linked", "detached"] } }
+    },
+    "nail": {
+      "type": "object", "additionalProperties": false,
+      "required": ["finger", "geometryRef", "steps"],
+      "properties": {
+        "finger": { "enum": ["L1", "L2", "L3", "L4", "L5", "R1", "R2", "R3", "R4", "R5"] },
+        "geometryRef": { "$ref": "#/$defs/geometryRef" },
+        "steps": {
+          "type": "array", "minItems": 2,
+          "$comment": "Runtime validation additionally requires the unique surface_finish to be the final array item; JSON Schema cannot express an arbitrary-length suffix position without a non-standard keyword.",
+          "prefixItems": [{ "allOf": [{ "$ref": "#/$defs/step" }, { "properties": { "kind": { "const": "background" } } }] }],
+          "items": { "$ref": "#/$defs/step" },
+          "allOf": [
+            { "contains": { "properties": { "kind": { "const": "background" } }, "required": ["kind"] }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "properties": { "kind": { "const": "surface_finish" } }, "required": ["kind"] }, "minContains": 1, "maxContains": 1 }
+          ]
+        },
+        "compositionProvenance": { "$ref": "#/$defs/compositionProvenance" }
+      }
+    },
+    "recipeInstance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["instanceId", "recipeId", "recipeRevision", "parameterValues"],
+      "properties": { "instanceId": { "$ref": "#/$defs/id" }, "recipeId": { "$ref": "#/$defs/id" }, "recipeRevision": { "$ref": "#/$defs/revision" }, "parameterValues": { "type": "object", "propertyNames": { "pattern": "^[a-z][A-Za-z0-9_]{0,63}$" }, "additionalProperties": { "type": ["string", "number", "boolean"] } } }
+    },
+    "communicationRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["communicationId", "asset", "createdAt"],
+      "properties": { "communicationId": { "$ref": "#/$defs/id" }, "asset": { "$ref": "#/$defs/assetRef" }, "caption": { "type": "string" }, "createdAt": { "$ref": "#/$defs/timestamp" } }
+    }
+  }
+}
