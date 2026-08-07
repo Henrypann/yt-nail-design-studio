@@ -387,14 +387,14 @@ export default function WizardPage() {
 
   return (
     <div
-      className="flex h-[calc(100vh-8.5rem)] flex-col gap-4"
+      className="flex min-h-[calc(100vh-8.5rem)] flex-col gap-4 lg:h-[calc(100vh-8.5rem)] lg:min-h-0"
       data-debug-id="studio.wizard.page"
       data-design-id={s.designId}
       data-wizard-status={s.status}
       data-wizard-ready={wizardReady ? 'true' : 'false'}
     >
       {/* 顶栏 */}
-      <header className="flex items-center gap-3 rounded-card border border-gray-200 bg-white px-4 py-2.5">
+      <header className="flex flex-wrap items-center gap-2 rounded-card border border-gray-200 bg-white px-3 py-2.5 sm:gap-3 sm:px-4">
         <button
           onClick={handleBack}
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
@@ -403,13 +403,13 @@ export default function WizardPage() {
           返回
         </button>
         <span className="h-4 w-px bg-gray-200" />
-        <span className="truncate text-sm font-medium text-gray-900">
+        <span className="min-w-0 truncate text-sm font-medium text-gray-900">
           {s.customer ? `👤 ${s.customer.name}` : '未选择客户'}
         </span>
         {summaryLabel && (
           <>
             <span className="h-4 w-px bg-gray-200" />
-            <span className="text-xs text-gray-600">{summaryLabel}</span>
+            <span className="min-w-0 truncate text-xs text-gray-600">{summaryLabel}</span>
             {s.step === 2 &&
               s.status === 'draft' &&
               !s.editingShapeLength &&
@@ -432,7 +432,7 @@ export default function WizardPage() {
         )}
         {s.status === 'confirmed' && <Badge variant="blue">已确认 · 只读</Badge>}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
           <Button
             size="sm"
             variant="ghost"
@@ -500,7 +500,7 @@ export default function WizardPage() {
       </header>
 
       {/* 主区 */}
-      <div className="min-h-0 flex-1">
+      <div className="min-h-0 flex-1 lg:overflow-hidden">
         {s.step === 1 ? <StepOne /> : <StepTwo />}
       </div>
 

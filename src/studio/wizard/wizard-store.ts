@@ -43,6 +43,11 @@ import {
 } from '@/studio/editor/lib/recipe-model';
 import { recipeDefinitionChecksum } from '@/studio/editor/lib/recipe-checksum';
 import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
+import {
+  canBuildWizardSummary,
+  missingWizardSummaryFields,
+  wizardSummaryCustomerId,
+} from './design-summary';
 import type { WizardDraftV1 } from './wizard-draft';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
@@ -188,11 +193,17 @@ export const useWizardStore = create<WizardState>((set, get) => {
   /** 由当前状态组装 DesignSummary（缩略图 best-effort，不阻断保存） */
   async function buildSummary(): Promise<DesignSummary | null> {
     const s = get();
-    if (!s.customer || !s.appliedShape || !s.appliedLength || !s.baseColor) return null;
+    if (!canBuildWizardSummary(s)) {
+      notifier?.error(`无法保存：缺少${missingWizardSummaryFields(s).join('、')}。`);
+      return null;
+    }
     const thumbnailDataUrl = s.step === 2 ? await renderThumbnailDataUrl() : undefined;
     return {
       id: s.designId,
-      customerId: s.customer.id,
+      // Community trials and blank designs are allowed before a customer is
+      // selected. The Editor V6 repository already uses an empty summary ID
+      // to represent an unassigned design and omits it from EditorDocV6.
+      customerId: wizardSummaryCustomerId(s.customer),
       title: s.templateName ?? '未命名设计',
       shape: s.appliedShape,
       length: s.appliedLength,

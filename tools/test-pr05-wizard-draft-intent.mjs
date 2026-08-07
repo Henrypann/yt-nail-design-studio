@@ -29,6 +29,8 @@ const {
   writeWizardDraft,
 } = await import('../src/studio/wizard/wizard-draft.ts');
 const { StorageKeys, writeEnvelope } = await import('../src/lib/storage.ts');
+const { canBuildWizardSummary, missingWizardSummaryFields, wizardSummaryCustomerId } =
+  await import('../src/studio/wizard/design-summary.ts');
 
 const customer = { id: 'customer-1' };
 const source = {
@@ -114,5 +116,19 @@ assert.equal(chooseWizardRestoreDraft({
 assert.equal(chooseWizardRestoreDraft({
   explicitDesignId: null, explicitDesign: null, activeDraft: serialized,
 }).designId, 'draft-1');
+
+// A Community trial can enter Step 2 before a customer is selected. Saving
+// that design must remain possible so the Wizard -> EditorDocV6 bridge does
+// not dead-end on the visible "未选择客户" state.
+const communityTrial = {
+  customer: null,
+  appliedShape: 'almond',
+  appliedLength: 'short',
+  baseColor: '#F5E0D3',
+};
+assert.equal(canBuildWizardSummary(communityTrial), true);
+assert.equal(wizardSummaryCustomerId(communityTrial.customer), '');
+assert.equal(canBuildWizardSummary({ ...communityTrial, appliedShape: null }), false);
+assert.deepEqual(missingWizardSummaryFields({ ...communityTrial, appliedShape: null }), ['甲型']);
 
 console.log('test-pr05-wizard-draft-intent: versioned recovery and precedence PASS');

@@ -154,12 +154,12 @@ export function StepTwo() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
+    <div className="flex min-h-0 flex-col gap-3 lg:h-full">
       <div className={cx(
-        'grid min-h-0 flex-1 gap-4',
+        'grid min-h-0 grid-cols-1 gap-4 lg:flex-1',
         petalP0
-          ? 'grid-cols-[180px_minmax(0,1fr)_260px]'
-          : 'grid-cols-[240px_minmax(0,1fr)_300px]',
+          ? 'lg:grid-cols-[180px_minmax(0,1fr)_260px]'
+          : 'lg:grid-cols-[240px_minmax(0,1fr)_300px]',
       )}>
         {/* 左：模板库（窄栏 · 风格标签 + 单列图文卡片） */}
         <aside data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 rounded-card border border-gray-200 bg-white p-3">
@@ -167,7 +167,7 @@ export function StepTwo() {
         </aside>
 
         {/* 中：主视觉三视图（或 [修改] 编辑态） */}
-        <section data-debug-id="studio.wizard.step2.preview" className="flex min-h-0 flex-col gap-3">
+        <section data-debug-id="studio.wizard.step2.preview" className="flex min-h-0 min-w-0 flex-col gap-3">
           {s.editingShapeLength ? (
             /* 顶栏 [修改]：预览区收缩为摘要条 + 重新选择 */
             <>
@@ -218,7 +218,7 @@ export function StepTwo() {
           ) : (
             <>
               {/* 视图切换 tab（UI 瞬态，不写入设计文档） */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex rounded-button border border-gray-200 bg-white p-0.5" role="tablist">
                   {viewTabs.map((tab) => (
                     <button
@@ -237,7 +237,7 @@ export function StepTwo() {
                     </button>
                   ))}
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {/* 指尖观察方向（UI 瞬态，整体搭配视图专用）：整幅组合画布 180° 旋转，不改设计数据 */}
                   {s.viewMode === 'ensemble' && (
                     <div
@@ -310,7 +310,7 @@ export function StepTwo() {
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto">
+              <div className="min-h-[24rem] flex-1 overflow-y-auto lg:min-h-0">
                 {s.viewMode === 'ensemble' && (
                   <div className="h-full" data-debug-id="studio.preview.ensemble">
                     <TenFingerPreview
@@ -380,7 +380,7 @@ export function StepTwo() {
         </section>
 
         {/* 右：常驻单指详情（≥240px）+ 参数 + 操作 */}
-        <aside className="flex min-h-0 flex-col gap-3">
+        <aside className="flex min-h-0 min-w-0 flex-col gap-3">
           {detailPanel}
           <div data-debug-id="studio.wizard.step2.params-panel" className="min-h-0 flex-1 rounded-card border border-gray-200 bg-white p-3">
             <ParamsPanel />
