@@ -85,8 +85,8 @@ interface EditorV6State {
   autosaveTimer: ReturnType<typeof setTimeout> | null;
 
   /* Lifecycle */
-  load: (designId: string) => 'ok' | 'missing' | 'invalid' | 'unsupported';
-  unload: () => void;
+  load: (designId: string) => 'ok' | 'missing' | 'invalid' | 'unsupported' | 'save_error';
+  unload: () => 'ok' | 'error';
   reloadFromStorage: () => boolean;
 
   /* Commit & History */
@@ -170,10 +170,52 @@ function cloneDoc(doc: EditorDocV6): EditorDocV6 {
 function scheduleAutosaveFlush(get: () => EditorV6State, set: (partial: Partial<EditorV6State>) => void) {
   const state = get();
   if (state.autosaveTimer) clearTimeout(state.autosaveTimer);
+  const capturedDesignId = state.designId;
   const timer = setTimeout(() => {
-    void get().save();
+    const current = get();
+    if (current.designId !== capturedDesignId) return;
+    if (current.autosaveTimer === timer) set({ autosaveTimer: null });
+    void current.save();
   }, AUTOSAVE_DEBOUNCE_MS);
   set({ autosaveTimer: timer });
+}
+
+function persistEditorDoc(
+  doc: EditorDocV6,
+  designId: string,
+  autosave: AutosaveRevisionState,
+): { status: 'ok'; doc: EditorDocV6; autosave: AutosaveRevisionState } | { status: 'error' } {
+  const now = new Date().toISOString();
+  const next: EditorDocV6 = { ...doc, updatedAt: now };
+  const saveResult = saveEditorDocV6ToLocalStorage(next);
+  if (saveResult.status !== 'ok') return { status: 'error' };
+
+  const design = getDesign(designId);
+  if (design) {
+    const masterFinger = next.presentationMeta.masterFinger;
+    const baseColor = next.nails[masterFinger].layers.find(
+      (layer) => layer.typeId === 'builtin.base_surface',
+    )?.surface?.baseColor ?? design.baseColor;
+    upsertDesign({
+      ...design,
+      title: next.title,
+      shape: next.defaultGeometry.shape,
+      length: next.defaultGeometry.length,
+      lengthPreset: next.lengthPreset,
+      baseColor,
+      finish: next.appearance.topFinish === 'matte' ? 'matte' : 'gloss',
+      surface: next.appearance,
+      updatedAt: now,
+    });
+  }
+
+  const nextAutosave = { ...autosave };
+  const flushRevision = autosave.pendingRevision ?? autosave.revision;
+  applySaveResult(nextAutosave, flushRevision);
+  if (nextAutosave.pendingRevision === flushRevision) {
+    nextAutosave.pendingRevision = null;
+  }
+  return { status: 'ok', doc: next, autosave: nextAutosave };
 }
 
 function normalizeLayerOrders(layers: EditorLayerV6[]): void {
@@ -228,6 +270,10 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
     if (result.status === 'unsupported') return 'unsupported';
     if (result.status === 'invalid') return 'invalid';
 
+    // Do not abandon a dirty document just because navigation loads another one.
+    // The target is validated first so failed target loads leave the current timer intact.
+    if (get().doc && get().unload() === 'error') return 'save_error';
+
     const design = getDesign(designId);
     const status = design?.status ?? 'draft';
     const doc = cloneDoc(result.doc);
@@ -257,8 +303,24 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   unload: () => {
-    const { autosaveTimer } = get();
+    const { autosaveTimer, saveState, doc, designId, autosave } = get();
     if (autosaveTimer) clearTimeout(autosaveTimer);
+    set({ autosaveTimer: null });
+
+    const hasUnsavedRevision = autosave.pendingRevision !== null;
+    if ((hasUnsavedRevision || saveState === 'dirty' || saveState === 'error') && doc && designId) {
+      try {
+        const result = persistEditorDoc(doc, designId, autosave);
+        if (result.status === 'error') {
+          set({ saveState: 'error' });
+          return 'error';
+        }
+      } catch {
+        set({ saveState: 'error' });
+        return 'error';
+      }
+    }
+
     set({
       designId: null,
       doc: null,
@@ -279,13 +341,15 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
       autosave: createRevisionState(),
       autosaveTimer: null,
     });
+    return 'ok';
   },
 
   reloadFromStorage: () => {
-    const { designId } = get();
+    const { designId, autosaveTimer } = get();
     if (!designId) return false;
     const result = getEditorDocV6Result(designId);
     if (result.status !== 'ok') return false;
+    if (autosaveTimer) clearTimeout(autosaveTimer);
     const doc = cloneDoc(result.doc);
     set({
       doc,
@@ -293,6 +357,7 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
       future: [],
       saveState: 'saved',
       autosave: createRevisionState(),
+      autosaveTimer: null,
     });
     return true;
   },
@@ -318,9 +383,12 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   undo: () => {
-    const { doc, history, future, readOnly } = get();
+    const { doc, history, future, readOnly, autosave } = get();
     if (!doc || readOnly || history.length === 0) return;
-    const prev = history[history.length - 1];
+    const prev = cloneDoc(history[history.length - 1]);
+    prev.revision = doc.revision + 1;
+    prev.updatedAt = new Date().toISOString();
+    bumpRevision(autosave);
     set({
       doc: prev,
       history: history.slice(0, -1),
@@ -332,9 +400,13 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   redo: () => {
-    const { doc, history, future, readOnly } = get();
+    const { doc, history, future, readOnly, autosave } = get();
     if (!doc || readOnly || future.length === 0) return;
-    const [next, ...rest] = future;
+    const [futureDoc, ...rest] = future;
+    const next = cloneDoc(futureDoc);
+    next.revision = doc.revision + 1;
+    next.updatedAt = new Date().toISOString();
+    bumpRevision(autosave);
     set({
       doc: next,
       history: [...history, doc].slice(-HISTORY_LIMIT),
@@ -741,40 +813,20 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   /* ── Save ───────────────────────────────────────────── */
 
   save: async () => {
-    const { doc, designId, readOnly, autosave } = get();
+    const { doc, designId, readOnly, autosave, autosaveTimer } = get();
     if (!doc || !designId) return 'error';
     if (readOnly) return 'error';
 
-    const flushRev = autosave.pendingRevision ?? autosave.revision;
-    set({ saveState: 'saving' });
+    if (autosaveTimer) clearTimeout(autosaveTimer);
+    set({ saveState: 'saving', autosaveTimer: null });
 
     try {
-      const now = new Date().toISOString();
-      const next: EditorDocV6 = { ...doc, updatedAt: now };
-      saveEditorDocV6ToLocalStorage(next);
-
-      const design = getDesign(designId);
-      if (design) {
-        const baseColor = next.nails['R4'].layers.find(
-          (l) => l.typeId === 'builtin.base_surface',
-        )?.surface?.baseColor ?? design.baseColor;
-        upsertDesign({
-          ...design,
-          title: next.title,
-          shape: next.defaultGeometry.shape,
-          length: next.defaultGeometry.length,
-          lengthPreset: next.lengthPreset,
-          baseColor,
-          finish: next.appearance.topFinish === 'matte' ? 'matte' : 'gloss',
-          surface: next.appearance,
-          updatedAt: now,
-        });
+      const result = persistEditorDoc(doc, designId, autosave);
+      if (result.status === 'error') {
+        set({ saveState: 'error' });
+        return 'error';
       }
-
-      const nextAutosave = { ...autosave };
-      applySaveResult(nextAutosave, flushRev);
-      nextAutosave.pendingRevision = null;
-      set({ doc: next, saveState: 'saved', autosave: nextAutosave });
+      set({ doc: result.doc, saveState: 'saved', autosave: result.autosave });
       return 'saved';
     } catch {
       set({ saveState: 'error' });
