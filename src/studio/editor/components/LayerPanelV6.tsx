@@ -5,21 +5,25 @@
 
 import { useEditorV6Store, selectCurrentNail } from '../store-v6';
 import type { EditorLayerV6 } from '../v6/model';
+import { useLocale, type Locale } from '@/lib/i18n';
+import { resolveTaxonomyEntry, taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 
-const LAYER_TYPE_LABELS: Record<string, string> = {
-  'builtin.base_surface': '底色/表面',
-  'builtin.draw': '手绘',
-  'builtin.art_2d': '二维素材',
-  'builtin.attachment': '附件',
-  'builtin.relief': '立体结构',
-  'builtin.recipe': '配方层',
-};
+const LEGACY_DEFAULT_LAYER_NAMES = new Set([
+  'Base surface', 'Base Surface', 'Draw', '2D Art', 'Attachment',
+  '底色/表面', '手绘', '二维素材', '附件', '饰品', '立体结构', '配方层',
+]);
 
-function layerLabel(layer: EditorLayerV6): string {
-  return layer.name || LAYER_TYPE_LABELS[layer.typeId] || layer.typeId;
+function layerLabel(layer: EditorLayerV6, locale: Locale): string {
+  const entry = resolveTaxonomyEntry('layer', layer.typeId);
+  const isDefaultName = !layer.name ||
+    layer.name === entry?.en ||
+    layer.name === entry?.zh ||
+    LEGACY_DEFAULT_LAYER_NAMES.has(layer.name);
+  return isDefaultName ? taxonomyLabel('layer', layer.typeId, locale) : layer.name;
 }
 
 export function LayerPanelV6() {
+  const { locale, text } = useLocale();
   // Subscribe through the selector so changing currentFinger rerenders the
   // panel even when the document object itself has not changed.
   const nail = useEditorV6Store(selectCurrentNail);
@@ -39,12 +43,12 @@ export function LayerPanelV6() {
   return (
     <div className="flex flex-col gap-1 p-2" data-debug-id="studio.editor.layer-panel-v6">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-medium text-gray-500">图层</h3>
+        <h3 className="text-xs font-medium text-gray-500">{text('图层', 'Layers')}</h3>
         {!readOnly && (
           <button
             className="rounded px-1.5 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            onClick={() => createLayerOnCurrent('builtin.draw', '手绘')}
-            title="添加手绘图层"
+            onClick={() => createLayerOnCurrent('builtin.draw', taxonomyLabel('layer', 'builtin.draw', locale))}
+            title={text('添加手绘图层', 'Add hand-paint layer')}
           >
             +
           </button>
@@ -87,7 +91,7 @@ export function LayerPanelV6() {
             </span>
 
             {/* Layer name */}
-            <span className="flex-1 truncate">{layerLabel(layer)}</span>
+            <span className="flex-1 truncate">{layerLabel(layer, locale)}</span>
 
             {/* Element count */}
             <span className="text-[10px] text-gray-400">

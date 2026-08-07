@@ -250,7 +250,7 @@ export default function EditorPage() {
                     key={capability.id}
                     disabled={!enabled}
                     onClick={() => setBlankShape(capability.id)}
-                    title={enabled ? hint || shapeName(capability.id) : `${shapeName(capability.id)} · Pending geometry sign-off`}
+                    title={enabled ? hint || shapeName(capability.id, locale) : `${shapeName(capability.id, locale)} · Pending geometry sign-off`}
                     data-shape-id={capability.id}
                     data-editor-enabled={enabled}
                     data-compatibility={enabled ? compatibility.severity : undefined}
@@ -263,7 +263,7 @@ export default function EditorPage() {
                       !enabled && 'cursor-not-allowed bg-gray-50 opacity-45',
                     )}
                   >
-                    <span>{shapeName(capability.id)}</span>
+                    <span>{shapeName(capability.id, locale)}</span>
                     {enabled && !selected && badge && (
                       <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>
                     )}
@@ -294,7 +294,7 @@ export default function EditorPage() {
                       compatibilityToneClass(compatibility, selected),
                     )}
                   >
-                    {lengthName(l)}
+                    {lengthName(l, locale)}
                     {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
                   </button>
                 );

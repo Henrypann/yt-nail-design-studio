@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Routes } from '@/app/routes';
 import { useLocale } from '@/lib/i18n';
+import { communityTaxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { communityInternalHref } from '../lib/entry-link';
 import type { CommunityContentV1, CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
 import { PublisherBadge } from './PublisherBadge';
@@ -13,11 +14,6 @@ interface Props {
   taxonomy: CommunityTaxonomyV1;
 }
 
-function pickLabel(item: { label: string; labelEn?: string } | undefined, locale: 'zh' | 'en') {
-  if (!item) return undefined;
-  return locale === 'en' ? item.labelEn ?? item.label : item.label;
-}
-
 export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -25,15 +21,13 @@ export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
   const [coverFailed, setCoverFailed] = useState(false);
   const style = taxonomy.mainStyles.find((s) => s.id === content.mainStyleId);
   const topicId = content.effectIds[0] ?? content.moodIds[0];
-  const topic =
-    pickLabel(
-      taxonomy.effects.find((e) => e.id === topicId),
-      locale,
-    ) ??
-    pickLabel(
-      taxonomy.moods.find((m) => m.id === topicId),
-      locale,
-    );
+  const effect = taxonomy.effects.find((e) => e.id === topicId);
+  const mood = taxonomy.moods.find((m) => m.id === topicId);
+  const topic = effect
+    ? communityTaxonomyLabel('community-effect', effect, locale)
+    : mood
+      ? communityTaxonomyLabel('community-mood', mood, locale)
+      : undefined;
 
   return (
     <button
@@ -68,7 +62,7 @@ export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
           <PublisherBadge publisher={publisher} />
           {style && (
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600">
-              {pickLabel(style, locale)}
+              {communityTaxonomyLabel('community-style', style, locale)}
             </span>
           )}
           {topic && (

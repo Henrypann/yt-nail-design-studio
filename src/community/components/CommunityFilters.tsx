@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button, cx } from '@/design-system';
 import { useLocale, type Locale } from '@/lib/i18n';
+import { communityTaxonomyLabel, taxonomyLabel, type NailTaxonomyNamespace } from '@/studio/shared/nail-taxonomy-labels';
 import type { CommunityTaxonomyV1 } from '../domain/types';
 import {
   advancedFilterCount,
@@ -13,14 +14,6 @@ interface Props {
   filters: CommunityFilterState;
   onChange: (next: CommunityFilterState) => void;
   resultCount: number;
-}
-
-function taxonomyLabel(
-  item: { label: string; labelEn?: string },
-  locale: Locale,
-): string {
-  if (locale === 'en') return item.labelEn ?? item.label;
-  return item.label;
 }
 
 export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: Props) {
@@ -124,7 +117,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
                 : 'border-gray-200 bg-white text-gray-600',
             )}
           >
-            {taxonomyLabel(s, locale)}
+            {communityTaxonomyLabel('community-style', s, locale)}
           </button>
         ))}
       </div>
@@ -149,6 +142,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           <FilterGroup
             title={text('场景', 'Occasion')}
             items={taxonomy.occasions}
+            namespace="community-occasion"
             locale={locale}
             selected={filters.occasion}
             onToggle={(id) => toggleMulti('occasion', id)}
@@ -156,6 +150,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           <FilterGroup
             title={text('效果', 'Effect')}
             items={taxonomy.effects}
+            namespace="community-effect"
             locale={locale}
             selected={filters.effect}
             onToggle={(id) => toggleMulti('effect', id)}
@@ -163,6 +158,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           <FilterGroup
             title={text('情绪', 'Mood')}
             items={taxonomy.moods}
+            namespace="community-mood"
             locale={locale}
             selected={filters.mood}
             onToggle={(id) => toggleMulti('mood', id)}
@@ -178,7 +174,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
                 <option value="">{text('全部', 'All')}</option>
                 {['almond', 'oval', 'coffin', 'square', 'round', 'squoval', 'stiletto'].map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {taxonomyLabel('shape', s, locale)}
                   </option>
                 ))}
               </select>
@@ -235,12 +231,14 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
 function FilterGroup({
   title,
   items,
+  namespace,
   selected,
   onToggle,
   locale,
 }: {
   title: string;
   items: Array<{ id: string; label: string; labelEn?: string }>;
+  namespace: Extract<NailTaxonomyNamespace, `community-${string}`>;
   selected: string[];
   onToggle: (id: string) => void;
   locale: Locale;
@@ -261,7 +259,7 @@ function FilterGroup({
                 : 'border-gray-200 text-gray-600',
             )}
           >
-            {taxonomyLabel(item, locale)}
+            {communityTaxonomyLabel(namespace, item, locale)}
           </button>
         ))}
       </div>

@@ -7,6 +7,8 @@
  */
 
 import type { Finish, NailLength, NailShape } from '@/lib/types';
+import type { Locale } from '@/lib/i18n';
+import { taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import type {
   BaseCoverage,
   ColorPresetId,
@@ -218,8 +220,9 @@ export const LOOK_PRESETS: readonly TaxonomyLookPreset[] = taxonomy?.look_preset
 export const COLOR_PRESETS: readonly TaxonomyColorPreset[] = taxonomy?.color_presets ?? [];
 export const SURFACE_PRESETS: readonly TaxonomySurfacePreset[] = taxonomy?.surface_presets ?? [];
 
-export function shapeName(shape: NailShape): string {
-  return shapeParams?.shapes?.[shape]?.name_en ?? shape;
+export function shapeName(shape: NailShape, locale: Locale = 'en'): string {
+  const fallback = shapeParams?.shapes?.[shape];
+  return taxonomyLabel('shape', shape, locale, { zh: fallback?.name, en: fallback?.name_en });
 }
 
 export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
@@ -235,14 +238,8 @@ export const TIER_ONE_EDITOR_SHAPES: readonly EditorShapeCapability[] = (
     return readiness !== 0 ? readiness : a.order - b.order;
   });
 
-const LENGTH_LABELS: Record<NailLength, string> = {
-  short: '短',
-  medium: '中',
-  long: '长',
-  'extra-long': '超长',
-};
-export function lengthName(length: NailLength): string {
-  return LENGTH_LABELS[length];
+export function lengthName(length: NailLength, locale: Locale = 'zh'): string {
+  return taxonomyLabel('geometry-length', length, locale);
 }
 
 /** 紧凑型 Editor 控件只暴露能力注册表中已签收、已启用的甲型。 */

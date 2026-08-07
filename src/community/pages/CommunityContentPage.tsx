@@ -9,6 +9,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Badge, Button, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { useLocale } from '@/lib/i18n';
+import { communityTaxonomyLabel, taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { getContentById, getPublisherById, loadTaxonomy } from '../data/content-repository';
 import type {
   CommunityContentV1,
@@ -28,7 +29,7 @@ export default function CommunityContentPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const toast = useToast();
-  const { locale } = useLocale();
+  const { locale, text } = useLocale();
   const [content, setContent] = useState<CommunityContentV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
   const [taxonomy, setTaxonomy] = useState<CommunityTaxonomyV1 | null>(null);
@@ -150,7 +151,7 @@ export default function CommunityContentPage() {
             <PublisherBadge publisher={publisher} />
             {style && (
               <Badge variant="gray">
-                {locale === 'en' ? style.labelEn ?? style.label : style.label}
+                {communityTaxonomyLabel('community-style', style, locale)}
               </Badge>
             )}
             <ApplicationBadge level={content.applicationLevel} />
@@ -165,10 +166,16 @@ export default function CommunityContentPage() {
             <div className="rounded-panel border border-gray-200 px-3 py-2 text-xs text-gray-700">
               <p className="font-medium text-gray-800">推荐甲型与长度</p>
               {content.recommendedShapes.length > 0 && (
-                <p className="mt-1">甲型：{content.recommendedShapes.join(' · ')}</p>
+                <p className="mt-1">
+                  {text('甲型：', 'Shape: ')}
+                  {content.recommendedShapes.map((id) => taxonomyLabel('shape', id, locale)).join(' · ')}
+                </p>
               )}
               {content.supportedLengths.length > 0 && (
-                <p className="mt-0.5">长度：{content.supportedLengths.join(' · ')}</p>
+                <p className="mt-0.5">
+                  {text('长度：', 'Length: ')}
+                  {content.supportedLengths.map((id) => taxonomyLabel('geometry-length', id, locale)).join(' · ')}
+                </p>
               )}
             </div>
           )}

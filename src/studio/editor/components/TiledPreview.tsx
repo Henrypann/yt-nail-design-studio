@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Download, RefreshCw, X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { FINGER_CODES } from '@/lib/types';
+import { useLocale } from '@/lib/i18n';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { fingerDisplayRatio, fingerDisplayScale } from '@/studio/finger-display';
 import { getSilhouette, lengthName, shapeName } from '../lib/material';
@@ -17,6 +18,7 @@ import { resolveFingerData, isFingerUnlocked } from '../lib/model';
 import { useEditorStore } from '../store';
 
 export function TiledPreview(props: { onClose: () => void; presentation?: boolean }) {
+  const { locale } = useLocale();
   const { onClose, presentation = false } = props;
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
@@ -201,7 +203,7 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
       <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-[11px] text-gray-500">
         <span>
           {presentation
-            ? `${shapeName(doc.shape)} · ${lengthName(doc.length)} · ${doc.lengthPreset}`
+            ? `${shapeName(doc.shape, locale)} · ${lengthName(doc.length, locale)} · ${doc.lengthPreset}`
             : `点击指位切换编辑指并返回单甲画布${hasBrush ? ' · 导出 PNG 含手绘/法式' : ''}`}
         </span>
         <span className="text-[10px] text-gray-400">

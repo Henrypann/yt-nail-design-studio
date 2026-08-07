@@ -12,6 +12,7 @@ import { Check, ChevronDown } from 'lucide-react';
 import { cx } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
 import type { NailLength, NailShape } from '@/lib/types';
+import { taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import {
   compatibilityLabel,
   compatibilityTitle,
@@ -101,7 +102,10 @@ function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelec
             : rawAvailability === '规划中'
               ? 'Planned'
               : 'Coming soon';
-  const shapeLabel = capability.label_en;
+  const shapeLabel = taxonomyLabel('shape', capability.id, locale, {
+    zh: capability.label,
+    en: capability.label_en,
+  });
   const unavailableReason = `${shapeLabel} · ${availability}`;
   const enabledTitle = compatibilityHint ? `${shapeLabel} · ${compatibilityHint}` : shapeLabel;
 
@@ -305,7 +309,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
                 )}
                 aria-pressed={selected}
               >
-                {meta?.name ?? item}
+                {taxonomyLabel('geometry-length', item, locale, { zh: meta?.name })}
                 {selected && meta && <span className="text-xs opacity-80 tnum">{meta.lengthMm}mm</span>}
                 {!selected && badge && <span aria-hidden="true" className="text-[10px] opacity-80">{badge}</span>}
               </button>
