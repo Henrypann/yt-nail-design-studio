@@ -14,6 +14,12 @@ production page and rejects any reachable legacy `store.ts` or
 `useEditorStore` consumer. Runtime persistence failure/retry behavior remains
 covered by `test:editor-v6-runtime`.
 
+The design list now probes and duplicates V6 documents through `repo-v6`; it
+blocks invalid/future documents instead of routing them through the legacy
+bridge. V6 blank creation rolls back the document envelope when its summary
+write fails. Customer confirmation saves first, then writes the status and
+reloads the same V6 document as read-only.
+
 Known follow-up boundaries:
 
 - PR-05 must replace the legacy Wizard bridge with the unique-ID V6 bridge.

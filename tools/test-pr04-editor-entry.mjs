@@ -60,6 +60,7 @@ function visit(file) {
 visit(entry);
 
 const editorPage = fs.readFileSync(entry, 'utf8');
+const designList = fs.readFileSync(path.join(root, 'src/app/pages/design/DesignListPage.tsx'), 'utf8');
 const shell = fs.readFileSync(path.join(root, 'src/studio/editor/components/EditorShellV6.tsx'), 'utf8');
 assert.match(editorPage, /EditorShellV6/);
 assert.match(editorPage, /createBlankEditorDesignV6/);
@@ -69,5 +70,9 @@ assert.match(editorPage, /unsupported/);
 assert.match(shell, /data-editor-schema="6"/);
 assert.match(shell, /LayerPanelV6/);
 assert.match(shell, /FINGER_CODES\.map/);
+assert.match(shell, /confirmDesign/);
+assert.match(designList, /getEditorDocV6Result/);
+assert.match(designList, /duplicateEditorDocV6/);
+assert.doesNotMatch(designList, /from ['"]@\/studio\/editor\/lib\/repo['"]/);
 
 console.log(`test-pr04-editor-entry: V6-only dependency boundary PASS (${visited.size} local modules)`);

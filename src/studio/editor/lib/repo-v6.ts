@@ -5,7 +5,7 @@
  */
 
 import { readData, writeEnvelope, StorageKeys } from '@/lib/storage';
-import type { DesignSummary } from '@/lib/types';
+import type { Customer, DesignSummary } from '@/lib/types';
 import { createEmptyEditorDocV6, type EditorDocV6 } from '../v6/model';
 import { getEditorDocV6Result as getEditorDocV6ResultFromMap, saveEditorDocV6ToMap, type EditorDocV6SaveResult, type EditorDocV6MigrationResult } from '../v6/repository-contract';
 import { classifyEditorDocSchemaVersion } from './editor-doc-schema-version';
@@ -30,6 +30,15 @@ export function upsertDesign(design: DesignSummary): void {
   if (idx >= 0) designs[idx] = design;
   else designs.unshift(design);
   writeDesigns(designs);
+}
+
+export function readCustomers(): Customer[] {
+  return readData<Customer[]>(StorageKeys.customers) ?? [];
+}
+
+export function customerName(customerId: string | undefined): string {
+  if (!customerId) return '未关联客户';
+  return readCustomers().find((customer) => customer.id === customerId)?.name ?? '未关联客户';
 }
 
 export function removeDesign(id: string): void {
@@ -148,22 +157,32 @@ export function createBlankEditorDesignV6(opts: {
     baseColor: opts.baseColor,
   });
 
-  saveEditorDocV6ToLocalStorage(doc);
+  const saveResult = saveEditorDocV6ToLocalStorage(doc);
+  if (saveResult.status !== 'ok') {
+    throw new Error('EditorDocV6 save rejected');
+  }
 
-  upsertDesign({
-    id,
-    customerId: opts.customerId ?? '',
-    title: doc.title,
-    shape: doc.defaultGeometry.shape,
-    length: doc.defaultGeometry.length,
-    baseColor: opts.baseColor ?? '#FBF5F0',
-    finish: doc.appearance.topFinish === 'matte' ? 'matte' : 'gloss',
-    status: 'draft',
-    source: 'editor',
-    version: 1,
-    createdAt: now,
-    updatedAt: now,
-  });
+  try {
+    upsertDesign({
+      id,
+      customerId: opts.customerId ?? '',
+      title: doc.title,
+      shape: doc.defaultGeometry.shape,
+      length: doc.defaultGeometry.length,
+      baseColor: opts.baseColor ?? '#FBF5F0',
+      finish: doc.appearance.topFinish === 'matte' ? 'matte' : 'gloss',
+      status: 'draft',
+      source: 'editor',
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+    });
+  } catch (error) {
+    // Best-effort rollback prevents an invisible EditorDoc orphan when the
+    // summary envelope fails after the document envelope succeeded.
+    try { removeEditorDoc(id); } catch { /* original storage error wins */ }
+    throw error;
+  }
 
   return id;
 }

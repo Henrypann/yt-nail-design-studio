@@ -71,8 +71,11 @@ globalThis.clearTimeout = timers.clearTimeout;
 
 const { createEmptyEditorDocV6 } = await import('../src/studio/editor/v6/model.ts');
 const {
+  createBlankEditorDesignV6,
+  duplicateEditorDocV6,
   getDesign,
   getEditorDocV6Result,
+  removeDesign,
   saveEditorDocV6ToLocalStorage,
   upsertDesign,
 } = await import('../src/studio/editor/lib/repo-v6.ts');
@@ -322,6 +325,32 @@ function addInvalidStoredDoc(designId) {
   assert.notEqual(useEditorV6Store.getState().doc.title, 'discard this dirty title');
   assert.equal(await timers.invoke(dirtyTimer), false);
   console.log('[runtime] reload clears discarded autosave timer: PASS');
+}
+
+// Repository lifecycle keeps V6 docs and summaries paired for create/duplicate/delete.
+{
+  resetRuntime();
+  storage.failWriteKeys.add(DESIGNS_KEY);
+  assert.throws(
+    () => createBlankEditorDesignV6({ title: 'rollback create' }),
+    /Injected localStorage write failure/,
+  );
+  storage.failWriteKeys.delete(DESIGNS_KEY);
+  const rolledBackEnvelope = JSON.parse(storage.getItem(EDITOR_DOCS_KEY));
+  assert.deepEqual(Object.keys(rolledBackEnvelope.data), []);
+
+  seedDesign('repo-life-source');
+  assert.equal(duplicateEditorDocV6('repo-life-source', 'repo-life-copy'), 'repo-life-copy');
+  assert.equal(getEditorDocV6Result('repo-life-copy').status, 'ok');
+  upsertDesign({
+    ...getDesign('repo-life-source'),
+    id: 'repo-life-copy',
+    title: 'Repository lifecycle copy',
+  });
+  removeDesign('repo-life-copy');
+  assert.equal(getDesign('repo-life-copy'), undefined);
+  assert.equal(getEditorDocV6Result('repo-life-copy').status, 'missing');
+  console.log('[runtime] V6 create rollback, duplicate and delete lifecycle: PASS');
 }
 
 console.log('\ntest-editor-v6-runtime: all assertions passed');

@@ -8,12 +8,15 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Redo2, Save, ShieldAlert, Undo2 } from 'lucide-react';
-import { Button, cx } from '@/design-system';
+import { ArrowLeft, CheckCircle2, Redo2, Save, ShieldAlert, Undo2 } from 'lucide-react';
+import { Button, cx, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { FINGER_CODES } from '@/lib/types';
 import { useLocale } from '@/lib/i18n';
+import { confirmDesign } from '@/lib/state-machine';
+import { readData, StorageKeys } from '@/lib/storage';
 import { getSilhouette, LENGTHS, lengthName, SHAPES, shapeName } from '../lib/material';
+import { getDesign, upsertDesign } from '../lib/repo-v6';
 import { useEditorV6Store } from '../store-v6';
 import { EditorToolRail, type EditorToolSection } from './EditorToolRail';
 import { LayerPanelV6 } from './LayerPanelV6';
@@ -30,6 +33,7 @@ const BASE_COLORS = ['#FBF5F0', '#EFC2C8', '#C94C65', '#7A2748', '#1F2630', '#C9
 export function EditorShellV6() {
   const navigate = useNavigate();
   const { text } = useLocale();
+  const toast = useToast();
   const doc = useEditorV6Store((state) => state.doc);
   const status = useEditorV6Store((state) => state.status);
   const readOnly = useEditorV6Store((state) => state.readOnly);
@@ -46,9 +50,11 @@ export function EditorShellV6() {
   const undo = useEditorV6Store((state) => state.undo);
   const redo = useEditorV6Store((state) => state.redo);
   const save = useEditorV6Store((state) => state.save);
+  const load = useEditorV6Store((state) => state.load);
   const [titleDraft, setTitleDraft] = useState(doc?.title ?? '');
   const [activeToolSection, setActiveToolSection] = useState<EditorToolSection>('looks');
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => setTitleDraft(doc?.title ?? ''), [doc?.designId, doc?.title]);
 
@@ -102,6 +108,29 @@ export function EditorShellV6() {
     if (section === 'components') setTool('attachment');
   };
 
+  const confirmCurrentDesign = async () => {
+    const saveResult = await save();
+    if (saveResult !== 'saved') {
+      toast.error(text('保存失败，设计未确认。', 'Save failed; the design was not confirmed.'));
+      return;
+    }
+    const design = getDesign(doc.designId);
+    if (!design) {
+      toast.error(text('设计摘要缺失，未更改确认状态。', 'Design summary is missing; confirmation was not changed.'));
+      return;
+    }
+    const session = readData<{ userName?: string }>(StorageKeys.session);
+    try {
+      upsertDesign(confirmDesign(design, session?.userName ?? text('美甲师', 'Nail artist')));
+      const reloadResult = load(doc.designId);
+      if (reloadResult !== 'ok') throw new Error('confirmed design reload failed');
+      setConfirmOpen(false);
+      toast.success(text('已确认并冻结为只读。', 'Confirmed and frozen as read-only.'));
+    } catch {
+      toast.error(text('确认状态写入失败，文档仍保留。', 'Confirmation update failed; the document is preserved.'));
+    }
+  };
+
   return (
     <section
       className="flex min-h-[620px] flex-col overflow-hidden rounded-card border border-gray-200 bg-white lg:h-[calc(100vh-8.5rem)]"
@@ -151,6 +180,11 @@ export function EditorShellV6() {
         >
           <Save size={14} /> {saveState === 'error' ? text('重试保存', 'Retry save') : text('保存', 'Save')}
         </Button>
+        {status === 'draft' && !readOnly && (
+          <Button size="sm" variant="secondary" onClick={() => setConfirmOpen(true)}>
+            <CheckCircle2 size={14} /> {text('顾客已确认', 'Customer approved')}
+          </Button>
+        )}
       </header>
 
       {readOnly && (
@@ -313,6 +347,25 @@ export function EditorShellV6() {
           ))}
         </div>
       </footer>
+
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title={text('标记顾客已确认？', 'Mark as customer approved?')}
+        footer={
+          <>
+            <Button size="sm" variant="ghost" onClick={() => setConfirmOpen(false)}>{text('取消', 'Cancel')}</Button>
+            <Button size="sm" onClick={() => void confirmCurrentDesign()}>{text('保存并冻结', 'Save and freeze')}</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-600">
+          {text(
+            'Studio 会先完成 V6 保存；仅保存成功后才写入确认状态并冻结当前版本。后续修改请从设计列表创建新版本。',
+            'Studio saves the V6 document first. Only a successful save can confirm and freeze this version; create a new version for later edits.',
+          )}
+        </p>
+      </Modal>
     </section>
   );
 }
