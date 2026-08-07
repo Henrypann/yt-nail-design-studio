@@ -31,6 +31,12 @@ import {
   duplicateEditorDocV6,
 } from './lib/repo-v6';
 import { genId } from './lib/model';
+import {
+  mirrorElementV6,
+  oppositeFingerForV6,
+  readElementTransform,
+  updateElementTransform,
+} from './v6/interaction';
 
 /* ── Types ──────────────────────────────────────────────── */
 
@@ -131,11 +137,19 @@ interface EditorV6State {
 
   /* Element CRUD */
   appendElementToCurrentLayer: (element: EditorElementV6) => void;
+  addElementToLayerOnCurrent: (typeId: string, layerName: string, element: EditorElementV6) => void;
+  selectElementOnCurrent: (layerId: string, elementId: string) => void;
   updateElementOnCurrentLayer: (elementId: string, updater: (el: EditorElementV6) => EditorElementV6) => void;
   removeElementFromCurrentLayer: (elementId: string) => void;
+  updateSelectedElementTransform: (patch: Partial<{ x: number; y: number; scale: number; rotation: number }>) => void;
+  nudgeSelectedElement: (dx: number, dy: number) => void;
+  duplicateSelectedElement: () => void;
+  toggleSelectedElementLocked: () => void;
+  toggleSelectedElementVisible: () => void;
 
   /* Cross-finger */
   copyLayerToFinger: (layerId: string, targetFinger: FingerCode) => void;
+  mirrorActiveLayerToOpposite: () => FingerCode | null;
 
   /* Document settings */
   setTitle: (title: string) => void;
@@ -493,8 +507,10 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   renameLayerOnCurrent: (layerId, name) => {
-    const { currentFinger, readOnly } = get();
-    if (readOnly) return;
+    const { doc, currentFinger, readOnly } = get();
+    if (!doc || readOnly) return;
+    const current = doc.nails[currentFinger].layers.find((layer) => layer.id === layerId);
+    if (!current || current.locked) return;
     get().commit((draft) => {
       const layer = draft.nails[currentFinger].layers.find((l) => l.id === layerId);
       if (layer) layer.name = name;
@@ -504,6 +520,8 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   duplicateLayerOnCurrent: (layerId) => {
     const { doc, currentFinger, readOnly } = get();
     if (!doc || readOnly) return;
+    const current = doc.nails[currentFinger].layers.find((layer) => layer.id === layerId);
+    if (!current || current.locked) return;
     get().commit((draft) => {
       const nail = draft.nails[currentFinger];
       const src = nail.layers.find((l) => l.id === layerId);
@@ -527,6 +545,8 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   deleteLayerOnCurrent: (layerId) => {
     const { doc, currentFinger, readOnly, activeLayerId } = get();
     if (!doc || readOnly) return;
+    const current = doc.nails[currentFinger].layers.find((layer) => layer.id === layerId);
+    if (!current || current.locked || current.typeId === 'builtin.base_surface') return;
     get().commit((draft) => {
       const nail = draft.nails[currentFinger];
       nail.layers = nail.layers.filter((l) => l.id !== layerId);
@@ -539,8 +559,10 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   reorderLayerOnCurrent: (layerId, direction) => {
-    const { currentFinger, readOnly } = get();
-    if (readOnly) return;
+    const { doc, currentFinger, readOnly } = get();
+    if (!doc || readOnly) return;
+    const current = doc.nails[currentFinger].layers.find((layer) => layer.id === layerId);
+    if (!current || current.locked) return;
     get().commit((draft) => {
       const layers = draft.nails[currentFinger].layers;
       const idx = layers.findIndex((l) => l.id === layerId);
@@ -635,6 +657,41 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
     });
   },
 
+  addElementToLayerOnCurrent: (typeId, layerName, element) => {
+    const { doc, currentFinger, readOnly } = get();
+    if (!doc || readOnly) return;
+    let nextLayerId: string | null = null;
+    get().commit((draft) => {
+      const nail = draft.nails[currentFinger];
+      let layer = nail.layers.find((candidate) => candidate.typeId === typeId && !candidate.locked);
+      if (!layer) {
+        layer = {
+          id: genId('layer'),
+          name: layerName,
+          typeId,
+          visible: true,
+          locked: false,
+          order: nail.layers.length,
+          elements: [],
+        };
+        nail.layers.push(layer);
+      }
+      const nextElement = structuredClone(element);
+      nextElement.order = layer.elements.length;
+      layer.elements.push(nextElement);
+      nextLayerId = layer.id;
+      normalizeLayerOrders(nail.layers);
+    });
+    if (nextLayerId) set({ activeLayerId: nextLayerId, selectedElementId: element.id, tool: 'select' });
+  },
+
+  selectElementOnCurrent: (layerId, elementId) => {
+    const { doc, currentFinger } = get();
+    const layer = doc?.nails[currentFinger].layers.find((candidate) => candidate.id === layerId);
+    if (!layer?.elements.some((element) => element.id === elementId)) return;
+    set({ activeLayerId: layerId, selectedElementId: elementId, tool: 'select' });
+  },
+
   updateElementOnCurrentLayer: (elementId, updater) => {
     const { doc, currentFinger, activeLayerId, readOnly } = get();
     if (!doc || readOnly) return;
@@ -664,6 +721,64 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
       layer.elements = layer.elements.filter((el) => el.id !== elementId);
       layer.elements.forEach((el, i) => { el.order = i; });
     });
+    if (get().selectedElementId === elementId) set({ selectedElementId: null });
+  },
+
+  updateSelectedElementTransform: (patch) => {
+    const { selectedElementId } = get();
+    if (!selectedElementId) return;
+    get().updateElementOnCurrentLayer(selectedElementId, (element) => updateElementTransform(element, patch));
+  },
+
+  nudgeSelectedElement: (dx, dy) => {
+    const { doc, currentFinger, activeLayerId, selectedElementId } = get();
+    const element = doc?.nails[currentFinger].layers
+      .find((layer) => layer.id === activeLayerId)?.elements
+      .find((candidate) => candidate.id === selectedElementId);
+    if (!element) return;
+    const transform = readElementTransform(element);
+    get().updateSelectedElementTransform({ x: transform.x + dx, y: transform.y + dy });
+  },
+
+  duplicateSelectedElement: () => {
+    const { doc, currentFinger, activeLayerId, selectedElementId, readOnly } = get();
+    if (!doc || readOnly || !activeLayerId || !selectedElementId) return;
+    const layer = doc.nails[currentFinger].layers.find((candidate) => candidate.id === activeLayerId);
+    const source = layer?.elements.find((candidate) => candidate.id === selectedElementId);
+    if (!layer || layer.locked || !source || source.locked) return;
+    const transform = readElementTransform(source);
+    const copy = updateElementTransform({ ...structuredClone(source), id: genId('el') }, {
+      x: transform.x + 8,
+      y: transform.y + 8,
+    });
+    get().appendElementToCurrentLayer(copy);
+    set({ selectedElementId: copy.id });
+  },
+
+  toggleSelectedElementLocked: () => {
+    const { doc, currentFinger, activeLayerId, selectedElementId, readOnly } = get();
+    if (!doc || readOnly || !activeLayerId || !selectedElementId) return;
+    const layer = doc.nails[currentFinger].layers.find((candidate) => candidate.id === activeLayerId);
+    if (!layer || layer.locked) return;
+    get().commit((draft) => {
+      const element = draft.nails[currentFinger].layers
+        .find((candidate) => candidate.id === activeLayerId)?.elements
+        .find((candidate) => candidate.id === selectedElementId);
+      if (element) element.locked = !element.locked;
+    });
+  },
+
+  toggleSelectedElementVisible: () => {
+    const { doc, currentFinger, activeLayerId, selectedElementId, readOnly } = get();
+    if (!doc || readOnly || !activeLayerId || !selectedElementId) return;
+    const layer = doc.nails[currentFinger].layers.find((candidate) => candidate.id === activeLayerId);
+    if (!layer || layer.locked) return;
+    get().commit((draft) => {
+      const element = draft.nails[currentFinger].layers
+        .find((candidate) => candidate.id === activeLayerId)?.elements
+        .find((candidate) => candidate.id === selectedElementId);
+      if (element) element.visible = !element.visible;
+    });
   },
 
   /* ── Cross-finger ───────────────────────────────────── */
@@ -671,6 +786,8 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   copyLayerToFinger: (layerId, targetFinger) => {
     const { doc, currentFinger, readOnly } = get();
     if (!doc || readOnly) return;
+    const source = doc.nails[currentFinger].layers.find((layer) => layer.id === layerId);
+    if (!source || source.locked || source.typeId === 'builtin.base_surface') return;
     get().commit((draft) => {
       const srcLayer = draft.nails[currentFinger].layers.find((l) => l.id === layerId);
       if (!srcLayer) return;
@@ -688,6 +805,30 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
       targetNail.layers.push(dup);
       normalizeLayerOrders(targetNail.layers);
     });
+  },
+
+  mirrorActiveLayerToOpposite: () => {
+    const { doc, currentFinger, activeLayerId, readOnly } = get();
+    if (!doc || readOnly || !activeLayerId) return null;
+    const source = doc.nails[currentFinger].layers.find((layer) => layer.id === activeLayerId);
+    if (!source || source.locked || source.typeId === 'builtin.base_surface') return null;
+    const targetFinger = oppositeFingerForV6(currentFinger);
+    get().commit((draft) => {
+      const target = draft.nails[targetFinger];
+      const mirrored: EditorLayerV6 = {
+        ...structuredClone(source),
+        id: genId('layer'),
+        name: `${source.name} · 镜像`,
+        order: target.layers.length,
+        elements: source.elements.map((element, index) => ({
+          ...mirrorElementV6(element, targetFinger),
+          order: index,
+        })),
+      };
+      target.layers.push(mirrored);
+      normalizeLayerOrders(target.layers);
+    });
+    return targetFinger;
   },
 
   /* ── Document settings ──────────────────────────────── */

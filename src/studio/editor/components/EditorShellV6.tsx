@@ -8,7 +8,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Redo2, Save, ShieldAlert, Undo2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Gem, ImagePlus, Paintbrush, Redo2, Save, ShieldAlert, Undo2 } from 'lucide-react';
 import { Button, cx, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { FINGER_CODES } from '@/lib/types';
@@ -20,6 +20,11 @@ import { getDesign, upsertDesign } from '../lib/repo-v6';
 import { useEditorV6Store } from '../store-v6';
 import { EditorToolRail, type EditorToolSection } from './EditorToolRail';
 import { LayerPanelV6 } from './LayerPanelV6';
+import { V6NailCanvas } from './V6NailCanvas';
+import { V6ElementInspector } from './V6ElementInspector';
+import { V6OutputPanel } from './V6OutputPanel';
+import { generateEditorId } from '../v6/id';
+import type { EditorElementV6 } from '../v6/model';
 
 const SAVE_LABEL = {
   saved: ['已保存', 'Saved'],
@@ -39,6 +44,7 @@ export function EditorShellV6() {
   const readOnly = useEditorV6Store((state) => state.readOnly);
   const currentFinger = useEditorV6Store((state) => state.currentFinger);
   const saveState = useEditorV6Store((state) => state.saveState);
+  const viewMode = useEditorV6Store((state) => state.viewMode);
   const historyCount = useEditorV6Store((state) => state.history.length);
   const futureCount = useEditorV6Store((state) => state.future.length);
   const setCurrentFinger = useEditorV6Store((state) => state.setCurrentFinger);
@@ -47,6 +53,9 @@ export function EditorShellV6() {
   const setTopFinish = useEditorV6Store((state) => state.setTopFinish);
   const setBaseColor = useEditorV6Store((state) => state.setBaseSurfaceColorOnCurrent);
   const setTool = useEditorV6Store((state) => state.setTool);
+  const addElement = useEditorV6Store((state) => state.addElementToLayerOnCurrent);
+  const nudgeSelectedElement = useEditorV6Store((state) => state.nudgeSelectedElement);
+  const removeElement = useEditorV6Store((state) => state.removeElementFromCurrentLayer);
   const undo = useEditorV6Store((state) => state.undo);
   const redo = useEditorV6Store((state) => state.redo);
   const save = useEditorV6Store((state) => state.save);
@@ -71,14 +80,28 @@ export function EditorShellV6() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target;
       const editingText = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
-      if (editingText || !(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') return;
-      event.preventDefault();
-      if (event.shiftKey) redo();
-      else undo();
+      if (editingText) return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+        return;
+      }
+      const state = useEditorV6Store.getState();
+      if (state.readOnly || !state.selectedElementId) return;
+      const step = event.shiftKey ? 10 : 2;
+      if (event.key === 'ArrowLeft') { event.preventDefault(); nudgeSelectedElement(-step, 0); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); nudgeSelectedElement(step, 0); }
+      if (event.key === 'ArrowUp') { event.preventDefault(); nudgeSelectedElement(0, -step); }
+      if (event.key === 'ArrowDown') { event.preventDefault(); nudgeSelectedElement(0, step); }
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault();
+        removeElement(state.selectedElementId);
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [redo, undo]);
+  }, [nudgeSelectedElement, redo, removeElement, undo]);
 
   const preview = useMemo(() => {
     if (!doc) return null;
@@ -108,6 +131,34 @@ export function EditorShellV6() {
     if (section === 'components') setTool('attachment');
   };
 
+  const addPresetElement = (
+    typeId: string,
+    layerName: string,
+    element: { domain: EditorElementV6['domain']; kind: string; [key: string]: unknown },
+  ) => {
+    const next = {
+      ...element,
+      id: generateEditorId(`el_${element.kind}`),
+      visible: true,
+      locked: false,
+      order: 0,
+    } as EditorElementV6;
+    addElement(typeId, layerName, next);
+  };
+
+  const importImage = (file: File | undefined) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') return;
+      addPresetElement('builtin.art_2d', text('二维素材', '2D art'), {
+        domain: 'pattern', kind: 'image', name: file.name, dataUrl: reader.result,
+        transform: { x: 0, y: -82, scale: 1, rotation: 0 },
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const confirmCurrentDesign = async () => {
     const saveResult = await save();
     if (saveResult !== 'saved') {
@@ -133,11 +184,11 @@ export function EditorShellV6() {
 
   return (
     <section
-      className="flex min-h-[620px] flex-col overflow-hidden rounded-card border border-gray-200 bg-white lg:h-[calc(100vh-8.5rem)]"
+      className="flex min-h-[calc(100vh-8rem)] flex-col overflow-visible rounded-card border border-gray-200 bg-white lg:h-[calc(100vh-8.5rem)] lg:min-h-[620px] lg:overflow-hidden"
       data-debug-id="studio.editor.shell-v6"
       data-editor-schema="6"
     >
-      <header className="flex flex-wrap items-center gap-2 border-b border-gray-200 px-3 py-2">
+      <header className="flex flex-wrap items-center gap-2 border-b border-gray-200 px-2 py-2 sm:px-3">
         <Button size="sm" variant="ghost" onClick={() => navigate(Routes.designs)}>
           <ArrowLeft size={14} /> {text('设计列表', 'Designs')}
         </Button>
@@ -228,7 +279,7 @@ export function EditorShellV6() {
         </div>
 
         {drawerOpen && (
-          <aside className="w-full shrink-0 border-b border-gray-200 bg-gray-50 p-3 lg:w-56 lg:border-b-0 lg:border-r">
+          <aside className="max-h-52 w-full shrink-0 overflow-auto border-b border-gray-200 bg-gray-50 p-3 lg:max-h-none lg:w-56 lg:border-b-0 lg:border-r">
             <p className="text-xs font-semibold text-gray-700">
               {activeToolSection === 'looks'
                 ? text('甲面底色', 'Nail base color')
@@ -251,41 +302,45 @@ export function EditorShellV6() {
                   />
                 ))}
               </div>
+            ) : activeToolSection === 'draw' ? (
+              <div className="mt-3 space-y-2">
+                <Button size="sm" variant="ghost" className="w-full" disabled={readOnly} onClick={() => addPresetElement('builtin.draw', text('手绘', 'Draw'), { domain: 'pattern', kind: 'brush', name: text('可移动笔触', 'Movable stroke'), points: [{ x: -24, y: 0 }, { x: 0, y: -10 }, { x: 24, y: 0 }], color: '#C2497A', size: 7, opacity: 1, transform: { x: 0, y: -82, scale: 1, rotation: 0 } })}><Paintbrush size={14} /> {text('添加笔触', 'Add stroke')}</Button>
+                <Button size="sm" variant="ghost" className="w-full" disabled={readOnly} onClick={() => addPresetElement('builtin.art_2d', text('二维素材', '2D art'), { domain: 'pattern', kind: 'french_edge', name: text('法式边', 'French edge'), strokeColor: '#FFFFFF', strokeWidth: 8, transform: { x: 0, y: -122, scale: 1, rotation: 0 } })}>{text('添加法式边', 'Add French edge')}</Button>
+                <p className="text-[10px] leading-4 text-gray-500">{text('添加后可在画布拖动，或用方向键微调。', 'Drag on canvas or use arrow keys for precise movement.')}</p>
+              </div>
+            ) : activeToolSection === 'components' ? (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button size="sm" variant="ghost" disabled={readOnly} onClick={() => addPresetElement('builtin.attachment', text('附件', 'Attachments'), { domain: 'attachment', kind: 'attachment', name: text('宝石', 'Gem'), decorationId: 'heart', heightMm: 0.15, transform: { x: 0, y: -82, scale: 1, rotation: 0 } })}><Gem size={14} /> {text('宝石', 'Gem')}</Button>
+                <Button size="sm" variant="ghost" disabled={readOnly} onClick={() => addPresetElement('builtin.relief', text('立体结构', 'Relief'), { domain: 'relief', kind: 'custom_relief', name: text('浮雕', 'Relief'), heightMm: 0.18, transform: { x: 0, y: -82, scale: 1, rotation: 0 } })}>{text('浮雕', 'Relief')}</Button>
+              </div>
             ) : (
-              <p className="mt-2 text-xs leading-5 text-gray-500">
-                {text(
-                  'PR-04 仅开放 V6 数据与保存链路；画笔直操控、导入和高级组件将在 PR-07 验收后开放。',
-                  'PR-04 exposes the V6 data and save path. Direct drawing, imports and advanced parts remain gated for PR-07.',
-                )}
-              </p>
+              <label className="mt-3 flex cursor-pointer flex-col items-center rounded-button border border-dashed border-gray-300 bg-white px-3 py-5 text-center text-xs text-gray-600 hover:border-primary">
+                <ImagePlus size={20} className="mb-2" />
+                {text('导入 PNG / JPG', 'Import PNG / JPG')}
+                <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" disabled={readOnly} onChange={(event) => importImage(event.target.files?.[0])} />
+              </label>
             )}
           </aside>
         )}
 
-        <main className="flex min-h-[360px] min-w-0 flex-1 flex-col items-center justify-center overflow-auto bg-[#f7f4f2] p-4">
+        <main className="flex min-h-[440px] min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#f7f4f2] p-3 sm:p-4 lg:min-h-0">
           <div className="mb-3 flex items-center gap-2 text-xs text-gray-600">
             <span className="font-medium">{currentFinger}</span>
             <span>{shapeName(preview.shape)} · {lengthName(preview.length)}</span>
-            <span>{text('结构预览', 'Structure preview')}</span>
+            <span>{viewMode === 'overview' ? text('顾客十指预览', 'Customer ten-finger preview') : text('可操作 V6 画布', 'Interactive V6 canvas')}</span>
           </div>
-          <div className="flex h-[330px] w-full max-w-[300px] items-center justify-center rounded-[28px] border border-white/80 bg-white/70 p-6 shadow-sm">
-            {preview.silhouette ? (
-              <svg viewBox={preview.silhouette.viewBox} className="h-full max-h-[285px] w-full" role="img" aria-label={text('当前甲面预览', 'Current nail preview')}>
-                <path d={preview.silhouette.pathD} fill={preview.baseColor} stroke="#9f8b83" strokeWidth="1.2" />
-              </svg>
-            ) : (
-              <div className="h-64 w-32 rounded-[55%_55%_35%_35%] border border-gray-300" style={{ backgroundColor: preview.baseColor }} />
-            )}
+          <div className={cx('flex w-full items-center justify-center rounded-[28px] border border-white/80 bg-white/70 p-3 shadow-sm', viewMode === 'overview' ? 'h-[390px] max-w-5xl' : 'h-[360px] max-w-[360px]')}>
+            <V6NailCanvas />
           </div>
           <p className="mt-3 text-center text-[11px] text-gray-500">
             {text(
-              `V6 结构预览 · ${preview.nail.layers.length} 个图层 · ${preview.visibleElementCount} 个可见元素`,
-              `V6 structure preview · ${preview.nail.layers.length} layers · ${preview.visibleElementCount} visible elements`,
+              `V6 真源 · ${preview.nail.layers.length} 个图层 · ${preview.visibleElementCount} 个可见元素`,
+              `V6 canonical document · ${preview.nail.layers.length} layers · ${preview.visibleElementCount} visible elements`,
             )}
           </p>
         </main>
 
-        <aside className="w-full shrink-0 overflow-auto border-t border-gray-200 bg-white lg:w-72 lg:border-l lg:border-t-0">
+        <aside className="max-h-[460px] w-full shrink-0 overflow-auto border-t border-gray-200 bg-white lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
           <div className="border-b border-gray-200 p-3">
             <h2 className="text-xs font-semibold text-gray-700">{text('设计属性', 'Design properties')}</h2>
             <label className="mt-3 block text-[11px] text-gray-500">
@@ -324,6 +379,8 @@ export function EditorShellV6() {
             </label>
           </div>
           <LayerPanelV6 />
+          <V6ElementInspector />
+          <V6OutputPanel />
         </aside>
       </div>
 
