@@ -636,23 +636,31 @@ export const useEditorV6Store = create<EditorV6State>((set, get) => ({
   },
 
   updateElementOnCurrentLayer: (elementId, updater) => {
-    const { currentFinger, activeLayerId, readOnly } = get();
-    if (readOnly) return;
+    const { doc, currentFinger, activeLayerId, readOnly } = get();
+    if (!doc || readOnly) return;
+    const currentLayer = doc.nails[currentFinger].layers.find((layer) => layer.id === activeLayerId);
+    const currentElement = currentLayer?.elements.find((element) => element.id === elementId);
+    if (!currentLayer || currentLayer.locked || !currentElement || currentElement.locked) return;
     get().commit((draft) => {
       const layer = draft.nails[currentFinger].layers.find((l) => l.id === activeLayerId);
-      if (!layer) return;
+      if (!layer || layer.locked) return;
       const idx = layer.elements.findIndex((el) => el.id === elementId);
-      if (idx < 0) return;
+      if (idx < 0 || layer.elements[idx].locked) return;
       layer.elements[idx] = updater(structuredClone(layer.elements[idx]));
     });
   },
 
   removeElementFromCurrentLayer: (elementId) => {
-    const { currentFinger, activeLayerId, readOnly } = get();
-    if (readOnly) return;
+    const { doc, currentFinger, activeLayerId, readOnly } = get();
+    if (!doc || readOnly) return;
+    const currentLayer = doc.nails[currentFinger].layers.find((layer) => layer.id === activeLayerId);
+    const currentElement = currentLayer?.elements.find((element) => element.id === elementId);
+    if (!currentLayer || currentLayer.locked || !currentElement || currentElement.locked) return;
     get().commit((draft) => {
       const layer = draft.nails[currentFinger].layers.find((l) => l.id === activeLayerId);
-      if (!layer) return;
+      if (!layer || layer.locked) return;
+      const element = layer.elements.find((candidate) => candidate.id === elementId);
+      if (!element || element.locked) return;
       layer.elements = layer.elements.filter((el) => el.id !== elementId);
       layer.elements.forEach((el, i) => { el.order = i; });
     });

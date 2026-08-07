@@ -1,9 +1,7 @@
-/**
- * PR-07 self-test: EditorShellV6 exports, layer operations via store.
- * (Full UI rendering requires browser — tested via build + typecheck)
- */
+/** PR-07 contract guards complementing the real store behavior suite. */
 
 import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
 
 /* ── 1. Store v6 layer operations ────────────────────────── */
 
@@ -69,10 +67,17 @@ const { createEmptyEditorDocV6, FINGER_CODES } = modelMod;
   console.log('[test:v6-layer-ops] PASS');
 }
 
-/* ── 2. EditorShellV6 type contract ──────────────────────── */
-/* Verified via typecheck + build:integration. */
+/* ── 2. Layer panel must use a reactive store selector ───── */
 
-console.log('[test:editor-shell-v6] SKIPPED (requires Vite runtime; covered by typecheck + build)');
+{
+  const source = await readFile(
+    new URL('../src/studio/editor/components/LayerPanelV6.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(source, /useEditorV6Store\(selectCurrentNail\)/);
+  assert.doesNotMatch(source, /selectCurrentNail\(useEditorV6Store\.getState\(\)\)/);
+  console.log('[test:layer-panel-v6-subscription] PASS');
+}
 
 /* ── Done ────────────────────────────────────────────────── */
 

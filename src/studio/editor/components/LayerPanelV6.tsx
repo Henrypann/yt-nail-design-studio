@@ -20,7 +20,9 @@ function layerLabel(layer: EditorLayerV6): string {
 }
 
 export function LayerPanelV6() {
-  const doc = useEditorV6Store((s) => s.doc);
+  // Subscribe through the selector so changing currentFinger rerenders the
+  // panel even when the document object itself has not changed.
+  const nail = useEditorV6Store(selectCurrentNail);
   const activeLayerId = useEditorV6Store((s) => s.activeLayerId);
   const setActiveLayerId = useEditorV6Store((s) => s.setActiveLayerId);
   const toggleLayerVisibleOnCurrent = useEditorV6Store((s) => s.toggleLayerVisibleOnCurrent);
@@ -30,8 +32,7 @@ export function LayerPanelV6() {
   const reorderLayerOnCurrent = useEditorV6Store((s) => s.reorderLayerOnCurrent);
   const readOnly = useEditorV6Store((s) => s.readOnly);
 
-  const nail = selectCurrentNail(useEditorV6Store.getState());
-  if (!doc || !nail) return null;
+  if (!nail) return null;
 
   const layers = nail.layers;
 

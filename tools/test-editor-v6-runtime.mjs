@@ -80,7 +80,7 @@ const {
   upsertDesign,
 } = await import('../src/studio/editor/lib/repo-v6.ts');
 const { AUTOSAVE_DEBOUNCE_MS } = await import('../src/studio/editor/lib/autosave-v6.ts');
-const { useEditorV6Store } = await import('../src/studio/editor/store-v6.ts');
+const { selectCurrentNail, useEditorV6Store } = await import('../src/studio/editor/store-v6.ts');
 
 const EDITOR_DOCS_KEY = 'nail-studio:editor.docs';
 const DESIGNS_KEY = 'nail-studio:designs';
@@ -351,6 +351,109 @@ function addInvalidStoredDoc(designId) {
   assert.equal(getDesign('repo-life-copy'), undefined);
   assert.equal(getEditorDocV6Result('repo-life-copy').status, 'missing');
   console.log('[runtime] V6 create rollback, duplicate and delete lifecycle: PASS');
+}
+
+// Element updates/removals must not bypass document, layer, or element locks.
+{
+  resetRuntime();
+  seedDesign('element-permissions');
+  useEditorV6Store.getState().load('element-permissions');
+  useEditorV6Store.getState().createLayerOnCurrent('builtin.draw', 'Permission layer');
+  const layerId = useEditorV6Store.getState().activeLayerId;
+  assert.ok(layerId);
+  useEditorV6Store.getState().appendElementToCurrentLayer({
+    id: 'permission-element',
+    domain: 'pattern',
+    kind: 'brush',
+    visible: true,
+    locked: false,
+    order: 0,
+    color: '#111111',
+  });
+
+  const snapshot = () => {
+    const state = useEditorV6Store.getState();
+    const layer = state.doc.nails[state.currentFinger].layers.find((candidate) => candidate.id === layerId);
+    return {
+      docRevision: state.doc.revision,
+      historyLength: state.history.length,
+      element: structuredClone(layer.elements[0]),
+      elementCount: layer.elements.length,
+    };
+  };
+
+  useEditorV6Store.getState().toggleLayerLockedOnCurrent(layerId);
+  const layerLockedBefore = snapshot();
+  let updaterCalled = false;
+  useEditorV6Store.getState().updateElementOnCurrentLayer('permission-element', (element) => {
+    updaterCalled = true;
+    return { ...element, color: '#222222' };
+  });
+  useEditorV6Store.getState().removeElementFromCurrentLayer('permission-element');
+  assert.equal(updaterCalled, false);
+  assert.deepEqual(snapshot(), layerLockedBefore);
+
+  useEditorV6Store.getState().toggleLayerLockedOnCurrent(layerId);
+  useEditorV6Store.getState().updateElementOnCurrentLayer('permission-element', (element) => ({
+    ...element,
+    locked: true,
+  }));
+  const elementLockedBefore = snapshot();
+  updaterCalled = false;
+  useEditorV6Store.getState().updateElementOnCurrentLayer('permission-element', (element) => {
+    updaterCalled = true;
+    return { ...element, color: '#333333' };
+  });
+  useEditorV6Store.getState().removeElementFromCurrentLayer('permission-element');
+  assert.equal(updaterCalled, false);
+  assert.deepEqual(snapshot(), elementLockedBefore);
+
+  const writableDoc = structuredClone(useEditorV6Store.getState().doc);
+  const writableLayer = writableDoc.nails.R4.layers.find((candidate) => candidate.id === layerId);
+  writableLayer.elements[0].locked = false;
+  useEditorV6Store.setState({ doc: writableDoc, readOnly: true });
+  const readOnlyBefore = snapshot();
+  updaterCalled = false;
+  useEditorV6Store.getState().updateElementOnCurrentLayer('permission-element', (element) => {
+    updaterCalled = true;
+    return { ...element, color: '#444444' };
+  });
+  useEditorV6Store.getState().removeElementFromCurrentLayer('permission-element');
+  assert.equal(updaterCalled, false);
+  assert.deepEqual(snapshot(), readOnlyBefore);
+  console.log('[runtime] element mutations respect readOnly/layer/element locks: PASS');
+}
+
+// The selector consumed by LayerPanelV6 must change with currentFinger so the
+// panel observes and renders the newly selected nail without a document edit.
+{
+  resetRuntime();
+  const doc = seedDesign('finger-subscription');
+  doc.nails.L1.layers.push({
+    id: 'layer_l1_draw',
+    name: 'L1 only',
+    typeId: 'builtin.draw',
+    visible: true,
+    locked: false,
+    order: 1,
+    elements: [],
+  });
+  assert.equal(saveEditorDocV6ToLocalStorage(doc).status, 'ok');
+  useEditorV6Store.getState().load('finger-subscription');
+
+  const selectedNails = [];
+  const unsubscribe = useEditorV6Store.subscribe((state, previousState) => {
+    const selected = selectCurrentNail(state);
+    if (selected !== selectCurrentNail(previousState)) selectedNails.push(selected?.finger ?? null);
+  });
+  useEditorV6Store.getState().setCurrentFinger('L1');
+  unsubscribe();
+
+  assert.deepEqual(selectedNails, ['L1']);
+  assert.equal(selectCurrentNail(useEditorV6Store.getState()).finger, 'L1');
+  assert.equal(selectCurrentNail(useEditorV6Store.getState()).layers[1].name, 'L1 only');
+  assert.equal(useEditorV6Store.getState().activeLayerId, 'layer_base_L1');
+  console.log('[runtime] current nail selector observes finger switches: PASS');
 }
 
 console.log('\ntest-editor-v6-runtime: all assertions passed');
