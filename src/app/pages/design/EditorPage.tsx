@@ -20,7 +20,9 @@ import {
   compatibilityToneClass,
   getShapeLengthCompatibility,
 } from '@/studio/compatibility';
-import { EditorShell, useEditorStore, createBlankEditorDesign } from '@/studio/editor';
+import { EditorShellV6 } from '@/studio/editor/components/EditorShellV6';
+import { createBlankEditorDesignV6 } from '@/studio/editor/lib/repo-v6';
+import { useEditorV6Store } from '@/studio/editor/store-v6';
 import {
   isEditorShapeEnabled,
   LENGTHS,
@@ -36,14 +38,25 @@ type PageState =
   | { kind: 'blank-picker' }
   | { kind: 'ready' }
   | { kind: 'missing' }
+  | { kind: 'save-error'; designId: string }
   | { kind: 'invalid'; unsupported?: boolean };
+
+type EditorLoadResult = 'ok' | 'missing' | 'invalid' | 'unsupported' | 'save_error';
+
+function editorPageStateForLoadResult(result: EditorLoadResult, designId: string): PageState {
+  if (result === 'ok') return { kind: 'ready' };
+  if (result === 'invalid') return { kind: 'invalid' };
+  if (result === 'unsupported') return { kind: 'invalid', unsupported: true };
+  if (result === 'save_error') return { kind: 'save-error', designId };
+  return { kind: 'missing' };
+}
 
 export default function EditorPage() {
   const { locale } = useLocale();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const load = useEditorStore((s) => s.load);
-  const unload = useEditorStore((s) => s.unload);
+  const load = useEditorV6Store((s) => s.load);
+  const unload = useEditorV6Store((s) => s.unload);
 
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [blankShape, setBlankShape] = useState<NailShape>('almond');
@@ -65,20 +78,14 @@ export default function EditorPage() {
     }
     if (designId) {
       const result = load(designId);
-      setState(
-        result === 'ok'
-          ? { kind: 'ready' }
-          : result === 'invalid' || result === 'unsupported'
-            ? { kind: 'invalid', unsupported: result === 'unsupported' }
-            : { kind: 'missing' },
-      );
+      setState(editorPageStateForLoadResult(result, designId));
       return;
     }
     setState({ kind: 'missing' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  useEffect(() => () => unload(), [unload]);
+  useEffect(() => () => { unload(); }, [unload]);
 
   const acknowledgeBridge = (designId: string) => {
     const result = load(designId);
@@ -86,21 +93,26 @@ export default function EditorPage() {
       setParams({ design: designId }, { replace: true });
       setState({ kind: 'ready' });
     } else {
-      setState({
-        kind: result === 'invalid' || result === 'unsupported' ? 'invalid' : 'missing',
-        ...(result === 'unsupported' ? { unsupported: true } : {}),
-      });
+      setState(editorPageStateForLoadResult(result, designId));
     }
   };
 
   const createBlank = () => {
-    const id = createBlankEditorDesign({ shape: blankShape, length: blankLength });
-    load(id);
-    setParams({ design: id }, { replace: true });
-    setState({ kind: 'ready' });
+    try {
+      const id = createBlankEditorDesignV6({ shape: blankShape, length: blankLength });
+      const result = load(id);
+      if (result === 'ok') {
+        setParams({ design: id }, { replace: true });
+        setState({ kind: 'ready' });
+      } else {
+        setState(editorPageStateForLoadResult(result, id));
+      }
+    } catch {
+      setState({ kind: 'save-error', designId: '' });
+    }
   };
 
-  if (state.kind === 'ready') return <EditorShell />;
+  if (state.kind === 'ready') return <EditorShellV6 />;
 
   return (
     <div className="flex flex-col gap-4">
@@ -144,6 +156,28 @@ export default function EditorPage() {
             <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
               返回设计列表
             </Button>
+          }
+          className="min-h-[320px]"
+        />
+      )}
+      {state.kind === 'save-error' && (
+        <EmptyState
+          title="当前设计尚未安全保存"
+          description="Studio 保留了内存中的 V6 设计，没有切换或覆盖目标文档。请检查浏览器存储后重试。"
+          action={
+            <div className="flex gap-2">
+              <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
+                返回设计列表
+              </Button>
+              {state.designId && (
+                <Button
+                  size="sm"
+                  onClick={() => setState(editorPageStateForLoadResult(load(state.designId), state.designId))}
+                >
+                  重试打开
+                </Button>
+              )}
+            </div>
           }
           className="min-h-[320px]"
         />
