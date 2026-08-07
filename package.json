@@ -51,6 +51,7 @@
     "test:pr05-wizard-draft": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr05-wizard-draft-intent.mjs",
     "test:pr05-v6-bridge": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr05-v6-bridge.mjs",
     "test:pr06": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr06-3d.mjs",
+    "test:pr06-bundle": "node tools/test-pr06-bundle.mjs",
     "test:pr07": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr07-editor-v6.mjs",
     "test:pr08": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr08-taxonomy.mjs",
     "test:pr09": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-pr09-brand.mjs"

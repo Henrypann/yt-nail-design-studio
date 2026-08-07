@@ -4,7 +4,7 @@ import { FINGER_CODES, type FingerCode } from '@/lib/types';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 import { registerPreviewExporter } from '@/studio/preview/export-png';
 import { compilePetalVeilAppearance, compilePetalVeilSet } from './appearance';
-import { PetalVeilRenderer, supportsPetalVeilWebGL, type PetalVeilSceneMode } from './three-renderer';
+import type { PetalVeilRenderer, PetalVeilSceneMode } from './three-renderer';
 
 interface CanvasProps {
   recipe: RecipeInstanceV1;
@@ -25,6 +25,7 @@ function PetalVeilCanvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<PetalVeilRenderer | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [retryKey, setRetryKey] = useState(0);
   const models = useMemo(
     () => (mode === 'single' ? [compilePetalVeilAppearance(recipe, finger)] : compilePetalVeilSet(recipe)),
     [finger, mode, recipe],
@@ -32,46 +33,55 @@ function PetalVeilCanvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !supportsPetalVeilWebGL()) {
+    if (!canvas) {
       setState('error');
       return;
     }
     setState('loading');
-    let renderer: PetalVeilRenderer;
-    try {
-      renderer = new PetalVeilRenderer(canvas, models, mode);
-      rendererRef.current = renderer;
-      setState('ready');
-    } catch {
-      setState('error');
-      return;
-    }
-    const resize = new ResizeObserver((entries) => {
-      const rect = entries[0]?.contentRect;
-      if (rect) renderer.resize(rect.width, rect.height);
-    });
-    resize.observe(canvas);
+    let cancelled = false;
+    let renderer: PetalVeilRenderer | null = null;
+    let resize: ResizeObserver | null = null;
     const onLost = (event: Event) => {
       event.preventDefault();
       setState('error');
     };
-    canvas.addEventListener('webglcontextlost', onLost);
-    if (registerExport) {
-      registerPreviewExporter({
-        rendererId: 'three-pbr/petal-veil-1',
-        isReady: () => Boolean(rendererRef.current),
-        renderPng: () => renderer.renderPng(2400, 1600),
-        renderThumbnail: () => renderer.renderPng(640, 426),
+
+    void import('./three-renderer').then((rendererModule) => {
+      if (cancelled) return;
+      if (!rendererModule.supportsPetalVeilWebGL()) {
+        setState('error');
+        return;
+      }
+      renderer = new rendererModule.PetalVeilRenderer(canvas, models, mode);
+      rendererRef.current = renderer;
+      resize = new ResizeObserver((entries) => {
+        const rect = entries[0]?.contentRect;
+        if (rect) renderer?.resize(rect.width, rect.height);
       });
-    }
+      resize.observe(canvas);
+      canvas.addEventListener('webglcontextlost', onLost);
+      if (registerExport) {
+        registerPreviewExporter({
+          rendererId: 'three-pbr/petal-veil-1',
+          isReady: () => Boolean(rendererRef.current),
+          renderPng: () => renderer!.renderPng(2400, 1600),
+          renderThumbnail: () => renderer!.renderPng(640, 426),
+        });
+      }
+      setState('ready');
+    }).catch(() => {
+      if (!cancelled) setState('error');
+    });
+
     return () => {
-      resize.disconnect();
+      cancelled = true;
+      resize?.disconnect();
       canvas.removeEventListener('webglcontextlost', onLost);
       if (registerExport) registerPreviewExporter(null);
-      renderer.dispose();
+      renderer?.dispose();
       rendererRef.current = null;
     };
-  }, [mode, models, registerExport, PETAL_RENDERER_REVISION]);
+  }, [mode, models, registerExport, retryKey, PETAL_RENDERER_REVISION]);
 
   if (state === 'error') {
     return (
@@ -83,10 +93,13 @@ function PetalVeilCanvas({
         role="alert"
         data-testid="petal-hq-unavailable"
       >
-        <p className="text-sm font-medium text-error">高保真预览不可用</p>
+        <p className="text-sm font-medium text-error">模拟 3D 预览不可用</p>
         <p className="max-w-sm text-xs leading-relaxed text-gray-600">
-          当前浏览器未能初始化 WebGL。为避免展示失真的 2D 回退，本款式已停止渲染。
+          当前区域没有渲染 2D 内容。请返回并切换到标准 2D 预览；模拟 3D 不代表物理适配或制造验证。
         </p>
+        <Button size="sm" variant="secondary" onClick={() => setRetryKey((key) => key + 1)}>
+          重试模拟 3D
+        </Button>
       </div>
     );
   }

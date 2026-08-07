@@ -22,8 +22,16 @@ function serveStaticAssets(): Plugin {
     '.svg': 'image/svg+xml',
     '.json': 'application/json; charset=utf-8',
     '.png': 'image/png',
+    '.glb': 'model/gltf-binary',
     '.stl': 'model/stl',
     '.md': 'text/markdown; charset=utf-8',
+  };
+  /** Internal review/build inputs must never be copied to or served by the web app. */
+  const isRuntimeAsset = (rootPrefix: string, relativePath: string): boolean => {
+    const normalized = relativePath.split(path.sep).join('/');
+    if (normalized.endsWith('.bak') || normalized.endsWith('.raw.glb') || normalized.endsWith('.stl')) return false;
+    if (rootPrefix === '/assets/' && (normalized.startsWith('golden-fixtures/') || normalized.startsWith('shape-calibration/'))) return false;
+    return true;
   };
   return {
     name: 'nail-studio-static-assets',
@@ -40,8 +48,9 @@ function serveStaticAssets(): Plugin {
         for (const [prefix, dir] of Object.entries(roots)) {
           if (!url.startsWith(prefix)) continue;
           const file = path.resolve(dir, url.slice(prefix.length));
+          const relativePath = path.relative(dir, file);
           const inside = file === dir || file.startsWith(dir + path.sep);
-          if (!inside || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+          if (!inside || !isRuntimeAsset(prefix, relativePath) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
             res.statusCode = 404;
             res.end('Not found');
             return;
@@ -56,7 +65,10 @@ function serveStaticAssets(): Plugin {
     closeBundle() {
       const dist = fileURLToPath(new URL('./dist', import.meta.url));
       for (const [prefix, dir] of Object.entries(roots)) {
-        fs.cpSync(dir, path.join(dist, prefix.replace(/^\/|\/$/g, '')), { recursive: true });
+        fs.cpSync(dir, path.join(dist, prefix.replace(/^\/|\/$/g, '')), {
+          recursive: true,
+          filter: (source) => isRuntimeAsset(prefix, path.relative(dir, source)),
+        });
       }
     },
   };
