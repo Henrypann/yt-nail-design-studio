@@ -14,14 +14,14 @@
 
 ## 2. V7 权威上下文
 
-架构基线统一为 **V7**。处理架构、Editor、端到端或设备问题时，按顺序阅读：
+架构基线统一为 **V7**。权威文档根目录为 `工作记录_2026-08-07/V7_系统架构/`；处理架构、Editor、端到端或设备问题时，按顺序阅读：
 
-1. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/V7_系统架构/README_V7_系统架构总览与权威文档索引.md`
-2. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/V7_系统架构/V7_系统架构与领域合同.md`
-3. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/Studio_Editor_V7_工艺步骤与内容架构_PRD_2026-08-07.md`
-4. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/V7_系统架构/V7_设备协议与Vendor_Adapter架构.md`
-5. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/V7_系统架构/V7_端到端开发计划_Studio至硬件联调.md`
-6. `/Users/henry.macbook/Desktop/nextGen Beauty/工作记录_2026-08-07/V7_系统架构/V7_版本治理与迁移矩阵.md`
+1. `README_V7_系统架构总览与权威文档索引.md`
+2. `V7_系统架构与领域合同.md`
+3. 同级目录的 `Studio_Editor_V7_工艺步骤与内容架构_PRD_2026-08-07.md`
+4. `V7_设备协议与Vendor_Adapter架构.md`
+5. `V7_端到端开发计划_Studio至硬件联调.md`
+6. `V7_版本治理与迁移矩阵.md`
 
 发生冲突时：人工签收的 ADR/Schema/Golden Fixture > V7 权威文档 > 当前分支已验证代码事实 > V3.1/V3 历史文档 > 非正式设备草案。必须区分“目标合同”和“当前实现”，不得把规划写成已交付。
 
@@ -109,7 +109,16 @@ git rev-parse --abbrev-ref HEAD
 
 没有用户明确授权时，不执行 push、merge、rebase、cherry-pick、发布或外部发送。用户明确要求提交/合入时，仍需先核对目标分支、diff、测试和工作树状态。
 
-## 8. 验收与交付
+## 8. macOS 安全围栏
+
+- 不使用 `sudo`，不绕过 TCC、Gatekeeper 或 SIP；未经授权不修改系统代理、证书、防火墙、登录项、LaunchAgent/Daemon。
+- 不读取 Keychain、浏览器 Cookie、SSH 私钥或无关 `.env`；发现凭据只报告位置和掩码。
+- 不全局安装 brew/npm/pip 包，不安装驱动、内核扩展或浏览器扩展。
+- 停止进程前核对 PID、端口和 cwd；只终止本任务启动的进程，禁止 `pkill node` 等宽泛操作。
+- 不对工作区、用户目录或系统目录递归删除、批量 `chmod/chown`；临时目录使用 `mktemp -d`。
+- GUI、`osascript`、辅助功能、完全磁盘访问、相机和麦克风操作需明确授权。
+
+## 9. 验收与交付
 
 按风险运行相关检查：typecheck、build、领域测试、migration/fixture、render/asset validator、`git diff --check`。UI 任务必须实际走查核心流程、错误态、保存/恢复、390/1280/1440 响应式、控制台和网络异常；自动化全绿不能替代人工视觉与状态转换验收。
 
