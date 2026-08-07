@@ -18,7 +18,7 @@ import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
 import { SingleNailView } from '@/studio/preview/SingleNailView';
 import { loadShapeParams } from '@/studio/preview/material-library';
 import { openBridge } from '@/studio/bridge';
-import { getEditorDoc } from '@/studio/editor';
+import { inspectEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { isPetalVeilRecipe } from '@/studio/editor/lib/recipe-model';
 import {
   PetalVeilSinglePreview,
@@ -50,7 +50,7 @@ export function StepTwo() {
   const viewTabs = petalP0 ? VIEW_TABS.filter((tab) => tab.key !== 'ensemble') : VIEW_TABS;
 
   /* 已桥接判定：EditorDoc 存在即该设计已转入自由画布（PRD §15 不可逆） */
-  const bridged = getEditorDoc(s.designId) !== undefined;
+  const bridged = inspectEditorDoc(s.designId).present;
 
   useEffect(() => {
     if (!s.appliedShape || !s.appliedLength) return;
@@ -105,7 +105,16 @@ export function StepTwo() {
         }
       }
       const result = openBridge(st().designId);
-      if (!result.ok) toast.error('设计数据缺失，无法打开自由画布。');
+      if (!result.ok) {
+        const message = result.reason === 'editor_doc_unsupported'
+          ? '画布来自更高版本，当前版本不会覆盖。'
+          : result.reason === 'editor_doc_invalid'
+            ? '画布数据无效，原始数据已保留。'
+            : result.reason === 'save_failed'
+              ? '画布保存失败，未进行跳转。'
+              : '设计数据缺失，无法打开自由画布。';
+        toast.error(message);
+      }
     } finally {
       setBridging(false);
     }

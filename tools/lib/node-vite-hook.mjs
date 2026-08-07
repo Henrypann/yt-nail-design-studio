@@ -30,8 +30,9 @@ function parentIsEditorLib(parentURL) {
 export async function resolve(specifier, context, nextResolve) {
   // Redirect material module (Vite glob) to fs shim when imported from editor/lib
   if (
-    (specifier === './material' || specifier === './material.ts') &&
-    parentIsEditorLib(context.parentURL)
+    specifier === '@/studio/editor/lib/material' ||
+    ((specifier === './material' || specifier === './material.ts') &&
+      parentIsEditorLib(context.parentURL))
   ) {
     return { url: MATERIAL_SHIM, shortCircuit: true, format: 'module' };
   }

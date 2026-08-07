@@ -84,7 +84,7 @@ const { resolveEffectiveTemplateId, resolveStyleRecommendation } = resolveMod;
 /* ── 3. V6 bridge type contract ──────────────────────────── */
 /* Verified via typecheck + build:integration (Vite import.meta.glob). */
 
-console.log('[test:v6-bridge] SKIPPED (requires Vite runtime; covered by typecheck + build)');
+console.log('[test:v6-bridge] delegated to executable behavior gate');
 
 /* ── Done ────────────────────────────────────────────────── */
 

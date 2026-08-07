@@ -12,6 +12,19 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SILHOUETTE_DIR = path.join(ROOT, 'material-library/shapes/silhouettes');
+const templateIndex = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'material-library/index.json'), 'utf8'),
+);
+const decorationManifest = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'assets/decorations/manifest.json'), 'utf8'),
+);
+
+export const TEMPLATES = templateIndex.templates ?? [];
+export const DECORATIONS = decorationManifest.decorations ?? [];
+
+export function templateById(id) {
+  return TEMPLATES.find((template) => template.id === id);
+}
 
 function silhouetteFileName(shape, length) {
   return `${shape}_${String(length).replace('-', '_')}.svg`;

@@ -9,8 +9,8 @@ import { FINGER_CODES } from '@/lib/types';
 import {
   LENGTH_PRESET_BY_GEOMETRY,
   appearanceFromLegacyFinish,
-  genId,
 } from '@/studio/editor/lib/model';
+import { generateEditorId } from '@/studio/editor/v6/id';
 import type {
   EditorDocV6,
   EditorLayerV6,
@@ -33,23 +33,10 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
   const appearance = appearanceFromLegacyFinish(legacyFinish);
   const lengthPreset = LENGTH_PRESET_BY_GEOMETRY[length];
 
-  // Build template pattern element if template exists
+  // Preserve the Wizard template reference even when the local display manifest
+  // only knows its render-template alias.
   const template = design.templateId ? templateById(design.templateId) : undefined;
-  const templateElement: EditorElementV6 | null = template
-    ? {
-        id: `el_tpl_${template.id}_${Date.now().toString(36)}`,
-        domain: 'pattern',
-        kind: 'template_pattern',
-        name: template.name,
-        visible: true,
-        locked: false,
-        order: 0,
-        templateId: template.id,
-        transform: { x: 0, y: 0, scale: 1, rotation: 0 },
-        editable: true,
-        source: 'recipe',
-      }
-    : null;
+  const templateName = template?.name ?? design.title ?? '模板图案';
 
   // Build recipe instance if recipe exists
   let recipeInstanceId: string | undefined;
@@ -75,7 +62,7 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
 
     // Layer 1: Base surface
     layers.push({
-      id: genId('layer'),
+      id: generateEditorId(`layer_base_${finger}`),
       name: '底色/表面',
       typeId: 'builtin.base_surface',
       visible: true,
@@ -86,15 +73,27 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
     });
 
     // Layer 2: Art 2D (template pattern)
-    if (templateElement) {
+    if (design.templateId) {
       layers.push({
-        id: genId('layer'),
+        id: generateEditorId(`layer_art_${finger}`),
         name: '二维素材',
         typeId: 'builtin.art_2d',
         visible: true,
         locked: false,
         order: order++,
-        elements: [{ ...structuredClone(templateElement), order: 0 }],
+        elements: [{
+          id: generateEditorId(`el_tpl_${finger}`),
+          domain: 'pattern',
+          kind: 'template_pattern',
+          name: templateName,
+          visible: true,
+          locked: false,
+          order: 0,
+          templateId: design.templateId,
+          transform: { x: 0, y: 0, scale: 1, rotation: 0 },
+          editable: true,
+          source: 'recipe',
+        } satisfies EditorElementV6],
       });
     }
 
@@ -103,7 +102,7 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
       const deco = DECORATIONS.find((d) => d.id === override.decorationId);
       if (deco) {
         layers.push({
-          id: genId('layer'),
+          id: generateEditorId(`layer_attachment_${finger}`),
           name: '附件',
           typeId: 'builtin.attachment',
           visible: true,
@@ -111,7 +110,7 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
           order: order++,
           elements: [
             {
-              id: genId('el_att'),
+              id: generateEditorId(`el_att_${finger}`),
               domain: 'attachment',
               kind: 'attachment',
               name: deco.name,
@@ -119,8 +118,13 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
               locked: false,
               order: 0,
               decorationId: deco.id,
-              transform: { x: 0, y: 0, scale: 1, rotation: 0 },
-              heightMm: deco.defaults?.heightMm ?? 0.15,
+              transform: {
+                x: deco.defaults.x,
+                y: deco.defaults.y,
+                scale: deco.defaults.scale,
+                rotation: deco.defaults.rotation,
+              },
+              heightMm: deco.defaults.heightMm,
             },
           ],
         });
@@ -130,7 +134,7 @@ export function wizardToEditorDocV6(design: DesignSummary): EditorDocV6 {
     // Layer 4: Recipe layer
     if (recipeInstanceId) {
       layers.push({
-        id: genId('layer'),
+        id: generateEditorId(`layer_recipe_${finger}`),
         name: '配方层',
         typeId: 'builtin.recipe',
         visible: true,

@@ -3,7 +3,7 @@
  * 使用 version-neutral editor probe，避免 getEditorDoc 迁移副作用。
  */
 
-import { hasEditorDoc } from '@/studio/editor/lib/repo';
+import { hasEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { useWizardStore } from '@/studio/wizard/wizard-store';
 import { getContentById } from '@/community/data/content-repository';
 import { clearStudioImportIntent } from '@/community/domain/studio-import-intent';

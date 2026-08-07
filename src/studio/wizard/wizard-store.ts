@@ -43,6 +43,7 @@ import {
 } from '@/studio/editor/lib/recipe-model';
 import { recipeDefinitionChecksum } from '@/studio/editor/lib/recipe-checksum';
 import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
+import type { WizardDraftV1 } from './wizard-draft';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
 
@@ -150,6 +151,8 @@ interface WizardState {
   applyTemplate: (t: TemplateEntry) => void;
   /** Community Intent「新建设计」：新 designId + 清空工作态，保持 draft */
   resetForNewDesign: () => void;
+  /** 恢复版本化活动草稿；Customer 始终从主数据重新解析。 */
+  restoreDraft: (draft: WizardDraftV1, customer: Customer | null) => void;
   setBaseColor: (hex: string) => void;
   setFinish: (f: Finish) => void;
   setFingerOverride: (fc: FingerCode, patch: FingerOverride) => void;
@@ -420,6 +423,42 @@ export const useWizardStore = create<WizardState>((set, get) => {
         version: 1,
         status: 'draft',
         confirmation: undefined,
+        saveState: 'saved',
+      });
+    },
+
+    restoreDraft: (draft, customer) => {
+      if (autosaveTimer !== null) {
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+      }
+      set({
+        step: draft.step,
+        pickerOpen: !customer,
+        customer,
+        shape: draft.shape,
+        length: draft.length,
+        styleId: draft.styleId,
+        styleName: draft.styleName,
+        stylePrompted: draft.stylePrompted,
+        appliedShape: draft.appliedShape,
+        appliedLength: draft.appliedLength,
+        editingShapeLength: false,
+        applying: false,
+        applyError: null,
+        presentNudge: false,
+        templateId: draft.templateId,
+        templateName: draft.templateName,
+        baseColor: draft.baseColor,
+        finish: draft.finish,
+        fingerOverrides: structuredClone(draft.fingerOverrides),
+        recipe: draft.recipe ? structuredClone(draft.recipe) : undefined,
+        selectedFinger: null,
+        designId: draft.designId,
+        createdAt: draft.createdAt,
+        version: draft.version,
+        status: draft.status,
+        confirmation: draft.confirmation ? structuredClone(draft.confirmation) : undefined,
         saveState: 'saved',
       });
     },

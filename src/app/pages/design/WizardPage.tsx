@@ -22,14 +22,20 @@ import { StepOne } from '@/studio/wizard/StepOne';
 import { StepTwo } from '@/studio/wizard/StepTwo';
 import { CustomerPickerModal } from '@/studio/wizard/CustomerPickerModal';
 import { findCustomer } from '@/studio/wizard/customer-repository';
+import { findDesign } from '@/studio/wizard/design-repository';
 import { setWizardNotifier, useWizardStore } from '@/studio/wizard/wizard-store';
+import {
+  chooseWizardRestoreDraft,
+  readWizardDraft,
+  writeWizardDraft,
+} from '@/studio/wizard/wizard-draft';
 import {
   cancelCommunityImportIntent,
   consumeCommunityImportIntent,
   detectCommunityIntentConflict,
   type CommunityIntentConflictKind,
 } from '@/studio/wizard/consume-community-intent';
-import { hasEditorDoc } from '@/studio/editor';
+import { hasEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { loadShapeParams } from '@/studio/preview/material-library';
 
 type IntentConflictUi = {
@@ -76,6 +82,8 @@ export default function WizardPage() {
   const [summaryLabel, setSummaryLabel] = useState('');
   const [intentConflict, setIntentConflict] = useState<IntentConflictUi | null>(null);
   const [intentPending, setIntentPending] = useState(false);
+  const [wizardReady, setWizardReady] = useState(false);
+  const initializedRef = useRef(false);
   /** 已处理的 intentId，避免同一次落地重复消费；换新 intent 可再次进入。 */
   const intentHandledRef = useRef<string | null>(null);
 
@@ -86,14 +94,54 @@ export default function WizardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /*
+   * 恢复顺序：显式 designId > 活动草稿 > 空白会话。
+   * Community Intent 与 customerId 必须等待这一步，避免静默覆盖。
+   */
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    const explicitId = searchParams.get('designId');
+    const explicitDesign = explicitId ? findDesign(explicitId) : null;
+    const draft = chooseWizardRestoreDraft({
+      explicitDesignId: explicitId,
+      explicitDesign,
+      activeDraft: explicitId ? null : readWizardDraft(),
+    });
+    if (draft) {
+      useWizardStore.getState().restoreDraft(
+        draft,
+        draft.customerId ? findCustomer(draft.customerId) : null,
+      );
+    }
+    setWizardReady(true);
+    // URL 初始化只执行一次；后续 query 更改由 intent/customer effects 处理。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* 完整/不完整 Step 1 状态都同步为活动草稿；纯 UI 瞬态由 serializer 排除。 */
+  useEffect(() => {
+    if (!wizardReady) return;
+    const persist = () => {
+      try {
+        writeWizardDraft(useWizardStore.getState());
+      } catch {
+        // localStorage 不可用不得阻断当前编辑会话。
+      }
+    };
+    persist();
+    return useWizardStore.subscribe(persist);
+  }, [wizardReady]);
+
   /* 客户上下文直达（客户详情/列表 [新建设计] 携带 customerId） */
   useEffect(() => {
+    if (!wizardReady) return;
     const customerId = searchParams.get('customerId');
-    if (!customerId || s.customer) return;
+    if (!customerId || useWizardStore.getState().customer) return;
     const found = findCustomer(customerId);
-    if (found) s.setCustomer(found);
+    if (found) useWizardStore.getState().setCustomer(found);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, wizardReady]);
 
   const stripIntentParam = () => {
     const next = new URLSearchParams(searchParams);
@@ -113,6 +161,7 @@ export default function WizardPage() {
 
   /* Community StudioImportIntent 消费（草稿冲突须显式选择） */
   useEffect(() => {
+    if (!wizardReady) return;
     const intentId = searchParams.get('communityIntent');
     if (!intentId) {
       intentHandledRef.current = null;
@@ -217,7 +266,7 @@ export default function WizardPage() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, wizardReady]);
 
   const resolveIntent = (choice: 'current' | 'new' | 'cancel') => {
     if (!intentConflict || intentPending) return;
@@ -342,6 +391,7 @@ export default function WizardPage() {
       data-debug-id="studio.wizard.page"
       data-design-id={s.designId}
       data-wizard-status={s.status}
+      data-wizard-ready={wizardReady ? 'true' : 'false'}
     >
       {/* 顶栏 */}
       <header className="flex items-center gap-3 rounded-card border border-gray-200 bg-white px-4 py-2.5">
