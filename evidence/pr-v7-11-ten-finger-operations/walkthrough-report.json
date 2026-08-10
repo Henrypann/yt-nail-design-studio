@@ -1,0 +1,147 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844
+    },
+    "metrics": {
+      "layout": "mobile",
+      "bodyClientWidth": 390,
+      "bodyScrollWidth": 390,
+      "barWidth": 390,
+      "minTouchTarget": 44,
+      "currentFinger": "L1同",
+      "selectedFingers": [
+        "L2同",
+        "R2同"
+      ],
+      "linkedCount": 3,
+      "detachedCount": 1
+    },
+    "syncDisabledInMirror": true,
+    "mirrorStatus": "来源 L1 · 范围 对侧镜像 · 将覆盖 R1 · 布局镜像，文字与素材本体保持正向",
+    "sheetFocusTrapped": true,
+    "confirmationFocusTrapped": true,
+    "closeFocusRestored": true,
+    "detachAffectedDisclosure": true,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "tablet",
+      "bodyClientWidth": 768,
+      "bodyScrollWidth": 768,
+      "barWidth": 768,
+      "minTouchTarget": 44,
+      "currentFinger": "L1同",
+      "selectedFingers": [
+        "L2同",
+        "R2同"
+      ],
+      "linkedCount": 3,
+      "detachedCount": 1
+    },
+    "syncDisabledInMirror": true,
+    "mirrorStatus": "来源 L1 · 范围 对侧镜像 · 将覆盖 R1 · 布局镜像，文字与素材本体保持正向",
+    "sheetFocusTrapped": true,
+    "confirmationFocusTrapped": true,
+    "closeFocusRestored": true,
+    "detachAffectedDisclosure": true,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "compact",
+      "bodyClientWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "barWidth": 1024,
+      "minTouchTarget": 44,
+      "currentFinger": "L1同",
+      "selectedFingers": [
+        "L2同",
+        "R2同"
+      ],
+      "linkedCount": 3,
+      "detachedCount": 1
+    },
+    "syncDisabledInMirror": true,
+    "mirrorStatus": "来源 L1 · 范围 对侧镜像 · 将覆盖 R1 · 布局镜像，文字与素材本体保持正向",
+    "sheetFocusTrapped": true,
+    "confirmationFocusTrapped": true,
+    "closeFocusRestored": true,
+    "detachAffectedDisclosure": true,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "wide",
+      "bodyClientWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "barWidth": 1280,
+      "minTouchTarget": 44,
+      "currentFinger": "L1同",
+      "selectedFingers": [
+        "L2同",
+        "R2同"
+      ],
+      "linkedCount": 3,
+      "detachedCount": 1
+    },
+    "syncDisabledInMirror": true,
+    "mirrorStatus": "来源 L1 · 范围 对侧镜像 · 将覆盖 R1 · 布局镜像，文字与素材本体保持正向",
+    "sheetFocusTrapped": true,
+    "confirmationFocusTrapped": true,
+    "closeFocusRestored": true,
+    "detachAffectedDisclosure": true,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "wide",
+      "bodyClientWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "barWidth": 1440,
+      "minTouchTarget": 44,
+      "currentFinger": "L1同",
+      "selectedFingers": [
+        "L2同",
+        "R2同"
+      ],
+      "linkedCount": 3,
+      "detachedCount": 1
+    },
+    "syncDisabledInMirror": true,
+    "mirrorStatus": "来源 L1 · 范围 对侧镜像 · 将覆盖 R1 · 布局镜像，文字与素材本体保持正向",
+    "sheetFocusTrapped": true,
+    "confirmationFocusTrapped": true,
+    "closeFocusRestored": true,
+    "detachAffectedDisclosure": true,
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

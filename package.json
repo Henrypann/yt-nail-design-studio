@@ -52,6 +52,7 @@
     "test:editor-v7-background-advanced": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-background-advanced.mjs",
     "test:editor-v7-flat-vector": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-flat-vector.mjs",
     "test:editor-v7-flat-content-assets": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-flat-content-assets.mjs",
+    "test:editor-v7-ten-finger": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-ten-finger.mjs",
     "test:editor-v7-creation-cutover": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-creation-cutover.mjs",
     "test:editor-v6-migrate": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v6-migrate.mjs",
     "test:store-v6": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-store-v6.mjs",
