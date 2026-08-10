@@ -6,6 +6,7 @@ import type {
   EditorDocV7,
   FlatDesignElementV7,
   ProcessStepV7,
+  RgbaColorV7,
   Transform2DV7,
 } from './v7/model';
 import type { EditorDocV7MigrationDiagnostic, EditorDocV7MigrationResolvers } from './v7/migrate';
@@ -35,6 +36,12 @@ import {
   type EditorDocV7Repository,
 } from './v7/repository';
 import { parseEditorDocV7 } from './v7/schema';
+import {
+  setEditorV7BackgroundColor,
+  setEditorV7BackgroundMode,
+  setEditorV7BackgroundOpacity,
+  type EditorV7BackgroundModeV7,
+} from './v7/background';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -82,6 +89,9 @@ export interface EditorV7State {
   selectStep(stepId: string | null): void;
   selectElement(elementId: string | null): void;
   setTitle(title: string): EditorV7ActionResult;
+  setBackgroundMode(finger: FingerCode, mode: EditorV7BackgroundModeV7): EditorV7ActionResult;
+  setBackgroundColor(finger: FingerCode, color: RgbaColorV7): EditorV7ActionResult;
+  setBackgroundOpacity(finger: FingerCode, opacity: number): EditorV7ActionResult;
   addStep(finger: FingerCode, step: ProcessStepV7, index: number): EditorV7ActionResult;
   deleteStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
@@ -364,6 +374,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
       setTitle: (title) => commitCommand((doc) => ({ ok: true, doc: { ...doc, title } })),
+      setBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7BackgroundMode(doc, finger, mode)),
+      setBackgroundColor: (finger, color) => commitCommand((doc) => setEditorV7BackgroundColor(doc, finger, color)),
+      setBackgroundOpacity: (finger, opacity) => commitCommand((doc) => setEditorV7BackgroundOpacity(doc, finger, opacity)),
       addStep: (finger, step, index) => commitCommand((doc) => addEditorV7Step(doc, finger, step, index)),
       deleteStep: (finger, stepId) => {
         const wasSelected = get().selectedStepId === stepId;

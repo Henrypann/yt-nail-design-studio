@@ -24,6 +24,7 @@ import { generateEditorV7Id } from '../v7/id';
 import { getProcessStepWorkspacePolicyV7 } from '../v7/workspace';
 import { selectCurrentNailV7, useEditorV7Store } from '../store-v7';
 import { V7StepToolGate } from './V7StepToolGate';
+import { BackgroundPanelV7 } from './BackgroundPanelV7';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -160,7 +161,11 @@ export function LayerPanelV7() {
                     <button type="button" className={iconButtonClass()} disabled={!canMutate || !policy.canDuplicate} onClick={() => duplicateStep(currentFinger, step.id)} aria-label={`复制 ${step.name}`} title={policy.canDuplicate ? '复制步骤' : '此步骤不可复制'}><Copy size={14} /></button>
                     <button type="button" className={cx(iconButtonClass(), 'hover:border-error/30 hover:text-error')} disabled={!canMutate || !policy.canDelete} onClick={() => deleteStep(currentFinger, step.id)} aria-label={`删除 ${step.name}`} title={policy.canDelete ? '删除步骤' : '此步骤不可删除'}><Trash2 size={14} /></button>
                   </div>
-                  {selected && <div className="mt-2"><V7StepToolGate tools={definition.allowedTools} /></div>}
+                  {selected && (
+                    step.kind === 'background'
+                      ? <BackgroundPanelV7 />
+                      : <div className="mt-2"><V7StepToolGate tools={definition.allowedTools} /></div>
+                  )}
                 </div>
               )}
             </li>

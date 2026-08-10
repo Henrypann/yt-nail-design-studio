@@ -17,6 +17,7 @@ export type EditorV7CommandFailure =
   | 'locked'
   | 'not_allowed'
   | 'invalid_position'
+  | 'invalid_value'
   | 'duplicate_id'
   | 'invalid_document';
 

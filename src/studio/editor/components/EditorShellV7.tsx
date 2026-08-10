@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBlocker, useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, Workflow } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
@@ -6,6 +6,7 @@ import { Routes } from '@/app/routes';
 import { FINGER_CODES } from '@/lib/types';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { LayerPanelV7 } from './LayerPanelV7';
+import { V7BackgroundCanvas } from './V7BackgroundCanvas';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -43,8 +44,10 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const unload = useEditorV7Store((state) => state.unload);
   const [titleDraft, setTitleDraft] = useState(doc?.title ?? '');
   const [leaving, setLeaving] = useState(false);
+  const processScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setTitleDraft(doc?.title ?? ''), [doc?.designId, doc?.title]);
+  useEffect(() => processScrollRef.current?.scrollTo({ left: 0 }), [currentFinger]);
 
   useEffect(() => {
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -189,30 +192,29 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       )}
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
-        <main className="flex min-h-[360px] min-w-0 flex-1 flex-col overflow-hidden bg-[#f5f2f0] p-3 sm:p-5 lg:min-h-0">
-          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center">
-            <div className="rounded-[28px] border border-white bg-white/80 p-4 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">Canonical process preview</p>
-                  <h1 className="mt-1 text-base font-semibold text-gray-900">{currentFinger} · 制作顺序</h1>
-                </div>
-                <span className="rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[10px] text-gray-500">Geometry {currentNail.geometryRef.assetId} @ {currentNail.geometryRef.revision}</span>
-              </div>
-              <div className="mt-6 flex min-h-28 items-stretch gap-1.5 overflow-x-auto pb-2" aria-label="当前可见制作步骤预览">
-                {processSummary.map((step, index) => (
-                  <div key={step.id} className="flex min-w-[104px] flex-1 items-center gap-1.5">
-                    <div className={cx('flex h-full min-h-24 flex-1 flex-col justify-between rounded-2xl p-3', STEP_TONE[step.kind], selectedStep?.id === step.id && 'ring-2 ring-primary ring-offset-2')}>
-                      <span className="text-[10px] opacity-70">{String(index + 1).padStart(2, '0')}</span>
-                      <span className="break-words text-xs font-semibold">{step.name}</span>
+        <main className="flex min-h-[420px] min-w-0 flex-1 flex-col overflow-auto bg-[#f5f2f0] p-3 sm:p-5 lg:min-h-0">
+          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
+            <div className="rounded-[28px] border border-white bg-white/65 p-4 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-6">
+              <V7BackgroundCanvas />
+
+              <div className="mt-5 border-t border-gray-200/80 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400"><Workflow size={13} />制作顺序</div>
+                <div ref={processScrollRef} className="mt-2 flex gap-1.5 overflow-x-auto pb-1" aria-label="当前可见制作步骤预览">
+                  {processSummary.map((step, index) => (
+                    <div key={step.id} className="flex shrink-0 items-center gap-1.5">
+                      <div className={cx('flex min-h-11 min-w-[92px] items-center gap-2 rounded-xl px-3 py-2', STEP_TONE[step.kind], selectedStep?.id === step.id && 'ring-2 ring-primary ring-offset-1')}>
+                        <span className="text-[9px] opacity-65">{String(index + 1).padStart(2, '0')}</span>
+                        <span className="max-w-[110px] truncate text-[10px] font-semibold">{step.name}</span>
+                      </div>
+                      {index < processSummary.length - 1 && <span aria-hidden="true" className="text-gray-300">→</span>}
                     </div>
-                    {index < processSummary.length - 1 && <span aria-hidden="true" className="text-gray-300">→</span>}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <div className="mt-4 flex items-start gap-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5 text-[11px] leading-5 text-gray-500">
-                <Workflow size={15} className="mt-0.5 shrink-0 text-primary" />
-                <p>本阶段展示 V7 结构、选择与工艺顺序，不假装提供画笔或 3D 渲染。背景与平面创作从 V7-05 起逐步开放。</p>
+
+              <div className="mt-3 flex items-start gap-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5 text-[10px] leading-4 text-gray-500">
+                <Workflow size={14} className="mt-0.5 shrink-0 text-primary" />
+                <p>V7-05 仅开放单指基础背景：单色、透色、颜色与透明度。渐变、猫眼、闪粉在 V7-06；画笔与 3D 仍未开放。</p>
               </div>
             </div>
           </div>

@@ -7,6 +7,8 @@
 export { EditorShell } from './components/EditorShell';
 export { EditorShellV7 } from './components/EditorShellV7';
 export { LayerPanelV7 } from './components/LayerPanelV7';
+export { BackgroundPanelV7 } from './components/BackgroundPanelV7';
+export { V7BackgroundCanvas } from './components/V7BackgroundCanvas';
 export { useEditorStore } from './store';
 export { useEditorV6Store } from './store-v6';
 export * from './lib/model';
@@ -58,6 +60,30 @@ export {
   getProcessStepTypeDefinitionV7,
 } from './v7/registry';
 export type { EditorToolIdV7, ProcessStepTypeDefinitionV1 } from './v7/registry';
+export {
+  EDITOR_V7_ADVANCED_BACKGROUND_MODES,
+  EDITOR_V7_BACKGROUND_MODES,
+  canonicalRgbaColorV7,
+  isAdvancedBackgroundModeV7,
+  isBackgroundModeV7,
+  isCanonicalRgbaColorV7,
+  matchProductSilhouetteRefV7,
+  parseHexColorV7,
+  representativeBackgroundColorV7,
+  resolveBackgroundPreviewModelV7,
+  resolveBackgroundSilhouetteV7,
+  rgbaToHexV7,
+  setEditorV7BackgroundColor,
+  setEditorV7BackgroundMode,
+  setEditorV7BackgroundOpacity,
+} from './v7/background';
+export type {
+  BackgroundPreviewModelV7,
+  EditorV7AdvancedBackgroundModeV7,
+  EditorV7BackgroundModeAnyV7,
+  EditorV7BackgroundModeV7,
+  NailSilhouetteV7,
+} from './v7/background';
 export {
   isEditorV7InternalEnabled,
   resolveEditorWriterRoute,
