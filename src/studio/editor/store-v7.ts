@@ -2,6 +2,7 @@ import { useStore } from 'zustand';
 import { createStore, type StoreApi } from 'zustand/vanilla';
 import { FINGER_CODES, type FingerCode } from '@/lib/types';
 import type {
+  AssetRefV7,
   DimensionalDecorationV7,
   EditorDocV7,
   FlatDesignElementV7,
@@ -60,6 +61,21 @@ import {
   replaceEditorV7FlatElement,
   setEditorV7FlatElementOpacity,
 } from './v7/flat-vector';
+import {
+  addBundledFlatAssetCommand,
+  addPreparedImportCommand,
+  addTextFlatElementCommand,
+  relinkImageAssetCommand,
+} from './v7/flat-content-commands';
+import {
+  createFlatAssetRepositoryV7,
+  createLocalFlatAssetStorageV7,
+  type FlatAssetRepositoryV7,
+} from './v7/flat-content-repository';
+import type {
+  FlatAssetPreparedV7,
+  TextFlatElementInputV7,
+} from './v7/flat-content-assets';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -69,6 +85,7 @@ export type EditorV7ActionResult =
 
 export interface EditorV7RuntimeDependencies {
   repository: EditorDocV7Repository;
+  flatAssets?: FlatAssetRepositoryV7;
   now?: () => string;
   idFactory?: EditorV7IdFactory;
   setTimeout?: typeof globalThis.setTimeout;
@@ -135,6 +152,10 @@ export interface EditorV7State {
   setElementTransform(finger: FingerCode, stepId: string, elementId: string, transform: Transform2DV7): EditorV7ActionResult;
   replaceFlatElement(finger: FingerCode, stepId: string, elementId: string, replacement: FlatDesignElementV7): EditorV7ActionResult;
   setFlatElementOpacity(finger: FingerCode, stepId: string, elementId: string, opacity: number): EditorV7ActionResult;
+  createTextElement(finger: FingerCode, stepId: string, input: Omit<TextFlatElementInputV7, 'id'>): EditorV7ActionResult;
+  addBundledImage(finger: FingerCode, stepId: string, bundleId: string): EditorV7ActionResult;
+  applyPreparedImport(finger: FingerCode, stepId: string, prepared: FlatAssetPreparedV7): Promise<EditorV7ActionResult>;
+  relinkImageAsset(finger: FingerCode, stepId: string, elementId: string, asset: AssetRefV7): Promise<EditorV7ActionResult>;
 }
 
 const HISTORY_LIMIT = 200;
@@ -153,6 +174,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
   const schedule = dependencies.setTimeout ?? globalThis.setTimeout.bind(globalThis);
   const cancel = dependencies.clearTimeout ?? globalThis.clearTimeout.bind(globalThis);
   const delay = dependencies.autosaveDelayMs ?? EDITOR_V7_AUTOSAVE_DEBOUNCE_MS;
+  const flatAssets = dependencies.flatAssets ?? createFlatAssetRepositoryV7(createLocalFlatAssetStorageV7());
 
   return createStore<EditorV7State>((set, get) => {
     const clearAutosave = () => {
@@ -451,6 +473,45 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setElementTransform: (finger, stepId, elementId, transform) => commitCommand((doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
       replaceFlatElement: (finger, stepId, elementId, replacement) => commitCommand((doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
       setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitCommand((doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
+      createTextElement: (finger, stepId, input) => commitCommand((doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
+      addBundledImage: (finger, stepId, bundleId) => commitCommand((doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
+      applyPreparedImport: async (finger, stepId, prepared) => {
+        const state = get();
+        if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+        if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
+        if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        if (!prepared || typeof prepared !== 'object' || !prepared.asset || typeof prepared.source !== 'string') {
+          return { ok: false, reason: 'invalid_value', message: 'prepared import payload is not well formed' };
+        }
+        // Pre-validate the target step so common gate failures never orphan a
+        // repository entry; the canonical commit still re-checks atomically.
+        const step = state.doc.nails[finger]?.steps.find((candidate) => candidate.id === stepId);
+        if (!step) return { ok: false, reason: 'not_found', message: 'step not found' };
+        if (step.kind !== 'flat_design') {
+          return { ok: false, reason: 'not_allowed', message: 'prepared import requires a flat design step' };
+        }
+        if (step.locked) return { ok: false, reason: 'locked', message: 'step is locked' };
+        // Repository write happens BEFORE the canonical commit; a failed write
+        // must never leave a document change behind.
+        const put = await flatAssets.put(prepared.asset, prepared.source);
+        if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
+        const result = commitCommand((doc) => addPreparedImportCommand(doc, finger, stepId, idFactory('element'), prepared.asset));
+        // Known limitation: if the canonical commit fails AFTER a successful
+        // repository write, the orphan asset entry may remain in the flat
+        // asset repository, but EditorDocV7 is guaranteed unchanged.
+        return result;
+      },
+      relinkImageAsset: async (finger, stepId, elementId, asset) => {
+        const state = get();
+        if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+        if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
+        if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        const resolved = await flatAssets.get(asset);
+        if (resolved.status === 'missing' || resolved.status === 'corrupt') {
+          return { ok: false, reason: 'not_found', message: 'asset source is not available for relink' };
+        }
+        return commitCommand((doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
+      },
     };
   });
 }

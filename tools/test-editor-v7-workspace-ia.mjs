@@ -70,14 +70,14 @@ const clone = (value) => structuredClone(value);
   console.log('[v7-workspace-ia] empty stage/tool gates do not create canonical content: PASS');
 }
 
-// Implemented tools target existing steps; future tools remain explicit and disabled.
+// Implemented tools target existing steps; future process capabilities remain explicit and disabled.
 {
   const doc = createFullEditorDocV7Fixture();
   const tools = deriveEditorWorkspaceToolsV7(doc.nails.L1);
-  for (const id of ['select', 'background', 'brush', 'eraser', 'shape']) {
+  for (const id of ['select', 'background', 'brush', 'eraser', 'shape', 'text', 'assets']) {
     assert.equal(tools.find((tool) => tool.id === id).enabled, true, `${id} should be enabled`);
   }
-  for (const id of ['text', 'assets', 'effects', 'decorations']) {
+  for (const id of ['effects', 'decorations']) {
     assert.equal(tools.find((tool) => tool.id === id).enabled, false, `${id} should remain unavailable`);
     assert.ok(tools.find((tool) => tool.id === id).reason);
   }

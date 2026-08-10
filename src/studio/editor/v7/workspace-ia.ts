@@ -137,8 +137,8 @@ export function deriveEditorWorkspaceToolsV7(nail: NailDesignV7): EditorWorkspac
     { id: 'brush', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
     { id: 'eraser', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
     { id: 'shape', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'text', enabled: false, targetStepId: flat?.id ?? null, reason: '文字与素材在 V7-10 开放' },
-    { id: 'assets', enabled: false, targetStepId: flat?.id ?? null, reason: '文字与素材在 V7-10 开放' },
+    { id: 'text', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
+    { id: 'assets', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
     { id: 'effects', enabled: false, targetStepId: effect?.id ?? null, reason: '表面效果编辑在 V7-12 开放' },
     { id: 'decorations', enabled: false, targetStepId: decoration?.id ?? null, reason: '立体装饰编辑在 V7-13 开放' },
   ];
