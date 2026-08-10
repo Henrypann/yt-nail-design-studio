@@ -75,6 +75,23 @@ export type {
   RecipeResolutionV7,
 } from './v7/migrate';
 export { getEditorDocV7Result } from './v7/repository-contract';
+export type {
+  EditorDocV7Repository,
+} from './v7/repository';
+export {
+  createEditorV7Store,
+  editorV7Store,
+  selectCurrentNailV7,
+  selectCurrentStepV7,
+  useEditorV7Store,
+} from './store-v7';
+export type {
+  EditorV7ActionResult,
+  EditorV7LoadResult,
+  EditorV7RuntimeDependencies,
+  EditorV7SaveState,
+  EditorV7State,
+} from './store-v7';
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';
