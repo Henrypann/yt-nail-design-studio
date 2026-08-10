@@ -1,0 +1,593 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.almond",
+      "revision": "template-v1",
+      "sha256": "318281b8f0170b27d645565c1192fd6b4a743b865b94234eed3efdbf1001aa69"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.coffin",
+      "revision": "template-v1",
+      "sha256": "6aca8a42fccb72916261aa09391c8defbb04e84d872bba7dda033e091c9c21f4"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.oval",
+      "revision": "template-v1",
+      "sha256": "f57a5598891c374902c438ee242796b64d19c38f12add18de6fa4cd459cbe2a0"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.round",
+      "revision": "template-v1",
+      "sha256": "1837ad713a306b5648f01266d2532212ce73fdbaaf7d5984b1df9ececcb60174"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.square",
+      "revision": "template-v1",
+      "sha256": "8208616193038d53d8ce8adae0578db2a3bd103a8d8f081ebdc1c124798524c5"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.squoval",
+      "revision": "template-v1",
+      "sha256": "da92a3cfdec53b9b3bfcf87efcf3a870e99d65edb6adf27b073d99c9cbb5ab71"
+    },
+    {
+      "templateId": "t_3d_waterdrop",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_3d_waterdrop.stiletto",
+      "revision": "template-v1",
+      "sha256": "e368590cdd339093ec23f70c6544f409e7fe24fedd4ed54cd6fde0affefbdfec"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.almond",
+      "revision": "template-v1",
+      "sha256": "c1359c8473a472bd80897e556b4ca648bc060b6003f80cae1f5cca17b2abf769"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.coffin",
+      "revision": "template-v1",
+      "sha256": "5e4c21119fc07518800539c1453038c4120d4b6813381eb942bcdbbef7339176"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.oval",
+      "revision": "template-v1",
+      "sha256": "f9a8da18544a3a22fc5c4e293ccd8fadf97780ced0aa71576be4eec236948b72"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.round",
+      "revision": "template-v1",
+      "sha256": "5e8f594f33eb78d8a67cfc7ba93186ec7a3333fe8d83119dd9c07bf30d0b751f"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.square",
+      "revision": "template-v1",
+      "sha256": "9142e25dd25cd7251f970171a55d113693dc7f1f5eccfc1610ae55b537890a6a"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.squoval",
+      "revision": "template-v1",
+      "sha256": "af7f0fa24bee12919023e4286f5b042472f153c4657f3507556e5e4b1cd9c347"
+    },
+    {
+      "templateId": "t_cat_eye_nude",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_cat_eye_nude.stiletto",
+      "revision": "template-v1",
+      "sha256": "4778c171e3c481263eaaf730122d0c88c7ed05e001bd8e1bbe432ca849d1f2ac"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_checkerboard.almond",
+      "revision": "template-v1",
+      "sha256": "dc2ae55e4919d854f4436e5f7827ff58835c78098fda688a9b775db83ceec94d"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_checkerboard.coffin",
+      "revision": "template-v1",
+      "sha256": "49c48a81b5bf99966ba33e2452683fd4a8dd964620933ae77c2e51c8f91fed57"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_checkerboard.oval",
+      "revision": "template-v1",
+      "sha256": "f9be518465c3e8265211d6bd73097e267b4ff4219981a0085e9f1cbe06716016"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_checkerboard.round",
+      "revision": "template-v1",
+      "sha256": "23b54c6acabb3e81fb74b9cc761771980cee547d767107377634211de81df447"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_checkerboard.square",
+      "revision": "template-v1",
+      "sha256": "fc143625236db9ffd92304f20935cec867dd0f84f2164e67f10f8d0fbd171c62"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_checkerboard.squoval",
+      "revision": "template-v1",
+      "sha256": "ff2ccfc6635671f006156c47eac4c772b120242116dc69d90bb5f5a0f5764381"
+    },
+    {
+      "templateId": "t_checkerboard",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_checkerboard.stiletto",
+      "revision": "template-v1",
+      "sha256": "0393914ff672176c2a00c69fcd95a3fa61efa9080174acc9a7a6cb90cfefba65"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_chrome_mirror.almond",
+      "revision": "template-v1",
+      "sha256": "d0d1f4a0ccabfee40356a088e3771f210a030830b3f588f48bd3349983a0b72c"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_chrome_mirror.coffin",
+      "revision": "template-v1",
+      "sha256": "e96aa81f2a08ab7cf6485ef8413fe355e3ae5a64be65602b0320ccb04c1170d1"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_chrome_mirror.oval",
+      "revision": "template-v1",
+      "sha256": "a34c540910c57fce6481f7990188e54544c06128b4c57ada8dce29bbd52a1697"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_chrome_mirror.round",
+      "revision": "template-v1",
+      "sha256": "dd91bcc6eed5126f001f2a846c86b2ead0b95c7c009cf635dc9b3313f7175f35"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_chrome_mirror.square",
+      "revision": "template-v1",
+      "sha256": "c67e0c78d7987885838bb301f6f9f79d44495b7152d822083fe143a1f6702e1a"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_chrome_mirror.squoval",
+      "revision": "template-v1",
+      "sha256": "89a2718e88887b7089dc4e7af0f02079815c3076cdf01360b72b76fa63e4e19a"
+    },
+    {
+      "templateId": "t_chrome_mirror",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_chrome_mirror.stiletto",
+      "revision": "template-v1",
+      "sha256": "6cd883262537eb79bc453108dc16ac5a7dce457e0b3ce3c5da241f270486657f"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.almond",
+      "revision": "template-v1",
+      "sha256": "026ac39f6e20db66be20e2a68079d27b7be7cfc04230c0aa8a86bb202b91cd3d"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.coffin",
+      "revision": "template-v1",
+      "sha256": "5276a732b0a869c50a91b527aac99bd0324237b0809c79ed78bb4aa073328706"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.oval",
+      "revision": "template-v1",
+      "sha256": "1175f6d0fcffe4435f4ea70eea18f917865783f2f8c200390aca5a1aeda44169"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.round",
+      "revision": "template-v1",
+      "sha256": "f798edb6b0b02327e40b0efeade4a21c467ac03bc83ec7d698f4a9d12447ca48"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.square",
+      "revision": "template-v1",
+      "sha256": "1bfe491dd1ec689b3179ea4c738fc3bd699662b6352653b4462e91a8f84032c1"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.squoval",
+      "revision": "template-v1",
+      "sha256": "a8c056a04e72c60abd499bdafa2e9b9e247a8b1fe02e697606d5fc5e56ac1edb"
+    },
+    {
+      "templateId": "t_classic_high_gloss",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_classic_high_gloss.stiletto",
+      "revision": "template-v1",
+      "sha256": "3ab4691f18b785388c5e853a48d0ce948001fec5450d01f520fd55262ad02e23"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_dark_gradient.almond",
+      "revision": "template-v1",
+      "sha256": "37f727ee4bab6e5ed0da9221a9ef124218d55d696ec9ad35d2d6cf1068529b9b"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_dark_gradient.coffin",
+      "revision": "template-v1",
+      "sha256": "82c3ec31d1c629a64fb60e3e254695fcaca3550362196b5900169ae42173f793"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_dark_gradient.oval",
+      "revision": "template-v1",
+      "sha256": "b242c6f1de9dac3fab37a3598535728ce79b235e6ef1ae789242d1a09bb83029"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_dark_gradient.round",
+      "revision": "template-v1",
+      "sha256": "b2e052968d6faa34548d4e4ce4ecdb32a25fefb820fbadb23bcf357caf695e19"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_dark_gradient.square",
+      "revision": "template-v1",
+      "sha256": "74e915b28eb52d7c085ce7efebb0f13d8c0da19ad9e4d4ca8dc107981909a8d7"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_dark_gradient.squoval",
+      "revision": "template-v1",
+      "sha256": "1d63986b0dcceea80c6cd4a919b813b94c23bb3f4db00b481c2b9ab84c5f9741"
+    },
+    {
+      "templateId": "t_dark_gradient",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_dark_gradient.stiletto",
+      "revision": "template-v1",
+      "sha256": "dbe83c73a319f3c94bff05a6a441d52692362b9226a24fb394fc0fbcc402ddf9"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_french_white.almond",
+      "revision": "template-v1",
+      "sha256": "47fafa9af0909e3a53294a01c97836edd82d5a40305e67e673f703850cabab20"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_french_white.coffin",
+      "revision": "template-v1",
+      "sha256": "f8ece504ff97596f5be1c4877a17ba7ff9d80fb9cc5c20dbf3f8852449f39359"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_french_white.oval",
+      "revision": "template-v1",
+      "sha256": "cd6ca29982ae07a3cc9b5c84215fb7ce712cb3c98fb46deb26f785643b65f079"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_french_white.round",
+      "revision": "template-v1",
+      "sha256": "306463d5218099c6c80a0e3b50f111fa7ef211baf3b93b564682ba754d13346e"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_french_white.square",
+      "revision": "template-v1",
+      "sha256": "a985543ce37c810a0531ff9c3eb0c4f25215b9a38a6d6dac0fac7053e192ff42"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_french_white.squoval",
+      "revision": "template-v1",
+      "sha256": "de705852b7ef52dc3229db5f7b51921d74968acd24f3f175c03720cab9327fd2"
+    },
+    {
+      "templateId": "t_french_white",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_french_white.stiletto",
+      "revision": "template-v1",
+      "sha256": "cf21ea12fbb9b5fe00337bf2d9eada0b99545c1c3a3c8038ad70e990eae9accf"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_holiday_glitter.almond",
+      "revision": "template-v1",
+      "sha256": "d3eb5f10d179d01896ee0497d346eac1a2ce77050287f25a6e44c9cad9c8b6e5"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_holiday_glitter.coffin",
+      "revision": "template-v1",
+      "sha256": "cb312477d9b2ae70cad2a4745c91d92ca5c6f465b95b3b98f04bc64442238f82"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_holiday_glitter.oval",
+      "revision": "template-v1",
+      "sha256": "f5ae17c306cc0d57d2988fbbbe3fb6bf7b618c1f4bb4444d6af92e42d2df797a"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_holiday_glitter.round",
+      "revision": "template-v1",
+      "sha256": "cb7079880bb0c1a587260c45c50a4b392732c26a80bb23f480a02cace9f14562"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_holiday_glitter.square",
+      "revision": "template-v1",
+      "sha256": "ce4afbb235a80e667abbea8664b4523e2a3a2f597f527055d94cbe4994e3c335"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_holiday_glitter.squoval",
+      "revision": "template-v1",
+      "sha256": "489fc1e1f5c7736baa637611cdabcfb5cfea66622c3cf05ee06cf6939cc2be1e"
+    },
+    {
+      "templateId": "t_holiday_glitter",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_holiday_glitter.stiletto",
+      "revision": "template-v1",
+      "sha256": "d95cf77ab5464179cba1cc38a2b8cea04f69ea2fc2d5cf64114e80d5058015dd"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.almond",
+      "revision": "template-v1",
+      "sha256": "da5ad1a1ada80cfd4ac6344492a930d5d50b0de7d20872b889fe809757f1f3fe"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.coffin",
+      "revision": "template-v1",
+      "sha256": "bde51149c077b734ec95320fc4dc8699103291b75bb1e0fc3f421df870500473"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.oval",
+      "revision": "template-v1",
+      "sha256": "bca0b0b2c8c665b052f091bcce5bad2803f2fec806fff20cbacd49bc455bb876"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.round",
+      "revision": "template-v1",
+      "sha256": "5e278730114a8ef0c83f3b396d5171b2850ad61ec9ca42aba383bf42f730c97d"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.square",
+      "revision": "template-v1",
+      "sha256": "8a21b45373f2ae09c4418272935a03111b761e3bae0f1365dc2c592661cdaa90"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.squoval",
+      "revision": "template-v1",
+      "sha256": "7891e2872b49f594b2074fe9f93f00acbfdffc70791b63c525eb250b87e5ed99"
+    },
+    {
+      "templateId": "t_liquid_velvet_cat_eye",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.stiletto",
+      "revision": "template-v1",
+      "sha256": "8c845977eebe3861543159b671ce47ee859e0be17cfc48a678bd7c39dc3cebba"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_nude_gradient.almond",
+      "revision": "template-v1",
+      "sha256": "ace1601b4cdd663dd255da440d8fc5c11969e1b4eca12efd90ce394999bed737"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_nude_gradient.coffin",
+      "revision": "template-v1",
+      "sha256": "84b4232fc2619247ab184d3bc6a996efea97ca13fcc9a496e93a83876d880115"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_nude_gradient.oval",
+      "revision": "template-v1",
+      "sha256": "51da89eb781c46fe952212b62dc19bd9e011b7b3ee1bae07838204e0819618cb"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_nude_gradient.round",
+      "revision": "template-v1",
+      "sha256": "1095856139872410e29817e0c7bdb91e1d10f606c140f0134c169048ebfb8dc7"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_nude_gradient.square",
+      "revision": "template-v1",
+      "sha256": "5becee8441ff08733cd6b847709824f174df022aeab3cde2cb448cece6e4eaa9"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_nude_gradient.squoval",
+      "revision": "template-v1",
+      "sha256": "ead98fdcb6ecfbe48cae7e4d87fb67e49cd287e1661258d23ee0441da6903da7"
+    },
+    {
+      "templateId": "t_nude_gradient",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_nude_gradient.stiletto",
+      "revision": "template-v1",
+      "sha256": "b0b02ae64d2925868ce0627821d40b659b754e0f355ad44727e016b024d2281b"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_petal_veil_french.almond",
+      "revision": "template-v2",
+      "sha256": "a677774006ca273d10b9b733731ce797a2730ab4445a7a93865aaa7d5629e029"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_petal_veil_french.coffin",
+      "revision": "template-v2",
+      "sha256": "6c88cce6465f66496618e870a139e611e72f2b6a9d4d180f7924cae0114fc6b0"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_petal_veil_french.oval",
+      "revision": "template-v2",
+      "sha256": "a1f6d33ab6b5d8e1cc09598a5527ca521583ac225c0bf83a81edf92f09826833"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_petal_veil_french.round",
+      "revision": "template-v2",
+      "sha256": "74438806955844b1c9740c002f9dbaa156d5a00ea237971eb795703b5f3f9b7c"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_petal_veil_french.square",
+      "revision": "template-v2",
+      "sha256": "749c370fa62e4f630b213974e0526b706cab902326b9a9462af5b22e8c9aae5c"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_petal_veil_french.squoval",
+      "revision": "template-v2",
+      "sha256": "06460e7452ec97fa608004a5be99091353df61673f4adffeb689f15e4421de48"
+    },
+    {
+      "templateId": "t_petal_veil_french",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_petal_veil_french.stiletto",
+      "revision": "template-v2",
+      "sha256": "9a0cdd57fa7b426ba0d6b151e5d14236c23171c795f4de783a3c4c7d19d9fd79"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "almond",
+      "assetId": "asset.template-pattern.t_y2k_ice.almond",
+      "revision": "template-v1",
+      "sha256": "ef024afa25bae3f376078f64c201ed7e124852c522421ad030d1a3ca940d0cdf"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "coffin",
+      "assetId": "asset.template-pattern.t_y2k_ice.coffin",
+      "revision": "template-v1",
+      "sha256": "851789114690e0f0b3b225c2433e3db1e26dc8ab4a9798deb1a38760a04c4c46"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "oval",
+      "assetId": "asset.template-pattern.t_y2k_ice.oval",
+      "revision": "template-v1",
+      "sha256": "f8936b0ea8f30cb7e3ff6b55b310d33d1c55704a52549b34b8ae6c694130b5b5"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "round",
+      "assetId": "asset.template-pattern.t_y2k_ice.round",
+      "revision": "template-v1",
+      "sha256": "67d1c1f7a4041d0ea95d9f1f955c76757e071ce282cda945265e8cb077a4f412"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "square",
+      "assetId": "asset.template-pattern.t_y2k_ice.square",
+      "revision": "template-v1",
+      "sha256": "336e536a1990140db968ddbd55d52c4627896a472434b21986cb207035bb8fd7"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "squoval",
+      "assetId": "asset.template-pattern.t_y2k_ice.squoval",
+      "revision": "template-v1",
+      "sha256": "2c9ff307fe792e9a4b038a8674166ccf849a70d441741e38a25cccb8e6b4ac29"
+    },
+    {
+      "templateId": "t_y2k_ice",
+      "shape": "stiletto",
+      "assetId": "asset.template-pattern.t_y2k_ice.stiletto",
+      "revision": "template-v1",
+      "sha256": "0aba49e0088c39d89db8dc1fc166e317d151922c95e71073f40c3dfb6dd90f12"
+    }
+  ]
+}

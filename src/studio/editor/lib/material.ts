@@ -286,6 +286,8 @@ export function getSilhouette(shape: NailShape, length: NailLength): SilhouetteI
 export interface PatternArtwork {
   /** 去掉外层 <svg> 的内部片段（含自身 defs + clip 组），可直接内嵌 */
   inner: string;
+  /** 原模板坐标系；嵌入 V7 nail-local 画布时不得猜测。 */
+  viewBox: string;
 }
 
 /** 读取某模板在某甲型上的图案 SVG 内部片段；clip id 由调用方改名防冲突 */
@@ -293,8 +295,10 @@ export function getPatternArtwork(templateId: string, shape: NailShape): Pattern
   const name = `${shape}.svg`;
   for (const [path, raw] of Object.entries(patternRaw)) {
     if (path.includes(`/templates/${templateId}/patterns/`) && fileKey(path) === name) {
+      const viewBox = raw.match(/viewBox="([^"]+)"/)?.[1];
+      if (!viewBox) return null;
       const inner = raw.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
-      return { inner };
+      return { inner, viewBox };
     }
   }
   return null;

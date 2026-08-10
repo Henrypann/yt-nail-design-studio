@@ -28,7 +28,8 @@ const clone = (value) => structuredClone(value);
     ['finish', false],
     ['customer', false],
   ]);
-  assert.equal(stages.find((stage) => stage.id === 'geometry').state, 'attention');
+  assert.equal(stages.find((stage) => stage.id === 'geometry').state, 'configured');
+  assert.match(stages.find((stage) => stage.id === 'geometry').description, /产品轮廓/);
   assert.equal(stages.find((stage) => stage.id === 'customer').state, 'empty');
   assert.equal(stages.find((stage) => stage.id === 'finish').state, 'configured');
   console.log('[v7-workspace-ia] deterministic five-stage read model: PASS');

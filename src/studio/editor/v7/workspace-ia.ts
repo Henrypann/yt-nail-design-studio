@@ -59,7 +59,7 @@ export function deriveEditorWorkspaceStagesV7(
       id: 'geometry',
       label: '甲型与适配',
       shortLabel: '甲型',
-      description: `${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`,
+      description: geometry.label,
       state: geometry.source === 'product' ? 'configured' : 'attention',
       active: currentStage === 'geometry',
       targetStepId: null,

@@ -24,6 +24,10 @@ export type EditorDocV7SaveResult =
   | { ok: true; doc: EditorDocV7 }
   | { ok: false; reason: EditorDocV7SaveFailure; message: string };
 
+export type EditorDocV7CreateResult =
+  | { ok: true; doc: EditorDocV7 }
+  | { ok: false; reason: 'invalid_document' | 'already_exists' | 'write_failed'; message: string };
+
 export interface EditorDocV7SaveContext {
   sourceVersion: number;
   userEdited: boolean;
@@ -47,6 +51,36 @@ export function createLocalEditorDocV7Storage(): EditorDocV7Storage {
       writeEnvelope(StorageKeys.editorDocs, next);
     },
   };
+}
+
+export function createEditorDocV7InMap(
+  docs: Record<string, unknown>,
+  candidate: unknown,
+): EditorDocV7CreateResult {
+  const parsed = parseEditorDocV7(candidate);
+  if (!parsed.ok) return { ok: false, reason: 'invalid_document', message: parsed.reason };
+  if (Object.prototype.hasOwnProperty.call(docs, parsed.doc.designId)) {
+    return { ok: false, reason: 'already_exists', message: 'Editor document already exists and was not overwritten' };
+  }
+  docs[parsed.doc.designId] = structuredClone(parsed.doc);
+  return { ok: true, doc: structuredClone(parsed.doc) };
+}
+
+export function createEditorDocV7InLocalStorage(candidate: unknown): EditorDocV7CreateResult {
+  const current = readData<Record<string, unknown>>(StorageKeys.editorDocs) ?? {};
+  const next = structuredClone(current);
+  const result = createEditorDocV7InMap(next, candidate);
+  if (!result.ok) return result;
+  try {
+    writeEnvelope(StorageKeys.editorDocs, next);
+    return result;
+  } catch (error) {
+    return {
+      ok: false,
+      reason: 'write_failed',
+      message: error instanceof Error ? error.message : 'storage write failed',
+    };
+  }
 }
 
 export function createEditorDocV7Repository(

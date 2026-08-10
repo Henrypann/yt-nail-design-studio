@@ -114,6 +114,8 @@ export function StepTwo() {
               ? '画布保存失败，未进行跳转。'
               : '设计数据缺失，无法打开自由画布。';
         toast.error(message);
+      } else if (result.compatibilityWarning) {
+        toast.warning('该设计包含 V7 尚未覆盖的内容，将使用 V6 兼容画布并完整保留数据。');
       }
     } finally {
       setBridging(false);

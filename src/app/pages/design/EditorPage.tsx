@@ -23,6 +23,7 @@ import {
 import { EditorShellV6 } from '@/studio/editor/components/EditorShellV6';
 import { EditorShellV7 } from '@/studio/editor/components/EditorShellV7';
 import { createBlankEditorDesignV6, getDesign, inspectEditorDoc } from '@/studio/editor/lib/repo-v6';
+import { createBlankEditorDesignV7 } from '@/studio/editor/lib/repo-v7';
 import { useEditorV6Store } from '@/studio/editor/store-v6';
 import { editorV7Store } from '@/studio/editor/store-v7';
 import { isEditorV7InternalEnabled, resolveEditorWriterRoute } from '@/studio/editor/v7/feature';
@@ -120,17 +121,25 @@ export default function EditorPage() {
   }, [unloadV6]);
 
   const acknowledgeBridge = (designId: string) => {
-    const result = loadV6(designId);
-    if (result === 'ok') {
-      setParams({ design: designId }, { replace: true });
-      setState({ kind: 'ready', writer: 'v6' });
-    } else {
-      setState(editorPageStateForLoadResult(result, designId));
-    }
+    // The bridge has already persisted the exact document version. Route back
+    // through the version-neutral loader instead of assuming the V6 writer.
+    setState({ kind: 'loading' });
+    setParams({ design: designId }, { replace: true });
   };
 
-  const createBlank = () => {
+  const createBlank = async () => {
     try {
+      if (v7Enabled) {
+        const id = createBlankEditorDesignV7({ shape: blankShape, length: blankLength });
+        const result = await editorV7Store.getState().load(id);
+        if (result === 'ok' || result === 'ok_with_warnings') {
+          setParams({ design: id }, { replace: true });
+          setState({ kind: 'ready', writer: 'v7', internalEnabled: true });
+        } else {
+          setState(result === 'missing' ? { kind: 'missing' } : { kind: 'save-error', designId: id });
+        }
+        return;
+      }
       const id = createBlankEditorDesignV6({ shape: blankShape, length: blankLength });
       const result = loadV6(id);
       if (result === 'ok') {
@@ -265,7 +274,7 @@ export default function EditorPage() {
             <Button variant="ghost" size="sm" onClick={() => navigate(Routes.designs)}>
               取消
             </Button>
-            <Button size="sm" onClick={createBlank}>
+            <Button size="sm" onClick={() => void createBlank()}>
               创建空白画布
             </Button>
           </>

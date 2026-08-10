@@ -37,6 +37,7 @@ export {
   removeDesign as removeDesignV6,
   saveEditorDocV6ToLocalStorage,
 } from './lib/repo-v6';
+export { createBlankEditorDesignV7, createWizardEditorDocV7 } from './lib/repo-v7';
 export type {
   EditorDocProbe,
   EditorDocV6,
@@ -145,6 +146,22 @@ export type {
 } from './v7/schema';
 export { isEditorDocV7, parseEditorDocV7, validateEditorDocV7 } from './v7/schema';
 export { migrateEditorDocV7 } from './v7/migrate';
+export {
+  PRODUCT_GEOMETRY_REVISION_V7,
+  createBlankEditorDocV7,
+  createProductGeometryRefV7,
+  wizardDesignToEditorDocV7,
+} from './v7/create';
+export type {
+  BlankEditorDocV7Input,
+  EditorDocV7CreationFailure,
+  EditorDocV7CreationResult,
+} from './v7/create';
+export {
+  OFFICIAL_TEMPLATE_PATTERN_ASSET_COUNT_V7,
+  getOfficialTemplatePatternAssetV7,
+  identifyOfficialTemplatePatternV7,
+} from './v7/official-template-assets';
 export type {
   AssetResolutionInputV7,
   EditorDocV7LegacyEvidence,
@@ -158,6 +175,10 @@ export type {
   RecipeResolutionV7,
 } from './v7/migrate';
 export { getEditorDocV7Result } from './v7/repository-contract';
+export {
+  createEditorDocV7InLocalStorage,
+  createEditorDocV7InMap,
+} from './v7/repository';
 export type {
   EditorDocV7Repository,
 } from './v7/repository';

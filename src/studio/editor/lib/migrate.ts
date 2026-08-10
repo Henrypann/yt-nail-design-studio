@@ -11,6 +11,7 @@ import {
 import type { ReliefElement, RecipeInstanceV1 } from './recipe-model.ts';
 import {
   EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION,
+  EDITOR_DOC_KNOWN_MAX_VERSION,
   EDITOR_DOC_MIGRATABLE_MAX_VERSION,
   classifyEditorDocSchemaVersion,
 } from './editor-doc-schema-version.ts';
@@ -216,6 +217,6 @@ export function migrateEditorDoc(value: unknown): EditorDocMigrationResult {
   }
   return {
     status: 'invalid',
-    reason: `Editor 文档版本无效（遗留运行时上限 v${EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION}；已知家族上限 v${EDITOR_DOC_MIGRATABLE_MAX_VERSION}）`,
+    reason: `Editor 文档版本无效（遗留运行时上限 v${EDITOR_DOC_LEGACY_RUNTIME_MAX_VERSION}；可迁移上限 v${EDITOR_DOC_MIGRATABLE_MAX_VERSION}；已知家族上限 v${EDITOR_DOC_KNOWN_MAX_VERSION}）`,
   };
 }

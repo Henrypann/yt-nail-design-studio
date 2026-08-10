@@ -94,7 +94,7 @@ export function V7BackgroundCanvas() {
       </div>
 
       <div className="min-w-0 space-y-3">
-        <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">2D 背景编辑</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {MODE_LABEL[preview.mode] ?? preview.mode}</h2><p className="mt-1 break-all text-[11px] text-gray-500">{nail.geometryRef.assetId} @ {nail.geometryRef.revision}</p></div>
+        <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">2D 背景编辑</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {MODE_LABEL[preview.mode] ?? preview.mode}</h2><p className="mt-1 text-[11px] text-gray-600">{silhouette.label}</p><p className="mt-0.5 truncate font-mono text-[9px] text-gray-400" title={`${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`}>{nail.geometryRef.assetId}</p></div>
         <dl className="grid grid-cols-2 gap-2 text-[11px]">
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">代表色</dt><dd className="mt-1 flex items-center gap-2 font-mono font-semibold text-gray-800"><span className="h-4 w-4 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />{hex.toUpperCase()}</dd></div>
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景透明度</dt><dd className="mt-1 font-semibold tabular-nums text-gray-800">{Math.round(background.opacity * 100)}%</dd></div>
