@@ -296,6 +296,37 @@ function runtime(docs, overrides = {}) {
   console.log('[v7-runtime] cross-design timer guard: PASS');
 }
 
+// A document switch is an exclusive transition: edits cannot appear after the flushed revision.
+{
+  const a = docWithId('design.runtime.switch-a', true);
+  const b = docWithId('design.runtime.switch-b');
+  const storage = new MemoryStorage({ [a.designId]: a, [b.designId]: b });
+  let resolveWrite;
+  storage.write = (next) => new Promise((resolve) => {
+    resolveWrite = () => { storage.docs = clone(next); storage.writes += 1; resolve(); };
+  });
+  const repository = createEditorDocV7Repository(storage, resolvers);
+  const { store } = runtime({}, { repository });
+  await store.getState().load(a.designId);
+  store.getState().setTitle('saved before exclusive switch');
+  const selectedFlat = store.getState().doc.nails.L1.steps.find((step) => step.kind === 'flat_design');
+  store.getState().selectStep(selectedFlat.id);
+  assert.equal(store.getState().deleteStep('L1', selectedFlat.id).ok, true);
+  assert.notEqual(store.getState().selectedStepId, selectedFlat.id);
+  const switching = store.getState().load(b.designId);
+  assert.equal(store.getState().switching, true);
+  assert.equal(store.getState().setTitle('must be rejected').reason, 'busy');
+  assert.equal(store.getState().undo().reason, 'busy');
+  for (let index = 0; index < 8 && !resolveWrite; index += 1) await Promise.resolve();
+  assert.equal(typeof resolveWrite, 'function');
+  resolveWrite();
+  assert.equal(await switching, 'ok');
+  assert.equal(store.getState().designId, b.designId);
+  assert.equal(store.getState().switching, false);
+  assert.equal(storage.docs[a.designId].title, 'saved before exclusive switch');
+  console.log('[v7-runtime] exclusive async switch and selection repair: PASS');
+}
+
 // Reload is blocked while a save is in flight, preventing memory/storage divergence.
 {
   const doc = docWithId('design.runtime.stale');

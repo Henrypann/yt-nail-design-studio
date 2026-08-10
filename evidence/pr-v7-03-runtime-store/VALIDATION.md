@@ -12,7 +12,7 @@
 
 - Luna was invoked in `write-isolated` mode. It completed repository/store analysis and two small foundation files, then reached its turn limit. Codex reviewed and completed the implementation.
 - Claude Code was invoked for read-only diff review but did not enter the model: the installed Hermes Claude binary returned `Permission denied`. Per skill policy, no chmod/chown or retry was attempted.
-- A separate read-only reviewer found four P1 concurrency/autosave issues. Codex fixed them with serialized repository writes, loaded-source CAS, persisted-revision CAS, and follow-up autosave scheduling. Follow-up review is recorded in the final delivery report.
+- Separate read-only reviews found concurrency/autosave issues. Codex fixed them with serialized repository writes, loaded-source CAS, persisted-revision CAS, follow-up autosave scheduling, and an exclusive async document-switch gate. Follow-up review is recorded in the final delivery report.
 
 ## Behavioral evidence
 
@@ -25,7 +25,7 @@
 - background/finish invariants and independent `visible`/`skipped` flags;
 - read-only document commands versus local selection state;
 - monotonic undo/redo and redo-branch clearing;
-- failure/retry, in-flight reload rejection, cross-design timer, and in-flight edit follow-up autosave;
+- failure/retry, in-flight reload rejection, cross-design timer, exclusive async switching, selection repair after deletion, and in-flight edit follow-up autosave;
 - serialized whole-map writes and source/revision compare-and-swap guards.
 
 ## Automated gates

@@ -69,6 +69,7 @@ export interface EditorV7State {
   revisionState: EditorV7RevisionState;
   autosaveTimer: ReturnType<typeof setTimeout> | null;
   generation: number;
+  switching: boolean;
 
   load(designId: string, options?: { readOnly?: boolean }): Promise<EditorV7LoadResult>;
   reloadFromStorage(): EditorV7LoadResult;
@@ -136,6 +137,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
     const commitCommand = (command: (doc: EditorDocV7) => EditorV7CommandResult): EditorV7ActionResult => {
       const state = get();
       if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+      if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
       if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
       const previous = clone(state.doc);
       const commandResult = command(clone(state.doc));
@@ -177,6 +179,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       revisionState: createEditorV7RevisionState(0),
       autosaveTimer: null,
       generation,
+      switching: false,
     });
 
     return {
@@ -193,9 +196,14 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (target.status === 'unsupported') return 'unsupported';
 
         const current = get();
-        if (current.doc && current.designId !== designId && current.revisionState.pendingRevision !== null) {
+        const switchingDesign = Boolean(current.doc && current.designId !== designId);
+        if (switchingDesign) set({ switching: true });
+        if (switchingDesign && current.revisionState.pendingRevision !== null) {
           const saved = await current.save();
-          if (saved !== 'saved' && saved !== 'clean') return 'save_error';
+          if (saved !== 'saved' && saved !== 'clean') {
+            set({ switching: false });
+            return 'save_error';
+          }
         }
         clearAutosave();
         const doc = clone(target.doc);
@@ -218,6 +226,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           revisionState: createEditorV7RevisionState(doc.revision),
           autosaveTimer: null,
           generation: get().generation + 1,
+          switching: false,
         });
         return target.status === 'migrated_with_warnings' ? 'ok_with_warnings' : 'ok';
       },
@@ -225,7 +234,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       reloadFromStorage: () => {
         const state = get();
         if (!state.designId) return 'missing';
-        if (state.saveState === 'saving') return 'busy';
+        if (state.saveState === 'saving' || state.switching) return 'busy';
         const result = dependencies.repository.load(state.designId);
         if (result.status === 'missing') return 'missing';
         if (result.status === 'invalid') return 'invalid';
@@ -250,10 +259,15 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
 
       unload: async () => {
         const state = get();
+        if (state.switching) return 'error';
+        set({ switching: true });
         clearAutosave();
         if (state.revisionState.pendingRevision !== null) {
           const saved = await get().save();
-          if (saved !== 'saved' && saved !== 'clean') return 'error';
+          if (saved !== 'saved' && saved !== 'clean') {
+            set({ switching: false });
+            return 'error';
+          }
         }
         set(reset(get().generation + 1));
         return 'ok';
@@ -301,6 +315,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       undo: () => {
         const state = get();
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+        if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
         if (state.history.length === 0) return { ok: false, reason: 'not_allowed', message: 'nothing to undo' };
         const restored = clone(state.history[state.history.length - 1]);
@@ -322,6 +337,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       redo: () => {
         const state = get();
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+        if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
         if (state.future.length === 0) return { ok: false, reason: 'not_allowed', message: 'nothing to redo' };
         const restored = clone(state.future[0]);
@@ -349,7 +365,15 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectElement: (elementId) => set({ selectedElementId: elementId }),
       setTitle: (title) => commitCommand((doc) => ({ ok: true, doc: { ...doc, title } })),
       addStep: (finger, step, index) => commitCommand((doc) => addEditorV7Step(doc, finger, step, index)),
-      deleteStep: (finger, stepId) => commitCommand((doc) => deleteEditorV7Step(doc, finger, stepId)),
+      deleteStep: (finger, stepId) => {
+        const wasSelected = get().selectedStepId === stepId;
+        const result = commitCommand((doc) => deleteEditorV7Step(doc, finger, stepId));
+        if (result.ok && wasSelected) {
+          const nextStepId = get().doc?.nails[finger].steps[0]?.id ?? null;
+          set({ selectedStepId: nextStepId, selectedElementId: null });
+        }
+        return result;
+      },
       moveStep: (finger, stepId, targetIndex) => commitCommand((doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
       duplicateStep: (finger, stepId) => commitCommand((doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
       setStepFlag: (finger, stepId, flag, value) => commitCommand((doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
