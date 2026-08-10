@@ -5,6 +5,7 @@ import type {
   DimensionalDecorationV7,
   EditorDocV7,
   FlatDesignElementV7,
+  GradientStopV7,
   ProcessStepV7,
   RgbaColorV7,
   Transform2DV7,
@@ -37,10 +38,22 @@ import {
 } from './v7/repository';
 import { parseEditorDocV7 } from './v7/schema';
 import {
+  addEditorV7GradientStop,
+  applyEditorV7PaletteTheme,
+  removeEditorV7GradientStop,
+  setEditorV7AdvancedBackgroundMode,
   setEditorV7BackgroundColor,
   setEditorV7BackgroundMode,
   setEditorV7BackgroundOpacity,
+  setEditorV7CatEyeParameters,
+  setEditorV7GlitterParameters,
+  setEditorV7GradientDirection,
+  setEditorV7GradientStops,
+  type EditorV7AdvancedBackgroundModeV7,
   type EditorV7BackgroundModeV7,
+  type EditorV7CatEyeParametersV7,
+  type EditorV7GlitterParametersV7,
+  type EditorV7PaletteThemeV7,
 } from './v7/background';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
@@ -92,6 +105,14 @@ export interface EditorV7State {
   setBackgroundMode(finger: FingerCode, mode: EditorV7BackgroundModeV7): EditorV7ActionResult;
   setBackgroundColor(finger: FingerCode, color: RgbaColorV7): EditorV7ActionResult;
   setBackgroundOpacity(finger: FingerCode, opacity: number): EditorV7ActionResult;
+  setAdvancedBackgroundMode(finger: FingerCode, mode: EditorV7AdvancedBackgroundModeV7): EditorV7ActionResult;
+  setGradientStops(finger: FingerCode, stops: readonly GradientStopV7[]): EditorV7ActionResult;
+  addGradientStop(finger: FingerCode, offset?: number): EditorV7ActionResult;
+  removeGradientStop(finger: FingerCode, index: number): EditorV7ActionResult;
+  setGradientDirection(finger: FingerCode, directionDeg: number): EditorV7ActionResult;
+  setCatEyeParameters(finger: FingerCode, parameters: EditorV7CatEyeParametersV7): EditorV7ActionResult;
+  setGlitterParameters(finger: FingerCode, parameters: EditorV7GlitterParametersV7): EditorV7ActionResult;
+  applyBackgroundPaletteTheme(finger: FingerCode, theme: EditorV7PaletteThemeV7): EditorV7ActionResult;
   addStep(finger: FingerCode, step: ProcessStepV7, index: number): EditorV7ActionResult;
   deleteStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
@@ -377,6 +398,14 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7BackgroundMode(doc, finger, mode)),
       setBackgroundColor: (finger, color) => commitCommand((doc) => setEditorV7BackgroundColor(doc, finger, color)),
       setBackgroundOpacity: (finger, opacity) => commitCommand((doc) => setEditorV7BackgroundOpacity(doc, finger, opacity)),
+      setAdvancedBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7AdvancedBackgroundMode(doc, finger, mode)),
+      setGradientStops: (finger, stops) => commitCommand((doc) => setEditorV7GradientStops(doc, finger, stops)),
+      addGradientStop: (finger, offset) => commitCommand((doc) => addEditorV7GradientStop(doc, finger, offset)),
+      removeGradientStop: (finger, index) => commitCommand((doc) => removeEditorV7GradientStop(doc, finger, index)),
+      setGradientDirection: (finger, directionDeg) => commitCommand((doc) => setEditorV7GradientDirection(doc, finger, directionDeg)),
+      setCatEyeParameters: (finger, parameters) => commitCommand((doc) => setEditorV7CatEyeParameters(doc, finger, parameters)),
+      setGlitterParameters: (finger, parameters) => commitCommand((doc) => setEditorV7GlitterParameters(doc, finger, parameters)),
+      applyBackgroundPaletteTheme: (finger, theme) => commitCommand((doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
       addStep: (finger, step, index) => commitCommand((doc) => addEditorV7Step(doc, finger, step, index)),
       deleteStep: (finger, stepId) => {
         const wasSelected = get().selectedStepId === stepId;

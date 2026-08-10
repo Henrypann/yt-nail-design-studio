@@ -214,7 +214,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
 
               <div className="mt-3 flex items-start gap-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5 text-[10px] leading-4 text-gray-500">
                 <Workflow size={14} className="mt-0.5 shrink-0 text-primary" />
-                <p>V7-05 仅开放单指基础背景：单色、透色、颜色与透明度。渐变、猫眼、闪粉在 V7-06；画笔与 3D 仍未开放。</p>
+                <p>V7-06 已开放单指完整背景：单色、透色、渐变、整甲猫眼、整甲闪粉与主题配色。局部效果、画笔与 3D 仍未开放。</p>
               </div>
             </div>
           </div>
