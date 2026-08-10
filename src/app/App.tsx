@@ -1,5 +1,12 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes as RouterRoutes } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Outlet,
+  Route,
+  RouterProvider,
+  useLocation,
+} from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
 import { LocaleProvider } from '@/lib/i18n';
 import { AppLayout } from './layouts/AppLayout';
@@ -31,51 +38,62 @@ const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
   : null;
 
+function RouterChrome() {
+  const location = useLocation();
+  const internalFixture = location.pathname === '/internal/petal-veil-fixture';
+  return (
+    <>
+      <Outlet />
+      {DevDebugPanel && !internalFixture && (
+        <Suspense fallback={null}>
+          <DevDebugPanel />
+        </Suspense>
+      )}
+    </>
+  );
+}
+
+const router = createBrowserRouter(createRoutesFromElements(
+  <Route element={<RouterChrome />}>
+    {/* 登录前 */}
+    <Route path={Routes.login} element={<LoginPage />} />
+    <Route path={Routes.register} element={<RegisterPage />} />
+    {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
+    <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
+    <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
+    {/* Community 独立产品壳（无 Studio 侧栏） */}
+    <Route element={<CommunityLayout />}>
+      <Route path={Routes.community} element={<CommunityDiscoverPage />} />
+      <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
+      <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
+      <Route path={Routes.communityContentPath} element={<CommunityContentPage />} />
+      <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
+    </Route>
+    {/* 登录后（侧栏 + 顶栏布局） */}
+    <Route element={<AppLayout />}>
+      <Route path={Routes.dashboard} element={<DashboardPage />} />
+      <Route path={Routes.customers} element={<CustomerListPage />} />
+      <Route path={Routes.customerNew} element={<CustomerNewPage />} />
+      <Route path={Routes.customerDetailPath} element={<CustomerDetailPage />} />
+      <Route path={Routes.designs} element={<DesignListPage />} />
+      <Route path={Routes.designNew} element={<WizardPage />} />
+      <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
+      <Route path={Routes.designCommunity} element={<CommunityPage />} />
+      <Route path={Routes.designCanvas} element={<EditorPage />} />
+      <Route path={Routes.devices} element={<DeviceListPage />} />
+      <Route path={Routes.deviceBind} element={<DeviceBindPage />} />
+    </Route>
+    {/* 404 */}
+    <Route path="*" element={<NotFoundPage />} />
+  </Route>,
+));
+
 /** 应用根：路由（PRD §1.4 + Community 独立域）+ 全局 Toast + 调试面板（仅 DEV） */
 export function App() {
-  const internalFixture = window.location.pathname === '/internal/petal-veil-fixture';
   return (
     <LocaleProvider>
       <ToastProvider>
-        <BrowserRouter>
-        <RouterRoutes>
-          {/* 登录前 */}
-          <Route path={Routes.login} element={<LoginPage />} />
-          <Route path={Routes.register} element={<RegisterPage />} />
-          {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
-          <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
-          <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
-          {/* Community 独立产品壳（无 Studio 侧栏） */}
-          <Route element={<CommunityLayout />}>
-            <Route path={Routes.community} element={<CommunityDiscoverPage />} />
-            <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
-            <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
-            <Route path={Routes.communityContentPath} element={<CommunityContentPage />} />
-            <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
-          </Route>
-          {/* 登录后（侧栏 + 顶栏布局） */}
-          <Route element={<AppLayout />}>
-            <Route path={Routes.dashboard} element={<DashboardPage />} />
-            <Route path={Routes.customers} element={<CustomerListPage />} />
-            <Route path={Routes.customerNew} element={<CustomerNewPage />} />
-            <Route path={Routes.customerDetailPath} element={<CustomerDetailPage />} />
-            <Route path={Routes.designs} element={<DesignListPage />} />
-            <Route path={Routes.designNew} element={<WizardPage />} />
-            <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
-            <Route path={Routes.designCommunity} element={<CommunityPage />} />
-            <Route path={Routes.designCanvas} element={<EditorPage />} />
-            <Route path={Routes.devices} element={<DeviceListPage />} />
-            <Route path={Routes.deviceBind} element={<DeviceBindPage />} />
-          </Route>
-          {/* 404 */}
-          <Route path="*" element={<NotFoundPage />} />
-        </RouterRoutes>
-        {DevDebugPanel && !internalFixture && (
-          <Suspense fallback={null}>
-            <DevDebugPanel />
-          </Suspense>
-        )}
-        </BrowserRouter>
+        <RouterProvider router={router} />
       </ToastProvider>
     </LocaleProvider>
   );

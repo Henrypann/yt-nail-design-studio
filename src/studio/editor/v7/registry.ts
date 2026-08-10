@@ -40,6 +40,27 @@ export type ProcessStepContentKindV7 =
   | 'matte'
   | 'frosted';
 
+export type EditorToolIdV7 =
+  | 'select'
+  | 'background_fill'
+  | 'color_picker'
+  | 'gradient'
+  | 'brush'
+  | 'eraser'
+  | 'shape'
+  | 'french'
+  | 'text'
+  | 'import_2d'
+  | 'mask'
+  | 'cat_eye'
+  | 'glitter'
+  | 'mirror'
+  | 'ink_bloom'
+  | 'relief'
+  | 'attachment'
+  | 'finish_picker'
+  | 'preview_3d';
+
 export interface ProcessStepTypeDefinitionV1 {
   typeId: string;
   kind: ProcessStepKindV7;
@@ -52,6 +73,7 @@ export interface ProcessStepTypeDefinitionV1 {
   duplicable: boolean;
   supportsMask: boolean;
   supportsMaterial: boolean;
+  allowedTools: readonly EditorToolIdV7[];
   allowedContentKinds: readonly ProcessStepContentKindV7[];
 }
 
@@ -68,6 +90,7 @@ export const PROCESS_STEP_REGISTRY_V7 = {
     duplicable: false,
     supportsMask: false,
     supportsMaterial: true,
+    allowedTools: ['background_fill', 'color_picker', 'gradient', 'cat_eye', 'glitter'],
     allowedContentKinds: ['solid', 'translucent', 'gradient', 'cat_eye', 'glitter'],
   },
   [PROCESS_STEP_TYPE_IDS_V7.flat_design]: {
@@ -82,6 +105,7 @@ export const PROCESS_STEP_REGISTRY_V7 = {
     duplicable: true,
     supportsMask: true,
     supportsMaterial: false,
+    allowedTools: ['select', 'brush', 'eraser', 'shape', 'french', 'text', 'import_2d', 'mask'],
     allowedContentKinds: [
       'brush_stroke',
       'eraser_mask',
@@ -104,6 +128,7 @@ export const PROCESS_STEP_REGISTRY_V7 = {
     duplicable: true,
     supportsMask: true,
     supportsMaterial: true,
+    allowedTools: ['select', 'mask', 'cat_eye', 'glitter', 'mirror', 'ink_bloom'],
     allowedContentKinds: ['cat_eye', 'glitter', 'mirror', 'ink_bloom'],
   },
   [PROCESS_STEP_TYPE_IDS_V7.dimensional_decoration]: {
@@ -118,6 +143,7 @@ export const PROCESS_STEP_REGISTRY_V7 = {
     duplicable: true,
     supportsMask: false,
     supportsMaterial: true,
+    allowedTools: ['select', 'relief', 'attachment'],
     allowedContentKinds: ['relief_2_5d', 'attachment_3d'],
   },
   [PROCESS_STEP_TYPE_IDS_V7.surface_finish]: {
@@ -132,6 +158,7 @@ export const PROCESS_STEP_REGISTRY_V7 = {
     duplicable: false,
     supportsMask: false,
     supportsMaterial: true,
+    allowedTools: ['finish_picker', 'preview_3d'],
     allowedContentKinds: ['gloss', 'matte', 'frosted'],
   },
 } as const satisfies Record<string, ProcessStepTypeDefinitionV1>;

@@ -5,6 +5,8 @@
  */
 
 export { EditorShell } from './components/EditorShell';
+export { EditorShellV7 } from './components/EditorShellV7';
+export { LayerPanelV7 } from './components/LayerPanelV7';
 export { useEditorStore } from './store';
 export { useEditorV6Store } from './store-v6';
 export * from './lib/model';
@@ -55,6 +57,15 @@ export {
   SURFACE_FINISH_TYPES_V7,
   getProcessStepTypeDefinitionV7,
 } from './v7/registry';
+export type { EditorToolIdV7, ProcessStepTypeDefinitionV1 } from './v7/registry';
+export {
+  isEditorV7InternalEnabled,
+  resolveEditorWriterRoute,
+} from './v7/feature';
+export type {
+  EditorDocVersionProbeV7,
+  EditorWriterRoute,
+} from './v7/feature';
 export type {
   EditorDocV7Issue,
   EditorDocV7IssueCode,

@@ -23,11 +23,13 @@ import {
   customerName,
   duplicateEditorDocV6,
   getEditorDocV6Result,
+  inspectEditorDoc,
   readDesigns,
   removeDesign,
   removeEditorDoc,
   upsertDesign,
 } from '@/studio/editor/lib/repo-v6';
+import { isEditorV7InternalEnabled } from '@/studio/editor/v7/feature';
 import { openBridge } from '@/studio/bridge';
 import { genId } from '@/studio/editor/lib/model';
 
@@ -55,6 +57,7 @@ export default function DesignListPage() {
   const [tick, setTick] = useState(0); // 本地增删后刷新
   const [revertTarget, setRevertTarget] = useState<DesignSummary | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DesignSummary | null>(null);
+  const editorV7Enabled = isEditorV7InternalEnabled();
 
   const designs = useMemo(() => {
     void tick;
@@ -71,6 +74,15 @@ export default function DesignListPage() {
   const refresh = () => setTick((t) => t + 1);
 
   const openDesign = (d: DesignSummary) => {
+    const probe = inspectEditorDoc(d.id);
+    if (probe.present && probe.schemaVersion === 7) {
+      navigate(`${Routes.designCanvas}?design=${d.id}`);
+      return;
+    }
+    if (probe.present && typeof probe.schemaVersion === 'number' && probe.schemaVersion > 7) {
+      toast.error('设计来自更高版本，当前版本不会覆盖。');
+      return;
+    }
     const editorDoc = getEditorDocV6Result(d.id);
     if (editorDoc.status === 'ok') {
       navigate(`${Routes.designCanvas}?design=${d.id}`);
@@ -86,6 +98,11 @@ export default function DesignListPage() {
   };
 
   const duplicateDesign = (d: DesignSummary) => {
+    const probe = inspectEditorDoc(d.id);
+    if (probe.present && probe.schemaVersion === 7) {
+      toast.error('V7 复制将在十指事务 PR 中开放；原设计未改变。');
+      return;
+    }
     const newId = genId('design');
     const now = new Date().toISOString();
     const source = getEditorDocV6Result(d.id);
@@ -119,6 +136,11 @@ export default function DesignListPage() {
   };
 
   const newVersion = (d: DesignSummary) => {
+    const probe = inspectEditorDoc(d.id);
+    if (probe.present && probe.schemaVersion === 7) {
+      toast.error('V7 新版本将在确认快照 PR 中开放；原设计未改变。');
+      return;
+    }
     let newId: string | null = null;
     try {
       newId = genId('design');
@@ -161,7 +183,10 @@ export default function DesignListPage() {
     <div className="flex flex-col gap-4" data-debug-id="studio.design-list">
       <header className="flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">我的设计</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-semibold text-gray-900">我的设计</h1>
+            {editorV7Enabled && <Badge variant="info">V7 internal</Badge>}
+          </div>
           <p className="mt-0.5 text-xs text-gray-500">
             顾客确认为线下场景：软件内仅手动标记「顾客已确认」→ 冻结只读。
           </p>

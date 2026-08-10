@@ -21,8 +21,11 @@ import {
   getShapeLengthCompatibility,
 } from '@/studio/compatibility';
 import { EditorShellV6 } from '@/studio/editor/components/EditorShellV6';
-import { createBlankEditorDesignV6 } from '@/studio/editor/lib/repo-v6';
+import { EditorShellV7 } from '@/studio/editor/components/EditorShellV7';
+import { createBlankEditorDesignV6, getDesign, inspectEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { useEditorV6Store } from '@/studio/editor/store-v6';
+import { editorV7Store } from '@/studio/editor/store-v7';
+import { isEditorV7InternalEnabled, resolveEditorWriterRoute } from '@/studio/editor/v7/feature';
 import {
   isEditorShapeEnabled,
   LENGTHS,
@@ -36,7 +39,7 @@ type PageState =
   | { kind: 'loading' }
   | { kind: 'bridge-warning'; designId: string }
   | { kind: 'blank-picker' }
-  | { kind: 'ready' }
+  | { kind: 'ready'; writer: 'v6' | 'v7'; internalEnabled?: boolean }
   | { kind: 'missing' }
   | { kind: 'save-error'; designId: string }
   | { kind: 'invalid'; unsupported?: boolean };
@@ -44,7 +47,7 @@ type PageState =
 type EditorLoadResult = 'ok' | 'missing' | 'invalid' | 'unsupported' | 'save_error';
 
 function editorPageStateForLoadResult(result: EditorLoadResult, designId: string): PageState {
-  if (result === 'ok') return { kind: 'ready' };
+  if (result === 'ok') return { kind: 'ready', writer: 'v6' };
   if (result === 'invalid') return { kind: 'invalid' };
   if (result === 'unsupported') return { kind: 'invalid', unsupported: true };
   if (result === 'save_error') return { kind: 'save-error', designId };
@@ -55,12 +58,37 @@ export default function EditorPage() {
   const { locale } = useLocale();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const load = useEditorV6Store((s) => s.load);
-  const unload = useEditorV6Store((s) => s.unload);
+  const loadV6 = useEditorV6Store((s) => s.load);
+  const unloadV6 = useEditorV6Store((s) => s.unload);
+  const v7Enabled = isEditorV7InternalEnabled();
 
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [blankShape, setBlankShape] = useState<NailShape>('almond');
   const [blankLength, setBlankLength] = useState<NailLength>('medium');
+
+  const loadPersistedDesign = async (designId: string): Promise<PageState> => {
+    const probe = inspectEditorDoc(designId);
+    const route = resolveEditorWriterRoute(probe, v7Enabled);
+    if (route === 'v7-edit' || route === 'v7-readonly') {
+      if (unloadV6() === 'error') return { kind: 'save-error', designId };
+      const summary = getDesign(designId);
+      const readOnly = route === 'v7-readonly' || summary?.status !== 'draft';
+      const result = await editorV7Store.getState().load(designId, { readOnly });
+      if (result === 'ok' || result === 'ok_with_warnings') {
+        return { kind: 'ready', writer: 'v7', internalEnabled: v7Enabled };
+      }
+      if (result === 'missing') return { kind: 'missing' };
+      if (result === 'save_error' || result === 'busy') return { kind: 'save-error', designId };
+      return { kind: 'invalid', unsupported: result === 'unsupported' };
+    }
+    if (route === 'recovery') {
+      const schemaVersion = probe.present ? probe.schemaVersion : null;
+      return { kind: 'invalid', unsupported: (schemaVersion ?? 0) > 7 };
+    }
+    const unloadedV7 = await editorV7Store.getState().unload();
+    if (unloadedV7 === 'error') return { kind: 'save-error', designId };
+    return editorPageStateForLoadResult(loadV6(designId), designId);
+  };
 
   useEffect(() => {
     const bridgeId = params.get('bridge');
@@ -77,21 +105,25 @@ export default function EditorPage() {
       return;
     }
     if (designId) {
-      const result = load(designId);
-      setState(editorPageStateForLoadResult(result, designId));
-      return;
+      let cancelled = false;
+      void loadPersistedDesign(designId).then((next) => {
+        if (!cancelled) setState(next);
+      });
+      return () => { cancelled = true; };
     }
     setState({ kind: 'missing' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  useEffect(() => () => { unload(); }, [unload]);
+  useEffect(() => () => {
+    unloadV6();
+  }, [unloadV6]);
 
   const acknowledgeBridge = (designId: string) => {
-    const result = load(designId);
+    const result = loadV6(designId);
     if (result === 'ok') {
       setParams({ design: designId }, { replace: true });
-      setState({ kind: 'ready' });
+      setState({ kind: 'ready', writer: 'v6' });
     } else {
       setState(editorPageStateForLoadResult(result, designId));
     }
@@ -100,10 +132,10 @@ export default function EditorPage() {
   const createBlank = () => {
     try {
       const id = createBlankEditorDesignV6({ shape: blankShape, length: blankLength });
-      const result = load(id);
+      const result = loadV6(id);
       if (result === 'ok') {
         setParams({ design: id }, { replace: true });
-        setState({ kind: 'ready' });
+        setState({ kind: 'ready', writer: 'v6' });
       } else {
         setState(editorPageStateForLoadResult(result, id));
       }
@@ -112,7 +144,11 @@ export default function EditorPage() {
     }
   };
 
-  if (state.kind === 'ready') return <EditorShellV6 />;
+  if (state.kind === 'ready') {
+    return state.writer === 'v7'
+      ? <EditorShellV7 internalEnabled={state.internalEnabled ?? false} />
+      : <EditorShellV6 />;
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -163,7 +199,7 @@ export default function EditorPage() {
       {state.kind === 'save-error' && (
         <EmptyState
           title="当前设计尚未安全保存"
-          description="Studio 保留了内存中的 V6 设计，没有切换或覆盖目标文档。请检查浏览器存储后重试。"
+          description="Studio 保留了内存中的设计，没有切换或覆盖目标文档。请检查浏览器存储后重试。"
           action={
             <div className="flex gap-2">
               <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
@@ -172,7 +208,7 @@ export default function EditorPage() {
               {state.designId && (
                 <Button
                   size="sm"
-                  onClick={() => setState(editorPageStateForLoadResult(load(state.designId), state.designId))}
+                  onClick={() => void loadPersistedDesign(state.designId).then(setState)}
                 >
                   重试打开
                 </Button>
