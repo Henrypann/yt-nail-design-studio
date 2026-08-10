@@ -47,8 +47,12 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const [leaving, setLeaving] = useState(false);
   const processScrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setTitleDraft(doc?.title ?? ''), [doc?.designId, doc?.title]);
-  useEffect(() => processScrollRef.current?.scrollTo({ left: 0 }), [currentFinger]);
+  useEffect(() => {
+    setTitleDraft(doc?.title ?? '');
+  }, [doc?.designId, doc?.title]);
+  useEffect(() => {
+    processScrollRef.current?.scrollTo({ left: 0 });
+  }, [currentFinger]);
 
   useEffect(() => {
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
