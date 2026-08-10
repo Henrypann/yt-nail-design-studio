@@ -1,0 +1,57 @@
+{
+  "date": "2026-08-10",
+  "route": "/design/canvas?design=design.v7.full",
+  "viewports": {
+    "1440x900": {
+      "layout": "wide",
+      "canvasWidthPx": 1036,
+      "documentOverflowPx": 0,
+      "flatCanvasMounted": 1
+    },
+    "1280x900": {
+      "layout": "wide",
+      "resourceDrawerWidthPx": 232,
+      "canvasWidthWithDrawerPx": 644,
+      "sidebarWidthPx": 340,
+      "documentOverflowPx": 0
+    },
+    "1024x900": {
+      "layout": "compact",
+      "canvasWidthPx": 960,
+      "openDialogs": 1,
+      "openOverlays": 1,
+      "escapeRestoredFocusTo": "层级",
+      "documentOverflowPx": 0
+    },
+    "768x900": {
+      "layout": "tablet",
+      "canvasWidthPx": 768,
+      "verticalToolRails": 0,
+      "horizontalToolRails": 1,
+      "documentOverflowPx": 0
+    },
+    "390x844": {
+      "layout": "mobile",
+      "canvasWidthPx": 390,
+      "verticalToolRails": 0,
+      "horizontalToolRails": 1,
+      "undersizedEnabledEditorButtons": 0,
+      "developmentOverlayButtons": 0,
+      "documentOverflowPx": 0
+    }
+  },
+  "interaction": {
+    "stageArrowRight": "表面封层：gloss",
+    "toolArrowRight": "背景",
+    "mobileFingerL1Clickable": true,
+    "stageSelectsExistingFlatStep": true,
+    "resourceSheetFocusTarget": "关闭资源",
+    "resourceSheetCloseRestoredFocusTo": "资源"
+  },
+  "runtime": {
+    "v7ConsoleErrors": 0,
+    "v6ConsoleErrors": 0,
+    "v6ImmersiveEditorRendered": true,
+    "v6DocumentOverflowPx": 0
+  }
+}

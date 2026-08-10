@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useBlocker, useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, Workflow } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { FINGER_CODES } from '@/lib/types';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
-import { LayerPanelV7 } from './LayerPanelV7';
-import { V7BackgroundCanvas } from './V7BackgroundCanvas';
-import { V7FlatDesignCanvas } from './V7FlatDesignCanvas';
+import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
+import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
+import { EditorStageBarV7 } from './EditorStageBarV7';
+import { EditorToolRailV7 } from './EditorToolRailV7';
+import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -16,13 +18,7 @@ const SAVE_LABEL = {
   error: '保存失败，可重试',
 } as const;
 
-const STEP_TONE = {
-  background: 'bg-rose-100 text-rose-700',
-  flat_design: 'bg-violet-100 text-violet-700',
-  surface_effect: 'bg-sky-100 text-sky-700',
-  dimensional_decoration: 'bg-amber-100 text-amber-800',
-  surface_finish: 'bg-slate-200 text-slate-700',
-} as const;
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean }) {
   const navigate = useNavigate();
@@ -45,14 +41,44 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const unload = useEditorV7Store((state) => state.unload);
   const [titleDraft, setTitleDraft] = useState(doc?.title ?? '');
   const [leaving, setLeaving] = useState(false);
-  const processScrollRef = useRef<HTMLDivElement>(null);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [workspacePanelOpen, setWorkspacePanelOpen] = useState(false);
+  const [workspacePanelTab, setWorkspacePanelTab] = useState<EditorWorkspacePanelTabV7>('layers');
+  const [wideWorkspace, setWideWorkspace] = useState(() => window.matchMedia('(min-width: 1280px)').matches);
+  const [dockedTools, setDockedTools] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
+  const [mobileWorkspace, setMobileWorkspace] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  const resourceDialogRef = useRef<HTMLDivElement>(null);
+  const overlayTriggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setTitleDraft(doc?.title ?? '');
   }, [doc?.designId, doc?.title]);
+
   useEffect(() => {
-    processScrollRef.current?.scrollTo({ left: 0 });
-  }, [currentFinger]);
+    const wide = window.matchMedia('(min-width: 1280px)');
+    const docked = window.matchMedia('(max-width: 1023px)');
+    const mobile = window.matchMedia('(max-width: 767px)');
+    const update = () => {
+      setWideWorkspace(wide.matches);
+      setDockedTools(docked.matches);
+      setMobileWorkspace(mobile.matches);
+      if (wide.matches) {
+        setWorkspacePanelOpen(false);
+        const trigger = overlayTriggerRef.current;
+        overlayTriggerRef.current = null;
+        queueMicrotask(() => trigger?.focus());
+      }
+    };
+    update();
+    wide.addEventListener('change', update);
+    docked.addEventListener('change', update);
+    mobile.addEventListener('change', update);
+    return () => {
+      wide.removeEventListener('change', update);
+      docked.removeEventListener('change', update);
+      mobile.removeEventListener('change', update);
+    };
+  }, []);
 
   useEffect(() => {
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -94,10 +120,57 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     });
   }, [blocker, leaving, toast, unload]);
 
+  const rememberOverlayTrigger = () => {
+    overlayTriggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  };
+  const restoreOverlayTrigger = () => {
+    const trigger = overlayTriggerRef.current;
+    overlayTriggerRef.current = null;
+    queueMicrotask(() => trigger?.focus());
+  };
+  const openResources = () => {
+    rememberOverlayTrigger();
+    setWorkspacePanelOpen(false);
+    setResourcesOpen(true);
+  };
+  const closeResources = () => {
+    setResourcesOpen(false);
+    restoreOverlayTrigger();
+  };
+  const toggleResources = () => {
+    if (resourcesOpen) closeResources();
+    else openResources();
+  };
+  const openWorkspacePanel = (tab: EditorWorkspacePanelTabV7) => {
+    rememberOverlayTrigger();
+    setResourcesOpen(false);
+    setWorkspacePanelTab(tab);
+    if (!wideWorkspace) setWorkspacePanelOpen(true);
+  };
+  const closeWorkspacePanel = () => {
+    setWorkspacePanelOpen(false);
+    restoreOverlayTrigger();
+  };
+
+  useEffect(() => {
+    if (wideWorkspace || !resourcesOpen) return;
+    resourceDialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
+  }, [resourcesOpen, wideWorkspace]);
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target;
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return;
+      if (event.key === 'Escape') {
+        if (workspacePanelOpen) {
+          event.preventDefault();
+          closeWorkspacePanel();
+        } else if (resourcesOpen) {
+          event.preventDefault();
+          closeResources();
+        }
+        return;
+      }
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') return;
       event.preventDefault();
       if (event.shiftKey) redo();
@@ -105,12 +178,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [redo, undo]);
-
-  const processSummary = useMemo(() => {
-    if (!currentNail) return [];
-    return currentNail.steps.filter((step) => step.visible && !step.skipped);
-  }, [currentNail]);
+  }, [redo, resourcesOpen, undo, workspacePanelOpen]);
 
   if (!doc || !currentNail) return null;
 
@@ -132,15 +200,32 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     if (result === 'error') toast.error(saveError ?? 'V7 保存失败，请重试。');
   };
 
+  const selectStageStep = (stepId: string) => {
+    if (selectedStep?.id !== stepId) editorV7Store.getState().selectStep(stepId);
+  };
+
+  const trapResourceFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const focusable = Array.from(resourceDialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  };
+
+  const layout = wideWorkspace ? 'wide' : dockedTools ? (mobileWorkspace ? 'mobile' : 'tablet') : 'compact';
+
   return (
     <section
-      className="flex min-h-[calc(100vh-8rem)] min-w-0 flex-col overflow-hidden rounded-card border border-gray-200 bg-white lg:h-[calc(100vh-8.5rem)] lg:min-h-[640px]"
+      className="flex h-[100dvh] min-h-[560px] min-w-0 flex-col overflow-hidden bg-white"
       data-debug-id="studio.editor.shell-v7"
       data-editor-schema="7"
       data-internal-editor-v7={internalEnabled}
+      data-layout={layout}
     >
-      <header className="flex flex-wrap items-center gap-2 border-b border-gray-200 px-2 py-2 sm:px-3">
-        <Button size="sm" variant="ghost" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit()}>
+      <header className="flex min-h-[52px] flex-wrap items-center gap-1.5 border-b border-gray-200 px-2 py-1.5 sm:gap-2 sm:px-3">
+        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit()}>
           <ArrowLeft size={14} /> 设计列表
         </Button>
         <span className="rounded-full bg-gray-900 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white">Editor V7</span>
@@ -165,14 +250,17 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         >
           {SAVE_LABEL[saveState]}
         </span>
-        <Button size="sm" variant="ghost" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
+        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
           <Undo2 size={14} />
         </Button>
-        <Button size="sm" variant="ghost" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
+        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
           <Redo2 size={14} />
         </Button>
-        <Button size="sm" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
+        <Button size="sm" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
           <Save size={14} /> {saveState === 'error' ? '重试保存' : '保存'}
+        </Button>
+        <Button size="sm" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" variant="secondary" disabled title="顾客全屏预览在 V7-09 开放" aria-label="顾客预览将在 V7-09 开放">
+          <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
         </Button>
       </header>
 
@@ -196,39 +284,32 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </div>
       )}
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:h-0 lg:overflow-hidden lg:flex-row">
-        <main className="flex min-h-[420px] min-w-0 flex-1 flex-col overflow-auto bg-[#f5f2f0] p-3 sm:p-5 lg:min-h-0">
-          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
-            <div className="rounded-[28px] border border-white bg-white/65 p-4 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-6">
-              {selectedStep?.kind === 'flat_design' ? <V7FlatDesignCanvas /> : <V7BackgroundCanvas />}
+      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} />
 
-              <div className="mt-5 border-t border-gray-200/80 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400"><Workflow size={13} />制作顺序</div>
-                <div ref={processScrollRef} className="mt-2 flex gap-1.5 overflow-x-auto pb-1" aria-label="当前可见制作步骤预览">
-                  {processSummary.map((step, index) => (
-                    <div key={step.id} className="flex shrink-0 items-center gap-1.5">
-                      <div className={cx('flex min-h-11 min-w-[92px] items-center gap-2 rounded-xl px-3 py-2', STEP_TONE[step.kind], selectedStep?.id === step.id && 'ring-2 ring-primary ring-offset-1')}>
-                        <span className="text-[9px] opacity-65">{String(index + 1).padStart(2, '0')}</span>
-                        <span className="max-w-[110px] truncate text-[10px] font-semibold">{step.name}</span>
-                      </div>
-                      {index < processSummary.length - 1 && <span aria-hidden="true" className="text-gray-300">→</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
+      <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
+        {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}
 
-              <div className="mt-3 flex items-start gap-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5 text-[10px] leading-4 text-gray-500">
-                <Workflow size={14} className="mt-0.5 shrink-0 text-primary" />
-                <p>当前已开放单指完整背景与平面矢量编辑：渐变、整甲猫眼、整甲闪粉、画笔、非破坏橡皮/遮罩、线条、图形、法式与锚点。贴纸、文字、导入、局部效果与 3D 仍未开放。</p>
-              </div>
+        {wideWorkspace && resourcesOpen && <aside className="h-full w-[232px] shrink-0 border-r border-gray-200" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
+
+        <main className="flex min-h-0 min-w-0 flex-1 overflow-auto bg-[#f3f0ee] p-3 sm:p-4" data-testid="v7-canvas-region">
+          <div className="mx-auto flex min-h-full w-full max-w-5xl items-center justify-center">
+            <div className="w-full rounded-[28px] border border-white/80 bg-white/55 p-3 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-5">
+              <EditorCanvasHostV7 />
             </div>
           </div>
         </main>
 
-        <aside className="flex min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-gray-200 bg-white lg:w-[300px] lg:border-l lg:border-t-0 xl:w-[320px]">
-          <LayerPanelV7 />
-        </aside>
+        <EditorWorkspaceSidebarV7 compact={!wideWorkspace} open={workspacePanelOpen} tab={workspacePanelTab} onTabChange={setWorkspacePanelTab} onClose={closeWorkspacePanel} />
+
+        {!wideWorkspace && resourcesOpen && <>
+          <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭资源" onClick={closeResources} />
+          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="资源与预设" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-modal md:inset-y-0 md:left-16 md:right-auto md:h-full md:max-h-none md:w-[280px] md:rounded-none" data-overlay-open="true">
+            <EditorResourceDrawerV7 onClose={closeResources} />
+          </aside>
+        </>}
       </div>
+
+      {dockedTools && <EditorToolRailV7 orientation="horizontal" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}
 
       <footer className="overflow-x-auto border-t border-gray-200 bg-white px-3 py-2" aria-label="选择手指">
         <div className="flex min-w-max items-center justify-center gap-1">

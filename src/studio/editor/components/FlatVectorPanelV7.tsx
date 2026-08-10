@@ -48,7 +48,9 @@ const ELEMENT_LABEL: Record<FlatDesignElementV7['kind'], string> = {
   region_mask: '区域遮罩',
 };
 
-export function FlatVectorPanelV7() {
+export type FlatVectorPanelVariantV7 = 'full' | 'resources' | 'inspector';
+
+export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPanelVariantV7 }) {
   const toast = useToast();
   const step = useEditorV7Store(selectCurrentStepV7);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
@@ -95,6 +97,9 @@ export function FlatVectorPanelV7() {
   const editablePath = selectedElement?.kind === 'vector_shape' || selectedElement?.kind === 'region_mask';
   const selectedLocked = selectedElement?.locked ?? false;
   const canEditSelected = canEdit && Boolean(selectedElement) && !selectedLocked;
+  const showResources = variant === 'full' || variant === 'resources';
+  const showElementList = variant === 'full';
+  const showInspector = variant === 'full' || variant === 'inspector';
 
   const resultToast = (result: { ok: true } | { ok: false; message: string }) => {
     if (!result.ok) toast.error(result.message);
@@ -154,12 +159,12 @@ export function FlatVectorPanelV7() {
 
   return (
     <div className="mt-2 space-y-3 rounded-xl border border-violet-200 bg-violet-50/55 p-3" data-testid="v7-flat-vector-panel">
-      <div>
+      {variant === 'full' && <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-700">平面矢量工具</p>
         <p className="mt-1 text-[10px] leading-4 text-gray-500">仅修改 {currentFinger} · 画布坐标固定为 nail-local 0–1。</p>
-      </div>
+      </div>}
 
-      <div className="grid grid-cols-2 gap-1.5" role="toolbar" aria-label="平面设计工具">
+      {showResources && <div className="grid grid-cols-2 gap-1.5" role="toolbar" aria-label="平面设计工具">
         {TOOL_ITEMS.map(({ tool, label, icon: Icon }) => (
           <button
             key={tool}
@@ -176,9 +181,9 @@ export function FlatVectorPanelV7() {
             <span className="truncate">{label}</span>
           </button>
         ))}
-      </div>
+      </div>}
 
-      <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
+      {showResources && <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
         <legend className="text-[10px] font-semibold text-gray-600">绘制样式</legend>
         <div className="grid grid-cols-5 gap-1.5">
           {PALETTE.slice(0, 5).map((item) => (
@@ -202,9 +207,9 @@ export function FlatVectorPanelV7() {
           </label>
         </div>
         <output className="sr-only" data-flat-color={colorHex} data-flat-width-mm={widthMm} />
-      </fieldset>
+      </fieldset>}
 
-      <div className="rounded-lg border border-gray-200 bg-white p-2">
+      {showElementList && <div className="rounded-lg border border-gray-200 bg-white p-2">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-semibold text-gray-700">元素 · {flatStep.elements.length}</p>
           <button type="button" disabled={!canEditSelected} onClick={() => selectedElement && resultToast(removeElement(currentFinger, flatStep.id, selectedElement.id))} className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-error disabled:opacity-35" aria-label="删除所选元素"><Trash2 size={14} /></button>
@@ -219,9 +224,9 @@ export function FlatVectorPanelV7() {
             </button>
           ))}
         </div>
-      </div>
+      </div>}
 
-      {selectedElement && (
+      {showInspector && selectedElement && (
         <div className="space-y-2 rounded-lg border border-violet-200 bg-white p-2.5">
           <div className="flex items-center gap-2 text-[10px] font-semibold text-violet-800"><Hand size={13} />所选：{ELEMENT_LABEL[selectedElement.kind]}</div>
           <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-[10px] text-gray-600">
@@ -245,9 +250,9 @@ export function FlatVectorPanelV7() {
         </div>
       )}
 
-      <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-[9px] leading-3.5 text-gray-500">
-        橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。贴纸、文字、导入和印章在 V7-08。
-      </p>
+      {showInspector && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-[9px] leading-3.5 text-gray-500">
+        橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。贴纸、文字、导入和印章在 V7-10。
+      </p>}
     </div>
   );
 }

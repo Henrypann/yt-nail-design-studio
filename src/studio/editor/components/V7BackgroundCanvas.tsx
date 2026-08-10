@@ -64,8 +64,8 @@ export function V7BackgroundCanvas() {
 
   return (
     <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(180px,0.8fr)_minmax(180px,1fr)] sm:items-center" data-testid="v7-background-canvas" data-background-mode={preview.mode} data-preview-fidelity={preview.fidelity} data-silhouette-source={silhouette.source}>
-      <div className="relative mx-auto flex h-[280px] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-[28px] border border-white bg-white/75 p-4 shadow-[0_18px_50px_rgba(77,53,67,0.12)]">
-        <svg viewBox={silhouette.viewBox} className="h-full max-h-[248px] w-full" role="img" aria-label={`${currentFinger} ${MODE_LABEL[preview.mode] ?? preview.mode}背景预览`} preserveAspectRatio="xMidYMid meet">
+      <div className="relative mx-auto flex h-[300px] w-full max-w-[240px] items-center justify-center overflow-hidden rounded-[28px] border border-white bg-white/75 p-2 shadow-[0_18px_50px_rgba(77,53,67,0.12)] sm:p-3">
+        <svg viewBox={silhouette.viewBox} className="h-full max-h-[280px] w-full" role="img" aria-label={`${currentFinger} ${MODE_LABEL[preview.mode] ?? preview.mode}背景预览`} preserveAspectRatio="xMidYMid meet">
           <defs>
             <clipPath id={clipId}><path d={silhouette.pathD} /></clipPath>
             <pattern id={gridId} width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#f7f7f8" /><rect width="6" height="6" fill="#e5e7eb" /><rect x="6" y="6" width="6" height="6" fill="#e5e7eb" /></pattern>

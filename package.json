@@ -46,6 +46,7 @@
     "test:editor-v7-migrate": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-migrate.mjs",
     "test:editor-v7-runtime": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-runtime.mjs",
     "test:editor-v7-workspace": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-workspace.mjs",
+    "test:editor-v7-workspace-ia": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-workspace-ia.mjs",
     "test:editor-v7-background": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-background.mjs",
     "test:editor-v7-background-advanced": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-background-advanced.mjs",
     "test:editor-v7-flat-vector": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-flat-vector.mjs",

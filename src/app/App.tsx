@@ -41,10 +41,11 @@ const DevDebugPanel = import.meta.env.DEV
 function RouterChrome() {
   const location = useLocation();
   const internalFixture = location.pathname === '/internal/petal-veil-fixture';
+  const immersiveEditor = location.pathname === Routes.designCanvas;
   return (
     <>
       <Outlet />
-      {DevDebugPanel && !internalFixture && (
+      {DevDebugPanel && !internalFixture && !immersiveEditor && (
         <Suspense fallback={null}>
           <DevDebugPanel />
         </Suspense>
@@ -69,6 +70,8 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.communityContentPath} element={<CommunityContentPage />} />
       <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
     </Route>
+    {/* Editor 使用独立沉浸式工作区；返回入口与安全离开由 EditorShell 负责。 */}
+    <Route path={Routes.designCanvas} element={<EditorPage />} />
     {/* 登录后（侧栏 + 顶栏布局） */}
     <Route element={<AppLayout />}>
       <Route path={Routes.dashboard} element={<DashboardPage />} />
@@ -79,7 +82,6 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.designNew} element={<WizardPage />} />
       <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
       <Route path={Routes.designCommunity} element={<CommunityPage />} />
-      <Route path={Routes.designCanvas} element={<EditorPage />} />
       <Route path={Routes.devices} element={<DeviceListPage />} />
       <Route path={Routes.deviceBind} element={<DeviceBindPage />} />
     </Route>
