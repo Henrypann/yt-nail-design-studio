@@ -10,6 +10,7 @@ import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
 import { EditorStageBarV7 } from './EditorStageBarV7';
 import { EditorToolRailV7 } from './EditorToolRailV7';
 import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
+import { captureCustomerPreviewSessionV7 } from '../v7/customer-preview-session';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -200,6 +201,12 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     if (result === 'error') toast.error(saveError ?? 'V7 保存失败，请重试。');
   };
 
+  const openCustomerPreview = () => {
+    if (saveState !== 'saved' || switching) return;
+    captureCustomerPreviewSessionV7(doc);
+    navigate(`${Routes.designCustomerPreview}?design=${encodeURIComponent(doc.designId)}`);
+  };
+
   const selectStageStep = (stepId: string) => {
     if (selectedStep?.id !== stepId) editorV7Store.getState().selectStep(stepId);
   };
@@ -259,7 +266,15 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         <Button size="sm" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
           <Save size={14} /> {saveState === 'error' ? '重试保存' : '保存'}
         </Button>
-        <Button size="sm" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" variant="secondary" disabled title="顾客全屏预览在 V7-09 开放" aria-label="顾客预览将在 V7-09 开放">
+        <Button
+          size="sm"
+          className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0"
+          variant="secondary"
+          disabled={saveState !== 'saved' || switching}
+          title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
+          aria-label="打开顾客只读预览"
+          onClick={openCustomerPreview}
+        >
           <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
         </Button>
       </header>
@@ -284,7 +299,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </div>
       )}
 
-      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} />
+      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} onOpenCustomerPreview={openCustomerPreview} customerPreviewEnabled={saveState === 'saved' && !switching} />
 
       <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
         {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}

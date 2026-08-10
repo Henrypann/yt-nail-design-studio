@@ -29,7 +29,7 @@ const clone = (value) => structuredClone(value);
     ['customer', false],
   ]);
   assert.equal(stages.find((stage) => stage.id === 'geometry').state, 'attention');
-  assert.equal(stages.find((stage) => stage.id === 'customer').state, 'unavailable');
+  assert.equal(stages.find((stage) => stage.id === 'customer').state, 'empty');
   assert.equal(stages.find((stage) => stage.id === 'finish').state, 'configured');
   console.log('[v7-workspace-ia] deterministic five-stage read model: PASS');
 }

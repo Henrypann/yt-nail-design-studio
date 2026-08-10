@@ -13,6 +13,7 @@ export const Routes = {
   /** @deprecated 兼容旧链；replace → /community/official */
   designCommunity: '/design/community',
   designCanvas: '/design/canvas', // Studio Editor
+  designCustomerPreview: '/design/preview', // V7 顾客只读预览
   devices: '/devices',
   deviceBind: '/devices/bind',
   deviceBindMobile: (token: string) => `/devices/bind/mobile/${token}`,

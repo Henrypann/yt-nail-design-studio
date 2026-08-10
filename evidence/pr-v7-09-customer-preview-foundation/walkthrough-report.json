@@ -1,0 +1,60 @@
+{
+  "pr": "V7-09",
+  "flow": "saved EditorDocV7 -> customer read-only preview -> temporary comparison -> editor",
+  "runtime": "http://127.0.0.1:5210/design/preview?design=design.v7.full",
+  "fixture": {
+    "designId": "design.v7.full",
+    "schemaVersion": 7,
+    "revision": 38
+  },
+  "viewports": {
+    "1440x900": {
+      "mode": "ten-finger",
+      "desktopScenarioPanel": "visible by default and collapsible",
+      "documentOverflowPx": 0
+    },
+    "1280x900": {
+      "mode": "single-finger",
+      "temporaryBackground": "milk",
+      "temporaryFinish": "matte",
+      "revisionAfterComparison": 38
+    },
+    "1024x800": {
+      "mode": "ten-finger",
+      "desktopScenarioPanel": "visible and collapsible",
+      "documentOverflowPx": 0
+    },
+    "768x900": {
+      "mode": "ten-finger",
+      "scenarioPanel": "closed by default; modal bottom sheet when opened"
+    },
+    "390x844": {
+      "mode": "ten-finger and single-finger",
+      "scenarioPanel": "closed by default; one dialog when opened",
+      "escapeCloses": true,
+      "focusRestoredTo": "方案比较",
+      "minimumEnabledTouchTargetPx": 44,
+      "documentOverflowPx": 0
+    }
+  },
+  "persistence": {
+    "sourceRevision": 38,
+    "revisionAfterTemporaryComparison": 38,
+    "repositoryWrites": 0,
+    "previewReadonlyMarker": true
+  },
+  "runtimeErrors": {
+    "pageErrors": 0,
+    "unhandledRejections": 0
+  },
+  "screenshots": [
+    "screenshots/1440-ten-finger.png",
+    "screenshots/1280-single-scenario.png",
+    "screenshots/1024-ten-finger.png",
+    "screenshots/768-ten-finger.png",
+    "screenshots/768-scenario-sheet.png",
+    "screenshots/390-ten-finger.png",
+    "screenshots/390-single-focus.png",
+    "screenshots/390-scenario-sheet.png"
+  ]
+}

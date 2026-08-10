@@ -16,10 +16,14 @@ export function EditorStageBarV7({
   nail,
   selectedStepId,
   onSelectStep,
+  onOpenCustomerPreview,
+  customerPreviewEnabled,
 }: {
   nail: NailDesignV7;
   selectedStepId: string | null;
   onSelectStep(stepId: string): void;
+  onOpenCustomerPreview(): void;
+  customerPreviewEnabled: boolean;
 }) {
   const stages = deriveEditorWorkspaceStagesV7(nail, selectedStepId);
   const moveStageFocus = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -46,7 +50,7 @@ export function EditorStageBarV7({
           const Icon = STAGE_ICON[stage.id];
           const current = stage.active;
           const unavailable = stage.state === 'unavailable';
-          const canNavigate = stage.targetStepId !== null && !unavailable;
+          const canNavigate = (stage.targetStepId !== null || (stage.id === 'customer' && customerPreviewEnabled)) && !unavailable;
           return (
             <li key={stage.id} className="flex items-center">
               <button
@@ -55,7 +59,10 @@ export function EditorStageBarV7({
                 aria-current={current ? 'step' : undefined}
                 aria-label={`${stage.label}：${stage.description}`}
                 title={!canNavigate ? stage.description : `前往${stage.label}`}
-                onClick={() => stage.targetStepId && onSelectStep(stage.targetStepId)}
+                onClick={() => {
+                  if (stage.targetStepId) onSelectStep(stage.targetStepId);
+                  else if (stage.id === 'customer') onOpenCustomerPreview();
+                }}
                 onKeyDown={moveStageFocus}
                 className={cx(
                   'group flex min-h-12 min-w-[142px] items-center gap-2 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
