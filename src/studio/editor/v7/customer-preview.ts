@@ -10,7 +10,7 @@ import type {
   RgbaColorV7,
   SurfaceFinishTypeV7,
 } from './model';
-import { identifyOfficialTemplatePatternV7 } from './official-template-assets';
+import { flatContentAssetStatusV7 } from './flat-content-assets';
 
 export interface CustomerPreviewScenarioV7 {
   backgroundColors: Partial<Record<FingerCode, RgbaColorV7>>;
@@ -77,8 +77,10 @@ export function deriveCustomerNailPreviewV7(
   const flatSteps = visibleMiddle.filter((step) => step.kind === 'flat_design');
   const flatElements = flatSteps.flatMap((step) => step.kind === 'flat_design' ? step.elements.filter((element) => element.visible) : []);
   const unsupportedFlatElements = flatElements.filter((element) => (
-    element.kind === 'text' ||
-    (element.kind === 'image_2d' && !identifyOfficialTemplatePatternV7(element.asset))
+    element.kind === 'image_2d' && flatContentAssetStatusV7(element.asset) === 'invalid'
+  ));
+  const runtimeImportedAssets = flatElements.filter((element) => (
+    element.kind === 'image_2d' && flatContentAssetStatusV7(element.asset) === 'import'
   ));
   const surfaceEffects = visibleMiddle.filter((step) => step.kind === 'surface_effect');
   const decorations = visibleMiddle
@@ -92,8 +94,12 @@ export function deriveCustomerNailPreviewV7(
   fidelity = maxFidelity(fidelity, 'approximate');
   if (!background.visible) warnings.push('背景步骤已隐藏');
   if (unsupportedFlatElements.length > 0) {
-    warnings.push(`${unsupportedFlatElements.length} 个未适配文字/素材元素将在 V7-10 完整呈现`);
+    warnings.push(`${unsupportedFlatElements.length} 个素材引用无效，预览中显示恢复占位`);
     fidelity = 'unavailable';
+  }
+  if (runtimeImportedAssets.length > 0) {
+    warnings.push(`${runtimeImportedAssets.length} 个本机导入素材将在运行时校验；缺失时显示恢复占位`);
+    fidelity = maxFidelity(fidelity, 'approximate');
   }
   if (surfaceEffects.length > 0) {
     warnings.push(`${surfaceEffects.length} 个表面效果仅保留数据，V7-12 提供 2D 预览`);

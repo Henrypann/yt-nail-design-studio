@@ -20,7 +20,7 @@ import {
   starPathDataV7,
   transformNailPointV7,
 } from '../v7/flat-vector';
-import { OfficialTemplatePatternV7 } from './OfficialTemplatePatternV7';
+import { FlatContentArtworkV7, type FlatContentImportResolverV7 } from './FlatContentArtworkV7';
 
 const CANVAS_WIDTH = 100;
 const CANVAS_HEIGHT = 160;
@@ -66,7 +66,7 @@ function transformedElement(element: FlatDesignElementV7, child: ReactNode): Rea
   );
 }
 
-function renderElement(element: FlatDesignElementV7, instanceId: string): ReactNode {
+function renderElement(element: FlatDesignElementV7, instanceId: string, resolveImported: FlatContentImportResolverV7): ReactNode {
   if (!element.visible || element.kind === 'eraser_mask' || element.kind === 'region_mask') return null;
   if (element.kind === 'brush_stroke') {
     return transformedElement(element, <polyline points={canvasPolyline(element.points)} fill="none" stroke={rgba(element.color, element.opacity)} strokeWidth={element.widthMm * MM_TO_CANVAS_UNITS} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />);
@@ -79,10 +79,9 @@ function renderElement(element: FlatDesignElementV7, instanceId: string): ReactN
     const control = Math.min(1, Math.max(0, edge + element.curvature * 0.18));
     return transformedElement(element, <path d={`M0 0 L${CANVAS_WIDTH} 0 L${CANVAS_WIDTH} ${edge * CANVAS_HEIGHT} Q${CANVAS_WIDTH / 2} ${control * CANVAS_HEIGHT} 0 ${edge * CANVAS_HEIGHT} Z`} fill={rgba(element.color, element.opacity)} />);
   }
-  if (element.kind === 'image_2d') {
-    return transformedElement(element, <OfficialTemplatePatternV7 element={element} instanceId={instanceId} />);
+  if (element.kind === 'text' || element.kind === 'image_2d') {
+    return transformedElement(element, <FlatContentArtworkV7 element={element} instanceId={instanceId} resolveImported={resolveImported} />);
   }
-  // Text and imported assets remain non-authorable until V7-10.
   return null;
 }
 
@@ -107,6 +106,7 @@ export function V7FlatDesignCanvas() {
   const addElement = useEditorV7Store((state) => state.addElement);
   const replaceElement = useEditorV7Store((state) => state.replaceFlatElement);
   const setTransform = useEditorV7Store((state) => state.setElementTransform);
+  const resolveFlatAsset = useEditorV7Store((state) => state.resolveFlatAsset);
   const [gesture, setGesture] = useState<DrawState>(null);
   const [draftTransform, setDraftTransform] = useState<Transform2DV7 | null>(null);
   const flatStep = step?.kind === 'flat_design' ? step : null;
@@ -222,7 +222,7 @@ export function V7FlatDesignCanvas() {
   const effectiveElement = (element: FlatDesignElementV7): FlatDesignElementV7 => element.id === selectedElementId && draftTransform ? { ...element, transform: draftTransform } : element;
 
   const renderWithOrderedMasks = (element: FlatDesignElementV7, index: number) => {
-    let node = renderElement(effectiveElement(element), `${rawId}-${index}`);
+    let node = renderElement(effectiveElement(element), `${rawId}-${index}`, resolveFlatAsset);
     if (!node) return null;
     const scope = resolveFlatElementMaskScopeV7(flatStep, index);
     const regionMasks = scope.regionMaskIds.map((id) => flatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => item.id === id && item.kind === 'region_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => Boolean(item));

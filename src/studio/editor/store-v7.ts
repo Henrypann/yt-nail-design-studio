@@ -66,10 +66,12 @@ import {
   addPreparedImportCommand,
   addTextFlatElementCommand,
   relinkImageAssetCommand,
+  replaceTextFlatElementCommand,
 } from './v7/flat-content-commands';
 import {
   createFlatAssetRepositoryV7,
   createLocalFlatAssetStorageV7,
+  type FlatAssetGetResultV7,
   type FlatAssetRepositoryV7,
 } from './v7/flat-content-repository';
 import type {
@@ -79,6 +81,8 @@ import type {
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
+/** Explicit local UI mode for the resource drawer; never part of EditorDocV7. */
+export type EditorResourceModeV7 = 'vector' | 'text' | 'assets';
 export type EditorV7ActionResult =
   | { ok: true }
   | { ok: false; reason: string; message: string };
@@ -105,6 +109,7 @@ export interface EditorV7State {
   selectedStepId: string | null;
   selectedElementId: string | null;
   activeFlatTool: FlatVectorToolV7;
+  resourceMode: EditorResourceModeV7;
   activeFlatColor: RgbaColorV7;
   activeFlatWidthMm: number;
   history: EditorDocV7[];
@@ -127,6 +132,7 @@ export interface EditorV7State {
   selectStep(stepId: string | null): void;
   selectElement(elementId: string | null): void;
   setActiveFlatTool(tool: FlatVectorToolV7): void;
+  setResourceMode(mode: EditorResourceModeV7): void;
   setActiveFlatColor(color: RgbaColorV7): void;
   setActiveFlatWidthMm(widthMm: number): void;
   setTitle(title: string): EditorV7ActionResult;
@@ -153,9 +159,14 @@ export interface EditorV7State {
   replaceFlatElement(finger: FingerCode, stepId: string, elementId: string, replacement: FlatDesignElementV7): EditorV7ActionResult;
   setFlatElementOpacity(finger: FingerCode, stepId: string, elementId: string, opacity: number): EditorV7ActionResult;
   createTextElement(finger: FingerCode, stepId: string, input: Omit<TextFlatElementInputV7, 'id'>): EditorV7ActionResult;
+  replaceTextElement(finger: FingerCode, stepId: string, elementId: string, input: TextFlatElementInputV7): EditorV7ActionResult;
   addBundledImage(finger: FingerCode, stepId: string, bundleId: string): EditorV7ActionResult;
   applyPreparedImport(finger: FingerCode, stepId: string, prepared: FlatAssetPreparedV7): Promise<EditorV7ActionResult>;
   relinkImageAsset(finger: FingerCode, stepId: string, elementId: string, asset: AssetRefV7): Promise<EditorV7ActionResult>;
+  /** Relink an imported image element from a freshly prepared file. */
+  relinkPreparedImageAsset(finger: FingerCode, stepId: string, elementId: string, prepared: FlatAssetPreparedV7): Promise<EditorV7ActionResult>;
+  /** Read-only import resolution; never touches doc/history/revision/autosave. */
+  resolveFlatAsset(ref: AssetRefV7): Promise<FlatAssetGetResultV7>;
 }
 
 const HISTORY_LIMIT = 200;
@@ -239,6 +250,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectedStepId: null,
       selectedElementId: null,
       activeFlatTool: 'select' as FlatVectorToolV7,
+      resourceMode: 'vector' as EditorResourceModeV7,
       activeFlatColor: { colorSpace: 'srgb' as const, r: 173, g: 34, b: 79, a: 1 },
       activeFlatWidthMm: 0.45,
       history: [],
@@ -433,6 +445,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select' }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
       setActiveFlatTool: (tool) => set({ activeFlatTool: tool }),
+      setResourceMode: (mode) => {
+        if (mode === 'vector' || mode === 'text' || mode === 'assets') set({ resourceMode: mode });
+      },
       setActiveFlatColor: (color) => set({ activeFlatColor: clone(color) }),
       setActiveFlatWidthMm: (widthMm) => {
         if (Number.isFinite(widthMm) && widthMm >= 0.01 && widthMm <= 10) set({ activeFlatWidthMm: widthMm });
@@ -474,6 +489,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       replaceFlatElement: (finger, stepId, elementId, replacement) => commitCommand((doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
       setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitCommand((doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
       createTextElement: (finger, stepId, input) => commitCommand((doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
+      replaceTextElement: (finger, stepId, elementId, input) => commitCommand((doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
       addBundledImage: (finger, stepId, bundleId) => commitCommand((doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
       applyPreparedImport: async (finger, stepId, prepared) => {
         const state = get();
@@ -512,6 +528,38 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         }
         return commitCommand((doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
       },
+      relinkPreparedImageAsset: async (finger, stepId, elementId, prepared) => {
+        const state = get();
+        if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
+        if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
+        if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        if (!prepared || typeof prepared !== 'object' || !prepared.asset || typeof prepared.source !== 'string') {
+          return { ok: false, reason: 'invalid_value', message: 'prepared relink payload is not well formed' };
+        }
+        // Precheck gates before touching the repository so common failures
+        // never orphan a stored asset entry; the canonical commit re-checks.
+        const step = state.doc.nails[finger]?.steps.find((candidate) => candidate.id === stepId);
+        if (!step) return { ok: false, reason: 'not_found', message: 'step not found' };
+        if (step.kind !== 'flat_design') return { ok: false, reason: 'not_allowed', message: 'relink requires a flat design step' };
+        if (step.locked) return { ok: false, reason: 'locked', message: 'step is locked' };
+        const element = step.elements.find((candidate) => candidate.id === elementId);
+        if (!element) return { ok: false, reason: 'not_found', message: 'element not found' };
+        if (element.kind !== 'image_2d') return { ok: false, reason: 'not_allowed', message: 'relink requires an image_2d element' };
+        if (element.role !== 'import') {
+          return { ok: false, reason: 'not_allowed', message: 'bundled sticker/stamp relink is not offered in this release' };
+        }
+        if (element.locked) return { ok: false, reason: 'locked', message: 'element is locked' };
+        // Repository write happens BEFORE the canonical commit; a failed write
+        // must never leave a document change behind.
+        const put = await flatAssets.put(prepared.asset, prepared.source);
+        if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
+        const result = commitCommand((doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, prepared.asset));
+        // Known limitation: if the canonical commit fails AFTER a successful
+        // repository write, the orphan asset entry may remain in the flat
+        // asset repository, but EditorDocV7 is guaranteed unchanged.
+        return result;
+      },
+      resolveFlatAsset: async (ref) => flatAssets.get(ref),
     };
   });
 }

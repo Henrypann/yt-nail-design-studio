@@ -262,7 +262,7 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   const sticker = createImageFlatElementV7({ id: 'element.bundled.sticker', role: 'sticker', asset: stickers[0].asset });
   const stamp = createImageFlatElementV7({ id: 'element.bundled.stamp', role: 'stamp', asset: stamps[0].asset });
   assert.ok(sticker && stamp);
-  assert.deepEqual(sticker.transform, IDENTITY_TRANSFORM_V7);
+  assert.deepEqual(sticker.transform, { ...IDENTITY_TRANSFORM_V7, scaleX: 0.42, scaleY: 0.42 });
   const withSticker = addEditorV7Element(inserted.doc, 'L1', 'step.v7-10.flat', sticker);
   const withStamp = addEditorV7Element(withSticker.doc, 'L1', 'step.v7-10.flat', stamp);
   assert.equal(withStamp.ok, true);
@@ -346,6 +346,15 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   assert.equal(prepared.asset.alphaMode, 'straight');
   assert.equal(prepared.source, svgText);
   assert.equal(prepared.asset.sha256, await digest(svgBytes));
+
+  const bomBytes = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(svgText)]);
+  const bomPrepared = await prepareFlatAssetImportV7(source(bomBytes, FLAT_ASSET_MIME_SVG_V7), { digest });
+  assert.equal(bomPrepared.ok, true);
+  assert.equal(bomPrepared.source, svgText);
+  assert.equal(bomPrepared.asset.sha256, await digest(svgBytes));
+  const bomRepo = createFlatAssetRepositoryV7(new MemoryFlatStorage(), { digest });
+  assert.equal((await bomRepo.put(bomPrepared.asset, bomPrepared.source)).ok, true);
+  assert.equal((await bomRepo.get(bomPrepared.asset)).status, 'valid');
 
   const viewBoxOnly = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 24"><rect x="4" y="4" width="40" height="16"/></svg>';
   const vbPrepared = await prepareFlatAssetImportV7(source(new TextEncoder().encode(viewBoxOnly), FLAT_ASSET_MIME_SVG_V7), { digest });
@@ -557,6 +566,8 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   const stamps = flatElements(store).filter((element) => element.kind === 'image_2d' && element.role === 'stamp');
   assert.equal(stamps.length, 2);
   assert.notEqual(stamps[0].id, stamps[1].id);
+  assert.notDeepEqual(stamps[0].transform.position, stamps[1].transform.position);
+  assert.ok(stamps.every((element) => element.transform.scaleX === 0.3 && element.transform.scaleY === 0.3));
   assert.ok(stamps.every((element) => element.asset.mimeType === FLAT_ASSET_MIME_SVG_V7));
 
   const pngPrep = await prepareFlatAssetImportV7(source(pngBytes({ width: 8, height: 8, colorType: 6 }), FLAT_ASSET_MIME_PNG_V7), { digest });
@@ -594,6 +605,38 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   assert.equal((await store.getState().applyPreparedImport('L1', 'step.v7-10.flat', svgPrep2)).reason, 'quota_exceeded');
   assertInvariants(store, invariantBeforeFailures);
   flatStorage.failWrite = null;
+
+  // Text apply preserves structural fields; no-op apply makes zero writes.
+  const originalText = flatElements(store).find((element) => element.kind === 'text');
+  const movedTextTransform = { position: { u: 0.36, v: 0.41 }, scaleX: 1.2, scaleY: 0.9, rotationDeg: 12 };
+  assert.equal(store.getState().setElementTransform('L1', 'step.v7-10.flat', originalText.id, movedTextTransform).ok, true);
+  assert.equal(store.getState().setFlatElementOpacity('L1', 'step.v7-10.flat', originalText.id, 0.64).ok, true);
+  const textBeforeApply = flatElements(store).find((element) => element.id === originalText.id);
+  assert.equal(store.getState().replaceTextElement('L1', 'step.v7-10.flat', originalText.id, { ...textBeforeApply, text: '中英 Nail Art' }).ok, true);
+  const textAfterApply = flatElements(store).find((element) => element.id === originalText.id);
+  assert.equal(textAfterApply.text, '中英 Nail Art');
+  assert.deepEqual(textAfterApply.transform, movedTextTransform);
+  assert.equal(textAfterApply.opacity, 0.64);
+  const noOpTextBefore = captureInvariants(store);
+  assert.equal(store.getState().replaceTextElement('L1', 'step.v7-10.flat', originalText.id, textAfterApply).reason, 'not_allowed');
+  assertInvariants(store, noOpTextBefore);
+
+  // Fresh-file relink preserves image identity/layout; read-only resolution is writer-zero.
+  const importBeforeRelink = flatElements(store).find((element) => element.id === importElement.id);
+  const relinkPrepared = await prepareFlatAssetImportV7(
+    source(new TextEncoder().encode('<svg width="12" height="9"><rect width="12" height="9" fill="#c8365c"/></svg>'), FLAT_ASSET_MIME_SVG_V7),
+    { digest },
+  );
+  assert.deepEqual(await store.getState().relinkPreparedImageAsset('L1', 'step.v7-10.flat', importElement.id, relinkPrepared), { ok: true });
+  const importAfterRelink = flatElements(store).find((element) => element.id === importElement.id);
+  assert.equal(importAfterRelink.id, importBeforeRelink.id);
+  assert.equal(importAfterRelink.role, 'import');
+  assert.deepEqual(importAfterRelink.transform, importBeforeRelink.transform);
+  assert.equal(importAfterRelink.opacity, importBeforeRelink.opacity);
+  assert.equal(importAfterRelink.asset.assetId, relinkPrepared.asset.assetId);
+  const resolveBefore = captureInvariants(store);
+  assert.equal((await store.getState().resolveFlatAsset(importAfterRelink.asset)).status, 'valid');
+  assertInvariants(store, resolveBefore);
 
   // Relink preserves id/role/transform/opacity/visible/locked and swaps only the asset.
   const stickerElement = flatElements(store).find((element) => element.kind === 'image_2d' && element.role === 'sticker');
@@ -662,7 +705,7 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   assert.equal(await reloaded.getState().load(doc.designId), 'ok');
   const reloadedElements = reloaded.getState().doc.nails.L1.steps[1].elements;
   const textElement = reloadedElements.find((element) => element.kind === 'text');
-  assert.equal(textElement.text, '中文文字');
+  assert.equal(textElement.text, '中英 Nail Art');
   assert.equal(textElement.fontRef.id, SANS_FONT.id);
   assert.equal(textElement.fontSizeMm, 2.5);
   assert.equal(reloadedElements.filter((element) => element.kind === 'image_2d' && element.role === 'sticker').length, 1);
@@ -707,6 +750,32 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
 {
   assert.equal(FLAT_ASSETS_STORAGE_KEY_V7, 'nail-studio:editor.v7.flat-assets');
   console.log('[v7-flat-assets] literal flat asset storage key: PASS');
+}
+
+/* ── G10: V7 workspace uses one shared flat-content reader ───────────── */
+
+{
+  const files = Object.fromEntries(await Promise.all([
+    'src/studio/editor/components/EditorToolRailV7.tsx',
+    'src/studio/editor/components/EditorResourceDrawerV7.tsx',
+    'src/studio/editor/components/V7FlatDesignCanvas.tsx',
+    'src/studio/editor/components/CustomerNailPreviewV7.tsx',
+    'src/studio/editor/components/LayerPanelV7.tsx',
+    'src/studio/editor/components/FlatContentArtworkV7.tsx',
+    'src/studio/editor/components/FlatContentResourcesV7.tsx',
+    'src/studio/editor/components/FlatContentInspectorV7.tsx',
+  ].map(async (file) => [file, await readFile(new URL(`../${file}`, import.meta.url), 'utf8')])));
+  assert.match(files['src/studio/editor/components/EditorToolRailV7.tsx'], /setResourceMode\('text'\)/);
+  assert.match(files['src/studio/editor/components/EditorToolRailV7.tsx'], /setResourceMode\('assets'\)/);
+  assert.match(files['src/studio/editor/components/EditorResourceDrawerV7.tsx'], /FlatContentResourcesV7/);
+  assert.match(files['src/studio/editor/components/V7FlatDesignCanvas.tsx'], /FlatContentArtworkV7/);
+  assert.match(files['src/studio/editor/components/CustomerNailPreviewV7.tsx'], /FlatContentArtworkV7/);
+  assert.match(files['src/studio/editor/components/LayerPanelV7.tsx'], /FlatContentInspectorV7/);
+  assert.match(files['src/studio/editor/components/FlatContentArtworkV7.tsx'], /素材缺失/);
+  assert.match(files['src/studio/editor/components/FlatContentArtworkV7.tsx'], /data-font-status/);
+  assert.match(files['src/studio/editor/components/FlatContentResourcesV7.tsx'], /image\/png,image\/svg\+xml/);
+  assert.match(files['src/studio/editor/components/FlatContentInspectorV7.tsx'], /relinkPreparedImageAsset/);
+  console.log('[v7-flat-assets] rail/drawer/canvas/preview/inspector shared-reader wiring: PASS');
 }
 
 function unknownRef(store) {

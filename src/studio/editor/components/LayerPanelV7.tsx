@@ -16,7 +16,7 @@ import {
   Unlock,
 } from 'lucide-react';
 import { Button, cx } from '@/design-system';
-import type { FlatDesignElementV7, ProcessStepV7 } from '../v7/model';
+import type { ProcessStepV7 } from '../v7/model';
 import { PROCESS_STEP_TYPE_IDS_V7, getProcessStepTypeDefinitionV7 } from '../v7/registry';
 import { generateEditorV7Id } from '../v7/id';
 import { getProcessStepWorkspacePolicyV7 } from '../v7/workspace';
@@ -24,6 +24,8 @@ import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../s
 import { V7StepToolGate } from './V7StepToolGate';
 import { BackgroundPanelV7 } from './BackgroundPanelV7';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
+import { FlatContentInspectorV7 } from './FlatContentInspectorV7';
+import { flatElementLabelV7 } from '../v7/flat-content-assets';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -31,16 +33,6 @@ const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   surface_effect: '表面效果层',
   dimensional_decoration: '立体装饰层',
   surface_finish: '表面完成层',
-};
-
-const ELEMENT_LABEL: Record<FlatDesignElementV7['kind'], string> = {
-  brush_stroke: '画笔线条',
-  eraser_mask: '橡皮遮罩',
-  vector_shape: '矢量图形',
-  text: '文字',
-  image_2d: '2D 素材',
-  french_edge: '法式甲缘',
-  region_mask: '区域遮罩',
 };
 
 function stepSummary(step: ProcessStepV7): string {
@@ -146,7 +138,7 @@ function ProcessTreeV7() {
                   <p className="mb-1.5 text-[10px] font-semibold text-violet-700">元素 · {step.elements.length}</p>
                   <div className="max-h-40 space-y-1 overflow-y-auto" aria-label="平面元素列表">
                     {step.elements.length === 0 && <p className="rounded-lg border border-dashed border-violet-200 px-2 py-3 text-center text-[10px] text-gray-400">从左侧工具开始绘制。</p>}
-                    {step.elements.map((element, elementIndex) => <button key={element.id} type="button" aria-current={selectedElementId === element.id ? 'true' : undefined} onClick={() => { selectElement(element.id); setActiveFlatTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{elementIndex + 1}</span><span className="min-w-0 flex-1 truncate">{ELEMENT_LABEL[element.kind]}</span>{element.locked && <Lock size={10} className="text-gray-400" />}</button>)}
+                    {step.elements.map((element, elementIndex) => <button key={element.id} type="button" aria-current={selectedElementId === element.id ? 'true' : undefined} onClick={() => { selectElement(element.id); setActiveFlatTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{elementIndex + 1}</span><span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>{element.locked && <Lock size={10} className="text-gray-400" />}</button>)}
                   </div>
                 </div>}
               </div>}
@@ -174,7 +166,7 @@ function InspectorV7() {
         {selectedStep.kind === 'background'
           ? <BackgroundPanelV7 />
           : selectedStep.kind === 'flat_design'
-            ? <FlatVectorPanelV7 variant="inspector" />
+            ? <><FlatVectorPanelV7 variant="inspector" /><FlatContentInspectorV7 /></>
             : definition
               ? <V7StepToolGate tools={definition.allowedTools} />
               : <p className="text-xs text-gray-500">当前步骤没有可用属性。</p>}

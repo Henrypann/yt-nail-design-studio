@@ -130,6 +130,7 @@ export {
   FLAT_BUNDLED_ASSET_REGISTRY_V7,
   FLAT_FONT_REGISTRY_V7,
   FLAT_FONT_REVISION_V1_V7,
+  FLAT_SYSTEM_SANS_FALLBACK_CSS_V7,
   FLAT_IMAGE_ROLES_V7,
   FLAT_TEXT_FONT_SIZE_MAX_MM_V7,
   FLAT_TEXT_FONT_SIZE_MIN_MM_V7,
@@ -139,6 +140,8 @@ export {
   createTextFlatElementV7,
   flatAssetSourcePayloadBytesV7,
   flatAssetSourceSha256V7,
+  flatContentAssetStatusV7,
+  flatElementLabelV7,
   getBundledFlatAssetV7,
   isFlatImageRoleCompatibleV7,
   isRegisteredFontV7,
@@ -147,6 +150,7 @@ export {
   relinkImageFlatElementV7,
   resolveBundledFlatAssetV7,
   resolveFontCssFamilyV7,
+  shortAssetIdV7,
   validateSvgSourceV7,
   validateFlatAssetSourceV7,
 } from './v7/flat-content-assets';
@@ -159,6 +163,7 @@ export type {
   FlatAssetPrepareOptionsV7,
   FlatAssetPrepareResultV7,
   FlatAssetSourceValidationV7,
+  FlatContentAssetStatusV7,
   FlatAssetRoleV7,
   FlatFontEntryV7,
   ImageFlatElementInputV7,
@@ -187,6 +192,7 @@ export {
   addPreparedImportCommand,
   addTextFlatElementCommand,
   relinkImageAssetCommand,
+  replaceTextFlatElementCommand,
 } from './v7/flat-content-commands';
 export type {
   BackgroundPreviewModelV7,

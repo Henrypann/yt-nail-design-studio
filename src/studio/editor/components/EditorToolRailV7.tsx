@@ -54,8 +54,10 @@ export function EditorToolRailV7({
   const nail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
   const activeFlatTool = useEditorV7Store((state) => state.activeFlatTool);
+  const resourceMode = useEditorV7Store((state) => state.resourceMode);
   const selectStep = useEditorV7Store((state) => state.selectStep);
   const setActiveFlatTool = useEditorV7Store((state) => state.setActiveFlatTool);
+  const setResourceMode = useEditorV7Store((state) => state.setResourceMode);
   const horizontal = orientation === 'horizontal';
   if (!nail) return null;
 
@@ -82,7 +84,16 @@ export function EditorToolRailV7({
     if (targetStepId) selectStep(targetStepId);
     const flatTool = TOOL_META[id].flatTool;
     if (flatTool) setActiveFlatTool(flatTool);
-    if (id === 'background' || flatTool) onOpenResources();
+    if (id === 'text') {
+      setResourceMode('text');
+      onOpenResources();
+    } else if (id === 'assets') {
+      setResourceMode('assets');
+      onOpenResources();
+    } else if (id === 'background' || flatTool) {
+      setResourceMode('vector');
+      onOpenResources();
+    }
   };
 
   return (
@@ -99,6 +110,8 @@ export function EditorToolRailV7({
         const Icon = meta.icon;
         const active = tool.id === 'background'
           ? selectedStep?.kind === 'background'
+          : tool.id === 'text' || tool.id === 'assets'
+            ? selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id
           : meta.flatTool !== undefined && selectedStep?.kind === 'flat_design' && activeFlatTool === meta.flatTool;
         return (
           <button

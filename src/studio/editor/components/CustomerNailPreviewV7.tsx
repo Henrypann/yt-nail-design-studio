@@ -17,7 +17,7 @@ import type {
 } from '../v7/model';
 import { parseNailPathDataV7, resolveFlatElementMaskScopeV7 } from '../v7/flat-vector';
 import type { CustomerNailPreviewReadModelV7 } from '../v7/customer-preview';
-import { OfficialTemplatePatternV7 } from './OfficialTemplatePatternV7';
+import { FlatContentArtworkV7 } from './FlatContentArtworkV7';
 
 const CANVAS_WIDTH = 100;
 const CANVAS_HEIGHT = 160;
@@ -82,8 +82,8 @@ function renderElement(element: FlatDesignElementV7, instanceId: string): ReactN
     const control = Math.min(1, Math.max(0, edge + element.curvature * 0.18));
     return transformedElement(element, <path d={`M0 0 L${CANVAS_WIDTH} 0 L${CANVAS_WIDTH} ${edge * CANVAS_HEIGHT} Q${CANVAS_WIDTH / 2} ${control * CANVAS_HEIGHT} 0 ${edge * CANVAS_HEIGHT} Z`} fill={rgba(element.color, element.opacity)} />);
   }
-  if (element.kind === 'image_2d') {
-    return transformedElement(element, <OfficialTemplatePatternV7 element={element} instanceId={instanceId} />);
+  if (element.kind === 'text' || element.kind === 'image_2d') {
+    return transformedElement(element, <FlatContentArtworkV7 element={element} instanceId={instanceId} />);
   }
   return null;
 }

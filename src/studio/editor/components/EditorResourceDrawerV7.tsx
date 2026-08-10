@@ -4,6 +4,7 @@ import { PALETTE } from '../lib/material';
 import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { parseHexColorV7 } from '../v7/background';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
+import { FlatContentResourcesV7 } from './FlatContentResourcesV7';
 
 export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
   const toast = useToast();
@@ -11,6 +12,7 @@ export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const resourceMode = useEditorV7Store((state) => state.resourceMode);
   const setBackgroundColor = useEditorV7Store((state) => state.setBackgroundColor);
   const canSetBackgroundColor = selectedStep?.kind === 'background'
     && (selectedStep.background.mode === 'solid' || selectedStep.background.mode === 'translucent')
@@ -36,7 +38,8 @@ export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        {selectedStep?.kind === 'flat_design' && <FlatVectorPanelV7 variant="resources" />}
+        {selectedStep?.kind === 'flat_design' && resourceMode === 'vector' && <FlatVectorPanelV7 variant="resources" />}
+        {selectedStep?.kind === 'flat_design' && resourceMode !== 'vector' && <FlatContentResourcesV7 mode={resourceMode} />}
 
         {selectedStep?.kind === 'background' && <div className="space-y-3">
           <div>

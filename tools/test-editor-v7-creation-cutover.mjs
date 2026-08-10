@@ -185,11 +185,13 @@ assert.equal(classifyEditorDocSchemaVersion(8).kind, 'unsupported');
 const editorPageSource = await readFile(path.join(root, 'src/app/pages/design/EditorPage.tsx'), 'utf8');
 const bridgeSource = await readFile(path.join(root, 'src/studio/bridge/index.ts'), 'utf8');
 const flatCanvasSource = await readFile(path.join(root, 'src/studio/editor/components/V7FlatDesignCanvas.tsx'), 'utf8');
+const flatArtworkSource = await readFile(path.join(root, 'src/studio/editor/components/FlatContentArtworkV7.tsx'), 'utf8');
 assert.match(editorPageSource, /if \(v7Enabled\)[\s\S]*createBlankEditorDesignV7/);
 assert.match(editorPageSource, /setParams\(\{ design: designId \}/);
 assert.doesNotMatch(editorPageSource, /acknowledgeBridge[\s\S]{0,250}loadV6/);
 assert.match(bridgeSource, /openBridgeV7WithDeps/);
 assert.match(bridgeSource, /v7_content_not_supported[\s\S]*openBridgeWithDeps/);
-assert.match(flatCanvasSource, /OfficialTemplatePatternV7/);
+assert.match(flatCanvasSource, /FlatContentArtworkV7/);
+assert.match(flatArtworkSource, /OfficialTemplatePatternV7/);
 
 console.log('[editor-v7-creation-cutover] 84 assets + creation + geometry + bridge compatibility: PASS');

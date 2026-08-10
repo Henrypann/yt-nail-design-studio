@@ -6,6 +6,7 @@ import type {
 } from './model';
 import { isCanonicalRgbaColorV7 } from './background';
 import { IDENTITY_TRANSFORM_V7 } from './flat-vector';
+import { identifyOfficialTemplatePatternV7 } from './official-template-assets';
 
 /**
  * V7-10 flat content assets: deterministic font registry, bundled sticker/stamp
@@ -37,6 +38,10 @@ const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 
 /* ── deterministic font registry ──────────────────────────────────────── */
 
+/** Documented system-sans fallback used when a text fontRef is unregistered. */
+export const FLAT_SYSTEM_SANS_FALLBACK_CSS_V7 =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif";
+
 export interface FlatFontEntryV7 {
   id: string;
   revision: string;
@@ -52,7 +57,7 @@ export const FLAT_FONT_REGISTRY_V7: readonly FlatFontEntryV7[] = [
     revision: FLAT_FONT_REVISION_V1_V7,
     label: '系统无衬线',
     category: 'sans',
-    cssFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+    cssFamily: FLAT_SYSTEM_SANS_FALLBACK_CSS_V7,
   },
   {
     id: 'font.builtin.system-serif',
@@ -224,6 +229,7 @@ export function createImageFlatElementV7(input: ImageFlatElementInputV7): FlatDe
   if (!FLAT_IMAGE_ROLES_V7.includes(input.role)) return null;
   if (!isValidFlatAssetRefV7(input.asset)) return null;
   if (!isFlatImageRoleCompatibleV7(input.role, input.asset)) return null;
+  const defaultScale = input.role === 'import' ? 0.72 : input.role === 'sticker' ? 0.42 : 0.3;
   return {
     id: input.id,
     kind: 'image_2d',
@@ -231,7 +237,11 @@ export function createImageFlatElementV7(input: ImageFlatElementInputV7): FlatDe
     visible: true,
     locked: false,
     opacity: 1,
-    transform: structuredClone(IDENTITY_TRANSFORM_V7),
+    transform: {
+      ...structuredClone(IDENTITY_TRANSFORM_V7),
+      scaleX: defaultScale,
+      scaleY: defaultScale,
+    },
     asset: structuredClone(input.asset),
   };
 }
@@ -659,9 +669,17 @@ export async function prepareFlatAssetImportV7(
   }
 
   const digest = options.digest ?? createDefaultFlatAssetDigestV7;
+  // Hash the exact payload that the repository persists and revalidates. For
+  // SVG this deliberately canonicalizes a UTF-8 BOM away during decode, so a
+  // valid imported file cannot become corrupt merely because the stored text
+  // is later encoded again.
+  const persistedPayload = flatAssetSourcePayloadV7(input.type, source);
+  if (!persistedPayload) {
+    return { ok: false, reason: 'hash_invalid', message: 'prepared source payload could not be encoded' };
+  }
   let sha256: string;
   try {
-    sha256 = await digest(bytes);
+    sha256 = await digest(persistedPayload);
   } catch (error) {
     return { ok: false, reason: 'hash_invalid', message: error instanceof Error ? error.message : 'digest failed' };
   }
@@ -732,3 +750,41 @@ export async function validateFlatAssetSourceV7(
 }
 
 export type FlatAssetPreparedV7 = Extract<FlatAssetPrepareResultV7, { ok: true }>;
+
+/* ── display helpers (derived views only, never canonical) ───────────── */
+
+/** Shortened asset id for recovery placeholders and read-only metadata. */
+export function shortAssetIdV7(assetId: string): string {
+  if (typeof assetId !== 'string' || assetId.length <= 16) return typeof assetId === 'string' ? assetId : 'unknown';
+  return `${assetId.slice(0, 12)}…${assetId.slice(-4)}`;
+}
+
+/** Deterministic element label used by layer trees and inspectors. */
+export function flatElementLabelV7(element: FlatDesignElementV7): string {
+  switch (element.kind) {
+    case 'brush_stroke': return '画笔线条';
+    case 'eraser_mask': return '橡皮遮罩';
+    case 'vector_shape': return '矢量图形';
+    case 'text': return '文字';
+    case 'image_2d': {
+      if (element.role === 'sticker') return '贴纸';
+      if (element.role === 'import') return '导入素材';
+      return '印章';
+    }
+    case 'french_edge': return '法式甲缘';
+    case 'region_mask': return '区域遮罩';
+  }
+}
+
+export type FlatContentAssetStatusV7 = 'official' | 'bundled' | 'import' | 'invalid';
+
+/**
+ * Synchronous classification used by renderers and inspectors:
+ * official template (checksum) > bundled registry > valid flat import ref.
+ * Everything else is unresolvable and must render the recovery placeholder.
+ */
+export function flatContentAssetStatusV7(asset: AssetRefV7): FlatContentAssetStatusV7 {
+  if (identifyOfficialTemplatePatternV7(asset)) return 'official';
+  if (resolveBundledFlatAssetV7(asset)) return 'bundled';
+  return isValidFlatAssetRefV7(asset) ? 'import' : 'invalid';
+}

@@ -17,7 +17,7 @@ import { cx, useToast } from '@/design-system';
 import { PALETTE } from '../lib/material';
 import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { generateEditorV7Id } from '../v7/id';
-import type { FlatDesignElementV7 } from '../v7/model';
+import { flatElementLabelV7 } from '../v7/flat-content-assets';
 import {
   createFrenchFlatElementV7,
   isValidNailPathDataV7,
@@ -37,16 +37,6 @@ const TOOL_ITEMS: Array<{ tool: FlatVectorToolV7; label: string; icon: typeof Mo
   { tool: 'region_mask', label: '区域遮罩', icon: Scissors },
   { tool: 'anchor', label: '锚点编辑', icon: Focus },
 ];
-
-const ELEMENT_LABEL: Record<FlatDesignElementV7['kind'], string> = {
-  brush_stroke: '画笔线条',
-  eraser_mask: '橡皮遮罩',
-  vector_shape: '矢量图形',
-  text: '文字（V7-08）',
-  image_2d: '2D 素材（V7-08）',
-  french_edge: '法式甲缘',
-  region_mask: '区域遮罩',
-};
 
 export type FlatVectorPanelVariantV7 = 'full' | 'resources' | 'inspector';
 
@@ -219,7 +209,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
           {flatStep.elements.map((element, index) => (
             <button key={element.id} type="button" onClick={() => { selectElement(element.id); setActiveTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-gray-50')}>
               <span className="w-5 tabular-nums text-gray-400">{index + 1}</span>
-              <span className="min-w-0 flex-1 truncate">{ELEMENT_LABEL[element.kind]}</span>
+              <span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>
               {element.locked && <span className="text-[9px] text-gray-400">锁定</span>}
             </button>
           ))}
@@ -228,7 +218,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
 
       {showInspector && selectedElement && (
         <div className="space-y-2 rounded-lg border border-violet-200 bg-white p-2.5">
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-violet-800"><Hand size={13} />所选：{ELEMENT_LABEL[selectedElement.kind]}</div>
+          <div className="flex items-center gap-2 text-[10px] font-semibold text-violet-800"><Hand size={13} />所选：{flatElementLabelV7(selectedElement)}</div>
           <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-[10px] text-gray-600">
             透明度
             <input type="range" min="0" max="100" step="1" value={opacityDraft} disabled={!canEditSelected} onChange={(event) => setOpacityDraft(Number(event.target.value))} onPointerUp={commitOpacity} onKeyUp={commitOpacity} onBlur={commitOpacity} className="h-11 w-full accent-violet-600 disabled:opacity-40" />
@@ -251,7 +241,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
       )}
 
       {showInspector && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-[9px] leading-3.5 text-gray-500">
-        橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。贴纸、文字、导入和印章在 V7-10。
+        橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。文字与素材的专属属性在下方检查器中编辑。
       </p>}
     </div>
   );
