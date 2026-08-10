@@ -9,6 +9,8 @@ export { EditorShellV7 } from './components/EditorShellV7';
 export { LayerPanelV7 } from './components/LayerPanelV7';
 export { BackgroundPanelV7 } from './components/BackgroundPanelV7';
 export { V7BackgroundCanvas } from './components/V7BackgroundCanvas';
+export { FlatVectorPanelV7 } from './components/FlatVectorPanelV7';
+export { V7FlatDesignCanvas } from './components/V7FlatDesignCanvas';
 export { useEditorStore } from './store';
 export { useEditorV6Store } from './store-v6';
 export * from './lib/model';
@@ -90,6 +92,33 @@ export {
   setEditorV7GradientDirection,
   setEditorV7GradientStops,
 } from './v7/background';
+export {
+  FLAT_VECTOR_TOOLS_V7,
+  IDENTITY_TRANSFORM_V7,
+  circlePathDataV7,
+  createFrenchFlatElementV7,
+  createPointerFlatElementV7,
+  createRegionMaskFlatElementV7,
+  createVectorFlatElementV7,
+  inverseTransformNailPointV7,
+  isClosedNailPathDataV7,
+  isDrawableNailPathDataV7,
+  isValidNailPathDataV7,
+  linePathDataV7,
+  mapNailPathDataV7,
+  moveNailPathAnchorV7,
+  nailPathAnchorsV7,
+  normalizePointerPointsV7,
+  parseNailPathDataV7,
+  rectanglePathDataV7,
+  resolveFlatElementMaskScopeV7,
+  replaceEditorV7FlatElement,
+  serializeNailPathDataV7,
+  setEditorV7FlatElementOpacity,
+  starPathDataV7,
+  transformNailPointV7,
+} from './v7/flat-vector';
+export type { FlatVectorToolV7, ParsedNailPathV7 } from './v7/flat-vector';
 export type {
   BackgroundPreviewModelV7,
   EditorV7CatEyeParametersV7,

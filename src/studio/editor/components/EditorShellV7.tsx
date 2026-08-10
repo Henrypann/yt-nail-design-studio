@@ -7,6 +7,7 @@ import { FINGER_CODES } from '@/lib/types';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { LayerPanelV7 } from './LayerPanelV7';
 import { V7BackgroundCanvas } from './V7BackgroundCanvas';
+import { V7FlatDesignCanvas } from './V7FlatDesignCanvas';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -191,11 +192,11 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </div>
       )}
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:h-0 lg:overflow-hidden lg:flex-row">
         <main className="flex min-h-[420px] min-w-0 flex-1 flex-col overflow-auto bg-[#f5f2f0] p-3 sm:p-5 lg:min-h-0">
           <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
             <div className="rounded-[28px] border border-white bg-white/65 p-4 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-6">
-              <V7BackgroundCanvas />
+              {selectedStep?.kind === 'flat_design' ? <V7FlatDesignCanvas /> : <V7BackgroundCanvas />}
 
               <div className="mt-5 border-t border-gray-200/80 pt-4">
                 <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400"><Workflow size={13} />制作顺序</div>
@@ -214,13 +215,13 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
 
               <div className="mt-3 flex items-start gap-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5 text-[10px] leading-4 text-gray-500">
                 <Workflow size={14} className="mt-0.5 shrink-0 text-primary" />
-                <p>V7-06 已开放单指完整背景：单色、透色、渐变、整甲猫眼、整甲闪粉与主题配色。局部效果、画笔与 3D 仍未开放。</p>
+                <p>当前已开放单指完整背景与平面矢量编辑：渐变、整甲猫眼、整甲闪粉、画笔、非破坏橡皮/遮罩、线条、图形、法式与锚点。贴纸、文字、导入、局部效果与 3D 仍未开放。</p>
               </div>
             </div>
           </div>
         </main>
 
-        <aside className="min-h-0 w-full shrink-0 border-t border-gray-200 bg-white lg:w-[300px] lg:border-l lg:border-t-0 xl:w-[320px]">
+        <aside className="flex min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-gray-200 bg-white lg:w-[300px] lg:border-l lg:border-t-0 xl:w-[320px]">
           <LayerPanelV7 />
         </aside>
       </div>

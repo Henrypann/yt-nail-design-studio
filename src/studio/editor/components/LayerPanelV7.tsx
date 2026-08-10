@@ -25,6 +25,7 @@ import { getProcessStepWorkspacePolicyV7 } from '../v7/workspace';
 import { selectCurrentNailV7, useEditorV7Store } from '../store-v7';
 import { V7StepToolGate } from './V7StepToolGate';
 import { BackgroundPanelV7 } from './BackgroundPanelV7';
+import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -90,7 +91,7 @@ export function LayerPanelV7() {
   };
 
   return (
-    <section className="flex min-h-0 flex-col" aria-label={`${currentFinger} 制作步骤`} data-testid="v7-layer-panel">
+    <section className="flex min-h-0 flex-1 flex-col" aria-label={`${currentFinger} 制作步骤`} data-testid="v7-layer-panel">
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-3">
         <div>
           <div className="flex items-center gap-2">
@@ -104,7 +105,7 @@ export function LayerPanelV7() {
         </Button>
       </div>
 
-      <ol className="min-h-0 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
+      <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
         {nail.steps.map((step, index) => {
           const definition = getProcessStepTypeDefinitionV7(step.typeId);
           if (!definition) return null;
@@ -164,6 +165,8 @@ export function LayerPanelV7() {
                   {selected && (
                     step.kind === 'background'
                       ? <BackgroundPanelV7 />
+                      : step.kind === 'flat_design'
+                        ? <FlatVectorPanelV7 />
                       : <div className="mt-2"><V7StepToolGate tools={definition.allowedTools} /></div>
                   )}
                 </div>

@@ -55,6 +55,11 @@ import {
   type EditorV7GlitterParametersV7,
   type EditorV7PaletteThemeV7,
 } from './v7/background';
+import {
+  type FlatVectorToolV7,
+  replaceEditorV7FlatElement,
+  setEditorV7FlatElementOpacity,
+} from './v7/flat-vector';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -82,6 +87,9 @@ export interface EditorV7State {
   currentFinger: FingerCode;
   selectedStepId: string | null;
   selectedElementId: string | null;
+  activeFlatTool: FlatVectorToolV7;
+  activeFlatColor: RgbaColorV7;
+  activeFlatWidthMm: number;
   history: EditorDocV7[];
   future: EditorDocV7[];
   saveState: EditorV7SaveState;
@@ -101,6 +109,9 @@ export interface EditorV7State {
   setCurrentFinger(finger: FingerCode): void;
   selectStep(stepId: string | null): void;
   selectElement(elementId: string | null): void;
+  setActiveFlatTool(tool: FlatVectorToolV7): void;
+  setActiveFlatColor(color: RgbaColorV7): void;
+  setActiveFlatWidthMm(widthMm: number): void;
   setTitle(title: string): EditorV7ActionResult;
   setBackgroundMode(finger: FingerCode, mode: EditorV7BackgroundModeV7): EditorV7ActionResult;
   setBackgroundColor(finger: FingerCode, color: RgbaColorV7): EditorV7ActionResult;
@@ -122,6 +133,8 @@ export interface EditorV7State {
   removeElement(finger: FingerCode, stepId: string, elementId: string): EditorV7ActionResult;
   setElementFlag(finger: FingerCode, stepId: string, elementId: string, flag: 'visible' | 'locked', value: boolean): EditorV7ActionResult;
   setElementTransform(finger: FingerCode, stepId: string, elementId: string, transform: Transform2DV7): EditorV7ActionResult;
+  replaceFlatElement(finger: FingerCode, stepId: string, elementId: string, replacement: FlatDesignElementV7): EditorV7ActionResult;
+  setFlatElementOpacity(finger: FingerCode, stepId: string, elementId: string, opacity: number): EditorV7ActionResult;
 }
 
 const HISTORY_LIMIT = 200;
@@ -203,6 +216,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       currentFinger: 'R4' as FingerCode,
       selectedStepId: null,
       selectedElementId: null,
+      activeFlatTool: 'select' as FlatVectorToolV7,
+      activeFlatColor: { colorSpace: 'srgb' as const, r: 173, g: 34, b: 79, a: 1 },
+      activeFlatWidthMm: 0.45,
       history: [],
       future: [],
       saveState: 'saved' as EditorV7SaveState,
@@ -392,8 +408,13 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         const first = get().doc?.nails[finger].steps[0]?.id ?? null;
         set({ currentFinger: finger, selectedStepId: first, selectedElementId: null });
       },
-      selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null }),
+      selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select' }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
+      setActiveFlatTool: (tool) => set({ activeFlatTool: tool }),
+      setActiveFlatColor: (color) => set({ activeFlatColor: clone(color) }),
+      setActiveFlatWidthMm: (widthMm) => {
+        if (Number.isFinite(widthMm) && widthMm >= 0.01 && widthMm <= 10) set({ activeFlatWidthMm: widthMm });
+      },
       setTitle: (title) => commitCommand((doc) => ({ ok: true, doc: { ...doc, title } })),
       setBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7BackgroundMode(doc, finger, mode)),
       setBackgroundColor: (finger, color) => commitCommand((doc) => setEditorV7BackgroundColor(doc, finger, color)),
@@ -420,9 +441,16 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       duplicateStep: (finger, stepId) => commitCommand((doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
       setStepFlag: (finger, stepId, flag, value) => commitCommand((doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
       addElement: (finger, stepId, element) => commitCommand((doc) => addEditorV7Element(doc, finger, stepId, element)),
-      removeElement: (finger, stepId, elementId) => commitCommand((doc) => removeEditorV7Element(doc, finger, stepId, elementId)),
+      removeElement: (finger, stepId, elementId) => {
+        const wasSelected = get().selectedElementId === elementId;
+        const result = commitCommand((doc) => removeEditorV7Element(doc, finger, stepId, elementId));
+        if (result.ok && wasSelected) set({ selectedElementId: null });
+        return result;
+      },
       setElementFlag: (finger, stepId, elementId, flag, value) => commitCommand((doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
       setElementTransform: (finger, stepId, elementId, transform) => commitCommand((doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
+      replaceFlatElement: (finger, stepId, elementId, replacement) => commitCommand((doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
+      setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitCommand((doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
     };
   });
 }
