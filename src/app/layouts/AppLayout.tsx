@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
-import { Routes } from '@/app/routes';
+import { designNewFresh, Routes } from '@/app/routes';
 import { communityHref } from '@/community/lib/entry-link';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
@@ -84,7 +84,7 @@ export function AppLayout() {
       label: 'Studio',
       icon: Palette,
       items: [
-        { to: '/design/new', label: text('新建设计', 'New design') },
+        { to: designNewFresh(), label: text('新建设计', 'New design') },
         { to: '/design', label: text('我的设计', 'My designs'), end: true },
       ],
     },

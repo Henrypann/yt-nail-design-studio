@@ -1,6 +1,7 @@
 /** PR-06 behavioral gate: manifest, GLB integrity, V6 selection, lazy fallback. */
 
 import { strict as assert } from 'node:assert';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 const {
@@ -22,7 +23,8 @@ assert.match(petalPreviewSource, /重试模拟 3D/);
 const fixtureResult = validateAssetManifest(fixture);
 assert.equal(fixtureResult.ok, true, fixtureResult.ok ? '' : fixtureResult.errors.join('\n'));
 assert.equal(fixture.rendererAdapters.length, 2, 'both reference recipes need data-driven adapter descriptors');
-assert.ok(fixture.assets.every((asset) => asset.evidence === 'MISSING'));
+assert.equal(fixture.assets.filter((asset) => asset.evidence === 'SIMULATED').length, 10);
+assert.equal(fixture.assets.filter((asset) => asset.evidence === 'MISSING').length, 1);
 assert.ok(fixture.assets.every((asset) => asset.manufacturingValidated === false));
 
 function clone(value) {
@@ -126,6 +128,23 @@ assert.equal(missing.kind, 'fallback_2d');
 assert.equal(missing.reason, 'missing_asset');
 assert.equal(missing.rendererId, 'svg-2.5d/mercury-1');
 assert.equal(moduleLoads, 0, 'missing assets must short-circuit before renderer import');
+
+const verifiedMercury = await resolveRenderer(
+  fixture,
+  { recipeRef: { id: 'mercury-dew', version: '1.0.0' }, screenCoveragePx: 800 },
+  {
+    fetchBytes: async (assetPath) => {
+      const bytes = await readFile(new URL(`..${assetPath}`, import.meta.url));
+      return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    },
+    digestSha256: async (bytes) => createHash('sha256').update(new Uint8Array(bytes)).digest('hex'),
+    moduleLoaders: neverLoad,
+  },
+);
+assert.equal(verifiedMercury.kind, 'adapter_loaded');
+assert.equal(verifiedMercury.assets.length, 10);
+assert.equal(moduleLoads, 1);
+moduleLoads = 0;
 
 const starfishMissing = await resolveRenderer(fixture, { recipeRef: { id: 'starfish-bloom-elegance', version: '1.0.0' }, screenCoveragePx: 800 });
 assert.equal(starfishMissing.kind, 'fallback_2d');

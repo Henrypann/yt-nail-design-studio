@@ -395,8 +395,13 @@ export const useWizardStore = create<WizardState>((set, get) => {
         viewMode: petalP0 ? 'tiled' : get().viewMode,
         recipe: petalP0
           ? createPetalVeilInstance()
-          : t.name.includes('Mercury Dew') || t.id === 't_mercury_dew_concept'
-            ? createMercuryInstance('signature', t.default_base_color)
+          : t.recipe_ref?.id === 'mercury-dew'
+            ? createMercuryInstance(
+                t.recipe_ref.preset_id === 'subtle' || t.recipe_ref.preset_id === 'statement'
+                  ? t.recipe_ref.preset_id
+                  : 'signature',
+                t.default_base_color,
+              )
             : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存

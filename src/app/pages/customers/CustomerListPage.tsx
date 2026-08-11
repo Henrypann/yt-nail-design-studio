@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, Users } from 'lucide-react';
 import { Badge, Button, EmptyState, Input, SkeletonRows } from '@/design-system';
 import { useToast } from '@/design-system';
-import { Routes } from '@/app/routes';
+import { designNewFresh, Routes } from '@/app/routes';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import {
   searchCustomers,
@@ -168,7 +168,7 @@ export default function CustomerListPage() {
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`${Routes.designNew}?customerId=${customer.id}`);
+                          navigate(designNewFresh(customer.id));
                         }}
                       >
                         新建设计

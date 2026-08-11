@@ -8,11 +8,11 @@
  * 右：常驻单指详情（≥240px）+ 参数 + 操作
  * 导出/缩略图：隐藏挂载的整幅 plate 实例为唯一注册源（与当前视图无关，导出语义稳定）。
  * 顶栏 [修改]：预览区收缩为一行摘要条 → 甲型/长度重新选择 → [应用→重新生成]；
- * 底部 [打开自由画布]：openBridge(designId)（已桥接则续进画布，见 @/studio/bridge）。
+ * 底部 [进入 Editor]：openBridge(designId)（首次创建或继续同一 EditorDoc，见 @/studio/bridge）。
  */
 
 import { Button, useToast, cx } from '@/design-system';
-import { Presentation } from 'lucide-react';
+import { ArrowRight, Presentation, Sparkles } from 'lucide-react';
 import { TenFingerPreview } from '@/studio/preview/TenFingerPreview';
 import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
 import { SingleNailView } from '@/studio/preview/SingleNailView';
@@ -85,7 +85,7 @@ export function StepTwo() {
     s.setPresentNudge(false);
   };
 
-  /** [打开自由画布]：等待进行中的自动保存 → 确保已保存 → openBridge（首次转化+警告 / 已桥接续进） */
+  /** [进入 Editor]：等待自动保存 → openBridge（首次创建 / 已存在则继续） */
   const handleOpenBridge = async () => {
     if (bridging || readOnly) return;
     setBridging(true);
@@ -100,7 +100,7 @@ export function StepTwo() {
       if (st().saveState !== 'saved') {
         const saved = await st().saveNow();
         if (!saved) {
-          toast.error('保存失败，无法打开自由画布。请重试。');
+          toast.error('保存失败，无法进入 Editor。请重试。');
           return;
         }
       }
@@ -112,10 +112,10 @@ export function StepTwo() {
             ? '画布数据无效，原始数据已保留。'
             : result.reason === 'save_failed'
               ? '画布保存失败，未进行跳转。'
+              : result.reason === 'v7_content_not_supported'
+                ? `该设计暂不能无损转换到 V7：${result.message ?? '请更换受支持的模板或效果。'}`
               : '设计数据缺失，无法打开自由画布。';
         toast.error(message);
-      } else if (result.compatibilityWarning) {
-        toast.warning('该设计包含 V7 尚未覆盖的内容，将使用 V6 兼容画布并完整保留数据。');
       }
     } finally {
       setBridging(false);
@@ -164,7 +164,7 @@ export function StepTwo() {
           : 'lg:grid-cols-[240px_minmax(0,1fr)_300px]',
       )}>
         {/* 左：模板库（窄栏 · 风格标签 + 单列图文卡片） */}
-        <aside data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 rounded-card border border-gray-200 bg-white p-3">
+        <aside data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 max-h-[420px] overflow-hidden rounded-card border border-gray-200 bg-white p-3 lg:max-h-none">
           <TemplateGallery />
         </aside>
 
@@ -392,23 +392,34 @@ export function StepTwo() {
 
       {/* 底部：桥接入口（PRD §15：首次转化 + 不可逆警告；已桥接续进画布） */}
       {!petalP0 && <footer
-        className="flex justify-center border-t border-gray-100 pt-3"
+        className="order-first flex flex-col gap-3 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary-soft via-white to-violet-50 p-4 shadow-[0_14px_38px_rgba(154,52,104,0.14)] sm:flex-row sm:items-center sm:justify-between lg:order-last"
         data-debug-id="studio.wizard.bridge"
       >
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-white shadow-sm">
+            <Sparkles size={20} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900">进入专业 Editor 继续精修</p>
+            <p className="mt-0.5 text-xs text-gray-600">保留当前甲型与十指方案，进入 V7 图层、画布与预览工作区。</p>
+          </div>
+        </div>
         <Button
-          variant="ghost"
+          size="md"
           disabled={readOnly}
           loading={bridging}
+          className="min-h-12 w-full shrink-0 px-5 text-sm shadow-[0_10px_24px_rgba(154,52,104,0.28)] sm:w-auto"
           title={
             readOnly
               ? '设计已冻结只读，不可进入自由画布编辑'
               : bridged
-                ? '该设计已在自由画布中，点击继续编辑'
-                : '转入自由画布精细编辑（转入后模板不可再切换）'
+                ? '该设计已有 Editor 文档，点击继续编辑'
+                : '首次创建 Editor 文档（创建后模板不可再切换）'
           }
           onClick={() => void handleOpenBridge()}
         >
-          {bridged ? '返回自由画布' : '打开自由画布'}
+          进入 Editor
+          <ArrowRight size={17} />
         </Button>
       </footer>}
 

@@ -20,8 +20,8 @@ import { wizardToEditorDocV6 } from './v6-bridge';
 export const BRIDGE_WARNING_TITLE = '打开自由画布后：';
 export const BRIDGE_WARNING_LINES: readonly string[] = [
   '你将无法再切换模板——当前模板会作为图案元素保留，但模板选择器将不再可用。',
-  '你可以在自由画布中继续调整图层与底色；系统会按文档版本选择兼容 writer。',
-  '含配方、立体装饰或珍珠封层的设计会继续使用 V6 兼容画布，以免静默丢失内容。',
+  '你可以在 Editor 中继续调整图层与底色；新建文档统一使用 EditorDocV7。',
+  '暂不能无损转换的内容会明确阻止进入，不会静默创建 V6 文档。',
   '如不满意，可返回设计列表、复制一份原设计重新开始。',
 ] as const;
 
@@ -128,12 +128,7 @@ export function openBridgeForWriterWithDeps(
 ): BridgeResult {
   if (!v7Enabled) return openBridgeWithDeps(designId, v6Deps);
   const v7 = openBridgeV7WithDeps(designId, v7Deps);
-  if (v7.ok) return { ...v7, writer: v7.writer ?? 'v7' };
-  if (v7.reason !== 'v7_content_not_supported') return v7;
-  const fallback = openBridgeWithDeps(designId, v6Deps);
-  return fallback.ok
-    ? { ...fallback, writer: 'v6', compatibilityWarning: v7.message }
-    : fallback;
+  return v7.ok ? { ...v7, writer: v7.writer ?? 'v7' } : v7;
 }
 
 /**

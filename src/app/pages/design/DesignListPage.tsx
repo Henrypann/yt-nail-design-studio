@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Copy, Eye, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { Badge, Button, Card, EmptyState, Modal, Tabs, useToast } from '@/design-system';
-import { Routes } from '@/app/routes';
+import { designNewFresh, Routes } from '@/app/routes';
 import {
   STATUS_BADGE,
   STATUS_LABEL,
@@ -195,7 +195,7 @@ export default function DesignListPage() {
           <Button size="sm" variant="secondary" onClick={() => navigate(`${Routes.designCanvas}?blank=1`)}>
             空白画布
           </Button>
-          <Button size="sm" onClick={() => navigate(Routes.designNew)}>
+          <Button size="sm" onClick={() => navigate(designNewFresh())}>
             <Plus size={14} />
             新建设计
           </Button>
@@ -220,7 +220,7 @@ export default function DesignListPage() {
           title={tab === 'all' ? '还没有设计。创建你的第一个美甲设计吧' : `没有「${TABS.find((t) => t.key === tab)?.label}」状态的设计`}
           description="从 Wizard 模板快速出单，或打开自由画布精细创作。"
           action={
-            <Button size="sm" onClick={() => navigate(Routes.designNew)}>
+            <Button size="sm" onClick={() => navigate(designNewFresh())}>
               <Plus size={14} />
               新建设计
             </Button>

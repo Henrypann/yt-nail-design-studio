@@ -107,6 +107,8 @@ git rev-parse --abbrev-ref HEAD
 
 同一任务保持一个产品代码写者。可视情况使用 `$hermes-luna-subagent` 或 `$claude-code-subagent` 做有边界的只读审查、代码探索、失败分析、UI/E2E 走查；子 Agent 不得与主写者同时修改同一源码。其结论必须由主 Agent 用实际代码、Git 状态和测试复核。
 
+仓库所有者已长期授权：为当前 NextGen Beauty 任务调用 Packy/Claude 时，可发送完成只读代码审查所必需的私有源码片段、diff 和测试输出，不必逐次重复询问。该授权不包含密钥、客户个人信息、浏览器会话、项目外文件或外部写操作；发送内容仍须最小化并限定在当前审查范围。
+
 没有用户明确授权时，不执行 push、merge、rebase、cherry-pick、发布或外部发送。用户明确要求提交/合入时，仍需先核对目标分支、diff、测试和工作树状态。
 
 ## 8. macOS 安全围栏
