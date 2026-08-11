@@ -728,7 +728,10 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
     assert.equal(minimalTools.find((tool) => tool.id === id).enabled, false, `${id} needs a flat step`);
     assert.equal(minimalTools.find((tool) => tool.id === id).targetStepId, null);
   }
-  assert.equal(minimalTools.find((tool) => tool.id === 'effects').enabled, false);
+  for (const id of ['effects', 'decorations']) {
+    assert.equal(minimalTools.find((tool) => tool.id === id).enabled, false);
+    assert.equal(minimalTools.find((tool) => tool.id === id).status, 'missing_step');
+  }
 
   const full = createFullEditorDocV7Fixture();
   const flatStep = full.nails.L1.steps.find((step) => step.kind === 'flat_design');
@@ -738,9 +741,7 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
     assert.equal(fullTools.find((tool) => tool.id === id).enabled, true, `${id} should be enabled with a flat step`);
     assert.equal(fullTools.find((tool) => tool.id === id).targetStepId, flatStep.id);
   }
-  for (const id of ['effects', 'decorations']) {
-    assert.equal(fullTools.find((tool) => tool.id === id).enabled, false);
-  }
+  for (const id of ['effects', 'decorations']) assert.equal(fullTools.find((tool) => tool.id === id).enabled, true);
   assert.equal(fullTools.find((tool) => tool.id === 'brush').enabled, true);
   console.log('[v7-flat-assets] workspace tools gate on flat design step presence: PASS');
 }

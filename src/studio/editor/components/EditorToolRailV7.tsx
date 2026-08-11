@@ -55,13 +55,19 @@ export function EditorToolRailV7({
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
   const activeFlatTool = useEditorV7Store((state) => state.activeFlatTool);
   const resourceMode = useEditorV7Store((state) => state.resourceMode);
+  const readOnly = useEditorV7Store((state) => state.readOnly);
+  const switching = useEditorV7Store((state) => state.switching);
   const selectStep = useEditorV7Store((state) => state.selectStep);
   const setActiveFlatTool = useEditorV7Store((state) => state.setActiveFlatTool);
   const setResourceMode = useEditorV7Store((state) => state.setResourceMode);
   const horizontal = orientation === 'horizontal';
   if (!nail) return null;
 
-  const availability = deriveEditorWorkspaceToolsV7(nail);
+  const availability = deriveEditorWorkspaceToolsV7(nail, {
+    selectedStepId: selectedStep?.id ?? null,
+    readOnly,
+    switching,
+  });
   const moveToolFocus = (event: KeyboardEvent<HTMLButtonElement>) => {
     const previousKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
     const nextKey = horizontal ? 'ArrowRight' : 'ArrowDown';
@@ -84,7 +90,9 @@ export function EditorToolRailV7({
     if (targetStepId) selectStep(targetStepId);
     const flatTool = TOOL_META[id].flatTool;
     if (flatTool) setActiveFlatTool(flatTool);
-    if (id === 'text') {
+    if (id === 'select') {
+      return;
+    } else if (id === 'text') {
       setResourceMode('text');
       onOpenResources();
     } else if (id === 'assets') {
@@ -110,8 +118,14 @@ export function EditorToolRailV7({
       {availability.map((tool) => {
         const meta = TOOL_META[tool.id];
         const Icon = meta.icon;
-        const active = tool.id === 'background'
+        const active = tool.id === 'select'
+          ? selectedStep !== null && ['flat_design', 'surface_effect', 'dimensional_decoration'].includes(selectedStep.kind) && activeFlatTool === 'select'
+          : tool.id === 'background'
           ? selectedStep?.kind === 'background'
+          : tool.id === 'effects'
+            ? selectedStep?.kind === 'surface_effect'
+            : tool.id === 'decorations'
+              ? selectedStep?.kind === 'dimensional_decoration'
           : tool.id === 'text' || tool.id === 'assets'
             ? selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id
           : meta.flatTool !== undefined && selectedStep?.kind === 'flat_design' && activeFlatTool === meta.flatTool;

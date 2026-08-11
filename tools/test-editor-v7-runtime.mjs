@@ -262,6 +262,61 @@ function runtime(docs, overrides = {}) {
   console.log('[v7-runtime] monotonic undo/redo and branch clearing: PASS');
 }
 
+// First-step creation, history replacement, and deletion always retain a valid selection.
+{
+  const doc = docWithId('design.runtime.selection-repair');
+  const source = createFullEditorDocV7Fixture();
+  const flat = clone(source.nails.L1.steps.find((step) => step.kind === 'flat_design'));
+  const { store } = runtime({ [doc.designId]: doc });
+  await store.getState().load(doc.designId);
+  store.getState().setCurrentFinger('L1');
+  const initialBackgroundId = store.getState().doc.nails.L1.steps[0].id;
+  const finishIndex = store.getState().doc.nails.L1.steps.length - 1;
+  assert.equal(store.getState().addStep('L1', flat, finishIndex).ok, true);
+  assert.equal(store.getState().selectedStepId, flat.id);
+  assert.equal(store.getState().undo().ok, true);
+  assert.equal(store.getState().selectedStepId, initialBackgroundId);
+  assert.equal(store.getState().selectedElementId, null);
+  assert.equal(store.getState().redo().ok, true);
+  assert.ok(store.getState().doc.nails.L1.steps.some((step) => step.id === store.getState().selectedStepId));
+
+  const full = docWithId('design.runtime.selection-delete', true);
+  const second = runtime({ [full.designId]: full });
+  await second.store.getState().load(full.designId);
+  second.store.getState().setCurrentFinger('L1');
+  const beforeSteps = second.store.getState().doc.nails.L1.steps;
+  const selectedIndex = beforeSteps.findIndex((step) => step.kind === 'surface_effect');
+  const selected = beforeSteps[selectedIndex];
+  const expectedAdjacentId = beforeSteps[selectedIndex + 1].id;
+  second.store.getState().selectStep(selected.id);
+  assert.equal(second.store.getState().deleteStep('L1', selected.id).ok, true);
+  assert.equal(second.store.getState().selectedStepId, expectedAdjacentId);
+  assert.equal(second.store.getState().selectedElementId, null);
+
+  const crossFinger = docWithId('design.runtime.selection-cross-finger', true);
+  const third = runtime({ [crossFinger.designId]: crossFinger });
+  await third.store.getState().load(crossFinger.designId);
+  third.store.getState().setCurrentFinger('L1');
+  const currentFinish = third.store.getState().doc.nails.L1.steps.at(-1);
+  third.store.getState().selectStep(currentFinish.id);
+  const remoteSource = createFullEditorDocV7Fixture();
+  const remoteFlat = clone(remoteSource.nails.L1.steps.find((step) => step.kind === 'flat_design'));
+  remoteFlat.id = 'step.L2.cross-finger-added';
+  for (const [index, element] of remoteFlat.elements.entries()) element.id = `element.L2.cross-finger-added.${index}`;
+  const remoteFinishIndex = third.store.getState().doc.nails.L2.steps.length - 1;
+  assert.equal(third.store.getState().addStep('L2', remoteFlat, remoteFinishIndex).ok, true);
+  assert.equal(third.store.getState().currentFinger, 'L1');
+  assert.equal(third.store.getState().selectedStepId, currentFinish.id);
+  const remoteElement = clone(remoteFlat.elements[0]);
+  remoteElement.id = 'element.L2.cross-finger-extra';
+  const existingRemoteFlat = third.store.getState().doc.nails.L2.steps.find((step) => step.kind === 'flat_design');
+  assert.equal(third.store.getState().addElement('L2', existingRemoteFlat.id, remoteElement).ok, true);
+  assert.equal(third.store.getState().selectedStepId, currentFinish.id);
+  assert.equal(third.store.getState().duplicateStep('L2', existingRemoteFlat.id).ok, true);
+  assert.equal(third.store.getState().selectedStepId, currentFinish.id);
+  console.log('[v7-runtime] first-step undo/redo and adjacent delete selection repair: PASS');
+}
+
 // Failed save retains dirty state; explicit retry persists the exact revision.
 {
   const doc = docWithId('design.runtime.retry');

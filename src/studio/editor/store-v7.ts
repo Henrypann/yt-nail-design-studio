@@ -92,6 +92,7 @@ import {
   type EditorV7FingerScope,
   type EditorV7FingerScopeKind,
 } from './v7/ten-finger-operations';
+import { repairEditorWorkspaceSelectionV7 } from './v7/workspace-ia';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -239,7 +240,10 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       set({ autosaveTimer: timer });
     };
 
-    const commitCommand = (command: (doc: EditorDocV7) => EditorV7CommandResult): EditorV7ActionResult => {
+    const commitCommand = (
+      command: (doc: EditorDocV7) => EditorV7CommandResult,
+      selectionFinger?: FingerCode,
+    ): EditorV7ActionResult => {
       const state = get();
       if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
       if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
@@ -252,6 +256,12 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       next.updatedAt = now();
       const parsed = parseEditorDocV7(next);
       if (!parsed.ok) return { ok: false, reason: 'invalid_document', message: parsed.reason };
+      const commandTargetsCurrentFinger = selectionFinger === undefined || selectionFinger === state.currentFinger;
+      const selection = repairEditorWorkspaceSelectionV7(
+        parsed.doc.nails[state.currentFinger],
+        commandTargetsCurrentFinger ? commandResult.selectedStepId ?? state.selectedStepId : state.selectedStepId,
+        commandTargetsCurrentFinger ? commandResult.selectedElementId ?? state.selectedElementId : state.selectedElementId,
+      );
       set({
         doc: parsed.doc,
         history: [...state.history.slice(-(HISTORY_LIMIT - 1)), previous],
@@ -259,8 +269,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         saveState: 'dirty',
         saveError: null,
         revisionState: markEditorV7RevisionPending(state.revisionState, parsed.doc.revision),
-        selectedStepId: commandResult.selectedStepId ?? state.selectedStepId,
-        selectedElementId: commandResult.selectedElementId ?? state.selectedElementId,
+        selectedStepId: selection.selectedStepId,
+        selectedElementId: selection.selectedElementId,
       });
       scheduleAutosave();
       return { ok: true };
@@ -274,7 +284,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       return result.ok
         ? { ...result, doc: detachLinkedEditorV7NailAfterEdit(result.doc, finger) }
         : result;
-    });
+    }, finger);
 
     const currentScope = (): EditorV7FingerScope => {
       const state = get();
@@ -456,6 +466,11 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         const restored = clone(state.history[state.history.length - 1]);
         restored.revision = state.doc.revision + 1;
         restored.updatedAt = now();
+        const selection = repairEditorWorkspaceSelectionV7(
+          restored.nails[state.currentFinger],
+          state.selectedStepId,
+          state.selectedElementId,
+        );
         set({
           doc: restored,
           history: state.history.slice(0, -1),
@@ -463,7 +478,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           saveState: 'dirty',
           saveError: null,
           revisionState: markEditorV7RevisionPending(state.revisionState, restored.revision),
-          selectedElementId: null,
+          selectedStepId: selection.selectedStepId,
+          selectedElementId: selection.selectedElementId,
         });
         scheduleAutosave();
         return { ok: true };
@@ -478,6 +494,11 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         const restored = clone(state.future[0]);
         restored.revision = state.doc.revision + 1;
         restored.updatedAt = now();
+        const selection = repairEditorWorkspaceSelectionV7(
+          restored.nails[state.currentFinger],
+          state.selectedStepId,
+          state.selectedElementId,
+        );
         set({
           doc: restored,
           history: [...state.history, clone(state.doc)].slice(-HISTORY_LIMIT),
@@ -485,7 +506,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           saveState: 'dirty',
           saveError: null,
           revisionState: markEditorV7RevisionPending(state.revisionState, restored.revision),
-          selectedElementId: null,
+          selectedStepId: selection.selectedStepId,
+          selectedElementId: selection.selectedElementId,
         });
         scheduleAutosave();
         return { ok: true };
@@ -553,10 +575,13 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       applyBackgroundPaletteTheme: (finger, theme) => commitFingerCommand(finger, (doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
       addStep: (finger, step, index) => commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index)),
       deleteStep: (finger, stepId) => {
-        const wasSelected = get().selectedStepId === stepId;
+        const before = get();
+        const wasSelected = before.currentFinger === finger && before.selectedStepId === stepId;
+        const previousIndex = before.doc?.nails[finger].steps.findIndex((step) => step.id === stepId) ?? -1;
         const result = commitFingerCommand(finger, (doc) => deleteEditorV7Step(doc, finger, stepId));
         if (result.ok && wasSelected) {
-          const nextStepId = get().doc?.nails[finger].steps[0]?.id ?? null;
+          const remaining = get().doc?.nails[finger].steps ?? [];
+          const nextStepId = remaining[Math.min(Math.max(previousIndex, 0), remaining.length - 1)]?.id ?? null;
           set({ selectedStepId: nextStepId, selectedElementId: null });
         }
         return result;

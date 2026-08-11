@@ -19,13 +19,79 @@ export interface EditorWorkspaceStageV7 {
   active: boolean;
   count?: number;
   targetStepId: string | null;
+  lanes?: EditorWorkspaceStepLaneV7[];
 }
 
-const PERSONAL_STEP_KINDS = new Set<ProcessStepV7['kind']>([
+const PERSONAL_STEP_KINDS = [
   'flat_design',
   'surface_effect',
   'dimensional_decoration',
-]);
+] as const satisfies readonly ProcessStepV7['kind'][];
+
+export type EditorWorkspaceStepLaneIdV7 = 'flat' | 'effects' | 'decorations';
+export type EditorWorkspaceStepLaneStateV7 = 'configured' | 'attention' | 'empty';
+
+export interface EditorWorkspaceStepLaneV7 {
+  id: EditorWorkspaceStepLaneIdV7;
+  kind: (typeof PERSONAL_STEP_KINDS)[number];
+  label: string;
+  state: EditorWorkspaceStepLaneStateV7;
+  active: boolean;
+  count: number;
+  activeCount: number;
+  targetStepId: string | null;
+}
+
+const LANE_META: ReadonlyArray<Pick<EditorWorkspaceStepLaneV7, 'id' | 'kind' | 'label'>> = [
+  { id: 'flat', kind: 'flat_design', label: '平面' },
+  { id: 'effects', kind: 'surface_effect', label: '效果' },
+  { id: 'decorations', kind: 'dimensional_decoration', label: '立体' },
+];
+
+function preferredStepForKindV7(
+  nail: NailDesignV7,
+  kind: ProcessStepV7['kind'],
+  selectedStepId: string | null | undefined,
+): ProcessStepV7 | null {
+  const compatible = nail.steps.filter((step) => step.kind === kind);
+  return compatible.find((step) => step.id === selectedStepId)
+    ?? compatible.find((step) => step.visible && !step.skipped && !step.locked)
+    ?? compatible.find((step) => step.visible && !step.skipped)
+    ?? compatible[0]
+    ?? null;
+}
+
+function preferredSelectableStepV7(
+  nail: NailDesignV7,
+  selectedStepId: string | null | undefined,
+): ProcessStepV7 | null {
+  const compatible = nail.steps.filter((step) => PERSONAL_STEP_KINDS.includes(step.kind as (typeof PERSONAL_STEP_KINDS)[number]));
+  return compatible.find((step) => step.id === selectedStepId)
+    ?? compatible.find((step) => step.visible && !step.skipped && !step.locked)
+    ?? compatible.find((step) => step.visible && !step.skipped)
+    ?? compatible[0]
+    ?? null;
+}
+
+/** Three parallel personalization lanes derived from canonical process steps. */
+export function deriveEditorWorkspaceStepLanesV7(
+  nail: NailDesignV7,
+  selectedStepId: string | null,
+): EditorWorkspaceStepLaneV7[] {
+  const selectedStep = nail.steps.find((step) => step.id === selectedStepId) ?? null;
+  return LANE_META.map((meta) => {
+    const steps = nail.steps.filter((step) => step.kind === meta.kind);
+    const activeCount = steps.filter((step) => step.visible && !step.skipped).length;
+    return {
+      ...meta,
+      state: steps.length === 0 ? 'empty' : activeCount === steps.length ? 'configured' : 'attention',
+      active: selectedStep?.kind === meta.kind,
+      count: steps.length,
+      activeCount,
+      targetStepId: preferredStepForKindV7(nail, meta.kind, selectedStepId)?.id ?? null,
+    };
+  });
+}
 
 export function editorWorkspaceStageForStepV7(
   step: ProcessStepV7 | null | undefined,
@@ -47,9 +113,10 @@ export function deriveEditorWorkspaceStagesV7(
   const selectedStep = nail.steps.find((step) => step.id === selectedStepId) ?? null;
   const currentStage = editorWorkspaceStageForStepV7(selectedStep);
   const background = nail.steps.find((step) => step.kind === 'background') ?? null;
-  const personalSteps = nail.steps.filter((step) => PERSONAL_STEP_KINDS.has(step.kind));
+  const personalSteps = nail.steps.filter((step) => PERSONAL_STEP_KINDS.includes(step.kind as (typeof PERSONAL_STEP_KINDS)[number]));
   const finish = nail.steps.find((step) => step.kind === 'surface_finish') ?? null;
   const geometry = resolveBackgroundSilhouetteV7(nail.geometryRef);
+  const lanes = deriveEditorWorkspaceStepLanesV7(nail, selectedStepId);
   const activePersonalSteps = personalSteps.filter((step) => step.visible && !step.skipped).length;
   const hiddenPersonalSteps = personalSteps.filter((step) => !step.visible).length;
   const skippedPersonalSteps = personalSteps.filter((step) => step.skipped).length;
@@ -80,10 +147,17 @@ export function deriveEditorWorkspaceStagesV7(
       description: personalSteps.length > 0
         ? `${personalSteps.length} 个步骤 · ${activePersonalSteps} 启用 · ${skippedPersonalSteps} 跳过 · ${hiddenPersonalSteps} 隐藏`
         : '尚未添加设计步骤',
-      state: personalSteps.length > 0 ? 'configured' : 'empty',
+      state: personalSteps.length === 0
+        ? 'empty'
+        : activePersonalSteps === personalSteps.length
+          ? 'configured'
+          : 'attention',
       active: currentStage === 'personalize',
       count: personalSteps.length,
-      targetStepId: personalSteps[0]?.id ?? null,
+      targetStepId: selectedStep && PERSONAL_STEP_KINDS.includes(selectedStep.kind as (typeof PERSONAL_STEP_KINDS)[number])
+        ? selectedStep.id
+        : personalSteps.find((step) => step.visible && !step.skipped)?.id ?? personalSteps[0]?.id ?? null,
+      lanes,
     },
     {
       id: 'finish',
@@ -120,26 +194,98 @@ export type EditorWorkspaceToolIdV7 =
 export interface EditorWorkspaceToolAvailabilityV7 {
   id: EditorWorkspaceToolIdV7;
   enabled: boolean;
+  status: EditorWorkspaceToolStatusV7;
   targetStepId: string | null;
   reason?: string;
 }
 
-export function deriveEditorWorkspaceToolsV7(nail: NailDesignV7): EditorWorkspaceToolAvailabilityV7[] {
-  const background = nail.steps.find((step) => step.kind === 'background') ?? null;
-  const flat = nail.steps.find((step) => step.kind === 'flat_design') ?? null;
-  const effect = nail.steps.find((step) => step.kind === 'surface_effect') ?? null;
-  const decoration = nail.steps.find((step) => step.kind === 'dimensional_decoration') ?? null;
-  const needsFlat = flat ? undefined : '请先在右侧层级中添加平面设计步骤';
+export type EditorWorkspaceToolStatusV7 =
+  | 'ready'
+  | 'switching'
+  | 'read_only'
+  | 'missing_step'
+  | 'locked'
+  | 'skipped'
+  | 'hidden';
 
-  return [
-    { id: 'select', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'background', enabled: Boolean(background), targetStepId: background?.id ?? null },
-    { id: 'brush', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'eraser', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'shape', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'text', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'assets', enabled: Boolean(flat), targetStepId: flat?.id ?? null, reason: needsFlat },
-    { id: 'effects', enabled: false, targetStepId: effect?.id ?? null, reason: '表面效果编辑在 V7-12 开放' },
-    { id: 'decorations', enabled: false, targetStepId: decoration?.id ?? null, reason: '立体装饰编辑在 V7-13 开放' },
-  ];
+export interface EditorWorkspaceToolContextV7 {
+  selectedStepId?: string | null;
+  readOnly?: boolean;
+  switching?: boolean;
+}
+
+const TOOL_STEP_KIND: Record<EditorWorkspaceToolIdV7, ProcessStepV7['kind']> = {
+  select: 'flat_design',
+  background: 'background',
+  brush: 'flat_design',
+  eraser: 'flat_design',
+  shape: 'flat_design',
+  text: 'flat_design',
+  assets: 'flat_design',
+  effects: 'surface_effect',
+  decorations: 'dimensional_decoration',
+};
+
+const MISSING_STEP_REASON: Partial<Record<ProcessStepV7['kind'], string>> = {
+  flat_design: '需要先添加平面设计步骤；确认后才能使用此工具',
+  surface_effect: '需要先添加表面效果步骤；确认后才能编辑局部效果',
+  dimensional_decoration: '需要先添加立体装饰步骤；确认后才能添加立体内容',
+};
+
+function toolStatusForStepV7(
+  step: ProcessStepV7 | null,
+  context: EditorWorkspaceToolContextV7,
+): { status: EditorWorkspaceToolStatusV7; reason?: string } {
+  if (context.switching) return { status: 'switching', reason: '正在安全保存并切换设计，请稍后重试' };
+  if (context.readOnly) return { status: 'read_only', reason: '当前设计为只读状态；可以查看，但不能修改步骤' };
+  if (!step) return { status: 'missing_step' };
+  if (step.locked) return { status: 'locked', reason: '对应步骤已锁定；请先在层级面板解锁' };
+  if (step.skipped) return { status: 'skipped', reason: '对应步骤已跳过；请先取消跳过' };
+  if (!step.visible) return { status: 'hidden', reason: '对应步骤已隐藏；请先恢复显示' };
+  return { status: 'ready' };
+}
+
+/**
+ * Resolve a tool intent against the selected compatible step first, then the
+ * first active canonical step. This prevents repeated step kinds from silently
+ * jumping back to their first occurrence.
+ */
+export function deriveEditorWorkspaceToolsV7(
+  nail: NailDesignV7,
+  context: EditorWorkspaceToolContextV7 = {},
+): EditorWorkspaceToolAvailabilityV7[] {
+  return (Object.keys(TOOL_STEP_KIND) as EditorWorkspaceToolIdV7[]).map((id) => {
+    const kind = TOOL_STEP_KIND[id];
+    const step = id === 'select'
+      ? preferredSelectableStepV7(nail, context.selectedStepId)
+      : preferredStepForKindV7(nail, kind, context.selectedStepId);
+    const resolved = toolStatusForStepV7(step, context);
+    const reason = resolved.status === 'missing_step' ? MISSING_STEP_REASON[kind] : resolved.reason;
+    return {
+      id,
+      enabled: resolved.status === 'ready',
+      status: resolved.status,
+      targetStepId: step?.id ?? null,
+      ...(reason ? { reason } : {}),
+    };
+  });
+}
+
+/** Repair UI selection after commands or history replacement; never writes the doc. */
+export function repairEditorWorkspaceSelectionV7(
+  nail: NailDesignV7,
+  selectedStepId: string | null,
+  selectedElementId: string | null,
+): { selectedStepId: string | null; selectedElementId: string | null } {
+  const selectedStep = nail.steps.find((step) => step.id === selectedStepId) ?? nail.steps[0] ?? null;
+  if (!selectedStep) return { selectedStepId: null, selectedElementId: null };
+  const elements = selectedStep.kind === 'flat_design'
+    ? selectedStep.elements
+    : selectedStep.kind === 'dimensional_decoration'
+      ? selectedStep.decorations
+      : [];
+  return {
+    selectedStepId: selectedStep.id,
+    selectedElementId: elements.some((element) => element.id === selectedElementId) ? selectedElementId : null,
+  };
 }

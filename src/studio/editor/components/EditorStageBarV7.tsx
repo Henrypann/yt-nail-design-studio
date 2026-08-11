@@ -65,7 +65,8 @@ export function EditorStageBarV7({
                 }}
                 onKeyDown={moveStageFocus}
                 className={cx(
-                  'group flex min-h-12 min-w-[142px] items-center gap-2 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                  'group flex min-h-12 items-center gap-2 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                  stage.lanes ? 'min-w-[210px]' : 'min-w-[142px]',
                   current
                     ? 'border-primary bg-primary-soft text-primary'
                     : !canNavigate
@@ -82,7 +83,32 @@ export function EditorStageBarV7({
                     {stage.count !== undefined && stage.count > 0 && <span className="rounded-full bg-white/75 px-1.5 text-[9px]">{stage.count}</span>}
                     {stage.state === 'configured' && <Check size={11} aria-label="已配置" />}
                   </span>
-                  <span className="mt-0.5 block max-w-[112px] truncate text-[9px] opacity-70">{stage.description}</span>
+                  {stage.lanes ? (
+                    <span className="mt-1 flex items-center gap-1" aria-label="个性化步骤状态">
+                      {stage.lanes.map((lane) => (
+                        <span
+                          key={lane.id}
+                          data-lane={lane.id}
+                          data-lane-state={lane.state}
+                          data-lane-active={lane.active}
+                          className={cx(
+                            'rounded-full px-1.5 py-0.5 text-[8px] font-semibold',
+                            lane.active
+                              ? 'bg-primary text-white'
+                              : lane.state === 'configured'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : lane.state === 'attention'
+                                  ? 'bg-amber-50 text-amber-700'
+                                  : 'bg-gray-100 text-gray-400',
+                          )}
+                        >
+                          {lane.label} {lane.count}
+                        </span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span className="mt-0.5 block max-w-[112px] truncate text-[9px] opacity-70">{stage.description}</span>
+                  )}
                 </span>
               </button>
               {index < stages.length - 1 && <span aria-hidden="true" className="mx-0.5 text-gray-300">›</span>}
