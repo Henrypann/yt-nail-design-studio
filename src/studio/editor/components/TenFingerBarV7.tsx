@@ -34,10 +34,15 @@ export function TenFingerBarV7() {
   const detachFingerScope = useEditorV7Store((state) => state.detachFingerScope);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [selectionStatus, setSelectionStatus] = useState<string | null>(null);
   const actionsTriggerRef = useRef<HTMLButtonElement>(null);
   const actionsDialogRef = useRef<HTMLDivElement>(null);
   const confirmationDialogRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setSelectionStatus(null);
+  }, [fingerScope]);
 
   const restoreActionFocus = () => {
     const target = returnFocusRef.current;
@@ -103,9 +108,43 @@ export function TenFingerBarV7() {
   const canSync = canMaterialize && fingerScope !== 'mirror' && linkedOutsideScope.length === 0;
   const canDetach = !disabled && linkedInScope.length > 0;
 
+  const switchCurrentFinger = (finger: FingerCode) => {
+    if (finger === currentFinger) {
+      setSelectionStatus(null);
+      setCurrentFinger(finger);
+      return;
+    }
+    const outcome = setCurrentFinger(finger);
+    if (!outcome) return;
+    setSelectionStatus(outcome.exact
+      ? `已切换至 ${finger}，并保持相同工艺步骤位置。`
+      : `${finger} 缺少当前同序号工艺步骤，已显示背景层；未创建新步骤。`);
+  };
+
   const chooseFinger = (finger: FingerCode) => {
-    if (fingerScope === 'selected') toggleSelectedFinger(finger);
-    else setCurrentFinger(finger);
+    if (fingerScope === 'selected') {
+      toggleSelectedFinger(finger);
+      setSelectionStatus(null);
+    } else switchCurrentFinger(finger);
+  };
+
+  const moveFingerFocus = (event: ReactKeyboardEvent<HTMLButtonElement>, finger: FingerCode) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const currentIndex = FINGER_CODES.indexOf(finger);
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? FINGER_CODES.length - 1
+        : event.key === 'ArrowLeft'
+          ? (currentIndex - 1 + FINGER_CODES.length) % FINGER_CODES.length
+          : (currentIndex + 1) % FINGER_CODES.length;
+    const nextFinger = FINGER_CODES[nextIndex];
+    const button = event.currentTarget.closest('[aria-label="选择手指"]')
+      ?.querySelector<HTMLButtonElement>(`button[data-finger="${nextFinger}"]`);
+    button?.focus();
+    button?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (fingerScope !== 'selected') switchCurrentFinger(nextFinger);
   };
 
   const report = (result: ReturnType<typeof copyFingerScope>, success: string) => {
@@ -174,6 +213,7 @@ export function TenFingerBarV7() {
                   data-selected={selected}
                   data-sync-state={syncState ?? 'none'}
                   onClick={() => chooseFinger(finger)}
+                  onKeyDown={(event) => moveFingerFocus(event, finger)}
                   className={cx(
                     'relative min-h-11 min-w-11 rounded-lg border px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                     current ? 'border-primary bg-primary-soft font-semibold text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50',
@@ -222,6 +262,7 @@ export function TenFingerBarV7() {
         来源 {currentFinger} · 范围 {SCOPE_LABEL[fingerScope]} · {writeTargets.length > 0 ? `将覆盖 ${writeTargets.join('、')}` : '当前没有可写目标'}
         {fingerScope === 'mirror' ? ' · 布局镜像，文字与素材本体保持正向' : ''}
       </p>
+      {selectionStatus && <p className="mt-1 break-words text-[11px] leading-4 text-amber-700" role="status" aria-atomic="true" data-testid="v7-finger-selection-status">{selectionStatus}</p>}
       {doc.compositionMeta && <p className="mt-0.5 text-[9px] text-gray-400">状态：同 = 已同步当前快照；独 = 已解除同步、可单独编辑</p>}
       {fingerScope !== 'mirror' && linkedOutsideScope.length > 0 && (
         <p className="mt-0.5 text-[10px] text-amber-700">范围外仍有同步成员 {linkedOutsideScope.join('、')}；为避免暗改，需先解除它们或选择全部十指。</p>

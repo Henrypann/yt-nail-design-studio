@@ -273,6 +273,47 @@ export function deriveEditorWorkspaceToolsV7(
   });
 }
 
+export interface EditorSelectionContinuityV7 {
+  /** Step resolved in the target nail; null only when the target has no background. */
+  selectedStepId: string | null;
+  /** True when the source step mapped to the exact same kind+ordinal step in the target. */
+  exact: boolean;
+}
+
+/**
+ * Pure cross-finger selection resolver (EDITOR-V7-14.3).
+ *
+ * Maps the source nail's selected step to the exact same kind + ordinal step in
+ * the target nail. Locked/skipped/hidden target steps are preserved as exact
+ * matches — the resolver selects them, it never guesses an active sibling.
+ * When the source selection is invalid or the target lacks that exact ordinal,
+ * it falls back to the target background step and reports `exact: false`.
+ * It never clamps to the first/last same-kind step and never mutates either
+ * nail; the caller owns all selection writes.
+ */
+export function resolveSelectionContinuityV7(
+  sourceNail: NailDesignV7,
+  targetNail: NailDesignV7,
+  selectedStepId: string | null,
+): EditorSelectionContinuityV7 {
+  const sourceStep = selectedStepId === null
+    ? null
+    : sourceNail.steps.find((step) => step.id === selectedStepId) ?? null;
+  const targetBackground = targetNail.steps.find((step) => step.kind === 'background') ?? null;
+  if (!sourceStep) {
+    return { selectedStepId: targetBackground?.id ?? null, exact: false };
+  }
+  const ordinal = sourceNail.steps
+    .filter((step) => step.kind === sourceStep.kind)
+    .findIndex((step) => step.id === sourceStep.id);
+  const sameKindInTarget = targetNail.steps.filter((step) => step.kind === sourceStep.kind);
+  const targetStep = sameKindInTarget[ordinal] ?? null;
+  if (!targetStep) {
+    return { selectedStepId: targetBackground?.id ?? null, exact: false };
+  }
+  return { selectedStepId: targetStep.id, exact: true };
+}
+
 /** Repair UI selection after commands or history replacement; never writes the doc. */
 export function repairEditorWorkspaceSelectionV7(
   nail: NailDesignV7,

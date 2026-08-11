@@ -27,10 +27,18 @@ const FINISH_LABEL: Record<SurfaceFinishTypeV7, string> = {
   frosted: '磨砂',
 };
 
-export function CustomerPreviewShellV7({ doc, loadWarnings }: { doc: EditorDocV7; loadWarnings: string[] }) {
+export function CustomerPreviewShellV7({
+  doc,
+  loadWarnings,
+  initialFinger = 'L1',
+}: {
+  doc: EditorDocV7;
+  loadWarnings: string[];
+  initialFinger?: FingerCode;
+}) {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'set' | 'single'>('set');
-  const [selectedFinger, setSelectedFinger] = useState<FingerCode>('L1');
+  const [selectedFinger, setSelectedFinger] = useState<FingerCode>(initialFinger);
   const [scenario, setScenario] = useState(createCustomerPreviewScenarioV7);
   const [compactPreview, setCompactPreview] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
   const [scenarioPanelOpen, setScenarioPanelOpen] = useState(() => !window.matchMedia('(max-width: 1023px)').matches);
@@ -40,6 +48,11 @@ export function CustomerPreviewShellV7({ doc, loadWarnings }: { doc: EditorDocV7
   const selectedModel = readModels.find((model) => model.finger === selectedFinger) ?? readModels[0];
   const selectedNail = doc.nails[selectedFinger];
   const scenarioCount = Object.keys(scenario.backgroundColors).length + (scenario.finishType ? 1 : 0);
+
+  useEffect(() => {
+    setSelectedFinger(initialFinger);
+    setMode('set');
+  }, [doc.designId, initialFinger]);
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 1023px)');
@@ -104,9 +117,9 @@ export function CustomerPreviewShellV7({ doc, loadWarnings }: { doc: EditorDocV7
   };
 
   return (
-    <section className="flex h-[100dvh] min-h-[560px] min-w-0 flex-col overflow-hidden bg-[#f5f1ef]" data-testid="customer-preview-v7" data-preview-mode={mode} data-editor-schema="7" data-preview-readonly="true">
+    <section className="flex h-[100dvh] min-h-[560px] min-w-0 flex-col overflow-hidden bg-[#f5f1ef]" data-testid="customer-preview-v7" data-preview-mode={mode} data-selected-finger={selectedFinger} data-editor-schema="7" data-preview-readonly="true">
       <header className="flex min-h-[58px] flex-wrap items-center gap-2 border-b border-white/80 bg-white/95 px-3 py-2 backdrop-blur sm:px-5">
-        <Button size="sm" variant="ghost" className="min-h-11 sm:min-h-0" onClick={returnToEditor}><ArrowLeft size={15} />返回设计</Button>
+        <Button size="sm" variant="ghost" className="min-h-11" onClick={returnToEditor}><ArrowLeft size={15} />返回设计</Button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-gray-900">{doc.title}</p>
           <p className="text-[10px] text-gray-500">顾客只读预览 · Revision {doc.revision}</p>
@@ -133,7 +146,7 @@ export function CustomerPreviewShellV7({ doc, loadWarnings }: { doc: EditorDocV7
               <div className="grid grid-cols-5 gap-2 rounded-[28px] border border-white bg-white/60 p-3 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:gap-3 sm:p-5 lg:grid-cols-10">
                 {FINGER_CODES.map((finger) => {
                   const model = readModels.find((item) => item.finger === finger) ?? readModels[0];
-                  return <button key={finger} type="button" aria-label={`聚焦 ${finger}`} onClick={() => focusFinger(finger)} className="min-w-0 rounded-2xl p-1.5 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><CustomerNailPreviewV7 nail={doc.nails[finger]} readModel={model} selected={finger === selectedFinger} /></button>;
+                  return <button key={finger} type="button" aria-label={`聚焦 ${finger}`} aria-current={finger === selectedFinger ? 'true' : undefined} onClick={() => focusFinger(finger)} className="min-w-0 rounded-2xl p-1.5 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><CustomerNailPreviewV7 nail={doc.nails[finger]} readModel={model} selected={finger === selectedFinger} /></button>;
                 })}
               </div>
               <div className="mx-auto flex max-w-2xl items-start gap-2 rounded-xl border border-info/20 bg-info-soft px-3 py-2 text-[10px] leading-4 text-info"><Info size={13} className="mt-0.5 shrink-0" /><p>2D 预览用于方案沟通，不等于最终 3D、可制造性证明或设备生产输出。缺失能力会保留设计数据并明确标注。</p></div>

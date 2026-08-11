@@ -93,7 +93,7 @@ import {
   type EditorV7FingerScope,
   type EditorV7FingerScopeKind,
 } from './v7/ten-finger-operations';
-import { repairEditorWorkspaceSelectionV7 } from './v7/workspace-ia';
+import { repairEditorWorkspaceSelectionV7, resolveSelectionContinuityV7 } from './v7/workspace-ia';
 import { addMissingEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalStepKindV7 } from './v7/workspace-step-factory';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
@@ -103,6 +103,19 @@ export type EditorResourceModeV7 = 'vector' | 'text' | 'assets';
 export type EditorV7ActionResult =
   | { ok: true }
   | { ok: false; reason: string; message: string };
+
+/**
+ * UI-only outcome of a finger switch (EDITOR-V7-14.3). `exact: false` means the
+ * resolver had to fall back to the target background because the source
+ * selection was invalid or the target lacked the exact kind+ordinal step.
+ * The switch never mutates doc/revision/history/future/save state.
+ */
+export interface EditorV7FingerSwitchOutcome {
+  finger: FingerCode;
+  /** Step selected in the target nail (background on fallback). */
+  stepId: string | null;
+  exact: boolean;
+}
 
 export interface EditorV7RuntimeDependencies {
   repository: EditorDocV7Repository;
@@ -148,7 +161,7 @@ export interface EditorV7State {
   retrySave(): Promise<'saved' | 'clean' | 'busy' | 'stale' | 'read_only' | 'error'>;
   undo(): EditorV7ActionResult;
   redo(): EditorV7ActionResult;
-  setCurrentFinger(finger: FingerCode): void;
+  setCurrentFinger(finger: FingerCode): EditorV7FingerSwitchOutcome | null;
   setFingerScope(scope: EditorV7FingerScopeKind): void;
   toggleSelectedFinger(finger: FingerCode): void;
   clearSelectedFingers(): void;
@@ -388,6 +401,13 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (result.status === 'unsupported') return 'unsupported';
         clearAutosave();
         const doc = clone(result.doc);
+        // Repair the UI selection against the replaced current nail so a
+        // stored-document difference can never leave a dangling selection.
+        const repairedSelection = repairEditorWorkspaceSelectionV7(
+          doc.nails[state.currentFinger],
+          state.selectedStepId,
+          state.selectedElementId,
+        );
         set({
           doc,
           sourceVersion: result.sourceVersion ?? 7,
@@ -401,6 +421,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           revisionState: createEditorV7RevisionState(doc.revision),
           generation: state.generation + 1,
           previewFinishType: null,
+          selectedStepId: repairedSelection.selectedStepId,
+          selectedElementId: repairedSelection.selectedElementId,
         });
         return result.status === 'migrated_with_warnings' ? 'ok_with_warnings' : 'ok';
       },
@@ -517,9 +539,27 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       },
 
       setCurrentFinger: (finger) => {
-        if (!FINGER_CODES.includes(finger)) return;
-        const first = get().doc?.nails[finger].steps[0]?.id ?? null;
-        set({ currentFinger: finger, selectedStepId: first, selectedElementId: null });
+        if (!FINGER_CODES.includes(finger)) return null;
+        const state = get();
+        if (!state.doc) return null;
+        const nail = state.doc.nails[finger];
+        if (!nail) return null;
+        // Same-finger repeated selection is a pure UI no-op: the step and the
+        // nested element stay untouched and nothing is scheduled or written.
+        if (state.currentFinger === finger) {
+          const stepExists = state.selectedStepId !== null
+            && nail.steps.some((step) => step.id === state.selectedStepId);
+          return { finger, stepId: state.selectedStepId, exact: stepExists };
+        }
+        // Cross-finger switching always clears the element selection; the step
+        // maps by exact kind+ordinal, falling back to the target background.
+        const resolved = resolveSelectionContinuityV7(
+          state.doc.nails[state.currentFinger],
+          nail,
+          state.selectedStepId,
+        );
+        set({ currentFinger: finger, selectedStepId: resolved.selectedStepId, selectedElementId: null });
+        return { finger, stepId: resolved.selectedStepId, exact: resolved.exact };
       },
       setFingerScope: (scope) => {
         if (scope !== 'current' && scope !== 'selected' && scope !== 'mirror' && scope !== 'all') return;

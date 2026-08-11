@@ -16,16 +16,22 @@ export function EditorStageBarV7({
   nail,
   selectedStepId,
   onSelectStep,
+  onOpenGeometry,
   onRequestPersonalization,
   onOpenCustomerPreview,
   customerPreviewEnabled,
+  customerPreviewReason,
+  expandedContext,
 }: {
   nail: NailDesignV7;
   selectedStepId: string | null;
   onSelectStep(stepId: string): void;
+  onOpenGeometry(trigger: HTMLButtonElement): void;
   onRequestPersonalization(trigger: HTMLButtonElement): void;
-  onOpenCustomerPreview(): void;
+  onOpenCustomerPreview(trigger: HTMLButtonElement): void;
   customerPreviewEnabled: boolean;
+  customerPreviewReason: string;
+  expandedContext: 'geometry' | 'customer' | null;
 }) {
   const stages = deriveEditorWorkspaceStagesV7(nail, selectedStepId);
   const moveStageFocus = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -52,21 +58,39 @@ export function EditorStageBarV7({
           const Icon = STAGE_ICON[stage.id];
           const current = stage.active;
           const unavailable = stage.state === 'unavailable';
-          const canNavigate = (stage.targetStepId !== null || (stage.id === 'customer' && customerPreviewEnabled)) && !unavailable;
-          const canActivate = canNavigate || (stage.id === 'personalize' && stage.targetStepId === null);
+          const description = stage.id === 'customer' ? customerPreviewReason : stage.description;
+          const explainableContext = stage.id === 'geometry' || stage.id === 'customer';
+          const canNavigate = stage.targetStepId !== null && !unavailable;
+          const canActivate = canNavigate || explainableContext || (stage.id === 'personalize' && stage.targetStepId === null);
+          // Customer remains an actionable status/detail entry while preview is
+          // unavailable. Marking it aria-disabled would make the explanation
+          // unreachable to touch automation and assistive technology.
+          const ariaDisabled = !canActivate;
+          const customerNeedsAttention = stage.id === 'customer' && !customerPreviewEnabled;
           return (
             <li key={stage.id} className="flex shrink-0 items-center">
               <button
                 type="button"
                 data-stage-id={stage.id}
-                aria-disabled={!canActivate}
+                data-stage-context-open={expandedContext === stage.id}
+                data-customer-preview-enabled={stage.id === 'customer' ? customerPreviewEnabled : undefined}
+                aria-controls={expandedContext === stage.id && explainableContext ? `editor-v7-stage-context-${stage.id}` : undefined}
+                aria-disabled={ariaDisabled}
+                aria-expanded={explainableContext ? expandedContext === stage.id : undefined}
                 aria-current={current ? 'step' : undefined}
-                aria-label={`${stage.label}：${stage.description}`}
-                title={!canActivate ? stage.description : stage.id === 'personalize' && !stage.targetStepId ? '打开开始设计引导' : `前往${stage.label}`}
+                aria-label={`${stage.label}：${description}`}
+                title={stage.id === 'customer' && !customerPreviewEnabled
+                  ? `查看不可用原因：${description}`
+                  : !canActivate
+                    ? description
+                    : stage.id === 'geometry'
+                      ? '查看当前甲型与轮廓来源'
+                      : stage.id === 'personalize' && !stage.targetStepId ? '打开开始设计引导' : `前往${stage.label}`}
                 onClick={(event) => {
                   if (stage.targetStepId) onSelectStep(stage.targetStepId);
+                  else if (stage.id === 'geometry') onOpenGeometry(event.currentTarget);
                   else if (stage.id === 'personalize') onRequestPersonalization(event.currentTarget);
-                  else if (stage.id === 'customer') onOpenCustomerPreview();
+                  else if (stage.id === 'customer') onOpenCustomerPreview(event.currentTarget);
                 }}
                 onKeyDown={moveStageFocus}
                 className={cx(
@@ -74,7 +98,9 @@ export function EditorStageBarV7({
                   stage.lanes ? 'min-w-[210px]' : 'min-w-[142px]',
                   current
                     ? 'border-primary bg-primary-soft text-primary'
-                    : !canActivate
+                    : customerNeedsAttention
+                      ? 'border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-300 hover:bg-amber-100/70'
+                    : ariaDisabled
                       ? 'cursor-not-allowed border-gray-100 bg-gray-50 text-gray-400'
                       : 'border-transparent bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50',
                 )}
@@ -112,7 +138,7 @@ export function EditorStageBarV7({
                       ))}
                     </span>
                   ) : (
-                    <span className="mt-0.5 block max-w-[112px] truncate text-[9px] opacity-70">{stage.description}</span>
+                    <span className="mt-0.5 block max-w-[132px] text-[10px] leading-3 opacity-70 line-clamp-2">{description}</span>
                   )}
                 </span>
               </button>

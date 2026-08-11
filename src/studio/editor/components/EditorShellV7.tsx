@@ -9,6 +9,7 @@ import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
 import { EditorGuidedStartV7 } from './EditorGuidedStartV7';
 import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
 import { EditorStageBarV7 } from './EditorStageBarV7';
+import { EditorStageContextNoticeV7 } from './EditorStageContextNoticeV7';
 import { EditorToolRailV7 } from './EditorToolRailV7';
 import { EditorWorkspaceIntentNoticeV7 } from './EditorWorkspaceIntentNoticeV7';
 import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
@@ -20,6 +21,7 @@ import {
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
 import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
+import { matchProductSilhouetteRefV7, resolveBackgroundSilhouetteV7 } from '../v7/background';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -29,6 +31,17 @@ const SAVE_LABEL = {
 } as const;
 
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function customerPreviewAvailabilityV7(
+  saveState: 'saved' | 'dirty' | 'saving' | 'error',
+  switching: boolean,
+): { enabled: boolean; description: string } {
+  if (switching) return { enabled: false, description: '正在安全切换设计' };
+  if (saveState === 'dirty') return { enabled: false, description: '请先保存当前更改' };
+  if (saveState === 'saving') return { enabled: false, description: '正在保存，完成后可预览' };
+  if (saveState === 'error') return { enabled: false, description: '保存失败，请重试后再预览' };
+  return { enabled: true, description: '只读预览已可用 · 确认 Snapshot 待 V7-16' };
+}
 
 export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean }) {
   const navigate = useNavigate();
@@ -59,12 +72,15 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const [dockedTools, setDockedTools] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
   const [mobileWorkspace, setMobileWorkspace] = useState(() => window.matchMedia('(max-width: 767px)').matches);
   const [pendingToolIntent, setPendingToolIntent] = useState<EditorWorkspaceToolAvailabilityV7 | null>(null);
+  const [stageContext, setStageContext] = useState<'geometry' | 'customer' | null>(null);
   const [dismissedGuides, setDismissedGuides] = useState<Set<string>>(() => new Set());
   const resourceDialogRef = useRef<HTMLDivElement>(null);
   const overlayTriggerRef = useRef<HTMLElement | null>(null);
   const toolIntentTriggerRef = useRef<HTMLElement | null>(null);
+  const stageContextTriggerRef = useRef<HTMLButtonElement | null>(null);
   const guidedStartRef = useRef<HTMLButtonElement>(null);
   const guideFocusRequestedRef = useRef(false);
+  const customerPreviewAvailability = customerPreviewAvailabilityV7(saveState, switching);
 
   useEffect(() => {
     setTitleDraft(doc?.title ?? '');
@@ -75,6 +91,11 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     toolIntentTriggerRef.current = null;
     guideFocusRequestedRef.current = false;
   }, [currentFinger, doc?.designId]);
+
+  useEffect(() => {
+    setStageContext(null);
+    stageContextTriggerRef.current = null;
+  }, [doc?.designId]);
 
   useEffect(() => {
     if (!guideFocusRequestedRef.current) return;
@@ -219,6 +240,19 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     setWorkspacePanelOpen(false);
     restoreOverlayTrigger();
   };
+  const closeStageContext = () => {
+    const trigger = stageContextTriggerRef.current;
+    stageContextTriggerRef.current = null;
+    setStageContext(null);
+    queueMicrotask(() => trigger?.isConnected && trigger.focus());
+  };
+
+  useEffect(() => {
+    // A dirty/saving/error explanation must not remain on screen after a save
+    // transition makes preview available. Close it and restore the Stage
+    // trigger so title and body never contradict the current availability.
+    if (stageContext === 'customer' && customerPreviewAvailability.enabled) closeStageContext();
+  }, [customerPreviewAvailability.enabled, stageContext]);
 
   useEffect(() => {
     if (wideWorkspace || !resourcesOpen) return;
@@ -236,6 +270,9 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
           toolIntentTriggerRef.current = null;
           setPendingToolIntent(null);
           queueMicrotask(() => trigger?.isConnected && trigger.focus());
+        } else if (stageContext) {
+          event.preventDefault();
+          closeStageContext();
         } else if (workspacePanelOpen) {
           event.preventDefault();
           closeWorkspacePanel();
@@ -252,7 +289,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [pendingToolIntent, redo, resourcesOpen, undo, workspacePanelOpen]);
+  }, [pendingToolIntent, redo, resourcesOpen, stageContext, undo, workspacePanelOpen]);
 
   if (!doc || !currentNail) return null;
 
@@ -274,13 +311,27 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     if (result === 'error') toast.error(saveError ?? 'V7 保存失败，请重试。');
   };
 
-  const openCustomerPreview = () => {
-    if (saveState !== 'saved' || switching) return;
+  const openGeometryContext = (trigger: HTMLButtonElement) => {
+    stageContextTriggerRef.current = trigger;
+    setStageContext('geometry');
+  };
+  const openCustomerPreview = (trigger: HTMLButtonElement) => {
+    if (!customerPreviewAvailability.enabled) {
+      stageContextTriggerRef.current = trigger;
+      setStageContext('customer');
+      return;
+    }
+    setStageContext(null);
+    stageContextTriggerRef.current = null;
     captureCustomerPreviewSessionV7(doc);
-    navigate(`${Routes.designCustomerPreview}?design=${encodeURIComponent(doc.designId)}`);
+    navigate(`${Routes.designCustomerPreview}?design=${encodeURIComponent(doc.designId)}&finger=${encodeURIComponent(currentFinger)}`);
   };
 
   const selectStageStep = (stepId: string) => {
+    if (stageContext) {
+      stageContextTriggerRef.current = null;
+      setStageContext(null);
+    }
     if (selectedStep?.id !== stepId) editorV7Store.getState().selectStep(stepId);
   };
 
@@ -429,6 +480,8 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const showGuidedStart = !dismissedGuides.has(guideKey) && !currentNail.steps.some((step) => (
     step.kind === 'flat_design' || step.kind === 'surface_effect' || step.kind === 'dimensional_decoration'
   ));
+  const geometrySilhouette = resolveBackgroundSilhouetteV7(currentNail.geometryRef);
+  const productGeometry = matchProductSilhouetteRefV7(currentNail.geometryRef);
 
   return (
     <section
@@ -494,7 +547,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
             disabled={saveState !== 'saved' || switching}
             title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
             aria-label="打开顾客只读预览"
-            onClick={openCustomerPreview}
+            onClick={(event) => openCustomerPreview(event.currentTarget)}
           >
             <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
           </Button>
@@ -521,7 +574,52 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </div>
       )}
 
-      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} onRequestPersonalization={showPersonalizationGuide} onOpenCustomerPreview={openCustomerPreview} customerPreviewEnabled={saveState === 'saved' && !switching} />
+      <EditorStageBarV7
+        nail={currentNail}
+        selectedStepId={selectedStep?.id ?? null}
+        onSelectStep={selectStageStep}
+        onOpenGeometry={openGeometryContext}
+        onRequestPersonalization={showPersonalizationGuide}
+        onOpenCustomerPreview={openCustomerPreview}
+        customerPreviewEnabled={customerPreviewAvailability.enabled}
+        customerPreviewReason={customerPreviewAvailability.description}
+        expandedContext={stageContext}
+      />
+
+      {stageContext === 'geometry' && (
+        <EditorStageContextNoticeV7
+          context="geometry"
+          source={geometrySilhouette.source}
+          title={`${currentFinger} · ${geometrySilhouette.label}`}
+          description={geometrySilhouette.source === 'product'
+            ? '当前设计按产品甲型轮廓裁剪预览。甲型与长度由 Wizard / DesignVersion 的 geometryRef 绑定，Editor 不在此重写。'
+            : '当前未解析到正式产品几何，预览使用通用轮廓；原 geometryRef 保持不变，正式绑定留给 V7-15。'}
+          details={[
+            { label: '指位', value: currentFinger },
+            ...(productGeometry ? [
+              { label: '甲型 / 长度', value: `${productGeometry.shape} / ${productGeometry.length}` },
+            ] : []),
+            { label: '几何引用', value: `${currentNail.geometryRef.assetId} @ ${currentNail.geometryRef.revision}` },
+          ]}
+          disclaimer="这是结构化预览映射，不代表扫描、贴合、物理或制造验证。"
+          onDismiss={closeStageContext}
+        />
+      )}
+
+      {stageContext === 'customer' && (
+        <EditorStageContextNoticeV7
+          context="customer"
+          title="顾客只读预览尚不可进入"
+          description={customerPreviewAvailability.description}
+          details={[
+            { label: '当前设计', value: doc.designId },
+            { label: '修订', value: String(doc.revision) },
+            { label: '起始指位', value: currentFinger },
+          ]}
+          disclaimer="预览只读且不生成 ConfirmationSnapshot；保存成功后再次激活该阶段。"
+          onDismiss={closeStageContext}
+        />
+      )}
 
       {pendingToolIntent && <EditorWorkspaceIntentNoticeV7 intent={pendingToolIntent} onResolve={resolveWorkspaceIntent} onDismiss={dismissWorkspaceIntent} />}
 

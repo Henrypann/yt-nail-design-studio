@@ -121,9 +121,16 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   }
   const appSource = await readFile(new URL('../src/app/App.tsx', import.meta.url), 'utf8');
   const shellSource = await readFile(new URL('../src/studio/editor/components/EditorShellV7.tsx', import.meta.url), 'utf8');
+  const pageSource = await readFile(new URL('../src/app/pages/design/CustomerPreviewPageV7.tsx', import.meta.url), 'utf8');
+  const previewShellSource = await readFile(new URL('../src/studio/editor/components/CustomerPreviewShellV7.tsx', import.meta.url), 'utf8');
   assert.match(appSource, /Routes\.designCustomerPreview/);
   assert.match(shellSource, /captureCustomerPreviewSessionV7/);
   assert.match(shellSource, /saveState === 'saved'/);
+  assert.match(shellSource, /&finger=/);
+  assert.match(pageSource, /FINGER_CODES\.includes/);
+  assert.match(previewShellSource, /initialFinger/);
+  assert.match(previewShellSource, /data-selected-finger/);
+  assert.match(previewShellSource, /aria-current=/);
   console.log('[v7-customer-preview] writer-zero source boundary and route entry: PASS');
 }
 

@@ -1,0 +1,257 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "expectedLayout": "mobile"
+    },
+    "setup": {
+      "designId": "design_5c239e9f-f1ba-4a9c-bf5d-b16186c863f8",
+      "revision": 10,
+      "history": 9,
+      "currentFinger": "R4",
+      "selectedStepId": "step.R4.continuity-flat.2"
+    },
+    "editorLayout": {
+      "layout": "mobile",
+      "bodyClientWidth": 390,
+      "bodyScrollWidth": 390,
+      "minFingerHeight": 44
+    },
+    "exactSwitch": {
+      "finger": "R5",
+      "stepId": "step.R5.continuity-flat.2",
+      "elementId": null,
+      "stepCount": 6
+    },
+    "fallback": {
+      "finger": "L2",
+      "selectedStepId": "step.design_5c239e9f-f1ba-4a9c-bf5d-b16186c863f8.L2.background",
+      "backgroundId": "step.design_5c239e9f-f1ba-4a9c-bf5d-b16186c863f8.L2.background",
+      "stepCount": 3
+    },
+    "currentKeyboard": {
+      "finger": "L1",
+      "focused": "L1"
+    },
+    "selectedKeyboard": {
+      "finger": "L1",
+      "focused": "L2"
+    },
+    "previewEntryFinger": "R3",
+    "invalidFingerFallback": "L1",
+    "layout": {
+      "previewMode": "set",
+      "bodyClientWidth": 390,
+      "bodyScrollWidth": 390,
+      "minButtonHeight": 44
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900,
+      "expectedLayout": "tablet"
+    },
+    "setup": {
+      "designId": "design_82a14640-278d-43cc-bd8d-4742f4cb5142",
+      "revision": 10,
+      "history": 9,
+      "currentFinger": "R4",
+      "selectedStepId": "step.R4.continuity-flat.2"
+    },
+    "editorLayout": {
+      "layout": "tablet",
+      "bodyClientWidth": 768,
+      "bodyScrollWidth": 768,
+      "minFingerHeight": 44
+    },
+    "exactSwitch": {
+      "finger": "R5",
+      "stepId": "step.R5.continuity-flat.2",
+      "elementId": null,
+      "stepCount": 6
+    },
+    "fallback": {
+      "finger": "L2",
+      "selectedStepId": "step.design_82a14640-278d-43cc-bd8d-4742f4cb5142.L2.background",
+      "backgroundId": "step.design_82a14640-278d-43cc-bd8d-4742f4cb5142.L2.background",
+      "stepCount": 3
+    },
+    "currentKeyboard": {
+      "finger": "L1",
+      "focused": "L1"
+    },
+    "selectedKeyboard": {
+      "finger": "L1",
+      "focused": "L2"
+    },
+    "previewEntryFinger": "R3",
+    "invalidFingerFallback": "L1",
+    "layout": {
+      "previewMode": "set",
+      "bodyClientWidth": 768,
+      "bodyScrollWidth": 768,
+      "minButtonHeight": 44
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900,
+      "expectedLayout": "compact"
+    },
+    "setup": {
+      "designId": "design_69cd4fba-2332-4d75-a938-498927af4a0f",
+      "revision": 10,
+      "history": 9,
+      "currentFinger": "R4",
+      "selectedStepId": "step.R4.continuity-flat.2"
+    },
+    "editorLayout": {
+      "layout": "compact",
+      "bodyClientWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "minFingerHeight": 44
+    },
+    "exactSwitch": {
+      "finger": "R5",
+      "stepId": "step.R5.continuity-flat.2",
+      "elementId": null,
+      "stepCount": 6
+    },
+    "fallback": {
+      "finger": "L2",
+      "selectedStepId": "step.design_69cd4fba-2332-4d75-a938-498927af4a0f.L2.background",
+      "backgroundId": "step.design_69cd4fba-2332-4d75-a938-498927af4a0f.L2.background",
+      "stepCount": 3
+    },
+    "currentKeyboard": {
+      "finger": "L1",
+      "focused": "L1"
+    },
+    "selectedKeyboard": {
+      "finger": "L1",
+      "focused": "L2"
+    },
+    "previewEntryFinger": "R3",
+    "invalidFingerFallback": "L1",
+    "layout": {
+      "previewMode": "set",
+      "bodyClientWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "minButtonHeight": 44
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900,
+      "expectedLayout": "wide"
+    },
+    "setup": {
+      "designId": "design_c8b8d15f-c3bf-4580-bd60-5971def6564f",
+      "revision": 10,
+      "history": 9,
+      "currentFinger": "R4",
+      "selectedStepId": "step.R4.continuity-flat.2"
+    },
+    "editorLayout": {
+      "layout": "wide",
+      "bodyClientWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "minFingerHeight": 44
+    },
+    "exactSwitch": {
+      "finger": "R5",
+      "stepId": "step.R5.continuity-flat.2",
+      "elementId": null,
+      "stepCount": 6
+    },
+    "fallback": {
+      "finger": "L2",
+      "selectedStepId": "step.design_c8b8d15f-c3bf-4580-bd60-5971def6564f.L2.background",
+      "backgroundId": "step.design_c8b8d15f-c3bf-4580-bd60-5971def6564f.L2.background",
+      "stepCount": 3
+    },
+    "currentKeyboard": {
+      "finger": "L1",
+      "focused": "L1"
+    },
+    "selectedKeyboard": {
+      "finger": "L1",
+      "focused": "L2"
+    },
+    "previewEntryFinger": "R3",
+    "invalidFingerFallback": "L1",
+    "layout": {
+      "previewMode": "set",
+      "bodyClientWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "minButtonHeight": 44
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900,
+      "expectedLayout": "wide"
+    },
+    "setup": {
+      "designId": "design_d6aeb576-4dc3-4a90-ac91-175ecad8ac43",
+      "revision": 10,
+      "history": 9,
+      "currentFinger": "R4",
+      "selectedStepId": "step.R4.continuity-flat.2"
+    },
+    "editorLayout": {
+      "layout": "wide",
+      "bodyClientWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "minFingerHeight": 44
+    },
+    "exactSwitch": {
+      "finger": "R5",
+      "stepId": "step.R5.continuity-flat.2",
+      "elementId": null,
+      "stepCount": 6
+    },
+    "fallback": {
+      "finger": "L2",
+      "selectedStepId": "step.design_d6aeb576-4dc3-4a90-ac91-175ecad8ac43.L2.background",
+      "backgroundId": "step.design_d6aeb576-4dc3-4a90-ac91-175ecad8ac43.L2.background",
+      "stepCount": 3
+    },
+    "currentKeyboard": {
+      "finger": "L1",
+      "focused": "L1"
+    },
+    "selectedKeyboard": {
+      "finger": "L1",
+      "focused": "L2"
+    },
+    "previewEntryFinger": "R3",
+    "invalidFingerFallback": "L1",
+    "layout": {
+      "previewMode": "set",
+      "bodyClientWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "minButtonHeight": 44
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]
