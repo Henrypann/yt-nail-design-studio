@@ -1,0 +1,152 @@
+/**
+ * CommunityLookCard · Explore/Search Look 卡片（COMM-V7.1-02）。
+ *
+ * 语义约束：
+ * - 卡片根节点是 `<article>`，内部有独立链接与按钮（不是「按钮套按钮」）。
+ * - 标题/封面是 canonical 详情链接（Routes.communityLook），只保留产品上下文
+ *   entry/return_to，不携带搜索/筛选状态。
+ * - Use 同样是 canonical 详情链接：真实试用必须经过 Look 详情的 Studio 意图
+ *   校验，卡片绝不直接写 Wizard/Editor store。
+ * - Save 是明确不可用的未来动作（Nail Board 属于 COMM-03）：禁用态 + 无障碍
+ *   说明，不伪造持久化、提示弹层或假保存成功。
+ * - Made 需要已验证的 RealResult / Fulfillment 制造记录；当前静态 fixture 无
+ *   任何此类证据，卡片显示不可用（—），绝不推断或伪造计数。
+ * - 不加载 Three.js。
+ */
+
+import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Bookmark, Hammer } from 'lucide-react';
+import { Routes } from '@/app/routes';
+import { useLocale } from '@/lib/i18n';
+import { communityTaxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
+import { communityInternalHref } from '../lib/entry-link';
+import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
+import type { CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
+import { PublisherBadge } from './PublisherBadge';
+import { ApplicationBadge, VerificationBadge } from './CapabilityBadge';
+
+interface Props {
+  look: PublishedLookReadModelV1;
+  publisher?: CommunityPublisherV1 | null;
+  taxonomy: CommunityTaxonomyV1;
+}
+
+export function CommunityLookCard({ look, publisher, taxonomy }: Props) {
+  const [searchParams] = useSearchParams();
+  const { locale, text } = useLocale();
+  const [coverFailed, setCoverFailed] = useState(false);
+  const detailHref = communityInternalHref(Routes.communityLook(look.lookId), searchParams);
+  const style = taxonomy.mainStyles.find((s) => s.id === look.mainStyleId);
+  const topicId = look.effectIds[0] ?? look.moodIds[0];
+  const effect = taxonomy.effects.find((e) => e.id === topicId);
+  const mood = taxonomy.moods.find((m) => m.id === topicId);
+  const topic = effect
+    ? communityTaxonomyLabel('community-effect', effect, locale)
+    : mood
+      ? communityTaxonomyLabel('community-mood', mood, locale)
+      : undefined;
+
+  return (
+    <article
+      data-testid="community-look-card"
+      data-look-id={look.lookId}
+      className="flex flex-col overflow-hidden rounded-card border border-gray-200 bg-white transition hover:border-primary/40 hover:shadow-sm"
+    >
+      <Link to={detailHref} className="block" aria-label={look.title} tabIndex={-1}>
+        <div className="aspect-[16/10] bg-gray-100">
+          {coverFailed ? (
+            <div
+              className="flex h-full w-full items-center justify-center text-[11px] text-gray-400"
+              data-testid="community-card-cover-fallback"
+            >
+              封面暂不可用
+            </div>
+          ) : (
+            <img
+              src={look.cover.url}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+              onError={() => setCoverFailed(true)}
+            />
+          )}
+        </div>
+      </Link>
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <div className="flex flex-wrap gap-1">
+          <PublisherBadge publisher={publisher} />
+          {style && (
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600">
+              {communityTaxonomyLabel('community-style', style, locale)}
+            </span>
+          )}
+          {topic && (
+            <span className="rounded-full bg-gray-50 px-2 py-0.5 text-[10px] text-gray-500">
+              {topic}
+            </span>
+          )}
+        </div>
+        <h3 className="text-sm font-medium text-gray-900">
+          <Link
+            to={detailHref}
+            className="line-clamp-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {look.title}
+          </Link>
+        </h3>
+        <div className="mt-auto flex flex-wrap gap-1 pt-1">
+          <ApplicationBadge level={look.applicationLevel} />
+          <VerificationBadge level={look.verificationLevel} />
+        </div>
+
+        {/* 可见动作：Save（不可用）/ Use（canonical 详情）/ Made（不可用） */}
+        <div
+          role="group"
+          aria-label={text('Look 操作', 'Look actions')}
+          className="mt-1 flex flex-wrap items-center gap-1.5 border-t border-gray-100 pt-2"
+        >
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            data-testid="look-card-save"
+            title={text(
+              '保存到 Nail Board 将在 COMM-03 提供（当前不可用）',
+              'Save to Nail Boards arrives in COMM-03 (currently unavailable)',
+            )}
+            className="inline-flex h-11 items-center gap-1 rounded-button border border-gray-200 bg-gray-50 px-2.5 text-xs font-medium text-gray-400"
+          >
+            <Bookmark size={13} aria-hidden />
+            {text('保存', 'Save')}
+          </button>
+          <Link
+            to={detailHref}
+            data-testid="look-card-use"
+            className="inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-2.5 text-xs font-medium text-primary hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {text('使用', 'Use')}
+          </Link>
+          <span
+            data-testid="look-card-made"
+            title={text(
+              'Made 需要已验证的 RealResult / 履约记录，当前无证据（不可用）',
+              'Made requires a verified RealResult / fulfillment record — no evidence available',
+            )}
+            className="inline-flex h-11 items-center gap-1 rounded-button border border-dashed border-gray-200 px-2.5 text-xs font-medium text-gray-400"
+          >
+            <Hammer size={13} aria-hidden />
+            {text('已制作', 'Made')} —
+          </span>
+        </div>
+        <p className="sr-only">
+          {text(
+            '保存不可用：Nail Board 将在 COMM-03 提供。Made 不可用：当前内容没有已验证的 RealResult / 履约记录。',
+            'Save is unavailable: Nail Boards arrive in COMM-03. Made is unavailable: this content has no verified RealResult / fulfillment record.',
+          )}
+        </p>
+      </div>
+    </article>
+  );
+}

@@ -24,6 +24,11 @@ export function CommunityLayout() {
       end: true,
     },
     {
+      to: communityInternalHref(Routes.communitySearch, searchParams),
+      label: text('搜索', 'Search'),
+      end: true,
+    },
+    {
       to: communityInternalHref(Routes.communityOfficial, searchParams),
       label: text('官方', 'Official'),
       end: true,
@@ -104,7 +109,7 @@ export function CommunityLayout() {
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
                   cx(
-                    'block rounded-button px-3 py-2 text-sm',
+                    'flex min-h-11 items-center rounded-button px-3 py-2 text-sm',
                     isActive ? 'bg-primary-soft text-primary' : 'text-gray-700',
                   )
                 }

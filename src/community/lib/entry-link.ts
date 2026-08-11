@@ -1,5 +1,9 @@
 /**
  * 产品域 → Community 入口链接（仅安全查询参数；不写 Wizard/Editor Store）。
+ *
+ * COMM-V7.1-02: 内部导航继续保留 Studio 入口上下文 `entry` / `return_to` /
+ * `shape` / `length`。后两者也可作为 Explore/Search 筛选状态，但不能因此
+ * 丢失 Wizard 传入的甲型/长度建议。其余搜索状态只属于当前页 URL。
  */
 
 import { Routes } from '@/app/routes';
