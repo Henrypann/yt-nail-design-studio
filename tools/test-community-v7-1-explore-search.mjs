@@ -468,8 +468,9 @@ const defaultState = () =>
   assert.match(card, /Routes\.communityLook\(look\.lookId\)/, 'canonical detail link');
   assert.doesNotMatch(card, /Routes\.communityContent\(/, 'no legacy content route');
   assert.match(card, /look-card-save/, 'Save action present');
-  assert.match(card, /disabled/, 'Save is disabled');
-  assert.match(card, /COMM-03/, 'Save explains Nail Board COMM-03');
+  assert.match(card, /disabled=\{!onSave\}/, 'Save enabled when onSave injected (COMM-03)');
+  assert.match(card, /onSave/, 'Save wired through parent-provided onSave');
+  assert.doesNotMatch(card, /COMM-03/, 'Save no longer claims COMM-03 unavailability');
   assert.match(card, /look-card-use/, 'Use action present');
   assert.match(card, /look-card-made/, 'Made action present');
   assert.match(card, /Made.*—|—/, 'Made displays unavailable dash');

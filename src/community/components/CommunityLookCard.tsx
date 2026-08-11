@@ -1,5 +1,5 @@
 /**
- * CommunityLookCard · Explore/Search Look 卡片（COMM-V7.1-02）。
+ * CommunityLookCard · Explore/Search Look 卡片（COMM-V7.1-02，COMM-V7.1-03 启用 Save）。
  *
  * 语义约束：
  * - 卡片根节点是 `<article>`，内部有独立链接与按钮（不是「按钮套按钮」）。
@@ -7,8 +7,9 @@
  *   entry/return_to，不携带搜索/筛选状态。
  * - Use 同样是 canonical 详情链接：真实试用必须经过 Look 详情的 Studio 意图
  *   校验，卡片绝不直接写 Wizard/Editor store。
- * - Save 是明确不可用的未来动作（Nail Board 属于 COMM-03）：禁用态 + 无障碍
- *   说明，不伪造持久化、提示弹层或假保存成功。
+ * - Save 由父级（CommunityFeed）注入 `onSave`：卡片只上报保存意图，持久化由
+ *   Feed 的 NailBoardSaveDialog 完成，卡片本身不做任何本地持久化、不伪造成功。
+ *   未注入 `onSave` 时按钮保持禁用。
  * - Made 需要已验证的 RealResult / Fulfillment 制造记录；当前静态 fixture 无
  *   任何此类证据，卡片显示不可用（—），绝不推断或伪造计数。
  * - 不加载 Three.js。
@@ -30,9 +31,11 @@ interface Props {
   look: PublishedLookReadModelV1;
   publisher?: CommunityPublisherV1 | null;
   taxonomy: CommunityTaxonomyV1;
+  /** COMM-V7.1-03: 由 Feed 注入，打开 Save-to-Board 对话框。 */
+  onSave?: (look: PublishedLookReadModelV1) => void;
 }
 
-export function CommunityLookCard({ look, publisher, taxonomy }: Props) {
+export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) {
   const [searchParams] = useSearchParams();
   const { locale, text } = useLocale();
   const [coverFailed, setCoverFailed] = useState(false);
@@ -109,14 +112,19 @@ export function CommunityLookCard({ look, publisher, taxonomy }: Props) {
         >
           <button
             type="button"
-            disabled
-            aria-disabled="true"
+            disabled={!onSave}
+            aria-disabled={!onSave}
             data-testid="look-card-save"
             title={text(
-              '保存到 Nail Board 将在 COMM-03 提供（当前不可用）',
-              'Save to Nail Boards arrives in COMM-03 (currently unavailable)',
+              onSave
+                ? '保存到 Nail Board（引用款式，不复制设计内容）'
+                : '保存到 Nail Board 需要注入 onSave（当前不可用）',
+              onSave
+                ? 'Save to Nail Boards (reference only, never a content copy)'
+                : 'Save to Nail Boards needs an injected onSave (currently unavailable)',
             )}
-            className="inline-flex h-11 items-center gap-1 rounded-button border border-gray-200 bg-gray-50 px-2.5 text-xs font-medium text-gray-400"
+            onClick={() => onSave?.(look)}
+            className="inline-flex h-11 items-center gap-1 rounded-button border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400"
           >
             <Bookmark size={13} aria-hidden />
             {text('保存', 'Save')}
@@ -142,8 +150,8 @@ export function CommunityLookCard({ look, publisher, taxonomy }: Props) {
         </div>
         <p className="sr-only">
           {text(
-            '保存不可用：Nail Board 将在 COMM-03 提供。Made 不可用：当前内容没有已验证的 RealResult / 履约记录。',
-            'Save is unavailable: Nail Boards arrive in COMM-03. Made is unavailable: this content has no verified RealResult / fulfillment record.',
+            '保存将款式作为引用加入 Nail Board（legacy 款式为未版本化灵感参考）。Made 不可用：当前内容没有已验证的 RealResult / 履约记录。',
+            'Save adds the look as a reference to a Nail Board (legacy looks are unversioned inspiration references). Made is unavailable: this content has no verified RealResult / fulfillment record.',
           )}
         </p>
       </div>

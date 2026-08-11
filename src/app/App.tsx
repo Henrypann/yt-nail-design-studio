@@ -36,6 +36,9 @@ import CommunityCreatorsPage from '@/community/pages/CommunityCreatorsPage';
 import CommunityLookPage from '@/community/pages/CommunityLookPage';
 import CommunityLegacyContentRedirect from '@/community/pages/CommunityLegacyContentRedirect';
 import CommunityProfilePage from '@/community/pages/CommunityProfilePage';
+import CommunityBoardsPage from '@/community/pages/CommunityBoardsPage';
+import CommunityBoardPage from '@/community/pages/CommunityBoardPage';
+import CommunityBoardSharePage from '@/community/pages/CommunityBoardSharePage';
 
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
@@ -72,6 +75,10 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
       <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
       <Route path={Routes.communityLookPath} element={<CommunityLookPage />} />
+      {/* Nail Board（COMM-V7.1-03）：owner 管理 + token 只读分享（同一 Community 壳） */}
+      <Route path={Routes.communityBoards} element={<CommunityBoardsPage />} />
+      <Route path={Routes.communityBoardDetailPath} element={<CommunityBoardPage />} />
+      <Route path={Routes.communityBoardSharePath} element={<CommunityBoardSharePage />} />
       {/* legacy 深链：replace 重定向到 canonical look 路由 */}
       <Route path={Routes.communityContentPath} element={<CommunityLegacyContentRedirect />} />
       <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
