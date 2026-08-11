@@ -8,7 +8,9 @@ import type {
   FlatDesignElementV7,
   GradientStopV7,
   ProcessStepV7,
+  RegionMaskV7,
   RgbaColorV7,
+  SurfaceEffectPayloadV7,
   Transform2DV7,
 } from './v7/model';
 import type { EditorDocV7MigrationDiagnostic, EditorDocV7MigrationResolvers } from './v7/migrate';
@@ -22,6 +24,8 @@ import {
   setEditorV7ElementFlag,
   setEditorV7ElementTransform,
   setEditorV7StepFlag,
+  setEditorV7SurfaceEffect,
+  setEditorV7SurfaceEffectMask,
   type EditorV7CommandResult,
 } from './v7/commands';
 import {
@@ -167,6 +171,8 @@ export interface EditorV7State {
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
   duplicateStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   setStepFlag(finger: FingerCode, stepId: string, flag: 'visible' | 'locked' | 'skipped', value: boolean): EditorV7ActionResult;
+  setSurfaceEffect(finger: FingerCode, stepId: string, effect: SurfaceEffectPayloadV7): EditorV7ActionResult;
+  setSurfaceEffectMask(finger: FingerCode, stepId: string, mask: RegionMaskV7): EditorV7ActionResult;
   addElement(finger: FingerCode, stepId: string, element: FlatDesignElementV7 | DimensionalDecorationV7): EditorV7ActionResult;
   removeElement(finger: FingerCode, stepId: string, elementId: string): EditorV7ActionResult;
   setElementFlag(finger: FingerCode, stepId: string, elementId: string, flag: 'visible' | 'locked', value: boolean): EditorV7ActionResult;
@@ -544,6 +550,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       moveStep: (finger, stepId, targetIndex) => commitFingerCommand(finger, (doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
       duplicateStep: (finger, stepId) => commitFingerCommand(finger, (doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
       setStepFlag: (finger, stepId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
+      setSurfaceEffect: (finger, stepId, effect) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffect(doc, finger, stepId, effect)),
+      setSurfaceEffectMask: (finger, stepId, mask) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffectMask(doc, finger, stepId, mask)),
       addElement: (finger, stepId, element) => commitFingerCommand(finger, (doc) => addEditorV7Element(doc, finger, stepId, element)),
       removeElement: (finger, stepId, elementId) => {
         const wasSelected = get().selectedElementId === elementId;

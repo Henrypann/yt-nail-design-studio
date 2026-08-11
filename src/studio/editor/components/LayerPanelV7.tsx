@@ -10,6 +10,7 @@ import {
   Layers3,
   Lock,
   Plus,
+  Sparkles,
   SkipForward,
   SlidersHorizontal,
   Trash2,
@@ -26,6 +27,8 @@ import { BackgroundPanelV7 } from './BackgroundPanelV7';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 import { FlatContentInspectorV7 } from './FlatContentInspectorV7';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
+import { createDefaultSurfaceEffectPayloadV7, createSurfaceEffectMaskV7 } from '../v7/surface-effect';
+import { SurfaceEffectPanelV7 } from './SurfaceEffectPanelV7';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -93,6 +96,24 @@ function ProcessTreeV7() {
     if (result.ok) selectStep(step.id);
   };
 
+  const addSurfaceEffectStep = () => {
+    const stepId = generateEditorV7Id('step');
+    const step: ProcessStepV7 = {
+      id: stepId,
+      typeId: PROCESS_STEP_TYPE_IDS_V7.surface_effect,
+      kind: 'surface_effect',
+      name: '局部表面效果',
+      visible: true,
+      locked: false,
+      skipped: false,
+      materialRefs: [],
+      effect: createDefaultSurfaceEffectPayloadV7('cat_eye', `${stepId}-cat-eye`),
+      mask: createSurfaceEffectMaskV7('center'),
+    };
+    const result = addStep(currentFinger, step, nail.steps.length - 1);
+    if (result.ok) selectStep(step.id);
+  };
+
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label={`${currentFinger} 制作步骤`} data-testid="v7-layer-panel">
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-3">
@@ -100,7 +121,7 @@ function ProcessTreeV7() {
           <div className="flex items-center gap-2"><Layers3 size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">层级与步骤</h2></div>
           <p className="mt-0.5 text-[10px] text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
         </div>
-        <Button size="sm" variant="secondary" disabled={readOnly || switching} onClick={addFlatStep} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面步骤</Button>
+        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addFlatStep} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addSurfaceEffectStep} title="在最终封层前添加局部表面效果"><Sparkles size={13} /> 效果</Button></div>
       </div>
 
       <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
@@ -167,6 +188,8 @@ function InspectorV7() {
           ? <BackgroundPanelV7 />
           : selectedStep.kind === 'flat_design'
             ? <><FlatVectorPanelV7 variant="inspector" /><FlatContentInspectorV7 /></>
+            : selectedStep.kind === 'surface_effect'
+              ? <SurfaceEffectPanelV7 />
             : definition
               ? <V7StepToolGate tools={definition.allowedTools} />
               : <p className="text-xs text-gray-500">当前步骤没有可用属性。</p>}

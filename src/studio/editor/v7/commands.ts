@@ -4,6 +4,8 @@ import type {
   EditorDocV7,
   FlatDesignElementV7,
   ProcessStepV7,
+  RegionMaskV7,
+  SurfaceEffectPayloadV7,
   Transform2DV7,
 } from './model';
 import { getProcessStepTypeDefinitionV7 } from './registry';
@@ -174,6 +176,40 @@ export function setEditorV7StepFlag(
   if (flag === 'visible' && found.step.kind === 'surface_finish' && !value) return reject('not_allowed', 'finish must remain visible');
   const next = structuredClone(doc);
   next.nails[finger].steps[found.index][flag] = value;
+  return validate(next);
+}
+
+export function setEditorV7SurfaceEffect(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  effect: SurfaceEffectPayloadV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
+  target.effect = structuredClone(effect);
+  return validate(next);
+}
+
+export function setEditorV7SurfaceEffectMask(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  mask: RegionMaskV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
+  target.mask = structuredClone(mask);
   return validate(next);
 }
 

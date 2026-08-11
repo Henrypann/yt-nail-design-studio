@@ -1,7 +1,8 @@
-import { Box, Layers3, ShieldCheck, Sparkles } from 'lucide-react';
+import { Box, Layers3, ShieldCheck } from 'lucide-react';
 import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { V7BackgroundCanvas } from './V7BackgroundCanvas';
 import { V7FlatDesignCanvas } from './V7FlatDesignCanvas';
+import { V7SurfaceEffectCanvas } from './V7SurfaceEffectCanvas';
 
 export function EditorCanvasHostV7() {
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
@@ -17,10 +18,9 @@ export function EditorCanvasHostV7() {
   }
   if (selectedStep.kind === 'background') return <V7BackgroundCanvas />;
   if (selectedStep.kind === 'flat_design') return <V7FlatDesignCanvas />;
+  if (selectedStep.kind === 'surface_effect') return <V7SurfaceEffectCanvas />;
 
-  const meta = selectedStep.kind === 'surface_effect'
-    ? { icon: Sparkles, title: '表面效果 2D 预览', detail: `${selectedStep.effect.effectType} · ${selectedStep.effect.previewFidelity}`, release: 'V7-12' }
-    : selectedStep.kind === 'dimensional_decoration'
+  const meta = selectedStep.kind === 'dimensional_decoration'
       ? { icon: Box, title: '立体装饰 2D/2.5D 预览', detail: `${selectedStep.decorations.length} 个装饰元素`, release: 'V7-13' }
       : { icon: ShieldCheck, title: '最终封层与组合预览', detail: selectedStep.finish.type, release: 'V7-14' };
   const Icon = meta.icon;

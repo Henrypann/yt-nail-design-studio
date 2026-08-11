@@ -1,4 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { Layers3, SlidersHorizontal, X } from 'lucide-react';
 import { cx } from '@/design-system';
 import { LayerPanelV7 } from './LayerPanelV7';
@@ -45,16 +46,16 @@ export function EditorWorkspaceSidebarV7({
   }
 
   if (!open) return null;
-  return (
+  return createPortal(
     <>
-      <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭工作区面板" onClick={onClose} />
+      <button type="button" className="fixed inset-0 z-[90] bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭工作区面板" onClick={onClose} />
       <aside
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={tab === 'layers' ? '层级面板' : '属性面板'}
         onKeyDown={trapFocus}
-        className="absolute inset-x-0 bottom-0 z-40 flex max-h-[70dvh] min-h-[360px] flex-col overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-modal md:inset-y-0 md:left-auto md:right-0 md:h-full md:max-h-none md:w-[360px] md:rounded-none"
+        className="fixed inset-0 z-[100] flex min-h-0 flex-col overflow-hidden border border-gray-200 bg-white shadow-modal md:left-auto md:w-[360px]"
         data-testid="v7-workspace-sidebar"
         data-overlay-open="true"
       >
@@ -65,6 +66,7 @@ export function EditorWorkspaceSidebarV7({
         </div>
         <div className="flex min-h-0 flex-1">{tab === 'layers' ? <LayerPanelV7 mode="tree" /> : <LayerPanelV7 mode="inspector" />}</div>
       </aside>
-    </>
+    </>,
+    document.body,
   );
 }
