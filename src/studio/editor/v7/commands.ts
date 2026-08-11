@@ -295,3 +295,25 @@ export function setEditorV7ElementTransform(
   nextLocated.items[nextLocated.index].transform = structuredClone(transform);
   return validate(next);
 }
+
+export function replaceEditorV7DimensionalDecoration(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  elementId: string,
+  replacement: DimensionalDecorationV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'dimensional_decoration') return reject('not_allowed', 'replacement requires a dimensional decoration step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const index = found.step.decorations.findIndex((item) => item.id === elementId);
+  if (index < 0) return reject('not_found', 'decoration not found');
+  if (found.step.decorations[index].locked) return reject('locked', 'decoration is locked');
+  if (replacement.id !== elementId) return reject('invalid_value', 'replacement must preserve the decoration ID');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'dimensional_decoration') return reject('not_allowed', 'replacement requires a dimensional decoration step');
+  target.decorations[index] = structuredClone(replacement);
+  return validate(next);
+}

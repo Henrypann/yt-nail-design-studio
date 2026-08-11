@@ -23,6 +23,7 @@ import {
   removeEditorV7Element,
   setEditorV7ElementFlag,
   setEditorV7ElementTransform,
+  replaceEditorV7DimensionalDecoration,
   setEditorV7StepFlag,
   setEditorV7SurfaceEffect,
   setEditorV7SurfaceEffectMask,
@@ -178,6 +179,7 @@ export interface EditorV7State {
   setElementFlag(finger: FingerCode, stepId: string, elementId: string, flag: 'visible' | 'locked', value: boolean): EditorV7ActionResult;
   setElementTransform(finger: FingerCode, stepId: string, elementId: string, transform: Transform2DV7): EditorV7ActionResult;
   replaceFlatElement(finger: FingerCode, stepId: string, elementId: string, replacement: FlatDesignElementV7): EditorV7ActionResult;
+  replaceDimensionalDecoration(finger: FingerCode, stepId: string, elementId: string, replacement: DimensionalDecorationV7): EditorV7ActionResult;
   setFlatElementOpacity(finger: FingerCode, stepId: string, elementId: string, opacity: number): EditorV7ActionResult;
   createTextElement(finger: FingerCode, stepId: string, input: Omit<TextFlatElementInputV7, 'id'>): EditorV7ActionResult;
   replaceTextElement(finger: FingerCode, stepId: string, elementId: string, input: TextFlatElementInputV7): EditorV7ActionResult;
@@ -562,6 +564,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setElementFlag: (finger, stepId, elementId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
       setElementTransform: (finger, stepId, elementId, transform) => commitFingerCommand(finger, (doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
       replaceFlatElement: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
+      replaceDimensionalDecoration: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7DimensionalDecoration(doc, finger, stepId, elementId, replacement)),
       setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitFingerCommand(finger, (doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
       createTextElement: (finger, stepId, input) => commitFingerCommand(finger, (doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
       replaceTextElement: (finger, stepId, elementId, input) => commitFingerCommand(finger, (doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
