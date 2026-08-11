@@ -473,14 +473,6 @@ function parseAssetRevisionRefs(raw: UnknownRecord, path: string, issues: Design
     );
     return;
   }
-  if (value.length === 0) {
-    addIssue(
-      issues,
-      'empty_asset_revisions',
-      `${path}.assetRevisionRefs`,
-      'assetRevisionRefs must reference at least one immutable asset revision',
-    );
-  }
   const seen = new Set<string>();
   for (let i = 0; i < value.length; i += 1) {
     const itemPath = `${path}.assetRevisionRefs[${i}]`;

@@ -109,12 +109,17 @@ for (const version of [DESIGN_VERSION_V1_ROOT_FIXTURE, DESIGN_VERSION_V1_CHILD_F
   assert.equal(version.editorDocRef.designId, version.designId);
   assert.equal(version.editorDocRef.revision, version.revision);
   assert.match(version.editorDocRef.sha256, /^[0-9a-f]{64}$/);
-  assert.ok(version.assetRevisionRefs.length >= 1);
+  assert.ok(Array.isArray(version.assetRevisionRefs));
   for (const asset of version.assetRevisionRefs) {
     assert.match(asset.sha256, /^[0-9a-f]{64}$/);
   }
 }
 assert.equal(validateDesignVersionV1(DESIGN_VERSION_V1_ROOT_FIXTURE), true);
+assert.equal(
+  validateDesignVersionV1({ ...DESIGN_VERSION_V1_ROOT_FIXTURE, assetRevisionRefs: [] }),
+  true,
+  'a valid released design may have zero hash-bearing assets',
+);
 assert.equal(validatePublishedLookV1(PUBLISHED_LOOK_V1_FIXTURE), true);
 assert.equal(validateRemixRelationV1(REMIX_RELATION_V1_FIXTURE), true);
 

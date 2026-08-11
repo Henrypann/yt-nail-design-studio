@@ -289,5 +289,6 @@ export type {
 export { composeNailSvg, composeTiledSvg, svgToPngDataUrl } from './lib/render';
 export { runRiskChecks } from './lib/risk';
 export * from './lib/recipe-model';
+export * from '../versioning';
 export { compileRecipeToFingerRenderModel } from './lib/mercury-renderer';
 export { createNailSurfaceMapper } from './lib/surface-mapper';
