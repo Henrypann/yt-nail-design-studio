@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nextgen-beauty.local/community/v7_1/identity-v1.schema.json",
+  "title": "Community V7.1 · Identity, Visibility, Privacy & Permission contracts",
+  "description": "GEN-V7.1-01 schemaVersion 1 contracts. One identity may hold CONSUMER, CREATOR, SALON_MEMBER and OPERATOR roles. NailProfile is private by default and must stay PRIVATE. The public creator projection (publicCreatorProfileV1) is the only public-facing shape and must never leak customer primary keys, raw nail geometry, allergy/service notes, email, phone or credentials. All objects reject unknown keys (additionalProperties false).",
+  "oneOf": [
+    { "$ref": "#/$defs/identityV1" },
+    { "$ref": "#/$defs/consumerProfileV1" },
+    { "$ref": "#/$defs/creatorProfileV1" },
+    { "$ref": "#/$defs/salonMembershipV1" },
+    { "$ref": "#/$defs/nailProfileV1" },
+    { "$ref": "#/$defs/publicCreatorProfileV1" },
+    { "$ref": "#/$defs/identityBundleV1" },
+    { "$ref": "#/$defs/publicTransitionPrerequisitesV1" }
+  ],
+  "$defs": {
+    "visibility": {
+      "type": "string",
+      "enum": ["PRIVATE", "UNLISTED", "PUBLIC"]
+    },
+    "identityRole": {
+      "type": "string",
+      "enum": ["CONSUMER", "CREATOR", "SALON_MEMBER", "OPERATOR"]
+    },
+    "creatorVerification": {
+      "type": "string",
+      "enum": ["NONE", "VERIFIED"]
+    },
+    "salonMemberRole": {
+      "type": "string",
+      "enum": ["OWNER", "NAIL_TECH", "STAFF"]
+    },
+    "salonMembershipStatus": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE", "SUSPENDED"]
+    },
+    "isoTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$"
+    },
+    "contractId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "identityV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "identityId", "roles", "handle", "displayName", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identityRole" }
+        },
+        "handle": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "avatarUrl": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTimestamp" },
+        "updatedAt": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "consumerProfileV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "profileType", "profileId", "identityId", "displayName", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "profileType": { "const": "CONSUMER" },
+        "profileId": { "$ref": "#/$defs/contractId" },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "avatarUrl": { "type": "string" },
+        "bio": { "type": "string" },
+        "customerId": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTimestamp" },
+        "updatedAt": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "creatorProfileV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "visibility": { "const": "PUBLIC" } }, "required": ["visibility"] },
+          "then": { "required": ["publicSince"] },
+          "else": { "not": { "required": ["publicSince"] } }
+        }
+      ],
+      "required": ["schemaVersion", "profileType", "profileId", "identityId", "handle", "displayName", "verification", "visibility", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "profileType": { "const": "CREATOR" },
+        "profileId": { "$ref": "#/$defs/contractId" },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "handle": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "avatarUrl": { "type": "string" },
+        "bio": { "type": "string" },
+        "verification": { "$ref": "#/$defs/creatorVerification" },
+        "visibility": { "$ref": "#/$defs/visibility" },
+        "publicSince": { "$ref": "#/$defs/isoTimestamp" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTimestamp" },
+        "updatedAt": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "salonMembershipV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "profileType", "membershipId", "identityId", "salonId", "memberRole", "status", "memberSince", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "profileType": { "const": "SALON_MEMBER" },
+        "membershipId": { "$ref": "#/$defs/contractId" },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "salonId": { "$ref": "#/$defs/contractId" },
+        "salonName": { "type": "string" },
+        "memberRole": { "$ref": "#/$defs/salonMemberRole" },
+        "status": { "$ref": "#/$defs/salonMembershipStatus" },
+        "memberSince": { "$ref": "#/$defs/isoTimestamp" },
+        "createdAt": { "$ref": "#/$defs/isoTimestamp" },
+        "updatedAt": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "nailProfileV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "profileType", "nailProfileId", "identityId", "visibility", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "profileType": { "const": "NAIL" },
+        "nailProfileId": { "$ref": "#/$defs/contractId" },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "visibility": { "const": "PRIVATE" },
+        "nailTwinSnapshotRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/contractId" }
+        },
+        "allergyNotes": { "type": "string" },
+        "serviceNotes": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTimestamp" },
+        "updatedAt": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "publicCreatorProfileV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "projectionType", "identityId", "profileId", "handle", "displayName", "verification", "visibility", "publicSince"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "projectionType": { "const": "CREATOR_PROFILE" },
+        "identityId": { "$ref": "#/$defs/contractId" },
+        "profileId": { "$ref": "#/$defs/contractId" },
+        "handle": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "avatarUrl": { "type": "string" },
+        "bio": { "type": "string" },
+        "verification": { "$ref": "#/$defs/creatorVerification" },
+        "visibility": { "const": "PUBLIC" },
+        "publicSince": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "identityBundleV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "identity"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "identity": { "$ref": "#/$defs/identityV1" },
+        "consumerProfile": { "$ref": "#/$defs/consumerProfileV1" },
+        "creatorProfile": { "$ref": "#/$defs/creatorProfileV1" },
+        "salonMemberships": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/salonMembershipV1" }
+        },
+        "nailProfile": { "$ref": "#/$defs/nailProfileV1" }
+      }
+    },
+    "publicTransitionPrerequisitesV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["copyrightDeclared", "sourceDeclared", "moderationCleared"],
+      "properties": {
+        "copyrightDeclared": { "type": "boolean" },
+        "sourceDeclared": { "type": "boolean" },
+        "moderationCleared": { "type": "boolean" }
+      }
+    }
+  }
+}
