@@ -170,13 +170,13 @@ assert.match(contentPage, /community-cover-fallback|onError/);
 assert.doesNotMatch(contentPage, /useWizardStore|useEditorStore/);
 
 const card = fs.readFileSync(
-  path.join(root, 'src/community/components/CommunityContentCard.tsx'),
+  path.join(root, 'src/community/components/CommunityLookCard.tsx'),
   'utf8',
 );
 assert.match(card, /community-card-cover-fallback|onError/);
 
 const feed = fs.readFileSync(path.join(root, 'src/community/components/CommunityFeed.tsx'), 'utf8');
-assert.match(feed, /loadPublishedContents/);
+assert.match(feed, /loadLookReadModels/);
 assert.match(feed, /community-feed-empty|没有匹配的已发布内容/);
 assert.doesNotMatch(feed, /from ['"]three|EditorHqPreview/);
 

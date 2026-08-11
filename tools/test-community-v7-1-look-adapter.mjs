@@ -348,8 +348,8 @@ const app = read('src/app/App.tsx');
 assert.match(app, /Routes\.communityLookPath[\s\S]*CommunityLookPage/);
 assert.match(app, /Routes\.communityContentPath[\s\S]*CommunityLegacyContentRedirect/);
 
-const card = read('src/community/components/CommunityContentCard.tsx');
-assert.match(card, /Routes\.communityLook\(content\.contentId\)/);
+const card = read('src/community/components/CommunityLookCard.tsx');
+assert.match(card, /Routes\.communityLook\(look\.lookId\)/);
 assert.doesNotMatch(card, /Routes\.communityContent\(/);
 
 const profile = read('src/community/pages/CommunityProfilePage.tsx');

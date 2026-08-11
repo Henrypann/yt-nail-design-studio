@@ -30,6 +30,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PetalVeilFixturePage from '@/studio/petal-veil/PetalVeilFixturePage';
 import CommunityDiscoverPage from '@/community/pages/CommunityDiscoverPage';
+import CommunitySearchPage from '@/community/pages/CommunitySearchPage';
 import CommunityOfficialPage from '@/community/pages/CommunityOfficialPage';
 import CommunityCreatorsPage from '@/community/pages/CommunityCreatorsPage';
 import CommunityLookPage from '@/community/pages/CommunityLookPage';
@@ -67,6 +68,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     {/* Community 独立产品壳（无 Studio 侧栏） */}
     <Route element={<CommunityLayout />}>
       <Route path={Routes.community} element={<CommunityDiscoverPage />} />
+      <Route path={Routes.communitySearch} element={<CommunitySearchPage />} />
       <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
       <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
       <Route path={Routes.communityLookPath} element={<CommunityLookPage />} />

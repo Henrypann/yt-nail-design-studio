@@ -20,6 +20,8 @@ export const Routes = {
   deviceBindMobilePath: '/devices/bind/mobile/:token',
   /** Community 独立产品域 */
   community: '/community',
+  /** Explore & Search（COMM-V7.1-02）：/community 为 Discover，/community/search 为 Search。 */
+  communitySearch: '/community/search',
   communityOfficial: '/community/official',
   communityCreators: '/community/creators',
   /**
