@@ -25,3 +25,4 @@ export type {
   ReleasedMaterialRefV1,
   ReleasedRecipeRefV1,
 } from './design-release';
+export * from '../publishing';
