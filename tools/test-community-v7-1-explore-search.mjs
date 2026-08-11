@@ -245,15 +245,21 @@ const defaultState = () =>
   assert.deepEqual(byColor('champagne').sort(), [
     'cc_micro_coquette',
     'cc_mercury_dew',
+    'cc_starfish_bloom',
     'cc_pugc_luna_blush',
     'cc_pugc_luna_pearl',
   ].sort(), 'color=champagne → primaryColorIds match');
-  assert.deepEqual(byColor('ocean').sort(), ['cc_pearl_tide', 'cc_pugc_kai_mirror'].sort());
+  assert.deepEqual(byColor('ocean').sort(), [
+    'cc_pearl_tide',
+    'cc_pugc_kai_mirror',
+    'cc_sea_glass_chrome',
+    'cc_starfish_bloom',
+  ].sort());
   assert.deepEqual(byColor('hotpink'), [], 'unknown color → zero matches, no throw');
   assert.equal(byColor(null).length, devLooks.length, 'color null → no color constraint');
   assert.deepEqual(
     byColor('champagne', { source: 'official' }).sort(),
-    ['cc_micro_coquette', 'cc_mercury_dew'].sort(),
+    ['cc_micro_coquette', 'cc_mercury_dew', 'cc_starfish_bloom'].sort(),
     'color + source combination',
   );
 }
@@ -472,6 +478,8 @@ const defaultState = () =>
   assert.match(card, /onSave/, 'Save wired through parent-provided onSave');
   assert.doesNotMatch(card, /COMM-03/, 'Save no longer claims COMM-03 unavailability');
   assert.match(card, /look-card-use/, 'Use action present');
+  assert.match(card, /look-card-use-disabled/, 'asset-incomplete Use action is disabled');
+  assert.match(card, /resolveStudioUseAvailabilityV1/, 'Use state comes from the domain projection');
   assert.match(card, /look-card-made/, 'Made action present');
   assert.match(card, /Made.*—|—/, 'Made displays unavailable dash');
   assert.match(card, /community-card-cover-fallback/, 'cover fallback kept');

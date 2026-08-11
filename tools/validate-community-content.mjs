@@ -39,8 +39,7 @@ const templateIds = new Set(library.templates.map((t) => t.id));
 
 assert.equal(index.schemaVersion, 1);
 assert.equal(index.officialPgcTarget, 20);
-assert.equal(index.officialMetadataReadyCount, 4);
-assert.equal(index.officialGapCount, 16);
+assert.equal(index.officialMetadataReadyCount + index.officialGapCount, index.officialPgcTarget);
 
 const contentIds = index.contents.map((c) => c.contentId);
 assert.equal(new Set(contentIds).size, contentIds.length, 'contentId unique');
@@ -120,18 +119,16 @@ for (const c of index.contents) {
   }
 }
 
-assert.equal(officialPublished, 4, 'official published PGC count');
-const creatorGapStyles = [...styleIds].filter((styleId) => officialStyleCounts.get(styleId) === 0);
-assert.equal(pugcPublished, creatorGapStyles.length, 'creator concepts only fill official style gaps');
+assert.equal(officialPublished, index.officialMetadataReadyCount, 'official metadata-ready count');
+assert.ok(pugcPublished >= 7, 'retain a varied demo creator set');
 for (const styleId of styleIds) {
-  const officialCount = officialStyleCounts.get(styleId) ?? 0;
-  const creatorCount = creatorStyleCounts.get(styleId) ?? 0;
-  if (officialCount > 0) {
-    assert.equal(creatorCount, 0, `${styleId} must not duplicate an official style`);
-  } else {
-    assert.equal(creatorCount, 1, `${styleId} missing creator gap concept`);
-  }
+  const total = (officialStyleCounts.get(styleId) ?? 0) + (creatorStyleCounts.get(styleId) ?? 0);
+  assert.ok(total >= 1, `${styleId} must have at least one visible Community fixture`);
 }
+const incompleteAssets = published.filter((content) => (
+  content.applicationLevel !== 'INSPIRATION_ONLY' && !content.assetRef
+));
+assert.ok(incompleteAssets.length >= 5, 'fixture set must exercise incomplete Studio assets');
 assert.ok(!JSON.stringify(index).includes('"style_tags"'));
 
 /** Community 模块依赖边界：不得 import Wizard / Editor */
@@ -174,6 +171,8 @@ const card = fs.readFileSync(
   'utf8',
 );
 assert.match(card, /community-card-cover-fallback|onError/);
+assert.match(card, /look-card-use-disabled/);
+assert.match(card, /resolveStudioUseAvailabilityV1/);
 
 const feed = fs.readFileSync(path.join(root, 'src/community/components/CommunityFeed.tsx'), 'utf8');
 assert.match(feed, /loadLookReadModels/);

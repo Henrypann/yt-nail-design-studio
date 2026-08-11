@@ -24,6 +24,7 @@ import { communityTaxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { communityInternalHref } from '../lib/entry-link';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
 import type { CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
+import { resolveStudioUseAvailabilityV1 } from '../domain/studio-use-availability';
 import { PublisherBadge } from './PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from './CapabilityBadge';
 
@@ -49,6 +50,12 @@ export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) 
     : mood
       ? communityTaxonomyLabel('community-mood', mood, locale)
       : undefined;
+  const useAvailability = resolveStudioUseAvailabilityV1(look);
+  const useUnavailableTitle = useAvailability.state === 'ASSETS_INCOMPLETE'
+    ? text('Studio 素材尚未补齐，暂不可使用', 'Studio assets are incomplete; Use is unavailable')
+    : useAvailability.state === 'INSPIRATION_ONLY'
+      ? text('该 Look 仅供灵感参考', 'This Look is inspiration only')
+      : text('该版本依赖暂不可用', 'This version dependency is unavailable');
 
   return (
     <article
@@ -104,7 +111,7 @@ export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) 
           <VerificationBadge level={look.verificationLevel} />
         </div>
 
-        {/* 可见动作：Save（不可用）/ Use（canonical 详情）/ Made（不可用） */}
+        {/* 可见动作：Save / Use（仅资产依赖完整时可用）/ Made（无 RealResult 时不可用） */}
         <div
           role="group"
           aria-label={text('Look 操作', 'Look actions')}
@@ -129,13 +136,28 @@ export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) 
             <Bookmark size={13} aria-hidden />
             {text('保存', 'Save')}
           </button>
-          <Link
-            to={detailHref}
-            data-testid="look-card-use"
-            className="inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-2.5 text-xs font-medium text-primary hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            {text('使用', 'Use')}
-          </Link>
+          {useAvailability.enabled ? (
+            <Link
+              to={detailHref}
+              data-testid="look-card-use"
+              data-use-state={useAvailability.state}
+              className="inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-2.5 text-xs font-medium text-primary hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {text('使用', 'Use')}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title={useUnavailableTitle}
+              data-testid="look-card-use-disabled"
+              data-use-state={useAvailability.state}
+              className="inline-flex h-11 cursor-not-allowed items-center rounded-button border border-gray-200 bg-gray-100 px-2.5 text-xs font-medium text-gray-400"
+            >
+              {text('使用', 'Use')}
+            </button>
+          )}
           <span
             data-testid="look-card-made"
             title={text(

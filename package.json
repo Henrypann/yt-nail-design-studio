@@ -23,6 +23,8 @@
     "test:studio-v7-1-versioned-import": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-versioned-import.mjs",
     "test:studio-v7-1-publish-package": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-publish-package.mjs",
     "test:community-v7-1-use-customize": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-use-customize.mjs",
+    "test:community-content-states": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-content-states.mjs",
+    "test:community-content-states:e2e": "node tools/e2e-community-content-states.mjs",
     "test:community-intent": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-intent.mjs",
     "test:community-studio-flow": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-studio-flow.mjs",
     "test:template-gallery-hq": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-template-gallery-hq.mjs",

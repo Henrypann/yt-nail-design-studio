@@ -234,11 +234,11 @@ assert.equal(
   false,
   'demo PUGC hidden in production mode',
 );
-assert.equal(prodLooks.length, 4, 'official published PGC only in production');
+assert.equal(prodLooks.length, 9, 'official published PGC only in production');
 
 const devLooks = buildLookReadModels(index.contents, 'integration');
 const devIds = devLooks.map((l) => l.lookId);
-assert.equal(devLooks.length, 11, 'integration mode shows official + demo PUGC');
+assert.equal(devLooks.length, 16, 'integration mode shows official + demo PUGC');
 assert.ok(devIds.includes('cc_pugc_luna_blush'), 'demo PUGC visible in integration');
 assert.ok(!devIds.includes('cc_draft_internal_gate'), 'draft never viewable');
 for (const lookModel of devLooks) {

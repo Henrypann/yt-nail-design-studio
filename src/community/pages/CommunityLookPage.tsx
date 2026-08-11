@@ -27,6 +27,7 @@ import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
 import { createVersionedUseIntentForLookV1 } from '@/integration/community-studio/versioned-use-runtime';
+import { resolveStudioUseAvailabilityV1 } from '../domain/studio-use-availability';
 
 function EvidenceRow({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'missing' }) {
   return (
@@ -106,6 +107,12 @@ export default function CommunityLookPage() {
   const legacy = look.readModelKind === 'LEGACY_PARTIAL';
   const canonical = look.readModelKind === 'CANONICAL';
   const evidence = look.evidence;
+  const useAvailability = resolveStudioUseAvailabilityV1(look);
+  const useUnavailableMessage = useAvailability.state === 'ASSETS_INCOMPLETE'
+    ? 'Studio 素材尚未补齐，暂不可使用'
+    : useAvailability.state === 'INSPIRATION_ONLY'
+      ? '该 Look 仅供灵感参考，暂不可使用'
+      : '该版本依赖暂不可用，请稍后再试';
 
   const publishIntent = () => {
     const result = createStudioImportIntent({
@@ -130,7 +137,7 @@ export default function CommunityLookPage() {
   };
 
   const onTryClick = () => {
-    if (!tryable) return;
+    if (!tryable || !useAvailability.enabled) return;
     if (look.applicationLevel === 'APPROXIMATE') {
       setApproxOpen(true);
       return;
@@ -221,7 +228,7 @@ export default function CommunityLookPage() {
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {canonical ? (
+            {canonical && useAvailability.enabled ? (
               <Button
                 onClick={onVersionedUseClick}
                 data-testid="community-use-versioned"
@@ -229,18 +236,30 @@ export default function CommunityLookPage() {
               >
                 使用此版本在 Studio 中定制
               </Button>
-            ) : tryable ? (
+            ) : tryable && useAvailability.enabled ? (
               <Button onClick={onTryClick} data-testid="community-try-in-studio">
                 在 Studio 中试用（Legacy 近似）
               </Button>
-            ) : look.applicationLevel === 'INSPIRATION_ONLY' ? (
-              <p className="text-xs text-gray-500" data-testid="community-inspiration-only">
-                灵感参考 · 不可直接试用到 Studio
-              </p>
             ) : (
-              <p className="text-xs text-gray-500" data-testid="community-missing-asset">
-                缺少可应用资产，暂不可试用
-              </p>
+              <div className="flex flex-col items-start gap-1">
+                <Button
+                  disabled
+                  variant="secondary"
+                  data-testid="community-use-disabled"
+                  data-use-state={useAvailability.state}
+                  title={useUnavailableMessage}
+                >
+                  使用
+                </Button>
+                <p
+                  className="text-xs text-gray-500"
+                  data-testid={look.applicationLevel === 'INSPIRATION_ONLY'
+                    ? 'community-inspiration-only'
+                    : 'community-missing-asset'}
+                >
+                  {useUnavailableMessage}
+                </p>
+              </div>
             )}
             <Button
               size="sm"

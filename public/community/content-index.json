@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "officialPgcTarget": 20,
-  "officialMetadataReadyCount": 4,
-  "officialGapCount": 16,
+  "officialMetadataReadyCount": 9,
+  "officialGapCount": 11,
   "contents": [
     {
       "schemaVersion": 1,
@@ -244,6 +244,193 @@
       "campaignTags": [],
       "status": "PUBLISHED",
       "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_starfish_bloom",
+      "contentType": "LOOK_SET",
+      "title": "海星绽放",
+      "titleEn": "Starfish Bloom Elegance",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/starfish-bloom-elegance/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_starfish_bloom_cover",
+          "url": "/assets/hero-recipes/starfish-bloom-elegance/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-08",
+      "subStyleIds": ["ST-10"],
+      "occasionIds": ["wedding", "party"],
+      "subjectIds": [],
+      "moodIds": ["soft"],
+      "effectIds": ["relief", "pearl"],
+      "primaryColorIds": ["ocean", "champagne"],
+      "recommendedShapes": ["almond", "oval"],
+      "supportedShapes": ["almond", "oval", "coffin"],
+      "notRecommendedShapes": {
+        "stiletto": "尖端安全区尚未完成立体附件视觉签收"
+      },
+      "supportedLengths": ["short", "medium"],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": ["new", "editorial-concept"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-08T09:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_sea_glass_chrome",
+      "contentType": "LOOK_SET",
+      "title": "海玻璃光影",
+      "titleEn": "Sea-Glass Chrome",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/sea-glass-chrome/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_sea_glass_chrome_cover",
+          "url": "/assets/hero-recipes/sea-glass-chrome/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-08",
+      "subStyleIds": ["ST-01"],
+      "occasionIds": ["daily", "work"],
+      "subjectIds": [],
+      "moodIds": ["calm"],
+      "effectIds": ["cat-eye", "chrome"],
+      "primaryColorIds": ["ocean"],
+      "recommendedShapes": ["almond", "oval"],
+      "supportedShapes": ["almond", "oval", "squoval"],
+      "notRecommendedShapes": {},
+      "supportedLengths": ["short", "medium"],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": ["new", "editorial-concept"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-08T08:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_sunset_aura_glaze",
+      "contentType": "LOOK_SET",
+      "title": "落日极光釉",
+      "titleEn": "Sunset Aura Glaze",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_sunset_aura_glaze_cover",
+          "url": "/assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-09",
+      "subStyleIds": [],
+      "occasionIds": ["party", "date"],
+      "subjectIds": [],
+      "moodIds": ["bold"],
+      "effectIds": ["aurora", "gloss"],
+      "primaryColorIds": ["sunset"],
+      "recommendedShapes": ["almond", "coffin"],
+      "supportedShapes": ["almond", "coffin", "oval"],
+      "notRecommendedShapes": {},
+      "supportedLengths": ["medium", "long"],
+      "applicationLevel": "APPROXIMATE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": ["new", "editorial-concept"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-08T07:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_liquid_chrome_statement",
+      "contentType": "LOOK_SET",
+      "title": "液态铬光宣言",
+      "titleEn": "Liquid Chrome Statement",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_liquid_chrome_statement_cover",
+          "url": "/assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-05",
+      "subStyleIds": ["ST-10"],
+      "occasionIds": ["party"],
+      "subjectIds": [],
+      "moodIds": ["bold"],
+      "effectIds": ["chrome"],
+      "primaryColorIds": ["silver"],
+      "recommendedShapes": ["coffin", "stiletto"],
+      "supportedShapes": ["coffin", "stiletto", "almond"],
+      "notRecommendedShapes": {},
+      "supportedLengths": ["medium", "long"],
+      "applicationLevel": "STRUCTURED_EDITABLE",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": ["new", "asset-pending"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-08T06:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_butter_glaze_quiet",
+      "contentType": "LOOK_SET",
+      "title": "静谧黄油釉",
+      "titleEn": "Butter Glaze Quiet",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": {
+        "url": "/assets/hero-recipes/butter-glaze-quiet/cover-16x9-1280x720-v1.png",
+        "kind": "EDITORIAL"
+      },
+      "media": [
+        {
+          "id": "cc_butter_glaze_quiet_cover",
+          "url": "/assets/hero-recipes/butter-glaze-quiet/cover-16x9-1280x720-v1.png",
+          "kind": "EDITORIAL"
+        }
+      ],
+      "mainStyleId": "ST-01",
+      "subStyleIds": [],
+      "occasionIds": ["daily", "work"],
+      "subjectIds": [],
+      "moodIds": ["calm"],
+      "effectIds": ["gloss"],
+      "primaryColorIds": ["butter", "nude"],
+      "recommendedShapes": ["almond", "oval"],
+      "supportedShapes": ["almond", "oval", "squoval"],
+      "notRecommendedShapes": {},
+      "supportedLengths": ["short", "medium"],
+      "applicationLevel": "INSPIRATION_ONLY",
+      "verificationLevel": "CONCEPT",
+      "campaignTags": ["new", "inspiration-only"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-08T05:00:00.000Z"
     },
     {
       "schemaVersion": 1,
