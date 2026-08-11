@@ -1,0 +1,31 @@
+{
+  "asset_pack_id": "hero_liquid_chrome_statement_v1",
+  "recipe_id": "hero_liquid_chrome_statement",
+  "version": 1,
+  "generated_at": "2026-08-04",
+  "generator": "cursor-built-in-imagegen",
+  "market_segment": "NA Black glam / Baddie · Gen Z statement",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "liquid-chrome-statement-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "style-recommend"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "285263f8976bf1995d5894fef72b1b7ae6e2412222b6fcfad986f0b250ed4dd8"
+    },
+    {
+      "asset_id": "liquid-chrome-statement-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["wizard", "gallery", "community-official"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "f6b35fa64314f0246b8b0a9e2337c07ab6fe9d4d10629137fd1cb92943afa63"
+    }
+  ]
+}

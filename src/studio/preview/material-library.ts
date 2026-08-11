@@ -178,6 +178,19 @@ export function notRecommendedReason(template: TemplateEntry, shape: NailShape):
   return template.shape_compatibility.not_recommended[shape] ?? null;
 }
 
+/** Hero-recipe editorial cover, not a legacy generated template thumbnail. */
+export function hasHighFidelityCover(template: TemplateEntry): boolean {
+  return template.thumbnail_url.startsWith('assets/hero-recipes/');
+}
+
+/** Wizard gallery: only customer-facing CONCEPT/SIMULATED hero-recipe cards. */
+export function isHighFidelityConceptGalleryTemplate(template: TemplateEntry): boolean {
+  return (
+    hasHighFidelityCover(template)
+    && (template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED')
+  );
+}
+
 const TIER_ORDER: Record<CompatTier, number> = { high: 0, neutral: 1, not: 2 };
 
 /** 按当前甲型三档排序：推荐 → 一般 → 不建议（档内按 sort_order 稳定排序） */

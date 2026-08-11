@@ -42,7 +42,8 @@ LENGTH_IDS = {"short", "medium", "long", "extra-long"}
 FINISH_IDS = {"gloss", "matte", "pearl"}
 STYLE_TAGS = {"trending", "sweet", "minimal", "cool", "retro", "luxe", "holiday"}
 EXPECTED_CANONICAL_TEMPLATE_COUNT = 11
-EXPECTED_CONCEPT_TEMPLATE_COUNT = 2
+EXPECTED_CONCEPT_TEMPLATE_COUNT = 7
+EXPECTED_SIMULATED_TEMPLATE_COUNT = 2
 EXPECTED_TIER_ONE = {"almond", "oval", "squoval", "square", "coffin"}
 EXPECTED_WIZARD_ENABLED = {"almond", "oval", "coffin"}
 FINGER_CODES = {f"{h}{i}" for h in "LR" for i in range(1, 6)}
@@ -172,6 +173,7 @@ def check_templates() -> None:
     templates = index.get("templates", [])
     canonical_templates = [t for t in templates if t.get("asset_status", "REAL") == "REAL"]
     concept_templates = [t for t in templates if t.get("asset_status") == "CONCEPT"]
+    simulated_templates = [t for t in templates if t.get("asset_status") == "SIMULATED"]
     if len(canonical_templates) != EXPECTED_CANONICAL_TEMPLATE_COUNT:
         err(
             f"index.json 正式模板数量 = {len(canonical_templates)}，"
@@ -181,6 +183,11 @@ def check_templates() -> None:
         err(
             f"index.json Concept 模板数量 = {len(concept_templates)}，"
             f"应为 {EXPECTED_CONCEPT_TEMPLATE_COUNT}"
+        )
+    if len(simulated_templates) != EXPECTED_SIMULATED_TEMPLATE_COUNT:
+        err(
+            f"index.json Simulated 模板数量 = {len(simulated_templates)}，"
+            f"应为 {EXPECTED_SIMULATED_TEMPLATE_COUNT}"
         )
 
     seen_ids: set[str] = set()
@@ -233,25 +240,25 @@ def check_templates() -> None:
         asset_status = t.get("asset_status", "REAL")
         if asset_status not in {"REAL", "CONCEPT", "SIMULATED"}:
             err(f"{tid}: asset_status 必须为 REAL、CONCEPT 或 SIMULATED")
-        if asset_status == "CONCEPT":
+        if asset_status in {"CONCEPT", "SIMULATED"}:
             render_template_id = t.get("render_template_id")
             owns_candidate_renderer = bool(t.get("capability_summary", {}).get("supported")) and render_template_id == tid
             if (not render_template_id or render_template_id not in all_ids) or (render_template_id == tid and not owns_candidate_renderer):
-                err(f"{tid}: CONCEPT 必须指向已注册基础模板，或声明自己的候选 Renderer")
+                err(f"{tid}: {asset_status} 必须指向已注册基础模板，或声明自己的候选 Renderer")
             elif render_template_id != tid:
                 render_target = next((item for item in templates if item.get("id") == render_template_id), None)
                 if render_target and render_target.get("asset_status", "REAL") != "REAL":
                     err(f"{tid}: render_template_id 必须指向 REAL 模板")
             spec_url = str(t.get("asset_spec_url", ""))
             if not spec_url or not (ROOT / spec_url.lstrip("/")).exists():
-                err(f"{tid}: CONCEPT 的 Asset Spec 不存在: {spec_url}")
+                err(f"{tid}: {asset_status} 的 Asset Spec 不存在: {spec_url}")
             summary = t.get("capability_summary", {})
             if not summary.get("supported") or not summary.get("pending"):
-                err(f"{tid}: CONCEPT 必须同时声明 supported 与 pending 能力")
+                err(f"{tid}: {asset_status} 必须同时声明 supported 与 pending 能力")
             turl = t.get("thumbnail_url")
             if not turl or not (ROOT / turl.lstrip("/")).exists():
-                err(f"{tid}: Concept 缩略图不存在: {turl}")
-            # Concept 没有自己的 Canonical pattern；后续正式化时再进入下方几何资产校验。
+                err(f"{tid}: {asset_status} 缩略图不存在: {turl}")
+            # Hero concept/simulation 没有自己的 Canonical pattern；通过 render_template_id 降级。
             continue
 
         # ---- §5.8-4 manifest 引用文件存在
@@ -625,7 +632,8 @@ def main() -> int:
     print(
         f"  - {EXPECTED_CANONICAL_TEMPLATE_COUNT} 正式模板 × {len(template_shape_ids)} 个模板就绪甲型 = "
         f"{EXPECTED_CANONICAL_TEMPLATE_COUNT * len(template_shape_ids)} 图案 SVG；"
-        f"{EXPECTED_CONCEPT_TEMPLATE_COUNT} 个 Concept 模板（明确降级渲染）"
+        f"{EXPECTED_CONCEPT_TEMPLATE_COUNT} 个 Concept + "
+        f"{EXPECTED_SIMULATED_TEMPLATE_COUNT} 个 Simulated 模板（明确降级渲染）"
     )
     print(
         f"  - {len(geometry_shape_ids)} 个几何甲型 × {len(LENGTH_IDS)} 长度 = "

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "recipe_id": "hero_starfish_bloom_elegance",
+  "name": "海星绽放优雅",
+  "name_en": "Starfish Bloom Elegance",
+  "status": {
+    "editorial": "approved",
+    "canonical_renderer": "pending",
+    "production": "unvalidated"
+  },
+  "recommended_shapes": {
+    "almond": ["short", "medium"],
+    "oval": ["short", "medium"],
+    "coffin": ["medium"]
+  },
+  "appearance": {
+    "base_coverage": "translucent",
+    "base_color": "#F5E0D3",
+    "optical_effect": "pearl-shimmer",
+    "ombre_gradient": {
+      "enabled": true,
+      "from": "#F5E0D3",
+      "to": "#B8D4E8",
+      "direction": "cuticle-to-tip"
+    },
+    "french_block": {
+      "enabled": true,
+      "color": "#F3E8C8",
+      "style": "curved-smile"
+    },
+    "top_finish": "gloss"
+  },
+  "relief": [
+    {
+      "kind": "starfish",
+      "route": "L2",
+      "preview_height_mm": 0.24,
+      "max_per_set": 2,
+      "material": "pearlescent-white",
+      "coordinate_space": "normalized_nail"
+    },
+    {
+      "kind": "plumeria_flower",
+      "route": "L2",
+      "petals": 5,
+      "preview_height_mm": 0.2,
+      "max_per_set": 2,
+      "gradient": ["#F2A8B8", "#F5E6A8"],
+      "coordinate_space": "normalized_nail"
+    },
+    {
+      "kind": "shell_ridge_fan",
+      "route": "L2",
+      "preview_height_mm": 0.18,
+      "ridge_count_presets": [5, 7],
+      "material": "iridescent-cream",
+      "coordinate_space": "normalized_nail"
+    }
+  ],
+  "attachments": [
+    {
+      "kind": "micro_pearl",
+      "route": "L3",
+      "diameter_mm": [0.8, 1.2, 2.0],
+      "max_per_accent_finger": 4
+    },
+    {
+      "kind": "gold_ball_stud",
+      "route": "L3",
+      "diameter_mm": 0.6,
+      "max_per_accent_finger": 3
+    },
+    {
+      "kind": "gold_star_charm",
+      "route": "L3",
+      "max_per_set": 1
+    }
+  ],
+  "default_accent_fingers": ["L2", "R4"],
+  "constraints": {
+    "sidewall_clearance_mm": 0.8,
+    "max_preview_height_mm": 0.3,
+    "customer_output_label": "模拟效果",
+    "production_command_allowed": false
+  },
+  "output_intents": [
+    "editor-preview",
+    "customer-present",
+    "customer-export",
+    "internal-proof",
+    "thumbnail"
+  ],
+  "editorial_assets": [
+    "editorial-cover-4x5-v1.png",
+    "editorial-cover-16x9-v1.png",
+    "cover-16x9-1280x720-v1.png"
+  ]
+}

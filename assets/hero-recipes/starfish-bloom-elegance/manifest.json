@@ -1,0 +1,40 @@
+{
+  "asset_pack_id": "hero_starfish_bloom_elegance_v1",
+  "recipe_id": "hero_starfish_bloom_elegance",
+  "version": 1,
+  "generated_at": "2026-08-04",
+  "generator": "reference-import",
+  "reference_note": "Product reference photograph; padded to Studio cover sizes.",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "starfish-bloom-editorial-4x5-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "reference"],
+      "path": "editorial-cover-4x5-v1.png",
+      "width": 688,
+      "height": 912,
+      "sha256": "85ca13c4757a02085de0bdec7df643448591370c0a6b677dd061cac34868e089"
+    },
+    {
+      "asset_id": "starfish-bloom-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1621,
+      "height": 912,
+      "sha256": "4506b2ef054ecb3dabdbbd15b58ab64c41d3a48bc80ddd38de22c08270832ef2"
+    },
+    {
+      "asset_id": "starfish-bloom-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["wizard", "gallery", "style-recommend"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "35059225583619f90ec3d977ae3dce94308f975b6bffd792b00506b2e82217b0"
+    }
+  ]
+}

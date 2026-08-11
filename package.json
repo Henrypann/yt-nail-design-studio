@@ -16,6 +16,7 @@
     "test:community-domain": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-domain.mjs",
     "test:community-intent": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-intent.mjs",
     "test:community-studio-flow": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-studio-flow.mjs",
+    "test:template-gallery-hq": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-template-gallery-hq.mjs",
     "slot-calibrator": "npx --yes serve -p 7788 .",
     "test:slots": "node tools/slot-calibrator/test-slot-math.mjs",
     "test:slot-coverage": "node tools/test-slot-coverage.mjs",

@@ -1,0 +1,31 @@
+{
+  "asset_pack_id": "hero_sea_glass_chrome_v1",
+  "recipe_id": "hero_sea_glass_chrome",
+  "version": 1,
+  "generated_at": "2026-08-04",
+  "generator": "cursor-built-in-imagegen",
+  "market_segment": "NA Millennial / Asian-American crossover · mass appeal",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "sea-glass-chrome-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "style-recommend"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "7afe00a3274917efe0c39251960db8023aeb77ec08a649816a69e05760ad1803"
+    },
+    {
+      "asset_id": "sea-glass-chrome-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["wizard", "gallery", "community-official"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "52da8f54ac05a4a2346ba43a68748570adcb073b713dd3120bc0f362baae21d9"
+    }
+  ]
+}
