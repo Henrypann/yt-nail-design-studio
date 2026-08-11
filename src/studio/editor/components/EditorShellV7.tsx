@@ -3,7 +3,6 @@ import { useBlocker, useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
-import { FINGER_CODES } from '@/lib/types';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
 import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
@@ -11,6 +10,7 @@ import { EditorStageBarV7 } from './EditorStageBarV7';
 import { EditorToolRailV7 } from './EditorToolRailV7';
 import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
 import { captureCustomerPreviewSessionV7 } from '../v7/customer-preview-session';
+import { TenFingerBarV7 } from './TenFingerBarV7';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -27,7 +27,6 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const doc = useEditorV7Store((state) => state.doc);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
-  const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const currentNail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
   const saveState = useEditorV7Store((state) => state.saveState);
@@ -35,7 +34,6 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const historyCount = useEditorV7Store((state) => state.history.length);
   const futureCount = useEditorV7Store((state) => state.future.length);
   const setTitle = useEditorV7Store((state) => state.setTitle);
-  const setCurrentFinger = useEditorV7Store((state) => state.setCurrentFinger);
   const undo = useEditorV7Store((state) => state.undo);
   const redo = useEditorV7Store((state) => state.redo);
   const save = useEditorV7Store((state) => state.save);
@@ -326,24 +324,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
 
       {dockedTools && <EditorToolRailV7 orientation="horizontal" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}
 
-      <footer className="overflow-x-auto border-t border-gray-200 bg-white px-3 py-2" aria-label="选择手指">
-        <div className="flex min-w-max items-center justify-center gap-1">
-          {FINGER_CODES.map((finger) => (
-            <button
-              key={finger}
-              type="button"
-              aria-pressed={currentFinger === finger}
-              onClick={() => setCurrentFinger(finger)}
-              className={cx(
-                'min-h-11 min-w-11 rounded-lg border px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                currentFinger === finger ? 'border-primary bg-primary-soft font-semibold text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50',
-              )}
-            >
-              {finger}
-            </button>
-          ))}
-        </div>
-      </footer>
+      <TenFingerBarV7 />
     </section>
   );
 }

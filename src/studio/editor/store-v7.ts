@@ -78,6 +78,13 @@ import type {
   FlatAssetPreparedV7,
   TextFlatElementInputV7,
 } from './v7/flat-content-assets';
+import {
+  detachEditorV7NailScope,
+  detachLinkedEditorV7NailAfterEdit,
+  materializeEditorV7NailScope,
+  type EditorV7FingerScope,
+  type EditorV7FingerScopeKind,
+} from './v7/ten-finger-operations';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -106,6 +113,8 @@ export interface EditorV7State {
   diagnostics: EditorDocV7MigrationDiagnostic[];
   readOnly: boolean;
   currentFinger: FingerCode;
+  fingerScope: EditorV7FingerScopeKind;
+  selectedFingers: FingerCode[];
   selectedStepId: string | null;
   selectedElementId: string | null;
   activeFlatTool: FlatVectorToolV7;
@@ -129,6 +138,12 @@ export interface EditorV7State {
   undo(): EditorV7ActionResult;
   redo(): EditorV7ActionResult;
   setCurrentFinger(finger: FingerCode): void;
+  setFingerScope(scope: EditorV7FingerScopeKind): void;
+  toggleSelectedFinger(finger: FingerCode): void;
+  clearSelectedFingers(): void;
+  copyFingerScope(): EditorV7ActionResult;
+  syncFingerScope(): EditorV7ActionResult;
+  detachFingerScope(): EditorV7ActionResult;
   selectStep(stepId: string | null): void;
   selectElement(elementId: string | null): void;
   setActiveFlatTool(tool: FlatVectorToolV7): void;
@@ -238,6 +253,25 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       return { ok: true };
     };
 
+    const commitFingerCommand = (
+      finger: FingerCode,
+      command: (doc: EditorDocV7) => EditorV7CommandResult,
+    ): EditorV7ActionResult => commitCommand((doc) => {
+      const result = command(doc);
+      return result.ok
+        ? { ...result, doc: detachLinkedEditorV7NailAfterEdit(result.doc, finger) }
+        : result;
+    });
+
+    const currentScope = (): EditorV7FingerScope => {
+      const state = get();
+      return {
+        kind: state.fingerScope,
+        currentFinger: state.currentFinger,
+        selectedFingers: state.fingerScope === 'selected' ? state.selectedFingers : undefined,
+      };
+    };
+
     const reset = (generation: number) => ({
       designId: null,
       doc: null,
@@ -247,6 +281,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       diagnostics: [],
       readOnly: false,
       currentFinger: 'R4' as FingerCode,
+      fingerScope: 'current' as EditorV7FingerScopeKind,
+      selectedFingers: [] as FingerCode[],
       selectedStepId: null,
       selectedElementId: null,
       activeFlatTool: 'select' as FlatVectorToolV7,
@@ -298,6 +334,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           diagnostics: clone(target.diagnostics),
           readOnly: options?.readOnly ?? false,
           currentFinger: 'R4',
+          fingerScope: 'current',
+          selectedFingers: [],
           selectedStepId: firstStep,
           selectedElementId: null,
           history: [],
@@ -442,6 +480,35 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         const first = get().doc?.nails[finger].steps[0]?.id ?? null;
         set({ currentFinger: finger, selectedStepId: first, selectedElementId: null });
       },
+      setFingerScope: (scope) => {
+        if (scope !== 'current' && scope !== 'selected' && scope !== 'mirror' && scope !== 'all') return;
+        const state = get();
+        set({
+          fingerScope: scope,
+          selectedFingers: scope === 'selected' && state.selectedFingers.length === 0
+            ? [state.currentFinger]
+            : state.selectedFingers,
+        });
+      },
+      toggleSelectedFinger: (finger) => {
+        if (!FINGER_CODES.includes(finger)) return;
+        const selected = new Set(get().selectedFingers);
+        if (selected.has(finger)) selected.delete(finger);
+        else selected.add(finger);
+        set({ selectedFingers: FINGER_CODES.filter((candidate) => selected.has(candidate)) });
+      },
+      clearSelectedFingers: () => set({ selectedFingers: [] }),
+      copyFingerScope: () => commitCommand((doc) => materializeEditorV7NailScope(doc, {
+        sourceFinger: get().currentFinger,
+        scope: currentScope(),
+        mode: 'copy-detached',
+      }, idFactory)),
+      syncFingerScope: () => commitCommand((doc) => materializeEditorV7NailScope(doc, {
+        sourceFinger: get().currentFinger,
+        scope: currentScope(),
+        mode: 'sync-linked',
+      }, idFactory)),
+      detachFingerScope: () => commitCommand((doc) => detachEditorV7NailScope(doc, currentScope())),
       selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select' }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
       setActiveFlatTool: (tool) => set({ activeFlatTool: tool }),
@@ -453,44 +520,44 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (Number.isFinite(widthMm) && widthMm >= 0.01 && widthMm <= 10) set({ activeFlatWidthMm: widthMm });
       },
       setTitle: (title) => commitCommand((doc) => ({ ok: true, doc: { ...doc, title } })),
-      setBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7BackgroundMode(doc, finger, mode)),
-      setBackgroundColor: (finger, color) => commitCommand((doc) => setEditorV7BackgroundColor(doc, finger, color)),
-      setBackgroundOpacity: (finger, opacity) => commitCommand((doc) => setEditorV7BackgroundOpacity(doc, finger, opacity)),
-      setAdvancedBackgroundMode: (finger, mode) => commitCommand((doc) => setEditorV7AdvancedBackgroundMode(doc, finger, mode)),
-      setGradientStops: (finger, stops) => commitCommand((doc) => setEditorV7GradientStops(doc, finger, stops)),
-      addGradientStop: (finger, offset) => commitCommand((doc) => addEditorV7GradientStop(doc, finger, offset)),
-      removeGradientStop: (finger, index) => commitCommand((doc) => removeEditorV7GradientStop(doc, finger, index)),
-      setGradientDirection: (finger, directionDeg) => commitCommand((doc) => setEditorV7GradientDirection(doc, finger, directionDeg)),
-      setCatEyeParameters: (finger, parameters) => commitCommand((doc) => setEditorV7CatEyeParameters(doc, finger, parameters)),
-      setGlitterParameters: (finger, parameters) => commitCommand((doc) => setEditorV7GlitterParameters(doc, finger, parameters)),
-      applyBackgroundPaletteTheme: (finger, theme) => commitCommand((doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
-      addStep: (finger, step, index) => commitCommand((doc) => addEditorV7Step(doc, finger, step, index)),
+      setBackgroundMode: (finger, mode) => commitFingerCommand(finger, (doc) => setEditorV7BackgroundMode(doc, finger, mode)),
+      setBackgroundColor: (finger, color) => commitFingerCommand(finger, (doc) => setEditorV7BackgroundColor(doc, finger, color)),
+      setBackgroundOpacity: (finger, opacity) => commitFingerCommand(finger, (doc) => setEditorV7BackgroundOpacity(doc, finger, opacity)),
+      setAdvancedBackgroundMode: (finger, mode) => commitFingerCommand(finger, (doc) => setEditorV7AdvancedBackgroundMode(doc, finger, mode)),
+      setGradientStops: (finger, stops) => commitFingerCommand(finger, (doc) => setEditorV7GradientStops(doc, finger, stops)),
+      addGradientStop: (finger, offset) => commitFingerCommand(finger, (doc) => addEditorV7GradientStop(doc, finger, offset)),
+      removeGradientStop: (finger, index) => commitFingerCommand(finger, (doc) => removeEditorV7GradientStop(doc, finger, index)),
+      setGradientDirection: (finger, directionDeg) => commitFingerCommand(finger, (doc) => setEditorV7GradientDirection(doc, finger, directionDeg)),
+      setCatEyeParameters: (finger, parameters) => commitFingerCommand(finger, (doc) => setEditorV7CatEyeParameters(doc, finger, parameters)),
+      setGlitterParameters: (finger, parameters) => commitFingerCommand(finger, (doc) => setEditorV7GlitterParameters(doc, finger, parameters)),
+      applyBackgroundPaletteTheme: (finger, theme) => commitFingerCommand(finger, (doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
+      addStep: (finger, step, index) => commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index)),
       deleteStep: (finger, stepId) => {
         const wasSelected = get().selectedStepId === stepId;
-        const result = commitCommand((doc) => deleteEditorV7Step(doc, finger, stepId));
+        const result = commitFingerCommand(finger, (doc) => deleteEditorV7Step(doc, finger, stepId));
         if (result.ok && wasSelected) {
           const nextStepId = get().doc?.nails[finger].steps[0]?.id ?? null;
           set({ selectedStepId: nextStepId, selectedElementId: null });
         }
         return result;
       },
-      moveStep: (finger, stepId, targetIndex) => commitCommand((doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
-      duplicateStep: (finger, stepId) => commitCommand((doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
-      setStepFlag: (finger, stepId, flag, value) => commitCommand((doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
-      addElement: (finger, stepId, element) => commitCommand((doc) => addEditorV7Element(doc, finger, stepId, element)),
+      moveStep: (finger, stepId, targetIndex) => commitFingerCommand(finger, (doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
+      duplicateStep: (finger, stepId) => commitFingerCommand(finger, (doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
+      setStepFlag: (finger, stepId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
+      addElement: (finger, stepId, element) => commitFingerCommand(finger, (doc) => addEditorV7Element(doc, finger, stepId, element)),
       removeElement: (finger, stepId, elementId) => {
         const wasSelected = get().selectedElementId === elementId;
-        const result = commitCommand((doc) => removeEditorV7Element(doc, finger, stepId, elementId));
+        const result = commitFingerCommand(finger, (doc) => removeEditorV7Element(doc, finger, stepId, elementId));
         if (result.ok && wasSelected) set({ selectedElementId: null });
         return result;
       },
-      setElementFlag: (finger, stepId, elementId, flag, value) => commitCommand((doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
-      setElementTransform: (finger, stepId, elementId, transform) => commitCommand((doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
-      replaceFlatElement: (finger, stepId, elementId, replacement) => commitCommand((doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
-      setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitCommand((doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
-      createTextElement: (finger, stepId, input) => commitCommand((doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
-      replaceTextElement: (finger, stepId, elementId, input) => commitCommand((doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
-      addBundledImage: (finger, stepId, bundleId) => commitCommand((doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
+      setElementFlag: (finger, stepId, elementId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
+      setElementTransform: (finger, stepId, elementId, transform) => commitFingerCommand(finger, (doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
+      replaceFlatElement: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
+      setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitFingerCommand(finger, (doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
+      createTextElement: (finger, stepId, input) => commitFingerCommand(finger, (doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
+      replaceTextElement: (finger, stepId, elementId, input) => commitFingerCommand(finger, (doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
+      addBundledImage: (finger, stepId, bundleId) => commitFingerCommand(finger, (doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
       applyPreparedImport: async (finger, stepId, prepared) => {
         const state = get();
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
@@ -511,7 +578,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         // must never leave a document change behind.
         const put = await flatAssets.put(prepared.asset, prepared.source);
         if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
-        const result = commitCommand((doc) => addPreparedImportCommand(doc, finger, stepId, idFactory('element'), prepared.asset));
+        const result = commitFingerCommand(finger, (doc) => addPreparedImportCommand(doc, finger, stepId, idFactory('element'), prepared.asset));
         // Known limitation: if the canonical commit fails AFTER a successful
         // repository write, the orphan asset entry may remain in the flat
         // asset repository, but EditorDocV7 is guaranteed unchanged.
@@ -526,7 +593,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (resolved.status === 'missing' || resolved.status === 'corrupt') {
           return { ok: false, reason: 'not_found', message: 'asset source is not available for relink' };
         }
-        return commitCommand((doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
+        return commitFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
       },
       relinkPreparedImageAsset: async (finger, stepId, elementId, prepared) => {
         const state = get();
@@ -553,7 +620,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         // must never leave a document change behind.
         const put = await flatAssets.put(prepared.asset, prepared.source);
         if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
-        const result = commitCommand((doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, prepared.asset));
+        const result = commitFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, prepared.asset));
         // Known limitation: if the canonical commit fails AFTER a successful
         // repository write, the orphan asset entry may remain in the flat
         // asset repository, but EditorDocV7 is guaranteed unchanged.

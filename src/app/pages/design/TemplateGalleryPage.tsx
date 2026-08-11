@@ -1,7 +1,7 @@
 /**
  * `/design/templates` 选款页（社区demo P0）
  *
- * STEP 1 甲型/长度确认后的独立路由页：三个标签（全部/当下流行/甜美）+ 大网格模板卡片，
+ * STEP 1 甲型/长度确认后的独立路由页：收敛后的四类标签 + 大网格模板卡片，
  * 复用 TemplateGallery.tsx 同一套 material-library 数据与甲型适配逻辑（compatTier/shapeBadges/
  * notRecommendedReason），只是布局从窄栏改为全宽网格。选定模板后进画布；也可跳过直接进画布；
  * 顶部提供「进入社区查看更多模板」入口 → /design/community（基础 mock，未接真实数据）。
@@ -15,6 +15,7 @@ import { Routes } from '@/app/routes';
 import type { NailShape } from '@/lib/types';
 import {
   compatTier,
+  isHighFidelityConceptGalleryTemplate,
   loadLibraryIndex,
   loadShapeParams,
   notRecommendedReason,
@@ -28,11 +29,13 @@ import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-/** 仅暴露这 3 个标签（社区demo P0 范围内固定，全部由 material-library 的 trending/sweet 驱动） */
+/** 与 Wizard 侧栏共用的顾客可见分类。 */
 const GALLERY_TABS: { id: string; label: string }[] = [
   { id: 'all', label: '全部' },
-  { id: 'trending', label: '当下流行' },
+  { id: 'trending', label: '推荐' },
   { id: 'sweet', label: '甜美' },
+  { id: 'minimal', label: '简约' },
+  { id: 'luxe', label: '奢华' },
 ];
 
 export default function TemplateGalleryPage() {
@@ -88,9 +91,10 @@ export default function TemplateGalleryPage() {
 
   const visible = useMemo(() => {
     if (!index) return [];
+    const highFidelityTemplates = index.templates.filter(isHighFidelityConceptGalleryTemplate);
     const enabledTemplates = PETAL_VEIL_P0_ENABLED
-      ? index.templates
-      : index.templates.filter((template) => template.id !== 't_petal_veil_french');
+      ? highFidelityTemplates
+      : highFidelityTemplates.filter((template) => template.id !== 't_petal_veil_french');
     const filtered =
       tagFilter === 'all'
         ? enabledTemplates

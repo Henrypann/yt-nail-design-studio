@@ -15,6 +15,7 @@ import type { NailShape } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import {
   compatTier,
+  isHighFidelityConceptGalleryTemplate,
   loadLibraryIndex,
   loadShapeParams,
   notRecommendedReason,
@@ -77,9 +78,10 @@ export function TemplateGallery() {
 
   const visible = useMemo(() => {
     if (!index) return [];
+    const highFidelityTemplates = index.templates.filter(isHighFidelityConceptGalleryTemplate);
     const enabledTemplates = PETAL_VEIL_P0_ENABLED
-      ? index.templates
-      : index.templates.filter((template) => template.id !== 't_petal_veil_french');
+      ? highFidelityTemplates
+      : highFidelityTemplates.filter((template) => template.id !== 't_petal_veil_french');
     const filtered =
       tagFilter === 'all'
         ? enabledTemplates

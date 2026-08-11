@@ -72,6 +72,30 @@ quiet luxury rather than childish kawaii.
 No giant bows, dangling jewelry, hands, text, logo or watermark.
 ```
 
+## Starfish Bloom Elegance｜16:9
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten coordinated Short Almond press-on nails
+in a tropical ocean-meets-floral Starfish Bloom Elegance style.
+Use translucent nude-pink jelly bases, pastel baby-blue ombré on select nails,
+buttercream yellow curved French blocks on select nails, and high-gloss pearl topcoat.
+Include sculpted pearlescent white starfish reliefs, pink-to-yellow plumeria flowers,
+iridescent scallop shell ridge embossing, micro white pearls, gold ball studs,
+and at most one flat gold star charm accent across the full set.
+Cinematic 16:9, two clean rows of five, all nails fully visible on a warm ivory studio surface.
+Resort wedding elegance, no hands, text, logo, watermark or beach props.
+```
+
+## Starfish Bloom Elegance｜4:5 reference
+
+```text
+Vertical product photograph of exactly ten separate Short Almond press-on nails,
+five on top row and five on bottom row, Starfish Bloom Elegance style.
+Translucent blush nude jelly, pearlescent starfish, plumeria accents, shell ridges,
+micro pearls and restrained gold studs. Every nail separated and fully visible.
+No hands, text, logo or watermark.
+```
+
 ## Petal Veil French P0｜16:9 cover
 
 ```text
@@ -110,4 +134,45 @@ Square photorealistic macro material progression using separate Almond nail tips
 milky translucent nude base, then soft micro French, then the finished nail with one five-petal low-relief flower.
 Warm neutral background and raking studio light showing clearcoat, translucency, petal thickness and contact shadow.
 No hands, text, logo, pearls, metallic lines or extra flowers.
+```
+
+## Sea-Glass Chrome｜16:9 (NA Millennial mass appeal)
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten Short-to-Medium Almond press-on nails
+in a Sea-Glass Chrome style for North American everyday luxury.
+Translucent sea-glass jelly base in soft aqua-mint and blush-nude, fine micro-glitter cat-eye band,
+delicate pearlescent chrome glaze, quiet Your-Nails-But-Better aesthetic.
+Two clean rows of five on warm ivory studio surface, cinematic 16:9, all nails visible.
+No hands, text, logo, watermark, heavy 3D sculpture or rhinestones.
+```
+
+## Sunset Aura Glaze｜16:9 (Latina glam / Gen Z)
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten Medium-Long Coffin press-on nails
+in Sunset Aura Glaze style: warm coral, peach, champagne and sunset orange aura blending,
+high-gloss glazed pearl-chrome topcoat with strong specular highlights.
+Two arcs of five nails on neutral studio plinth, cinematic 16:9, resort evening luxury.
+No hands, text, logo or watermark.
+```
+
+## Liquid Chrome Statement｜16:9 (Black glam / Baddie)
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten Long Coffin press-on nails
+in Liquid Chrome Statement Black glam style: high-contrast liquid silver and gold chrome fluid ridges,
+bold sculptural metal lines, glossy deep plum and black accent bases.
+Two rows of five on dark charcoal studio surface, dramatic rim light, cinematic 16:9.
+No hands, text, logo, watermark, piercings or dangling jewelry.
+```
+
+## Butter Glaze Quiet｜16:9 (Clean Girl · Short Squoval)
+
+```text
+Create a hyper-realistic luxury product photograph of exactly ten Short Squoval press-on nails
+in Butter Glaze Quiet Clean Girl style: soft butter yellow and warm nude bases,
+ultra-thin pearlescent chrome glaze, quiet luxury minimal everyday aesthetic.
+Two neat rows of five on warm cream linen studio surface, cinematic 16:9, all nails visible.
+No hands, text, logo, watermark, heavy 3D or rhinestones.
 ```

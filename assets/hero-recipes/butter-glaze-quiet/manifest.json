@@ -1,0 +1,31 @@
+{
+  "asset_pack_id": "hero_butter_glaze_quiet_v1",
+  "recipe_id": "hero_butter_glaze_quiet",
+  "version": 1,
+  "generated_at": "2026-08-04",
+  "generator": "cursor-built-in-imagegen",
+  "market_segment": "NA Caucasian Clean Girl · Quiet Luxury · Millennial/Gen X",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "butter-glaze-quiet-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "style-recommend"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "5cc47814896e33dd2df62c9197a9431eca1676f1ee80cac7e158c12dbec3f378"
+    },
+    {
+      "asset_id": "butter-glaze-quiet-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["wizard", "gallery", "community-official"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "c9b90546e66275f80e2caeb7805124bd10aab43e240bb768b517d7345c09fa5e"
+    }
+  ]
+}

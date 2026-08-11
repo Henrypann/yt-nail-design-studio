@@ -1,0 +1,31 @@
+{
+  "asset_pack_id": "hero_sunset_aura_glaze_v1",
+  "recipe_id": "hero_sunset_aura_glaze",
+  "version": 1,
+  "generated_at": "2026-08-04",
+  "generator": "cursor-built-in-imagegen",
+  "market_segment": "NA Latina glam · Gen Z social",
+  "maturity": "concept-approved",
+  "canonical_renderer_output": false,
+  "production_validated": false,
+  "assets": [
+    {
+      "asset_id": "sunset-aura-glaze-editorial-16x9-v1",
+      "kind": "editorial-cover",
+      "intent": ["inspiration", "style-recommend"],
+      "path": "editorial-cover-16x9-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "2e4676e8acbc732723957944de734a1ee3f9da7454048b7af74b922e7d62676a"
+    },
+    {
+      "asset_id": "sunset-aura-glaze-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["wizard", "gallery", "community-official"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "bdf3a3d52eeece3d223b8aac0443715cdccc8cceab7e1959ee1eb850c6c685b7"
+    }
+  ]
+}

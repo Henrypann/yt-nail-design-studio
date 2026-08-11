@@ -11,6 +11,7 @@ export { BackgroundPanelV7 } from './components/BackgroundPanelV7';
 export { V7BackgroundCanvas } from './components/V7BackgroundCanvas';
 export { FlatVectorPanelV7 } from './components/FlatVectorPanelV7';
 export { V7FlatDesignCanvas } from './components/V7FlatDesignCanvas';
+export { TenFingerBarV7 } from './components/TenFingerBarV7';
 export { useEditorStore } from './store';
 export { useEditorV6Store } from './store-v6';
 export * from './lib/model';
@@ -120,6 +121,21 @@ export {
   transformNailPointV7,
 } from './v7/flat-vector';
 export type { FlatVectorToolV7, ParsedNailPathV7 } from './v7/flat-vector';
+export {
+  detachEditorV7NailScope,
+  detachLinkedEditorV7NailAfterEdit,
+  materializeEditorV7NailScope,
+  oppositeEditorV7Finger,
+  resolveEditorV7FingerScope,
+} from './v7/ten-finger-operations';
+export type {
+  EditorV7FingerProjection,
+  EditorV7FingerScope,
+  EditorV7FingerScopeKind,
+  EditorV7ScopeCommandResult,
+  EditorV7ScopeResolution,
+  EditorV7ScopeTarget,
+} from './v7/ten-finger-operations';
 export {
   FLAT_ASSET_MAX_BYTES_V7,
   FLAT_ASSET_MAX_DIMENSION_V7,

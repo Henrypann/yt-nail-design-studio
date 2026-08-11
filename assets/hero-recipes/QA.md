@@ -32,6 +32,18 @@
 - [ ] 安全区、碰撞和勾挂风险验证。
 - [ ] 实体附件固定测试。
 
+## Starfish Bloom Elegance
+
+- [x] 4:5 参考图包含 10 枚 Short Almond 甲片。
+- [x] 16:9 与 1280×720 Wizard 封面已导出。
+- [x] 海星、鸡蛋花、贝壳脊线、珍珠与金饰可辨。
+- [x] 无人手、文字、Logo 和水印。
+- [x] Asset Spec、Recipe Spec 和 Manifest 已建立。
+- [x] L2/L3 preview GLB 已生成（8 个 web.glb + artifact-manifest）。
+- [ ] Three.js HQ Renderer 接入 Wizard。
+- [ ] Almond Short/Medium Canonical Visual Regression。
+- [ ] 实体连续点胶与附件签收。
+
 ## 总体边界
 
 - [x] 所有生成图均标记为 Concept。

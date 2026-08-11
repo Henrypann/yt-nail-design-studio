@@ -1,4 +1,4 @@
-# NextGen Beauty｜3D Hero Recipe Asset Pack
+# Nail Style｜3D Hero Recipe Asset Pack
 
 **生成日期**：2026-07-31  
 **生成方式**：OpenAI built-in image generation  
@@ -11,6 +11,11 @@
 | Mercury Dew | 完整概念资产包：16:9、4:5、材质演进特写、Asset Spec、结构化 Recipe Spec、Manifest |
 | Pearl Tide Shell | Asset Spec、16:9 高保真封面、Manifest |
 | Micro Coquette | Asset Spec、16:9 高保真封面、Manifest |
+| Starfish Bloom Elegance | Asset Spec、16:9 / 4:5 高保真封面、Recipe Spec、Manifest |
+| Sea-Glass Chrome | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（NA Millennial 公约数） |
+| Sunset Aura Glaze | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Latina glam） |
+| Liquid Chrome Statement | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Black glam Statement） |
+| Butter Glaze Quiet | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Clean Girl Squoval） |
 
 ## 重要边界
 
@@ -25,5 +30,10 @@
 - [Mercury Dew](./mercury-dew/ASSET_SPEC.md)
 - [Pearl Tide Shell](./pearl-tide-shell/ASSET_SPEC.md)
 - [Micro Coquette](./micro-coquette/ASSET_SPEC.md)
+- [Starfish Bloom Elegance](./starfish-bloom-elegance/ASSET_SPEC.md)
+- [Sea-Glass Chrome](./sea-glass-chrome/ASSET_SPEC.md)
+- [Sunset Aura Glaze](./sunset-aura-glaze/ASSET_SPEC.md)
+- [Liquid Chrome Statement](./liquid-chrome-statement/ASSET_SPEC.md)
+- [Butter Glaze Quiet](./butter-glaze-quiet/ASSET_SPEC.md)
 - [生成提示词](./PROMPTS.md)
 

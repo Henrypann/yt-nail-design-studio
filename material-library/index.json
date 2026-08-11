@@ -1,35 +1,74 @@
 {
   "version": 2,
-  "updated_at": "2026-07-31T00:00:00Z",
+  "updated_at": "2026-08-04T00:00:00Z",
   "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。REAL 为正式可编辑模板；CONCEPT 为独立产品卡片，但必须通过 render_template_id 降级到已签收基础层，并显示未实现能力。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码。not_recommended 的每个条目必须带人类可读 reason。",
   "style_tags": [
-    { "id": "trending", "name": "当下流行", "name_en": "Trending Now" },
-    { "id": "sweet", "name": "甜美", "name_en": "Sweet" },
-    { "id": "minimal", "name": "简约", "name_en": "Minimal" },
-    { "id": "cool", "name": "酷炫", "name_en": "Cool" },
-    { "id": "retro", "name": "复古", "name_en": "Retro" },
-    { "id": "luxe", "name": "奢华", "name_en": "Luxe" },
-    { "id": "holiday", "name": "节日", "name_en": "Holiday" }
+    {
+      "id": "trending",
+      "name": "推荐",
+      "name_en": "Recommended"
+    },
+    {
+      "id": "sweet",
+      "name": "甜美",
+      "name_en": "Sweet"
+    },
+    {
+      "id": "minimal",
+      "name": "简约",
+      "name_en": "Minimal"
+    },
+    {
+      "id": "luxe",
+      "name": "奢华",
+      "name_en": "Luxe"
+    }
   ],
-  "shape_ids": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"],
+  "shape_ids": [
+    "almond",
+    "oval",
+    "coffin",
+    "squoval",
+    "round",
+    "square",
+    "stiletto"
+  ],
   "templates": [
     {
       "id": "t_mercury_dew_concept",
-      "name": "Mercury Dew · Concept",
-      "name_en": "Mercury Dew · Concept",
-      "asset_status": "CONCEPT",
+      "name": "Mercury Dew",
+      "name_en": "Mercury Dew",
+      "asset_status": "SIMULATED",
       "render_template_id": "t_liquid_velvet_cat_eye",
       "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
       "capability_summary": {
-        "supported": ["猫眼底层已支持"],
-        "pending": ["金属浮雕待实现", "透明水滴待实现"]
+        "supported": [
+          "2D Canonical Renderer 已签收",
+          "Almond/Oval/Coffin × Natural/Medium",
+          "Three.js HQ 预览（待 3D 签收）"
+        ],
+        "pending": [
+          "3D 资产视觉签收",
+          "生产验证"
+        ]
       },
-      "style_tags": ["trending", "luxe", "minimal"],
+      "style_tags": [
+        "trending",
+        "luxe",
+        "minimal"
+      ],
       "default_base_color": "#D9B5AB",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "coffin"],
-        "neutral": ["oval", "squoval", "round"],
+        "highly_compatible": [
+          "almond",
+          "coffin"
+        ],
+        "neutral": [
+          "oval",
+          "squoval",
+          "round"
+        ],
         "not_recommended": {
           "square": "当前纵向猫眼与液态流线构图尚未针对宽平甲面完成视觉签收",
           "stiletto": "尖端安全区过窄，透明水滴与金属浮雕的侧壁间距尚未验证"
@@ -40,15 +79,336 @@
       "sort_order": -1
     },
     {
+      "id": "t_pearl_tide_shell_concept",
+      "name": "液态贝壳海洋浮雕",
+      "name_en": "Pearl Tide Shell",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_3d_waterdrop",
+      "asset_spec_url": "/assets/hero-recipes/pearl-tide-shell/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Almond/Oval/Coffin × Medium/Long",
+          "3D Waterdrop 近似基础层"
+        ],
+        "pending": [
+          "参数化贝壳脊线",
+          "Canonical Renderer 签收",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "luxe",
+        "sweet"
+      ],
+      "default_base_color": "#F5E0D3",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "coffin"
+        ],
+        "neutral": [
+          "squoval"
+        ],
+        "not_recommended": {
+          "round": "短圆甲面难以展开扇形贝壳脊线",
+          "square": "平直甲面与有机贝壳纹构图不协调",
+          "stiletto": "尖端过窄，贝壳扇形与珠光层难以平衡"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/pearl-tide-shell/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "sort_order": -0.5
+    },
+    {
+      "id": "t_micro_coquette_concept",
+      "name": "法式微蝶结珍珠",
+      "name_en": "Micro Coquette",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_french_white",
+      "asset_spec_url": "/assets/hero-recipes/micro-coquette/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Almond/Oval × Short/Medium",
+          "French White 近似基础层"
+        ],
+        "pending": [
+          "微蝶结组件",
+          "Petal Veil 级 HQ",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "sweet",
+        "minimal"
+      ],
+      "default_base_color": "#F2E4DA",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "almond",
+          "oval"
+        ],
+        "neutral": [
+          "round",
+          "squoval"
+        ],
+        "not_recommended": {
+          "coffin": "宽平甲尖会放大装饰密度，需单独验证比例",
+          "square": "直边轮廓与微法式蝶结构图冲突",
+          "stiletto": "尖端空间不足以容纳蝶结与半珍珠组合"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/micro-coquette/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_french_white/manifest.json",
+      "sort_order": -0.25
+    },
+    {
+      "id": "t_starfish_bloom_elegance_concept",
+      "name": "海星绽放优雅",
+      "name_en": "Starfish Bloom Elegance",
+      "asset_status": "SIMULATED",
+      "render_template_id": "t_3d_waterdrop",
+      "asset_spec_url": "/assets/hero-recipes/starfish-bloom-elegance/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Short/Medium Almond/Oval/Coffin",
+          "Three.js HQ 预览（待 3D 签收）"
+        ],
+        "pending": [
+          "3D 资产视觉签收",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "sweet",
+        "luxe"
+      ],
+      "default_base_color": "#F5E0D3",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "almond",
+          "oval"
+        ],
+        "neutral": [
+          "coffin",
+          "squoval",
+          "round"
+        ],
+        "not_recommended": {
+          "square": "宽平甲面难以容纳海星与鸡蛋花的有机曲线构图",
+          "stiletto": "尖端过窄，3D 海星与珍珠附件的侧壁安全区尚未验证"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/starfish-bloom-elegance/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "sort_order": -0.15
+    },
+    {
+      "id": "t_sea_glass_chrome_concept",
+      "name": "海玻璃光影猫眼",
+      "name_en": "Sea-Glass Chrome",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_liquid_velvet_cat_eye",
+      "asset_spec_url": "/assets/hero-recipes/sea-glass-chrome/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Short/Medium Almond/Squoval/Oval",
+          "Liquid Velvet Cat-eye 近似基础层"
+        ],
+        "pending": [
+          "海玻璃色浆参数",
+          "微 Chrome 釉层",
+          "Canonical 签收",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "minimal",
+        "luxe"
+      ],
+      "default_base_color": "#C8DDD8",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "squoval"
+        ],
+        "neutral": [
+          "round",
+          "coffin"
+        ],
+        "not_recommended": {
+          "square": "宽平甲面削弱海玻璃纵向透亮延伸感",
+          "stiletto": "极尖甲面磁光带易聚于尖端，海玻璃层次不完整"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/sea-glass-chrome/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "sort_order": -0.12
+    },
+    {
+      "id": "t_sunset_aura_glaze_concept",
+      "name": "落日暖色极光釉",
+      "name_en": "Sunset Aura Glaze",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_nude_gradient",
+      "asset_spec_url": "/assets/hero-recipes/sunset-aura-glaze/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Medium/Long Almond/Coffin",
+          "Liquid Velvet Cat-eye 近似基础层"
+        ],
+        "pending": [
+          "高饱和 Aura 渐变",
+          "Glazed Chrome 釉层",
+          "3D 水滴",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "luxe",
+        "sweet"
+      ],
+      "default_base_color": "#E8A088",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "almond",
+          "coffin"
+        ],
+        "neutral": [
+          "oval",
+          "squoval",
+          "stiletto"
+        ],
+        "not_recommended": {
+          "round": "短圆甲面难以展开落日 Aura 纵向渐变",
+          "square": "平直轮廓与暖色晕染构图冲突"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "sort_order": -0.11
+    },
+    {
+      "id": "t_liquid_chrome_statement_concept",
+      "name": "液态金属宣言雕塑",
+      "name_en": "Liquid Chrome Statement",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_chrome_mirror",
+      "asset_spec_url": "/assets/hero-recipes/liquid-chrome-statement/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Long/Medium Coffin",
+          "Liquid Velvet Cat-eye 近似基础层"
+        ],
+        "pending": [
+          "液态金属 L2 浮雕",
+          "Statement 3D 雕塑",
+          "穿刺组件",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "trending",
+        "luxe"
+      ],
+      "default_base_color": "#3D2B35",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "coffin",
+          "stiletto"
+        ],
+        "neutral": [
+          "almond",
+          "oval"
+        ],
+        "not_recommended": {
+          "squoval": "短方圆甲面不足以承载宣言级金属流线",
+          "round": "圆形轮廓与高对比雕塑构图不匹配",
+          "square": "宽平甲面使金属流线缺乏纵向张力"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "sort_order": -0.1
+    },
+    {
+      "id": "t_butter_glaze_quiet_concept",
+      "name": "奶油黄薄釉 Quiet",
+      "name_en": "Butter Glaze Quiet",
+      "asset_status": "CONCEPT",
+      "render_template_id": "t_nude_gradient",
+      "asset_spec_url": "/assets/hero-recipes/butter-glaze-quiet/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": [
+          "Short Squoval/Oval/Round",
+          "Nude Gradient 近似基础层"
+        ],
+        "pending": [
+          "奶油黄色号参数",
+          "薄 Chrome 釉层",
+          "Canonical 签收",
+          "生产验证"
+        ]
+      },
+      "style_tags": [
+        "minimal",
+        "trending"
+      ],
+      "default_base_color": "#F3E4A6",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": [
+          "squoval",
+          "oval",
+          "round"
+        ],
+        "neutral": [
+          "almond",
+          "square"
+        ],
+        "not_recommended": {
+          "coffin": "长梯甲面与 Clean Girl 短甲实用定位不符",
+          "stiletto": "尖甲与 Quiet Luxury 极简日常场景冲突"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/butter-glaze-quiet/cover-16x9-1280x720-v1.png",
+      "manifest_url": "material-library/templates/t_nude_gradient/manifest.json",
+      "sort_order": -0.09
+    },
+    {
       "id": "t_liquid_velvet_cat_eye",
       "name": "裸透猫眼金属流线",
       "name_en": "Liquid Velvet Cat-eye",
-      "style_tags": ["trending", "luxe", "minimal"],
+      "style_tags": [
+        "trending",
+        "luxe",
+        "minimal"
+      ],
       "default_base_color": "#8A625A",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "coffin", "squoval"],
-        "neutral": ["round", "stiletto"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "coffin",
+          "squoval"
+        ],
+        "neutral": [
+          "round",
+          "stiletto"
+        ],
         "not_recommended": {
           "square": "平直宽甲面会让纵向磁光发散，侧弧金属流线也难以形成连续拉长感"
         }
@@ -65,15 +425,34 @@
       "render_template_id": "t_petal_veil_french",
       "asset_spec_url": "/assets/hero-recipes/petal-veil-french/ASSET_SPEC.md",
       "capability_summary": {
-        "supported": ["Almond × Medium", "R4 单重音指", "Three.js HQ 三视图"],
-        "pending": ["人工视觉签收", "生产验证"]
+        "supported": [
+          "Almond × Medium",
+          "R4 单重音指",
+          "Three.js HQ 三视图"
+        ],
+        "pending": [
+          "人工视觉签收",
+          "生产验证"
+        ]
       },
-      "style_tags": ["trending", "sweet", "minimal"],
+      "style_tags": [
+        "trending",
+        "sweet",
+        "minimal"
+      ],
       "default_base_color": "#F2E4DA",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "round", "squoval"],
-        "neutral": ["coffin", "square"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "round",
+          "squoval"
+        ],
+        "neutral": [
+          "coffin",
+          "square"
+        ],
         "not_recommended": {
           "stiletto": "极尖甲面会压缩法式弧与低浮雕花的留白，削弱轻柔比例"
         }
@@ -86,12 +465,23 @@
       "id": "t_french_white",
       "name": "法式白边",
       "name_en": "French White Tip",
-      "style_tags": ["minimal", "classic"],
+      "style_tags": [
+        "minimal",
+        "classic"
+      ],
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "squoval", "coffin"],
-        "neutral": ["square", "round"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "squoval",
+          "coffin"
+        ],
+        "neutral": [
+          "square",
+          "round"
+        ],
         "not_recommended": {
           "stiletto": "极尖甲面上法式弧线比例失衡，白边视觉效果不理想"
         }
@@ -104,12 +494,22 @@
       "id": "t_nude_gradient",
       "name": "裸粉渐变",
       "name_en": "Nude Pink Gradient",
-      "style_tags": ["sweet"],
+      "style_tags": [
+        "sweet"
+      ],
       "default_base_color": "#F7D9CF",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "round", "squoval"],
-        "neutral": ["coffin", "square"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "round",
+          "squoval"
+        ],
+        "neutral": [
+          "coffin",
+          "square"
+        ],
         "not_recommended": {
           "stiletto": "渐变过渡在尖端被截断，色彩层次不完整"
         }
@@ -122,12 +522,21 @@
       "id": "t_cat_eye_nude",
       "name": "猫眼裸色",
       "name_en": "Cat Eye Nude",
-      "style_tags": ["luxe"],
+      "style_tags": [
+        "luxe"
+      ],
       "default_base_color": "#E8D5C4",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "coffin", "squoval"],
-        "neutral": ["round"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "coffin",
+          "squoval"
+        ],
+        "neutral": [
+          "round"
+        ],
         "not_recommended": {
           "square": "猫眼光带需要纵向弧面支撑，平直甲面光带发散不集中",
           "stiletto": "猫眼光带需要纵向弧面，过尖甲面上光带断裂"
@@ -141,12 +550,21 @@
       "id": "t_y2k_ice",
       "name": "Y2K 冰川",
       "name_en": "Y2K Glacier",
-      "style_tags": ["cool"],
+      "style_tags": [
+        "cool"
+      ],
       "default_base_color": "#DCEBF2",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["coffin", "almond", "stiletto"],
-        "neutral": ["oval", "squoval"],
+        "highly_compatible": [
+          "coffin",
+          "almond",
+          "stiletto"
+        ],
+        "neutral": [
+          "oval",
+          "squoval"
+        ],
         "not_recommended": {
           "round": "短圆甲面气场不足，冰川碎线比例失衡",
           "square": "短平甲面气场不足，冰川碎线显得局促"
@@ -160,12 +578,21 @@
       "id": "t_dark_gradient",
       "name": "暗夜渐变",
       "name_en": "Midnight Gradient",
-      "style_tags": ["cool"],
+      "style_tags": [
+        "cool"
+      ],
       "default_base_color": "#3B2A4A",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["stiletto", "coffin", "almond"],
-        "neutral": ["oval", "squoval"],
+        "highly_compatible": [
+          "stiletto",
+          "coffin",
+          "almond"
+        ],
+        "neutral": [
+          "oval",
+          "squoval"
+        ],
         "not_recommended": {
           "round": "渐变需要长度支撑，短圆甲面色彩过渡仓促",
           "square": "渐变需要长度支撑，短平甲面色彩过渡仓促"
@@ -179,12 +606,21 @@
       "id": "t_chrome_mirror",
       "name": "镜面铬",
       "name_en": "Chrome Mirror",
-      "style_tags": ["luxe"],
+      "style_tags": [
+        "luxe"
+      ],
       "default_base_color": "#D9DCE0",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["stiletto", "coffin"],
-        "neutral": ["almond", "oval", "squoval"],
+        "highly_compatible": [
+          "stiletto",
+          "coffin"
+        ],
+        "neutral": [
+          "almond",
+          "oval",
+          "squoval"
+        ],
         "not_recommended": {
           "round": "镜面效果在大圆弧平面上显廉价，长甲面反光更集中",
           "square": "镜面效果在大平面上显廉价，窄长甲面反光更集中"
@@ -198,12 +634,21 @@
       "id": "t_checkerboard",
       "name": "棋盘格",
       "name_en": "Checkerboard",
-      "style_tags": ["retro"],
+      "style_tags": [
+        "retro"
+      ],
       "default_base_color": "#F5F5F5",
       "default_finish": "matte",
       "shape_compatibility": {
-        "highly_compatible": ["square", "coffin"],
-        "neutral": ["almond", "oval", "squoval"],
+        "highly_compatible": [
+          "square",
+          "coffin"
+        ],
+        "neutral": [
+          "almond",
+          "oval",
+          "squoval"
+        ],
         "not_recommended": {
           "round": "格子在圆弧边上变形，图案边缘被裁切",
           "stiletto": "格子在收窄的曲边上变形，图案边缘被裁切"
@@ -217,12 +662,21 @@
       "id": "t_3d_waterdrop",
       "name": "3D 水滴",
       "name_en": "3D Waterdrop",
-      "style_tags": ["sweet"],
+      "style_tags": [
+        "sweet"
+      ],
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "round"],
-        "neutral": ["coffin", "squoval"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "round"
+        ],
+        "neutral": [
+          "coffin",
+          "squoval"
+        ],
         "not_recommended": {
           "square": "水滴造型与直边轮廓冲突，视觉风格不协调",
           "stiletto": "水滴造型与尖角轮廓冲突，视觉风格不协调"
@@ -236,11 +690,21 @@
       "id": "t_classic_high_gloss",
       "name": "经典高光",
       "name_en": "Classic High Gloss",
-      "style_tags": ["minimal"],
+      "style_tags": [
+        "minimal"
+      ],
       "default_base_color": "#F5E0D3",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "coffin",
+          "squoval",
+          "round",
+          "square",
+          "stiletto"
+        ],
         "neutral": [],
         "not_recommended": {}
       },
@@ -252,12 +716,22 @@
       "id": "t_holiday_glitter",
       "name": "节日闪粉",
       "name_en": "Holiday Glitter",
-      "style_tags": ["holiday"],
+      "style_tags": [
+        "holiday"
+      ],
       "default_base_color": "#7E2A44",
       "default_finish": "gloss",
       "shape_compatibility": {
-        "highly_compatible": ["almond", "oval", "coffin", "round"],
-        "neutral": ["squoval", "square"],
+        "highly_compatible": [
+          "almond",
+          "oval",
+          "coffin",
+          "round"
+        ],
+        "neutral": [
+          "squoval",
+          "square"
+        ],
         "not_recommended": {
           "stiletto": "闪粉在尖端堆积过厚，封层易起翘"
         }
