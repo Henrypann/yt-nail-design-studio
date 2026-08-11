@@ -35,7 +35,7 @@ export function CommunityContentCard({ content, publisher, taxonomy }: Props) {
       data-content-id={content.contentId}
       data-testid="community-content-card"
       onClick={() =>
-        navigate(communityInternalHref(Routes.communityContent(content.contentId), searchParams))
+        navigate(communityInternalHref(Routes.communityLook(content.contentId), searchParams))
       }
       className="flex flex-col overflow-hidden rounded-card border border-gray-200 bg-white text-left transition hover:border-primary/40 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >

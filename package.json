@@ -16,6 +16,7 @@
     "test:community-domain": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-domain.mjs",
     "test:community-v7-1-identity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-identity.mjs",
     "test:community-v7-1-design-content": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-design-content.mjs",
+    "test:community-v7-1-look-adapter": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-look-adapter.mjs",
     "test:community-intent": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-intent.mjs",
     "test:community-studio-flow": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-studio-flow.mjs",
     "test:template-gallery-hq": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-template-gallery-hq.mjs",

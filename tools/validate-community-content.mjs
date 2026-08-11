@@ -161,7 +161,7 @@ assert.match(intentSrc, /createStudioImportIntent|validateStudioImportIntent/);
 assert.doesNotMatch(intentSrc, /useWizardStore|useEditorStore|studio\/wizard|studio\/editor/);
 
 const contentPage = fs.readFileSync(
-  path.join(root, 'src/community/pages/CommunityContentPage.tsx'),
+  path.join(root, 'src/community/pages/CommunityLookPage.tsx'),
   'utf8',
 );
 assert.match(contentPage, /createStudioImportIntent/);
