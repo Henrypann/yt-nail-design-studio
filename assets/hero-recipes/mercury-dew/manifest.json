@@ -1,14 +1,23 @@
 {
   "asset_pack_id": "hero_mercury_dew_v1",
-  "recipe_id": "hero_mercury_dew",
+  "recipe_id": "mercury-dew",
   "version": 1,
   "generated_at": "2026-07-31",
   "generator": "openai-built-in-imagegen",
-  "maturity": "concept-approved",
+  "maturity": "visual-signoff-approved",
   "customer_visible": true,
-  "canonical_renderer_output": false,
+  "canonical_renderer_output": true,
   "production_validated": false,
   "assets": [
+    {
+      "asset_id": "mercury-dew-wizard-cover-16x9-v1",
+      "kind": "wizard-cover",
+      "intent": ["template-selection", "recommendation"],
+      "path": "cover-16x9-1280x720-v1.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "a448be6ba41f251db7fe75f80dfc28abe4fc1047333c98572177e1e057f31818"
+    },
     {
       "asset_id": "mercury-dew-editorial-16x9-v1",
       "kind": "editorial-cover",
@@ -35,7 +44,27 @@
       "width": 1254,
       "height": 1254,
       "sha256": "46460963cace8d21756b12442edf3911f3b93748b8272c31466f175ffb0e710c"
+    },
+    {
+      "asset_id": "mercury-dew-canonical-recipe-v1",
+      "kind": "recipe-contract",
+      "intent": ["editor-v7", "deterministic-preview"],
+      "path": "../../../material-library/recipes/mercury-dew/recipe.json",
+      "sha256": "7c776f1d745f7bbd00592b38f78ee691e5615af1fca83c5b9ef76e5eb3878e28"
+    },
+    {
+      "asset_id": "mercury-dew-golden-fixtures-v1",
+      "kind": "visual-fixture-registry",
+      "intent": ["visual-qa", "editor-v7"],
+      "path": "../../golden-fixtures/mercury-dew/index.json",
+      "sha256": "a06e0ddc38a660ab9cb370169b206db3c572ce9277075b013738a85bf347f0d0"
+    },
+    {
+      "asset_id": "mercury-dew-base-pattern-registry-v7",
+      "kind": "template-pattern-registry",
+      "intent": ["editor-v7", "shape-binding"],
+      "path": "../../../material-library/template-pattern-assets.v7.json",
+      "sha256": "5414135c37e59cbf03a1f209d5edd612c3531f347f07f1ccaa26a553b48572c0"
     }
   ]
 }
-

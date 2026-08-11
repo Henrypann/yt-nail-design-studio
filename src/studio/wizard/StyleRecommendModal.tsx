@@ -7,7 +7,7 @@
  * 选中风格 → 映射 material-library 模板自动应用；[暂不选择] 直接进入画布。
  * 封面证据等级：
  * - REAL：正式摄影/签收素材；
- * - CONCEPT：高保真概念方向，画布只应用近似基础模板；
+ * - CONCEPT：高保真概念方向，必须声明 V7 结构化配方或近似基础模板的实际能力；
  * - MOCK：程序占位图。
  * 三者必须显式标注，不得把 Editorial Concept 冒充 Canonical Renderer 输出。
  */
@@ -38,6 +38,7 @@ export interface StyleRecommendation {
   base_template_name?: string;
   asset_spec_url?: string;
   template_id: string | null;
+  recipe_ref?: { id: string; version: string; preset_id: string };
 }
 
 interface StyleManifest {
@@ -222,7 +223,7 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                     <div className="rounded-button border border-warning/20 bg-warning-soft px-2 py-1.5 text-[10px] leading-relaxed text-warning">
                       <p>{st.concept_note ?? '概念封面用于审美方向；当前画布为近似基础方案。'}</p>
                       {st.base_template_name && (
-                        <p className="mt-0.5 opacity-80">当前应用：{st.base_template_name}</p>
+                        <p className="mt-0.5 opacity-80">{st.recipe_ref ? '基础渲染：' : '当前应用：'}{st.base_template_name}</p>
                       )}
                       {st.asset_spec_url && (
                         <a
@@ -246,7 +247,9 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                       onClick={() => void selectStyle(st)}
                     >
                       {st.cover_status === 'CONCEPT'
-                        ? text('应用近似基础方案', 'Apply approximate base')
+                        ? st.recipe_ref
+                          ? text('应用 V7 配方方案', 'Apply V7 recipe')
+                          : text('应用近似基础方案', 'Apply approximate base')
                         : text('选用此风格', 'Use this look')}
                       <ArrowRight size={13} />
                     </Button>

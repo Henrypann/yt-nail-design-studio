@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "manifestId": "nextgen-browser-preview-assets",
-  "manifestVersion": "1.0.0",
-  "updatedAt": "2026-08-07T00:00:00.000Z",
+  "manifestVersion": "1.1.0",
+  "updatedAt": "2026-08-11T00:00:00.000Z",
   "coordinateContract": {
     "unit": "mm",
     "handedness": "right",
@@ -11,59 +11,30 @@
     "surfaceDirection": "positive_z"
   },
   "assets": [
-    {
-      "id": "shell-almond-medium",
-      "revision": "1.0.0-missing",
-      "category": "shell",
-      "evidence": "MISSING",
-      "renderSuitability": "fallback_only",
-      "manufacturingValidated": false,
-      "lods": [],
-      "statusNote": "No reviewed browser GLB is present in this integration branch; use the existing 2D silhouette."
-    },
-    {
-      "id": "mercury-dew-ribbon",
-      "revision": "1.0.0-missing",
-      "category": "ribbon",
-      "evidence": "MISSING",
-      "renderSuitability": "fallback_only",
-      "manufacturingValidated": false,
-      "lods": [],
-      "statusNote": "Reference geometry exists only outside the accepted branch and has not been signed off here."
-    },
-    {
-      "id": "mercury-dew-droplet",
-      "revision": "1.0.0-missing",
-      "category": "droplet",
-      "evidence": "MISSING",
-      "renderSuitability": "fallback_only",
-      "manufacturingValidated": false,
-      "lods": [],
-      "statusNote": "No reviewed browser GLB is present; Mercury Dew continues to use its simulated 2D renderer."
-    },
-    {
-      "id": "starfish-bloom-starfish",
-      "revision": "1.0.0-missing",
-      "category": "custom",
-      "evidence": "MISSING",
-      "renderSuitability": "fallback_only",
-      "manufacturingValidated": false,
-      "lods": [],
-      "statusNote": "Starfish Bloom component geometry has not been accepted into this branch."
-    }
+    { "id": "shell-almond-short", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/almond/short/shell.web.glb", "sizeBytes": 13900, "sha256": "3a883fd04952198a9a4779d9ceb2959d3ebcf778adce62670d3c9d8aff7c8491", "boundsMm": { "min": [-5.5, -14, 0.0005], "max": [5.5, 1.1, 3.0347] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "shell-almond-medium", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/almond/medium/shell.web.glb", "sizeBytes": 13796, "sha256": "4092b69c106306aeb3d6f13a3c9cfa474c0603a795c7f69a014826a495a734bc", "boundsMm": { "min": [-5.4997, -18, -0.0003], "max": [5.4997, 1.1, 3.0355] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "shell-oval-short", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/oval/short/shell.web.glb", "sizeBytes": 14064, "sha256": "a3141b31065e063ba50ec167b7fcb9787d639659800d4c9086095d647f776f3a", "boundsMm": { "min": [-5.5, -14, 0.0005], "max": [5.5, 1.1, 3.0235] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "shell-oval-medium", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/oval/medium/shell.web.glb", "sizeBytes": 13720, "sha256": "aca3ab1cd7c4d8c96794c002a64b0c521253e825cb3f50cce3653e711713b35f", "boundsMm": { "min": [-5.4997, -18, -0.0001], "max": [5.4997, 1.1, 3.0241] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "shell-coffin-short", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/coffin/short/shell.web.glb", "sizeBytes": 13256, "sha256": "8a223af27682f984263e48e9836b3b0b41986b38b98d7e92f3214771153fd876", "boundsMm": { "min": [-5.5, -14, 0.0001], "max": [5.5, 0.605, 3.0239] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "shell-coffin-medium", "revision": "1.0.0-simulated", "category": "shell", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/shells/coffin/medium/shell.web.glb", "sizeBytes": 13036, "sha256": "341655c22ac5f62e360bce624da1175734e01654bfb83a1f533b04f8a508bb94", "boundsMm": { "min": [-5.5002, -18, 0.0005], "max": [5.5002, 0.605, 3.0235] } }], "statusNote": "Preview-only candidate imported from 3965f41; manufacturing unvalidated." },
+    { "id": "mercury-dew-ribbon", "revision": "1.0.0-simulated", "category": "ribbon", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/ribbon/ribbon.web.glb", "sizeBytes": 5500, "sha256": "55fe8c6ca47a6f51dcf4ed88a5be742631db4e21be4e2d52e27ad0764d830a1d", "boundsMm": { "min": [0.1994, -5.0939, 0.072], "max": [3.3241, 5.4681, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
+    { "id": "mercury-dew-droplet-0.8", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-0.8.web.glb", "sizeBytes": 23980, "sha256": "79f9b522c53a8e0bddcb9acc1e8a9d6ffe7b67445eb11c70f2faebe5bf48b1c3", "boundsMm": { "min": [-0.4, -0.4, 0], "max": [0.4, 0.4, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
+    { "id": "mercury-dew-droplet-1.2", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-1.2.web.glb", "sizeBytes": 23980, "sha256": "c6a325c8e1e98693bc4472b59a9a9bcd15ee6ca76b1fdff602d495a2c2c0beeb", "boundsMm": { "min": [-0.6, -0.6, 0], "max": [0.6, 0.6, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
+    { "id": "mercury-dew-droplet-1.8", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-1.8.web.glb", "sizeBytes": 23980, "sha256": "ff1212a6c9188c0bb1fab35d40c02be5b7a442f386ad24844a22582800ca63d3", "boundsMm": { "min": [-0.9, -0.9, 0], "max": [0.9, 0.9, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
+    { "id": "starfish-bloom-starfish", "revision": "1.0.0-missing", "category": "custom", "evidence": "MISSING", "renderSuitability": "fallback_only", "manufacturingValidated": false, "lods": [], "statusNote": "Starfish Bloom component geometry has not been accepted into this branch." }
   ],
   "rendererAdapters": [
     {
       "id": "three-pbr/mercury-dew-1",
       "recipeRef": { "id": "mercury-dew", "version": "1.0.0" },
-      "requiredAssetIds": ["shell-almond-medium", "mercury-dew-ribbon", "mercury-dew-droplet"],
+      "requiredAssetIds": ["shell-almond-short", "shell-almond-medium", "shell-oval-short", "shell-oval-medium", "shell-coffin-short", "shell-coffin-medium", "mercury-dew-ribbon", "mercury-dew-droplet-0.8", "mercury-dew-droplet-1.2", "mercury-dew-droplet-1.8"],
       "fallbackRendererId": "svg-2.5d/mercury-1",
       "evidence": "SIMULATED"
     },
     {
       "id": "three-pbr/starfish-bloom-1",
       "recipeRef": { "id": "starfish-bloom-elegance", "version": "1.0.0" },
-      "requiredAssetIds": ["shell-almond-medium", "starfish-bloom-starfish"],
+      "requiredAssetIds": ["starfish-bloom-starfish"],
       "fallbackRendererId": "svg-2d/generic-nail-1",
       "evidence": "SIMULATED"
     }

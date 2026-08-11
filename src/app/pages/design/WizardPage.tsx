@@ -26,6 +26,7 @@ import { findDesign } from '@/studio/wizard/design-repository';
 import { setWizardNotifier, useWizardStore } from '@/studio/wizard/wizard-store';
 import {
   chooseWizardRestoreDraft,
+  clearWizardDraft,
   readWizardDraft,
   writeWizardDraft,
 } from '@/studio/wizard/wizard-draft';
@@ -101,18 +102,28 @@ export default function WizardPage() {
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
-    const explicitId = searchParams.get('designId');
+    const fresh = searchParams.get('fresh') === '1';
+    const explicitId = fresh ? null : searchParams.get('designId');
+    if (fresh) {
+      clearWizardDraft();
+      useWizardStore.getState().resetForNewDesign();
+    }
     const explicitDesign = explicitId ? findDesign(explicitId) : null;
     const draft = chooseWizardRestoreDraft({
       explicitDesignId: explicitId,
       explicitDesign,
-      activeDraft: explicitId ? null : readWizardDraft(),
+      activeDraft: explicitId || fresh ? null : readWizardDraft(),
     });
     if (draft) {
       useWizardStore.getState().restoreDraft(
         draft,
         draft.customerId ? findCustomer(draft.customerId) : null,
       );
+    }
+    if (fresh) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('fresh');
+      setSearchParams(next, { replace: true });
     }
     setWizardReady(true);
     // URL 初始化只执行一次；后续 query 更改由 intent/customer effects 处理。
@@ -132,6 +143,19 @@ export default function WizardPage() {
     persist();
     return useWizardStore.subscribe(persist);
   }, [wizardReady]);
+
+  /* SPA 内再次点击“新建设计”时组件不会卸载，fresh intent 仍须消费。 */
+  useEffect(() => {
+    if (!wizardReady || searchParams.get('fresh') !== '1') return;
+    clearWizardDraft();
+    useWizardStore.getState().resetForNewDesign();
+    const customerId = searchParams.get('customerId');
+    const customer = customerId ? findCustomer(customerId) : null;
+    if (customer) useWizardStore.getState().setCustomer(customer);
+    const next = new URLSearchParams(searchParams);
+    next.delete('fresh');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, wizardReady]);
 
   /* 客户上下文直达（客户详情/列表 [新建设计] 携带 customerId） */
   useEffect(() => {

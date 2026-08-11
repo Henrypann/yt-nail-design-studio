@@ -27,3 +27,10 @@ export const Routes = {
   communityProfile: (handle: string) => `/community/profile/${handle}`,
   communityProfilePath: '/community/profile/:handle',
 } as const;
+
+/** User-facing “New design” intent. Plain /design/new remains draft resume. */
+export function designNewFresh(customerId?: string): string {
+  const params = new URLSearchParams({ fresh: '1' });
+  if (customerId) params.set('customerId', customerId);
+  return `${Routes.designNew}?${params.toString()}`;
+}

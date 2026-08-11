@@ -40,6 +40,7 @@
       "name_en": "Mercury Dew",
       "asset_status": "SIMULATED",
       "render_template_id": "t_liquid_velvet_cat_eye",
+      "recipe_ref": { "id": "mercury-dew", "version": "1.0.0", "preset_id": "signature" },
       "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
       "capability_summary": {
         "supported": [

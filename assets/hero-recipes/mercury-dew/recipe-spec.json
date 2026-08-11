@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "recipe_id": "hero_mercury_dew",
+  "recipe_id": "mercury-dew",
   "name": "液态金属波光水滴",
   "name_en": "Mercury Dew",
   "status": {
     "editorial": "approved",
-    "canonical_renderer": "pending",
+    "canonical_renderer": "visual-signoff-approved",
     "production": "unvalidated"
   },
   "recommended_shapes": {
@@ -66,4 +66,3 @@
     "material-progression-1x1-v1.png"
   ]
 }
-

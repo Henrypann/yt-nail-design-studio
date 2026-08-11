@@ -16,8 +16,9 @@
         "cover_url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
         "cover_status": "CONCEPT",
         "preview_fidelity": "APPROXIMATE",
-        "concept_note": "高保真概念封面；当前画布不含液态金属与透明水滴浮雕。",
+        "concept_note": "V7 会保存猫眼、金属丝带与透明水滴的结构化配方；当前效果与 3D 资产均为模拟预览，尚未制造验证。",
         "base_template_name": "Liquid Velvet Cat-eye 基础模板",
+        "recipe_ref": { "id": "mercury-dew", "version": "1.0.0", "preset_id": "signature" },
         "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
         "template_id": "t_mercury_dew_concept"
       },
@@ -108,8 +109,9 @@
         "cover_url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
         "cover_status": "CONCEPT",
         "preview_fidelity": "APPROXIMATE",
-        "concept_note": "高保真概念封面；当前画布不含液态金属与透明水滴浮雕。",
+        "concept_note": "V7 会保存猫眼、金属丝带与透明水滴的结构化配方；当前效果与 3D 资产均为模拟预览，尚未制造验证。",
         "base_template_name": "Liquid Velvet Cat-eye 基础模板",
+        "recipe_ref": { "id": "mercury-dew", "version": "1.0.0", "preset_id": "signature" },
         "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
         "template_id": "t_mercury_dew_concept"
       },
@@ -197,8 +199,9 @@
         "cover_url": "/assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
         "cover_status": "CONCEPT",
         "preview_fidelity": "APPROXIMATE",
-        "concept_note": "高保真概念封面；当前画布不含液态金属与透明水滴浮雕。",
+        "concept_note": "V7 会保存猫眼、金属丝带与透明水滴的结构化配方；当前效果与 3D 资产均为模拟预览，尚未制造验证。",
         "base_template_name": "Liquid Velvet Cat-eye 基础模板",
+        "recipe_ref": { "id": "mercury-dew", "version": "1.0.0", "preset_id": "signature" },
         "asset_spec_url": "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
         "template_id": "t_mercury_dew_concept"
       },

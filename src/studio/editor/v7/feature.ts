@@ -14,7 +14,9 @@ export type EditorWriterRoute =
 export function isEditorV7InternalEnabled(
   env: Pick<ImportMetaEnv, 'VITE_EDITOR_V7'> = import.meta.env,
 ): boolean {
-  return env.VITE_EDITOR_V7 === '1';
+  // V7 is the creation baseline. `0` is an explicit local recovery opt-out;
+  // an absent flag must never make a newly created design silently become V6.
+  return env.VITE_EDITOR_V7 !== '0';
 }
 
 /** Schema selects the writer. The flag only controls whether V7 is editable. */

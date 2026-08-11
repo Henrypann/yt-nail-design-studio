@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Compass, Monitor, Palette, Users, ArrowRight } from 'lucide-react';
 import { Card, cx } from '@/design-system';
-import { Routes } from '@/app/routes';
+import { designNewFresh, Routes } from '@/app/routes';
 import { communityHref } from '@/community/lib/entry-link';
 import { readOnboarding } from '@/platform/onboarding';
 import { useRequireAuth } from '@/platform/session';
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       title: '创建第一个设计',
       description: '选模板、调参数，十分钟出一套十指设计。',
       actionLabel: '创建设计',
-      to: Routes.designNew,
+      to: designNewFresh(),
       done: onboarding.hasDesign,
     },
   ];

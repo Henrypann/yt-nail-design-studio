@@ -5,6 +5,7 @@ import type { EditorDocV7, FlatDesignElementV7, GeometryRefV7, ProcessStepV7, Su
 import { getOfficialTemplatePatternAssetV7 } from './official-template-assets';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
 import { parseEditorDocV7 } from './schema';
+import { materializeMercuryDewV7 } from './mercury-dew';
 
 export const PRODUCT_GEOMETRY_REVISION_V7 = 'shape-params-v3';
 
@@ -164,14 +165,14 @@ export function wizardDesignToEditorDocV7(
   if (design.finish === 'pearl') {
     return { ok: false, reason: 'unsupported_finish', message: 'Pearl finish requires the V7 surface-effect adapter' };
   }
-  if (design.recipe) {
-    return { ok: false, reason: 'unsupported_recipe', message: 'Recipe materialization remains on the V6 compatibility writer until V7-12/13' };
+  if (design.recipe && design.recipe.recipeRef.id !== 'mercury-dew') {
+    return { ok: false, reason: 'unsupported_recipe', message: `Recipe ${design.recipe.recipeRef.id} is not yet losslessly supported by EditorDocV7` };
   }
   const decoration = Object.entries(design.fingerOverrides ?? {}).find(([, override]) => override?.decorationId);
   if (decoration) {
     return { ok: false, reason: 'unsupported_decoration', message: `Decoration on ${decoration[0]} requires the V7-13 adapter` };
   }
-  return buildEditorDocV7({
+  const base = buildEditorDocV7({
     designId: design.id,
     shape: design.shape,
     length: design.length,
@@ -184,4 +185,9 @@ export function wizardDesignToEditorDocV7(
     sourceId: design.id,
     revision: String(design.version),
   });
+  if (!base.ok || !design.recipe) return base;
+  const materialized = materializeMercuryDewV7(base.doc, design.recipe);
+  return materialized
+    ? { ok: true, doc: materialized }
+    : { ok: false, reason: 'unsupported_recipe', message: 'Mercury Dew V7 materialization failed contract validation' };
 }

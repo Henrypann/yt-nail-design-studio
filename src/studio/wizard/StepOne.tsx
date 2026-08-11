@@ -192,7 +192,9 @@ export function StepOne() {
     setStyleModalOpen(false);
     if (st.cover_status === 'CONCEPT') {
       toast.warning(
-        `已应用「${st.base_template_name ?? result.entry.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
+        st.recipe_ref
+          ? `已应用「${st.name_en}」V7 结构化配方；2D/2.5D 与 3D 均为模拟预览，不代表制造结果。`
+          : `已应用「${st.base_template_name ?? result.entry.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
       );
     }
     navigate(Routes.designNew);

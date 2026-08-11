@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Palette, Trash2 } from 'lucide-react';
 import { Badge, Button, Card, EmptyState, Modal } from '@/design-system';
 import { useToast } from '@/design-system';
-import { Routes } from '@/app/routes';
+import { designNewFresh, Routes } from '@/app/routes';
 import { STATUS_BADGE, STATUS_LABEL } from '@/lib/state-machine';
 import {
   NOTES_MAX,
@@ -157,7 +157,7 @@ export default function CustomerDetailPage() {
         </Button>
         <Button
           size="sm"
-          onClick={() => navigate(`${Routes.designNew}?customerId=${customer.id}`)}
+          onClick={() => navigate(designNewFresh(customer.id))}
         >
           <Palette size={14} />
           新建设计

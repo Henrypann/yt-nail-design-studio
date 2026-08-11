@@ -23,6 +23,7 @@ import {
 } from '../src/studio/editor/v7/official-template-assets.ts';
 import { createEditorDocV7InMap } from '../src/studio/editor/v7/repository.ts';
 import { resolveBackgroundSilhouetteV7 } from '../src/studio/editor/v7/background.ts';
+import { isEditorV7InternalEnabled } from '../src/studio/editor/v7/feature.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registry = JSON.parse(await readFile(path.join(root, 'material-library/template-pattern-assets.v7.json'), 'utf8'));
@@ -98,7 +99,23 @@ assert.equal(new Set(allIds).size, allIds.length, 'step/element ids must be glob
 
 // Unsupported semantic content never silently materializes into a lossy V7 doc.
 assert.deepEqual(wizardDesignToEditorDocV7(summary({ finish: 'pearl' })).reason, 'unsupported_finish');
-assert.deepEqual(wizardDesignToEditorDocV7(summary({ recipe: createMercuryInstance() })).reason, 'unsupported_recipe');
+const mercury = wizardDesignToEditorDocV7(summary({
+  templateId: 't_liquid_velvet_cat_eye',
+  recipe: createMercuryInstance(),
+}));
+assert.equal(mercury.ok, true);
+assert.equal(mercury.doc.schemaVersion, 7);
+assert.equal(Object.keys(mercury.doc.recipeInstances).length, 1);
+for (const finger of FINGER_CODES) {
+  const nail = mercury.doc.nails[finger];
+  assert.equal(nail.steps[0].kind, 'background');
+  assert.equal(nail.steps[0].background.mode, 'cat_eye');
+  const relief = nail.steps.find((step) => step.kind === 'dimensional_decoration');
+  assert.ok(relief);
+  assert.equal(relief.decorations.length, 5);
+  assert.equal(relief.previewFidelity, undefined);
+  assert.equal(nail.steps.at(-1).kind, 'surface_finish');
+}
 assert.deepEqual(
   wizardDesignToEditorDocV7(summary({ fingerOverrides: { L1: { decorationId: 'deco.star' } } })).reason,
   'unsupported_decoration',
@@ -153,7 +170,10 @@ race.deps.inspectEditorDoc = () => (++raceProbeCount === 1 ? { present: false } 
 assert.deepEqual(openBridgeV7WithDeps(summary().id, race.deps), { ok: true, mode: 'existing', writer: 'v7' });
 assert.equal(race.calls.create, 1);
 
-// Feature-off stays V6; feature-on falls back only for content V7 cannot yet express.
+// V7 is default-on; unsupported new content is blocked instead of silently creating V6.
+assert.equal(isEditorV7InternalEnabled({}), true);
+assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: '1' }), true);
+assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: '0' }), false);
 const v6Calls = { save: 0, navigate: [] };
 const v6Deps = {
   getDesign: () => summary({ recipe: createMercuryInstance() }),
@@ -162,11 +182,10 @@ const v6Deps = {
   navigate: (url) => v6Calls.navigate.push(url),
 };
 const unsupportedV7 = bridgeDeps({ convert: { ok: false, reason: 'unsupported_recipe', message: 'recipe preserved in V6' } });
-const fallback = openBridgeForWriterWithDeps(summary().id, true, v6Deps, unsupportedV7.deps);
-assert.equal(fallback.ok, true);
-assert.equal(fallback.writer, 'v6');
-assert.equal(fallback.compatibilityWarning, 'recipe preserved in V6');
-assert.equal(v6Calls.save, 1);
+const blockedWithoutFallback = openBridgeForWriterWithDeps(summary().id, true, v6Deps, unsupportedV7.deps);
+assert.equal(blockedWithoutFallback.ok, false);
+assert.equal(blockedWithoutFallback.reason, 'v7_content_not_supported');
+assert.equal(v6Calls.save, 0);
 
 let v7Touched = false;
 const disabledV7 = { ...unsupportedV7.deps, getDesign: () => { v7Touched = true; return summary(); } };
@@ -190,8 +209,8 @@ assert.match(editorPageSource, /if \(v7Enabled\)[\s\S]*createBlankEditorDesignV7
 assert.match(editorPageSource, /setParams\(\{ design: designId \}/);
 assert.doesNotMatch(editorPageSource, /acknowledgeBridge[\s\S]{0,250}loadV6/);
 assert.match(bridgeSource, /openBridgeV7WithDeps/);
-assert.match(bridgeSource, /v7_content_not_supported[\s\S]*openBridgeWithDeps/);
+assert.doesNotMatch(bridgeSource, /v7_content_not_supported[\s\S]{0,300}fallback/);
 assert.match(flatCanvasSource, /FlatContentArtworkV7/);
 assert.match(flatArtworkSource, /OfficialTemplatePatternV7/);
 
-console.log('[editor-v7-creation-cutover] 84 assets + creation + geometry + bridge compatibility: PASS');
+console.log('[editor-v7-creation-cutover] 84 assets + V7-only creation + Mercury recipe + legacy compatibility: PASS');
