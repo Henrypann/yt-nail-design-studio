@@ -2,8 +2,8 @@
  * Community 独立产品壳：无 Studio 侧栏，不读 Wizard/Editor Store。
  */
 
-import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Compass, Menu, Palette, X } from 'lucide-react';
+import { Link, NavLink, Outlet, useSearchParams } from 'react-router-dom';
+import { ArrowUpRight, Compass, LogIn, Menu, Palette, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
 import { cx } from '@/design-system';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
@@ -84,6 +84,22 @@ export function CommunityLayout() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <div className="hidden items-center gap-1 lg:flex" aria-label={text('账号', 'Account')}>
+              <Link
+                to={Routes.login}
+                data-testid="community-login-entry"
+                className="inline-flex min-h-10 items-center justify-center rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                {text('登录', 'Log in')}
+              </Link>
+              <Link
+                to={Routes.register}
+                data-testid="community-register-entry"
+                className="inline-flex min-h-10 items-center justify-center rounded-button border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-primary-soft hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                {text('注册', 'Sign up')}
+              </Link>
+            </div>
             <LanguageToggle />
             <a
               href={studioHref}
@@ -114,6 +130,26 @@ export function CommunityLayout() {
                 {item.label}
               </NavLink>
             ))}
+            <div className="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3">
+              <Link
+                to={Routes.login}
+                data-testid="community-mobile-login-entry"
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700"
+              >
+                <LogIn size={15} aria-hidden />
+                {text('登录', 'Log in')}
+              </Link>
+              <Link
+                to={Routes.register}
+                data-testid="community-mobile-register-entry"
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button bg-primary px-3 text-sm font-semibold text-primary-foreground"
+              >
+                <UserPlus size={15} aria-hidden />
+                {text('注册', 'Sign up')}
+              </Link>
+            </div>
           </nav>
         )}
       </header>

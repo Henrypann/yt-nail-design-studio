@@ -790,6 +790,10 @@ async function createBoard(repo, title = 'My board') {
   const layout = read('src/app/layouts/CommunityLayout.tsx');
   assert.match(layout, /Routes\.communityBoards/, 'Boards nav entry');
   assert.match(layout, /text\('Nail Board', 'Nail Board'\)/, 'Boards nav label');
+  assert.match(layout, /community-login-entry/, 'Community desktop exposes optional login entry');
+  assert.match(layout, /community-register-entry/, 'Community desktop exposes optional registration entry');
+  assert.match(layout, /community-mobile-login-entry/, 'Community mobile menu exposes login entry');
+  assert.match(layout, /community-mobile-register-entry/, 'Community mobile menu exposes registration entry');
 
   const card = read('src/community/components/CommunityLookCard.tsx');
   assert.match(card, /onSave\?:/, 'card accepts onSave');
@@ -813,6 +817,9 @@ async function createBoard(repo, title = 'My board') {
   assert.match(boardsPage, /boards-default-private-disclosure/, 'default PRIVATE disclosure');
   assert.match(boardsPage, /boards-empty/, 'empty state');
   assert.match(boardsPage, /boards-storage-corrupted/, 'corrupted storage disclosure');
+  assert.match(boardsPage, /loadLookReadModels/, 'board homepage resolves saved references to visual covers');
+  assert.match(boardsPage, /BoardCoverMosaic/, 'board homepage renders image-first cover mosaics');
+  assert.match(boardsPage, /boards-create-open/, 'board creation is a lightweight secondary action');
 
   const boardPage = read('src/community/pages/CommunityBoardPage.tsx');
   assert.match(boardPage, /board-share-private-note/, 'PRIVATE not shareable note');
