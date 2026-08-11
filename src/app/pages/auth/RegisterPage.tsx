@@ -33,7 +33,7 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
 
   if (isLoggedIn()) {
-    return <Navigate to={Routes.dashboard} replace />;
+    return <Navigate to={Routes.studio} replace />;
   }
 
   const handleFinish = () => {
@@ -51,7 +51,7 @@ export default function RegisterPage() {
         email: account.email,
       });
       toast.success('注册成功，欢迎！');
-      navigate(Routes.dashboard, { replace: true });
+      navigate(Routes.studio, { replace: true });
     }, 400);
   };
 

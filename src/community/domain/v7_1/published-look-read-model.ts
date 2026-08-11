@@ -2,7 +2,7 @@
  * Community V7.1 · COMM-V7.1-01 PublishedLookReadModelV1 — typed read model.
  *
  * A read model is the UI-facing projection of a published look on the canonical
- * detail route `/community/look/:lookId`. It is a DISCRIMINATED projection:
+ * detail route `/look/:lookId`. It is a DISCRIMINATED projection:
  *
  * - `CANONICAL`       — backed by a real PublishedLookV1 contract document
  *                       (immutable DesignVersionV1 ref + EditorDoc SHA-256 +
@@ -100,7 +100,7 @@ export interface PublishedLookEvidenceV1 {
 export interface PublishedLookReadModelV1Base {
   schemaVersion: 1;
   readModelKind: PublishedLookReadModelKind;
-  /** Canonical detail id — `/community/look/:lookId`. Legacy: contentId doubles as lookId. */
+  /** Canonical detail id — `/look/:lookId`. Legacy: contentId doubles as lookId. */
   lookId: string;
   /** Original legacy content id (stable compatibility key). */
   contentId: string;

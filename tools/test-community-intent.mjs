@@ -56,6 +56,8 @@ assert.equal(canTryInStudio(missingAsset), false);
 
 assert.equal(isAllowlistedReturnTo('/community/content/x'), true);
 assert.equal(isAllowlistedReturnTo('/design/new'), true);
+assert.equal(isAllowlistedReturnTo('/look/x'), true);
+assert.equal(isAllowlistedReturnTo('/studio/design/new'), true);
 assert.equal(isAllowlistedReturnTo('/'), true);
 assert.equal(isAllowlistedReturnTo('/community'), true);
 assert.equal(isAllowlistedReturnTo('/design'), true);
@@ -100,7 +102,7 @@ assert.equal(created.ok, true);
 assert.match(created.href, /communityIntent=/);
 const stored = getStudioImportIntent(created.intentId);
 assert.ok(stored);
-assert.equal(stored.returnTo, `/community/look/${tryable.contentId}`);
+assert.equal(stored.returnTo, `/look/${tryable.contentId}`);
 assert.equal(stored.assetRef.templateId, tryable.assetRef.templateId);
 assert.ok(Date.parse(stored.expiresAt) - Date.parse(stored.createdAt) === STUDIO_IMPORT_INTENT_TTL_MS);
 

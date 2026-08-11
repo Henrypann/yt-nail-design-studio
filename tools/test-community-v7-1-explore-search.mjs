@@ -436,7 +436,7 @@ const defaultState = () =>
 // 9 · Route / card wiring + entry-link contract + purity
 // ---------------------------------------------------------------------------
 {
-  assert.equal(Routes.communitySearch, '/community/search', 'canonical search route');
+  assert.equal(Routes.communitySearch, '/search', 'canonical search route');
 
   const app = read('src/app/App.tsx');
   assert.match(app, /Routes\.communitySearch[\s\S]*CommunitySearchPage/, 'search route wired');
@@ -486,7 +486,7 @@ const defaultState = () =>
   // entry-link: internal navigation preserves the four Studio entry-context keys
   const entryContext = new URLSearchParams({
     entry: 'wizard',
-    return_to: '/design/new?fresh=1',
+    return_to: '/studio/design/new?fresh=1',
     shape: 'almond',
     length: 'medium',
     style: 'ST-01',
@@ -495,9 +495,9 @@ const defaultState = () =>
     sort: 'new',
     tab: 'creators',
   });
-  const officialUrl = new URL(communityInternalHref('/community/official', entryContext), 'https://local.test');
+  const officialUrl = new URL(communityInternalHref('/official', entryContext), 'https://local.test');
   assert.equal(officialUrl.searchParams.get('entry'), 'wizard');
-  assert.equal(officialUrl.searchParams.get('return_to'), '/design/new?fresh=1');
+  assert.equal(officialUrl.searchParams.get('return_to'), '/studio/design/new?fresh=1');
   assert.equal(officialUrl.searchParams.get('shape'), 'almond');
   assert.equal(officialUrl.searchParams.get('length'), 'medium');
   for (const dropped of ['style', 'color', 'q', 'sort', 'tab', 'source']) {

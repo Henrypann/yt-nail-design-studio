@@ -254,31 +254,31 @@ assert.deepEqual(
 // ---------------------------------------------------------------------------
 // 8 · Canonical routes + legacy route kept deprecated
 // ---------------------------------------------------------------------------
-assert.equal(Routes.communityLook('cc_mercury_dew'), '/community/look/cc_mercury_dew');
-assert.equal(Routes.communityLookPath, '/community/look/:lookId');
-assert.equal(Routes.communityContent('cc_mercury_dew'), '/community/content/cc_mercury_dew');
-assert.equal(Routes.communityContentPath, '/community/content/:contentId');
-assert.equal(Routes.communityOfficial, '/community/official');
+assert.equal(Routes.communityLook('cc_mercury_dew'), '/look/cc_mercury_dew');
+assert.equal(Routes.communityLookPath, '/look/:lookId');
+assert.equal(Routes.communityContent('cc_mercury_dew'), '/content/cc_mercury_dew');
+assert.equal(Routes.communityContentPath, '/content/:contentId');
+assert.equal(Routes.communityOfficial, '/official');
 
 // ---------------------------------------------------------------------------
 // 9 · Legacy redirect behavior: replace target + query preservation
 // ---------------------------------------------------------------------------
 assert.equal(
   legacyContentRedirectTarget('cc_mercury_dew', new URLSearchParams('entry=wizard&shape=almond&length=medium')),
-  '/community/look/cc_mercury_dew?entry=wizard&shape=almond&length=medium',
+  '/look/cc_mercury_dew?entry=wizard&shape=almond&length=medium',
   'query params preserved on redirect target',
 );
 assert.equal(
   legacyContentRedirectTarget('cc_mercury_dew', new URLSearchParams()),
-  '/community/look/cc_mercury_dew',
+  '/look/cc_mercury_dew',
   'no query → plain canonical target',
 );
 assert.equal(
   legacyContentRedirectTarget('cc_mercury_dew', new URLSearchParams('return_to=/design/new')),
-  '/community/look/cc_mercury_dew?return_to=%2Fdesign%2Fnew',
+  '/look/cc_mercury_dew?return_to=%2Fdesign%2Fnew',
   'URL-encoded query preserved verbatim',
 );
-assert.equal(legacyContentRedirectTarget(undefined, new URLSearchParams('a=1')), '/community/official');
+assert.equal(legacyContentRedirectTarget(undefined, new URLSearchParams('a=1')), '/official');
 
 // ---------------------------------------------------------------------------
 // 10 · Studio import intent fallback uses the canonical look URL (behavior)
@@ -310,7 +310,7 @@ const storedIntent = JSON.parse(mem.get('nail-studio:community.studio-import-int
 const stored = storedIntent.data[intentResult.intentId];
 assert.equal(
   stored.returnTo,
-  '/community/look/cc_mercury_dew',
+  '/look/cc_mercury_dew',
   'non-allowlisted returnTo falls back to the canonical look URL',
 );
 

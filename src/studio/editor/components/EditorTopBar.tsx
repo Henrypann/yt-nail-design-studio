@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button, Modal, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
 import { useLocale } from '@/lib/i18n';
 import { confirmDesign } from '@/lib/state-machine';
@@ -164,11 +165,11 @@ export function EditorTopBar(props: {
           title="进入 Community"
           aria-label="进入 Community"
           onClick={() =>
-            navigate(
-              communityHref({
+            window.location.assign(
+              communityProductHref(communityHref({
                 entry: 'editor',
                 returnTo: `${Routes.designCanvas}?design=${doc.designId}`,
-              }),
+              })),
             )
           }
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"

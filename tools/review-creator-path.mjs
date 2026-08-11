@@ -31,15 +31,15 @@ try {
   await page.waitForURL('**/register');
   await page.getByLabel('门店名称').fill('创作者工作室');
   await page.getByRole('button', { name: '完成注册' }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(`${BASE}/studio`);
   await page.getByRole('link', { name: '新建客户' }).first().click();
   await page.getByLabel('姓名 *').fill('林小满');
   await page.getByRole('button', { name: '提交' }).click();
   await page.locator('text=客户隐私同意').waitFor({ timeout: 5000 });
   await page.locator('text=*（必选）').click();
   await page.getByRole('button', { name: '确认并创建' }).click();
-  await page.waitForURL('**/customers/**');
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.waitForURL('**/studio/customers/**');
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /林小满/ }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
   await page.getByRole('button', { name: /Almond/ }).first().click();
@@ -56,9 +56,9 @@ try {
   await page.getByRole('button', { name: /^保存$/ }).click();
   await page.getByText('💾 已保存').waitFor({ timeout: 10000 });
   await page.getByRole('button', { name: /打开自由画布|返回自由画布/ }).click();
-  await page.waitForURL('**/design/canvas?bridge=**', { timeout: 15000 });
+  await page.waitForURL('**/studio/design/canvas?bridge=**', { timeout: 15000 });
   await page.getByRole('button', { name: '我已了解，进入自由画布' }).click();
-  await page.waitForURL('**/design/canvas?design=**', { timeout: 10000 });
+  await page.waitForURL('**/studio/design/canvas?design=**', { timeout: 10000 });
   await page.getByTestId('editor-inspector').waitFor();
   note('已进入 Editor（默认 R4）');
 

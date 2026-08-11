@@ -21,21 +21,21 @@ await page.getByRole('button', { name: '登录 / 注册' }).click();
 await page.waitForURL('**/register');
 await page.getByLabel('门店名称').fill('异常测试店');
 await page.getByRole('button', { name: '完成注册' }).click();
-await page.waitForURL(`${BASE}/`);
+await page.waitForURL(`${BASE}/studio`);
 await page.getByRole('link', { name: '新建客户' }).first().click();
 await page.getByLabel('姓名 *').fill('测试客');
 await page.getByRole('button', { name: '提交' }).click();
 await page.locator('text=客户隐私同意').waitFor({ timeout: 5000 });
 await page.locator('text=*（必选）').click();
 await page.getByRole('button', { name: '确认并创建' }).click();
-await page.waitForURL('**/customers/**');
+await page.waitForURL('**/studio/customers/**');
 
 await page.getByRole('button', { name: '调试面板' }).click();
 await page.locator('label').filter({ hasText: '单指失败降级' }).first().click();
 await page.getByRole('button', { name: '调试面板' }).click();
 note('已注入单指失败降级');
 
-await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: /测试客/ }).click();
 await page.getByRole('button', { name: '确认选择' }).click();
 await page.getByRole('button', { name: /Almond/ }).first().click();

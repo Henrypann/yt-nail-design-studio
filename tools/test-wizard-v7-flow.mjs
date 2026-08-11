@@ -10,8 +10,8 @@ import { designNewFresh } from '../src/app/routes.ts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-assert.equal(designNewFresh(), '/design/new?fresh=1');
-assert.equal(designNewFresh('customer 7'), '/design/new?fresh=1&customerId=customer+7');
+assert.equal(designNewFresh(), '/studio/design/new?fresh=1');
+assert.equal(designNewFresh('customer 7'), '/studio/design/new?fresh=1&customerId=customer+7');
 
 const wizard = await read('src/app/pages/design/WizardPage.tsx');
 assert.match(wizard, /searchParams\.get\('fresh'\) === '1'/);

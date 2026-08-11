@@ -1,5 +1,5 @@
 /**
- * `/community/board/:boardId` · Nail Board owner 详情 / 管理（COMM-V7.1-03）。
+ * `/board/:boardId` · Nail Board owner 详情 / 管理（COMM-V7.1-03）。
  *
  * - 重命名、可见性切换（PUBLIC 需显式确认）、分享链接创建/复制/撤销、
  *   有序条目（可访问 Move up/down + Delete）。
@@ -7,7 +7,7 @@
  *   version_unavailable（canonical 引用的设计版本不可用）。
  * - 每次变更都经 repository 校验 expected revision；失败只显示错误消息，
  *   不留下乐观 UI（repository 保证失败零写入，canonical 状态不变）。
- * - 本页只展示 owner 管理动作；匿名查看走 /community/board/share/:token。
+ * - 本页只展示 owner 管理动作；匿名查看走 /board/share/:token。
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';

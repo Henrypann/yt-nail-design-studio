@@ -1,5 +1,5 @@
 /**
- * `/community/boards` · Nail Board 列表 / 创建（COMM-V7.1-03）。
+ * `/boards` · Nail Board 列表 / 创建（COMM-V7.1-03）。
  *
  * - 新 Board 默认 PRIVATE（显式披露）。
  * - 列表展示标题、可见性、款式数量与更新时间。

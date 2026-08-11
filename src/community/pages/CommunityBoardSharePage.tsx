@@ -1,5 +1,5 @@
 /**
- * `/community/board/share/:token` · 匿名只读分享页（COMM-V7.1-03）。
+ * `/board/share/:token` · 匿名只读分享页（COMM-V7.1-03）。
  *
  * - URL 只携带不可猜测的 token，绝不携带 owner/customer 身份。
  * - 匿名解析（resolveAccessByToken）：UNLISTED 需有效未过期未撤销 token；

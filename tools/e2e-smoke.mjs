@@ -37,13 +37,13 @@ try {
   /* 2. 注册 Step 2：门店名称 */
   await page.getByLabel('门店名称').fill(STORE);
   await page.getByRole('button', { name: '完成注册' }).click();
-  await page.waitForURL(`${BASE}/`, { timeout: 10000 });
+  await page.waitForURL(`${BASE}/studio`, { timeout: 10000 });
   await page.getByText(`欢迎回来，${STORE}`).waitFor();
   step('注册门店 → Dashboard', true);
 
   /* 3. 新建客户 */
   await page.getByRole('link', { name: '新建客户' }).first().click();
-  await page.waitForURL('**/customers/new');
+  await page.waitForURL('**/studio/customers/new');
   await page.getByLabel('姓名 *').fill(CUSTOMER);
   // quick 模式：勾选隐私同意 → 创建客户；full 模式：提交 → 隐私弹窗
   const quickConsent = page.locator('text=客户已阅读并同意隐私政策').first();
@@ -56,12 +56,12 @@ try {
     await page.locator('text=*（必选）').click();
     await page.getByRole('button', { name: '确认并创建' }).click();
   }
-  await page.waitForURL('**/customers**', { timeout: 10000 });
+  await page.waitForURL('**/studio/customers**', { timeout: 10000 });
   await page.getByText(CUSTOMER).first().waitFor();
   step('新建客户', true, page.url());
 
   /* 4. 进入 Wizard：客户选择器 → 选中客户 */
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: new RegExp(CUSTOMER) }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
   await page.getByText('下一步：选风格').waitFor();
@@ -283,13 +283,13 @@ try {
 
   /* 9. [打开自由画布] 桥接：不可逆警告弹窗 */
   await page.getByRole('button', { name: /打开自由画布|返回自由画布/ }).click();
-  await page.waitForURL('**/design/canvas?bridge=**', { timeout: 15000 });
+  await page.waitForURL('**/studio/design/canvas?bridge=**', { timeout: 15000 });
   await page.getByText('你将无法再切换模板').waitFor({ timeout: 10000 });
   step('桥接 → 不可逆警告弹窗', true);
 
   /* 10. 确认进入 Editor 画布 */
   await page.getByRole('button', { name: '我已了解，进入自由画布' }).click();
-  await page.waitForURL('**/design/canvas?design=**', { timeout: 10000 });
+  await page.waitForURL('**/studio/design/canvas?design=**', { timeout: 10000 });
   await page.waitForTimeout(1500);
   step('进入 Editor 画布', !page.url().includes('bridge='), page.url());
 
@@ -386,7 +386,7 @@ try {
   step('Editor 同步开放 Coffin；Squoval / Square 保持灰态', coffinEnabled && squareStillDisabled && squovalStillDisabled);
 
   const editorUrl = page.url();
-  await page.goto(`${BASE}/design/canvas?blank=1`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/canvas?blank=1`, { waitUntil: 'networkidle' });
   await page.getByRole('heading', { name: '空白画布新建' }).waitFor({ timeout: 5000 });
   const blankShapeOrder = await page.locator('[data-shape-id]').evaluateAll((elements) =>
     elements.map((element) => element.getAttribute('data-shape-id')),
@@ -440,7 +440,7 @@ try {
   step('Editor 顾客展示模式 + Esc', (await page.getByText('顾客确认展示').count()) === 0);
 
   /* 11. 设计列表可见 */
-  await page.goto(`${BASE}/design`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(800);
   const cards = await page.locator('text=/个历史设计|v1/').count();
   const listHtml = await page.content();

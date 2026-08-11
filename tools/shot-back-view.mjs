@@ -34,9 +34,9 @@ async function reachBackView(page) {
   await page.waitForURL('**/register', { timeout: 15000 });
   await page.getByLabel('门店名称').fill('截图门店');
   await page.getByRole('button', { name: '完成注册' }).click();
-  await page.waitForURL(`${BASE}/`, { timeout: 15000 });
+  await page.waitForURL(`${BASE}/studio`, { timeout: 15000 });
 
-  await page.goto(`${BASE}/customers/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/customers/new`, { waitUntil: 'networkidle' });
   await page.getByLabel('姓名 *').fill('截图客户');
   const consent = page.locator('text=客户已阅读并同意隐私政策').first();
   if (await consent.isVisible().catch(() => false)) await consent.click();
@@ -46,9 +46,9 @@ async function reachBackView(page) {
     await page.locator('text=*（必选）').click();
     await page.getByRole('button', { name: '确认并创建' }).click();
   }
-  await page.waitForURL('**/customers**', { timeout: 15000 });
+  await page.waitForURL('**/studio/customers**', { timeout: 15000 });
 
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /截图客户/ }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
   await page.getByText('下一步：选风格').waitFor({ timeout: 15000 });

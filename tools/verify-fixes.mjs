@@ -34,11 +34,11 @@ try {
   await page.waitForURL('**/register');
   await page.getByLabel('门店名称').fill('修复验证店');
   await page.getByRole('button', { name: '完成注册' }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(`${BASE}/studio`);
 
   /* ── A. P0-1a：调试面板位置与遮挡 ── */
   await page.getByRole('link', { name: '新建客户' }).first().click();
-  await page.waitForURL('**/customers/new');
+  await page.waitForURL('**/studio/customers/new');
   const debugBtn = page.locator('[data-debug-id="app.debug-panel"]');
   const dbgBox = await debugBtn.boundingBox();
   check('A1 调试面板为左缘圆形收纳（≤56px 宽）', !!dbgBox && dbgBox.width <= 56 && dbgBox.x < 120, `x=${dbgBox?.x} w=${dbgBox?.width}`);
@@ -61,10 +61,10 @@ try {
   check('B2 吸底 CTA 真实点击 → 隐私弹窗', true);
   await page.locator('text=*（必选）').click();
   await page.getByRole('button', { name: '确认并创建' }).click();
-  await page.waitForURL('**/customers/**');
+  await page.waitForURL('**/studio/customers/**');
 
   /* ── D1. 流程-1：STEP1 改名 + 即时预览 ── */
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /验证客/ }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
   const ctaText = await page.getByRole('button', { name: /下一步：选风格|进入画布/ }).textContent();

@@ -15,7 +15,7 @@ export default function LoginPage() {
   const toast = useToast();
 
   if (isLoggedIn()) {
-    return <Navigate to={Routes.dashboard} replace />;
+    return <Navigate to={Routes.studio} replace />;
   }
 
   const handleVerified = (email: string) => {
@@ -27,7 +27,7 @@ export default function LoginPage() {
         email: account.email,
       });
       toast.success(`欢迎回来，${account.storeName}。`);
-      navigate(Routes.dashboard, { replace: true });
+      navigate(Routes.studio, { replace: true });
       return;
     }
     // 首次登录 → 自动注册：邮箱已验证，直接进入 Step 2

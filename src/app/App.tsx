@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
+  Navigate,
   Outlet,
   Route,
   RouterProvider,
@@ -9,10 +10,11 @@ import {
 } from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
 import { LocaleProvider } from '@/lib/i18n';
-import { AppLayout } from './layouts/AppLayout';
+import { StudioLayout } from './layouts/StudioLayout';
 import { CommunityLayout } from './layouts/CommunityLayout';
-import { Routes } from './routes';
+import { LegacyRoutes, legacyCommunityPathTarget, legacyStudioPathTarget, Routes } from './routes';
 import DashboardPage from './pages/DashboardPage';
+import StudioHomePage from './pages/StudioHomePage';
 import CustomerListPage from './pages/customers/CustomerListPage';
 import CustomerNewPage from './pages/customers/CustomerNewPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
@@ -39,6 +41,7 @@ import CommunityProfilePage from '@/community/pages/CommunityProfilePage';
 import CommunityBoardsPage from '@/community/pages/CommunityBoardsPage';
 import CommunityBoardPage from '@/community/pages/CommunityBoardPage';
 import CommunityBoardSharePage from '@/community/pages/CommunityBoardSharePage';
+import { HardwareRegistrationGate } from './guards/HardwareRegistrationGate';
 
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
@@ -60,6 +63,14 @@ function RouterChrome() {
   );
 }
 
+function LegacyProductPathRedirect({ surface }: { surface: 'community' | 'studio' }) {
+  const location = useLocation();
+  const pathname = surface === 'community'
+    ? legacyCommunityPathTarget(location.pathname)
+    : legacyStudioPathTarget(location.pathname);
+  return <Navigate replace to={`${pathname}${location.search}${location.hash}`} />;
+}
+
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<RouterChrome />}>
     {/* 登录前 */}
@@ -68,7 +79,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
     <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
     <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
-    {/* Community 独立产品壳（无 Studio 侧栏） */}
+    {/* Nail Lover Community：全局默认产品与首页，无 Studio 侧栏。 */}
     <Route element={<CommunityLayout />}>
       <Route path={Routes.community} element={<CommunityDiscoverPage />} />
       <Route path={Routes.communitySearch} element={<CommunitySearchPage />} />
@@ -83,22 +94,34 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.communityContentPath} element={<CommunityLegacyContentRedirect />} />
       <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
     </Route>
+    {/* 历史 Community 深链保留，统一 replace 到无 /community 前缀的公共产品 URL。 */}
+    <Route path={LegacyRoutes.communityContentPath} element={<CommunityLegacyContentRedirect />} />
+    <Route path={LegacyRoutes.communityWildcard} element={<LegacyProductPathRedirect surface="community" />} />
     {/* Editor 使用独立沉浸式工作区；返回入口与安全离开由 EditorShell 负责。 */}
     <Route path={Routes.designCanvas} element={<EditorPage />} />
     <Route path={Routes.designCustomerPreview} element={<CustomerPreviewPageV7 />} />
-    {/* 登录后（侧栏 + 顶栏布局） */}
-    <Route element={<AppLayout />}>
-      <Route path={Routes.dashboard} element={<DashboardPage />} />
-      <Route path={Routes.customers} element={<CustomerListPage />} />
-      <Route path={Routes.customerNew} element={<CustomerNewPage />} />
-      <Route path={Routes.customerDetailPath} element={<CustomerDetailPage />} />
+    {/* Nail Design Studio 独立工具产品（侧栏 + 顶栏布局）。 */}
+    <Route element={<StudioLayout />}>
+      <Route path={Routes.studioHome} element={<StudioHomePage />} />
       <Route path={Routes.designs} element={<DesignListPage />} />
       <Route path={Routes.designNew} element={<WizardPage />} />
       <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
       <Route path={Routes.designCommunity} element={<CommunityPage />} />
-      <Route path={Routes.devices} element={<DeviceListPage />} />
+      {/* 首次硬件注册始终可进入；客户/门店 Dashboard/设备列表由注册状态统一解锁。 */}
       <Route path={Routes.deviceBind} element={<DeviceBindPage />} />
+      <Route element={<HardwareRegistrationGate />}>
+        <Route path={Routes.dashboard} element={<DashboardPage />} />
+        <Route path={Routes.customers} element={<CustomerListPage />} />
+        <Route path={Routes.customerNew} element={<CustomerNewPage />} />
+        <Route path={Routes.customerDetailPath} element={<CustomerDetailPage />} />
+        <Route path={Routes.devices} element={<DeviceListPage />} />
+      </Route>
     </Route>
+    {/* 历史 Studio 深链：保留 query/hash，迁入 /studio namespace。 */}
+    <Route path={LegacyRoutes.designCommunity} element={<Navigate replace to={Routes.communityOfficial} />} />
+    <Route path={LegacyRoutes.designWildcard} element={<LegacyProductPathRedirect surface="studio" />} />
+    <Route path={LegacyRoutes.customersWildcard} element={<LegacyProductPathRedirect surface="studio" />} />
+    <Route path={LegacyRoutes.devicesWildcard} element={<LegacyProductPathRedirect surface="studio" />} />
     {/* 404 */}
     <Route path="*" element={<NotFoundPage />} />
   </Route>,

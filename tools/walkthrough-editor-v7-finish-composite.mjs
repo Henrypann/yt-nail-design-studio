@@ -22,7 +22,7 @@ for (const viewport of viewports) {
   const pageErrors = [];
   page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.goto(`${baseUrl}/design/canvas?blank=1`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/studio/design/canvas?blank=1`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: '创建空白画布' }).click();
   await page.locator('[data-editor-schema="7"]').waitFor();
 

@@ -5,7 +5,9 @@ import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
 import { designNewFresh, Routes } from '@/app/routes';
+import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
+import { useDevicesStore } from '@/platform/devices/device-store';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
 interface SessionInfo {
@@ -18,6 +20,7 @@ interface NavItem {
   to: string;
   label: string;
   end?: boolean;
+  productBoundary?: boolean;
 }
 interface NavGroup {
   key: string;
@@ -33,6 +36,7 @@ export function AppLayout() {
   const { text } = useLocale();
   const navigate = useNavigate();
   const session = readData<SessionInfo>(StorageKeys.session) ?? {};
+  const hasRegisteredHardware = useDevicesStore((state) => state.devices.length > 0);
   const [collapsed, setCollapsed] = useState(
     () => readData<{ collapsed: boolean }>(StorageKeys.sidebarCollapsed)?.collapsed ?? false,
   );
@@ -59,33 +63,19 @@ export function AppLayout() {
     removeKey(StorageKeys.session);
     navigate('/login', { replace: true });
   };
-  const communityTo = communityHref({
+  const communityTo = communityProductHref(communityHref({
     entry: 'product_switcher',
-    returnTo: Routes.dashboard,
-  });
+    returnTo: Routes.studio,
+  }));
   const navGroups: NavGroup[] = [
-    {
-      key: 'home',
-      label: text('首页', 'Home'),
-      icon: Home,
-      items: [{ to: '/', label: 'Dashboard', end: true }],
-    },
-    {
-      key: 'customers',
-      label: text('客户管理', 'Customers'),
-      icon: Users,
-      items: [
-        { to: '/customers', label: text('客户列表', 'Customer list'), end: true },
-        { to: '/customers/new', label: text('新建客户', 'New customer') },
-      ],
-    },
     {
       key: 'studio',
       label: 'Studio',
       icon: Palette,
       items: [
+        { to: Routes.studio, label: 'Studio Home', end: true },
         { to: designNewFresh(), label: text('新建设计', 'New design') },
-        { to: '/design', label: text('我的设计', 'My designs'), end: true },
+        { to: Routes.designs, label: text('我的设计', 'My designs'), end: true },
       ],
     },
     {
@@ -93,16 +83,30 @@ export function AppLayout() {
       label: 'Community',
       icon: Compass,
       items: [
-        { to: communityTo, label: text('社区', 'Community'), end: true },
+        { to: communityTo, label: 'Nail Lover Community', productBoundary: true },
       ],
     },
+    ...(hasRegisteredHardware ? [
+      {
+        key: 'customers',
+        label: text('客户管理', 'Customers'),
+        icon: Users,
+        items: [
+          { to: Routes.dashboard, label: 'Dashboard' },
+          { to: Routes.customers, label: text('客户列表', 'Customer list'), end: true },
+          { to: Routes.customerNew, label: text('新建客户', 'New customer') },
+        ],
+      },
+    ] satisfies NavGroup[] : []),
     {
       key: 'devices',
       label: text('设备管理', 'Devices'),
       icon: Monitor,
       items: [
-        { to: '/devices/bind', label: text('设备绑定', 'Bind device') },
-        { to: '/devices', label: text('我的设备', 'My devices'), end: true },
+        { to: Routes.deviceBind, label: text('设备绑定', 'Bind device') },
+        ...(hasRegisteredHardware
+          ? [{ to: Routes.devices, label: text('我的设备', 'My devices'), end: true }]
+          : []),
       ],
     },
   ];
@@ -123,7 +127,7 @@ export function AppLayout() {
             sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4',
           )}
         >
-          {!sidebarCollapsed && <span className="text-sm font-bold text-primary">NextGen Beauty Studio</span>}
+          {!sidebarCollapsed && <span className="text-sm font-bold text-primary">Nail Design Studio</span>}
           {!compactViewport && (
             <button
               onClick={toggleCollapsed}
@@ -137,7 +141,7 @@ export function AppLayout() {
         </div>
         <nav className={cx('flex-1 overflow-y-auto py-4', sidebarCollapsed ? 'px-2' : 'px-3')}>
           {navGroups.map((group) => (
-            <div key={group.key} className="mb-4">
+            <div key={group.key} className="mb-4" data-testid={`nav-group-${group.key}`}>
               {sidebarCollapsed ? (
                 <p className="mb-1 flex justify-center text-gray-300" title={group.label}>
                   <group.icon size={14} />
@@ -148,13 +152,25 @@ export function AppLayout() {
                   {group.label}
                 </p>
               )}
-              {group.items.map((item) => (
+              {group.items.map((item) => item.productBoundary ? (
+                <a
+                  key={item.to}
+                  href={item.to}
+                  title={sidebarCollapsed ? item.label : undefined}
+                  data-testid="nav-community"
+                  className={cx(
+                    'block rounded-button py-1.5 text-sm text-gray-600 transition-colors duration-fast ease-out hover:bg-gray-100 hover:text-gray-900',
+                    sidebarCollapsed ? 'px-1 text-center text-[11px] leading-tight' : 'px-2.5',
+                  )}
+                >
+                  {sidebarCollapsed ? item.label.slice(0, 2) : item.label}
+                </a>
+              ) : (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.end}
                   title={sidebarCollapsed ? item.label : undefined}
-                  data-testid={group.key === 'community' ? 'nav-community' : undefined}
                   className={({ isActive }) =>
                     cx(
                       'block rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',

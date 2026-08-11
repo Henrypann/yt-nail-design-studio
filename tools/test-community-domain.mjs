@@ -56,22 +56,23 @@ assert.equal(visibleCommunityPublishers(publishers, 'production').length, 1);
 /** Community internal navigation preserves the product return context. */
 const entryContext = new URLSearchParams({
   entry: 'wizard',
-  return_to: '/design/new?fresh=1',
+  return_to: '/studio/design/new?fresh=1',
   shape: 'almond',
   length: 'medium',
   style: 'ST-01',
 });
-const officialHref = communityInternalHref('/community/official', entryContext);
+const officialHref = communityInternalHref('/official', entryContext);
 const officialUrl = new URL(officialHref, 'https://local.test');
-assert.equal(officialUrl.pathname, '/community/official');
+assert.equal(officialUrl.pathname, '/official');
 assert.equal(officialUrl.searchParams.get('entry'), 'wizard');
-assert.equal(officialUrl.searchParams.get('return_to'), '/design/new?fresh=1');
+assert.equal(officialUrl.searchParams.get('return_to'), '/studio/design/new?fresh=1');
 assert.equal(officialUrl.searchParams.get('shape'), 'almond');
 assert.equal(officialUrl.searchParams.get('length'), 'medium');
 assert.equal(officialUrl.searchParams.has('style'), false);
-assert.equal(studioReturnPath(officialUrl.searchParams), '/design/new?fresh=1');
-assert.equal(studioReturnPath(new URLSearchParams({ return_to: '//evil.example' })), '/design');
-assert.equal(studioReturnPath(new URLSearchParams({ return_to: '/community' })), '/design');
+assert.equal(studioReturnPath(officialUrl.searchParams), '/studio/design/new?fresh=1');
+assert.equal(studioReturnPath(new URLSearchParams({ return_to: '//evil.example' })), '/studio');
+assert.equal(studioReturnPath(new URLSearchParams({ return_to: '/community' })), '/studio');
+assert.equal(studioReturnPath(new URLSearchParams({ return_to: '/design/new?fresh=1' })), '/studio/design/new?fresh=1');
 
 /** 多条件 filter：同维 OR、跨维 AND */
 const multi = filterContents(published, {

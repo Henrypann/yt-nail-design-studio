@@ -1,9 +1,9 @@
 /**
- * `/design/new` Studio Wizard（Studio-PRD §十二 · 默认入口）
+ * `/studio/design/new` Studio Wizard（Studio-PRD §十二 · 默认入口）
  *
  * 流程：客户选择器（无客户上下文时）→ STEP 1 门禁 → STEP 2 三栏画布。
  * 顶栏：← 返回（未保存拦截弹窗）│ 客户 │ 甲型·长度 [修改] │ 💾已保存 ↔ ●未保存 [保存]。
- * 进入方式：/design/new（弹客户选择器）| /design/new?customerId=xxx（客户上下文直达 STEP 1）。
+ * 进入方式：/studio/design/new（弹客户选择器）| /studio/design/new?customerId=xxx（客户上下文直达 STEP 1）。
  * PR-02：`?communityIntent=` 消费 Community StudioImportIntent。
  */
 
@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Compass, Save } from 'lucide-react';
 import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
 import {
   peekStudioImportIntentRaw,
@@ -558,13 +559,13 @@ export default function WizardPage() {
             title="进入 Community"
             aria-label="进入 Community"
             onClick={() =>
-              navigate(
-                communityHref({
+              window.location.assign(
+                communityProductHref(communityHref({
                   entry: 'wizard',
                   returnTo: Routes.designNew,
                   shape: s.appliedShape ?? undefined,
                   length: s.appliedLength ?? undefined,
-                }),
+                })),
               )
             }
           >

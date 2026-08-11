@@ -3,6 +3,7 @@ import { useBlocker, useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { communityProductHref } from '@/app/product-navigation';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
 import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
@@ -93,7 +94,11 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     setLeaving(true);
     const result = await unload();
     if (result === 'ok') {
-      navigate(destination);
+      if (destination === Routes.community || destination.startsWith('/look/')) {
+        window.location.assign(communityProductHref(destination));
+      } else {
+        navigate(destination);
+      }
       return;
     }
     setLeaving(false);

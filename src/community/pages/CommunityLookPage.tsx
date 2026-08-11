@@ -1,5 +1,5 @@
 /**
- * `/community/look/:lookId` · Canonical 可分享详情（COMM-V7.1-01）。
+ * `/look/:lookId` · Canonical 可分享详情（COMM-V7.1-01）。
  *
  * 消费 PublishedLookReadModelV1（当前来自 legacy 静态内容的 LEGACY_PARTIAL
  * 投影）并展示显式证据块：Legacy 兼容状态、已验证 vs 不可用、以及
@@ -12,6 +12,7 @@ import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-r
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Badge, Button, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
+import { studioProductHref } from '@/app/product-navigation';
 import { useLocale } from '@/lib/i18n';
 import { communityTaxonomyLabel, taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { getPublisherById, loadTaxonomy } from '../data/content-repository';
@@ -125,7 +126,7 @@ export default function CommunityLookPage() {
       }
       return;
     }
-    navigate(result.href);
+    window.location.assign(studioProductHref(result.href));
   };
 
   const onTryClick = () => {
@@ -144,7 +145,7 @@ export default function CommunityLookPage() {
       toast.error('该版本暂不可用于 Studio，请刷新或返回 Explore 重试。');
       return;
     }
-    navigate(result.href);
+    window.location.assign(studioProductHref(result.href));
   };
 
   return (
@@ -245,7 +246,7 @@ export default function CommunityLookPage() {
               size="sm"
               variant="secondary"
               data-testid="community-open-studio"
-              onClick={() => navigate(studioReturnPath(searchParams, Routes.designNew))}
+              onClick={() => window.location.assign(studioProductHref(studioReturnPath(searchParams, Routes.designNew)))}
             >
               进入 Studio
             </Button>

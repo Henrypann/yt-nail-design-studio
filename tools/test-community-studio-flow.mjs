@@ -495,6 +495,8 @@ assert.equal(isAllowlistedReturnTo('/community'), true);
 assert.equal(isAllowlistedReturnTo('/community/content/x'), true);
 assert.equal(isAllowlistedReturnTo('/design'), true);
 assert.equal(isAllowlistedReturnTo('/design/new'), true);
+assert.equal(isAllowlistedReturnTo('/look/x'), true);
+assert.equal(isAllowlistedReturnTo('/studio/design/new'), true);
 assert.equal(isAllowlistedReturnTo('/community-evil'), false);
 assert.equal(isAllowlistedReturnTo('/designer'), false);
 assert.equal(isAllowlistedReturnTo('//host'), false);

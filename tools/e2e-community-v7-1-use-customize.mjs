@@ -32,7 +32,7 @@ for (const viewport of viewports) {
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
 
-  await page.goto(`${baseURL}/community/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
   await page.getByTestId('community-use-versioned').waitFor();
   const canonicalEvidence = await page.getByTestId('community-look-evidence').textContent();
   assert.match(canonicalEvidence ?? '', /Canonical PublishedLookV1/);
@@ -42,7 +42,7 @@ for (const viewport of viewports) {
   await page.getByTestId('community-use-versioned').click();
   await page.getByTestId('versioned-intent-conflict').waitFor();
   await page.waitForTimeout(400); // measure after modal scale-in animation settles
-  assert.match(page.url(), /\/design\/new\?versionedIntent=/);
+  assert.match(page.url(), /\/studio\/design\/new\?versionedIntent=/);
   assert.equal(await page.locator('[role="dialog"]').count(), 1, 'versioned flow has one active dialog');
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null,
     'CTA click is not a successful customize event');
@@ -55,7 +55,7 @@ for (const viewport of viewports) {
   await page.getByTestId('versioned-intent-new').click();
   await page.getByTestId('editor-remix-disclosure').waitFor();
   await page.waitForTimeout(3500); // success toast must not obscure signed visual evidence
-  assert.match(page.url(), /\/design\/canvas\?design=design\.remix\./);
+  assert.match(page.url(), /\/studio\/design\/canvas\?design=design\.remix\./);
   assert.match(await page.getByTestId('editor-remix-disclosure').textContent() ?? '', /dv\.v7-1\.petal-veil\.1/);
   assert.equal(await page.getByLabel('设计名称').isEnabled(), true, 'new Remix must be editable');
   assert.equal(await page.getByText('当前 V7 设计处于只读状态；选择与折叠仍可使用。').count(), 0);
@@ -84,7 +84,7 @@ for (const viewport of viewports) {
   report.push({ viewport: viewport.name, errors, designId: doc.designId, eventCount: Object.keys(stored.events).length });
   assert.deepEqual(errors, []);
   await page.getByTestId('editor-return-source').click();
-  await page.waitForURL(`${baseURL}/community/look/look.v7-1.petal-veil`);
+  await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   await context.close();
 }
 
@@ -92,7 +92,7 @@ for (const viewport of viewports) {
 {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();
-  await page.goto(`${baseURL}/community/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
   await page.getByTestId('community-use-versioned').click();
   const designId = await page.locator('[data-debug-id="studio.wizard.page"]').getAttribute('data-design-id');
   await page.getByTestId('versioned-intent-current').click();
@@ -106,10 +106,10 @@ for (const viewport of viewports) {
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const page = await context.newPage();
-  await page.goto(`${baseURL}/community/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
   await page.getByTestId('community-use-versioned').click();
   await page.getByTestId('versioned-intent-cancel').click();
-  await page.waitForURL(`${baseURL}/community/look/look.v7-1.petal-veil`);
+  await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null);
   await context.close();
 }

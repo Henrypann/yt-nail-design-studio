@@ -150,13 +150,17 @@ export function parseStudioImportIntent(
 
 /**
  * Allowlisted internal return targets.
- * 仅 `/`、`/community`、`/community/...`、`/design`、`/design/...`。
+ * 仅 canonical Community / Studio 路径，以及迁移期的旧 `/community`、`/design` 深链。
  */
 export function isAllowlistedReturnTo(path: string | undefined | null): path is string {
   if (!path || typeof path !== 'string') return false;
   if (!path.startsWith('/') || path.startsWith('//')) return false;
   if (path.includes('://')) return false;
   if (path === '/') return true;
+  if (path === '/search' || path === '/official' || path === '/creators' || path === '/boards') return true;
+  if (path.startsWith('/look/') || path.startsWith('/content/') || path.startsWith('/board/') || path.startsWith('/profile/')) return true;
+  if (path === '/studio' || path.startsWith('/studio/')) return true;
+  // Stored legacy intents remain readable during the route cutover.
   if (path === '/community' || path.startsWith('/community/')) return true;
   if (path === '/design' || path.startsWith('/design/')) return true;
   return false;

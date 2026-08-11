@@ -1,7 +1,7 @@
 /**
  * 客户选择器弹窗（Studio-PRD §12.2）
  *
- * 从 Dashboard / 客户页进入 /design/new 且无客户上下文时显示。
+ * 从 Studio Dashboard / 客户页进入 /studio/design/new 且无客户上下文时显示。
  * 状态：骨架屏 5 行 / 搜索无结果 / 空列表 / [快速建档] 内嵌（仅姓名 + 隐私勾选）/ 确认选择。
  */
 

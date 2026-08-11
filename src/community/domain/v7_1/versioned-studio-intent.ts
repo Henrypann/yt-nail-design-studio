@@ -45,7 +45,8 @@ function exactKeys(value: UnknownRecord, keys: readonly string[]): boolean {
 
 export function isVersionedReturnToAllowedV2(value: string): boolean {
   if (!value.startsWith('/') || value.startsWith('//') || value.includes('://')) return false;
-  return value === '/community' || value.startsWith('/community/look/') || value.startsWith('/community/board/');
+  return value === '/' || value.startsWith('/look/') || value.startsWith('/board/')
+    || value === '/community' || value.startsWith('/community/look/') || value.startsWith('/community/board/');
 }
 
 function parseAssets(value: unknown): ImmutableAssetRevisionRefV1[] | null {
@@ -110,7 +111,7 @@ export function createVersionedStudioImportIntentV2(
   // Preview assets are derived publication outputs and need not be embedded in
   // the released EditorDoc manifest. The intent freezes the DesignVersion's
   // canonical source assets; preview integrity remains part of PublishedLook.
-  const returnTo = input.returnTo ?? `/community/look/${look.lookId}`;
+  const returnTo = input.returnTo ?? `/look/${look.lookId}`;
   if (!isVersionedReturnToAllowedV2(returnTo)) return { ok: false, reason: 'invalid_return' };
   let intentId: string;
   try { intentId = deps.nextId(); } catch { return { ok: false, reason: 'dependency' }; }

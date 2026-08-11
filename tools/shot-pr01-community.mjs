@@ -66,14 +66,14 @@ try {
     const steps = [
       { id: 'dashboard', url: `${base}/`, wait: 'text=欢迎回来' },
       { id: 'community-discover', url: `${base}/community`, wait: 'text=Discover' },
-      { id: 'community-official', url: `${base}/community/official`, wait: 'text=官方灵感库' },
+      { id: 'community-official', url: `${base}/official`, wait: 'text=官方灵感库' },
       { id: 'community-creators', url: `${base}/community/creators`, wait: 'text=认证创作者' },
       { id: 'community-content', url: `${base}/community/content/cc_mercury_dew`, wait: 'text=Mercury Dew' },
       { id: 'community-missing', url: `${base}/community/content/cc_does_not_exist`, wait: 'text=内容不存在' },
       { id: 'community-draft-leak', url: `${base}/community/content/cc_draft_internal_gate`, wait: 'text=内容不存在' },
       { id: 'legacy-redirect', url: `${base}/design/community`, wait: 'text=官方灵感库' },
-      { id: 'wizard', url: `${base}/design/new?fresh=1`, wait: 'text=Community' },
-      { id: 'editor', url: `${base}/design/canvas?blank=1`, wait: 'text=Studio Editor' },
+      { id: 'wizard', url: `${base}/studio/design/new?fresh=1`, wait: 'text=Community' },
+      { id: 'editor', url: `${base}/studio/design/canvas?blank=1`, wait: 'text=Studio Editor' },
     ];
 
     for (const step of steps) {
@@ -101,7 +101,7 @@ try {
     await shot(page, `${vp.name}-nav-community-to-dashboard`);
 
     // refresh / back / forward
-    await page.goto(`${base}/community/official?style=ST-01`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/official?style=ST-01`, { waitUntil: 'networkidle' });
     await page.reload({ waitUntil: 'networkidle' });
     await page.getByText('官方灵感库').waitFor();
     await shot(page, `${vp.name}-refresh-official`);

@@ -1,6 +1,6 @@
 /**
  * Editor 模块（模块 4）对外出口。
- * 页面入口：src/app/pages/design/EditorPage.tsx（/design/canvas）。
+ * 页面入口：src/app/pages/design/EditorPage.tsx（/studio/design/canvas）。
  * 桥接入口：@/studio/bridge 的 openBridge(designId)。
  */
 

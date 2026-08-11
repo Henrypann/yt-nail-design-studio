@@ -592,7 +592,7 @@ function legacyModule(
 
 export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
   {
-    match: '/design/new',
+    match: '/studio/design/new',
     pageId: 'studio.wizard',
     title: 'Studio Wizard · 新建设计',
     goal: '从客户与基础规格开始，快速产出可保存、可展示、可确认并可桥接 Editor 的十指方案。',
@@ -602,7 +602,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: wizardModules,
   },
   {
-    match: '/design/canvas',
+    match: '/studio/design/canvas',
     pageId: 'studio.editor',
     title: 'Studio Editor · 自由画布',
     goal: '在单甲画布中进行结构化自由设计，并同步检查十指、展示、保存与导出结果。',
@@ -612,7 +612,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: editorModules,
   },
   {
-    match: '/design',
+    match: '/studio/design',
     pageId: 'studio.design-list',
     title: '我的设计',
     goal: '管理门店设计资产、状态、版本和后续编辑入口。',
@@ -622,7 +622,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: designListModules,
   },
   {
-    match: '/customers/new',
+    match: '/studio/customers/new',
     pageId: 'app.customers.new',
     title: '新建客户',
     goal: '以姓名和隐私同意完成最快建档。',
@@ -632,7 +632,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: [legacyModule('app.customers.new', 'app.customers.new', '建档表单', '创建客户档案。', ['姓名与隐私同意必填；其余资料可后补。'])],
   },
   {
-    match: '/customers/',
+    match: '/studio/customers/',
     pageId: 'app.customers.detail',
     title: '客户详情',
     goal: '查看和维护客户档案及历史设计。',
@@ -642,7 +642,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: [legacyModule('app.customers.detail', 'app.customers.detail', '档案详情', '维护单客户资料。', ['支持内联编辑、历史设计与软删除。'])],
   },
   {
-    match: '/customers',
+    match: '/studio/customers',
     pageId: 'app.customers',
     title: '客户管理',
     goal: '管理客户档案与设计关联。',
@@ -652,7 +652,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: [legacyModule('app.customers.list', 'app.customers.list', '客户列表', '浏览和检索客户。', ['展示基础资料、Twin 摘要和历史设计数。'])],
   },
   {
-    match: '/devices/bind/mobile',
+    match: '/studio/devices/bind/mobile',
     pageId: 'app.devices.mobile-bind',
     title: '手机辅助配网',
     goal: '通过一次性链接辅助设备配网。',
@@ -662,7 +662,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: [legacyModule('app.devices.mobile-bind', 'app.devices.mobile-bind', '移动端配网', '提交 WiFi 信息。', ['Token 一次性且有有效期。'])],
   },
   {
-    match: '/devices/bind',
+    match: '/studio/devices/bind',
     pageId: 'app.devices.bind-wizard',
     title: '设备配网向导',
     goal: '通过 Mock 流程完成设备绑定演示。',
@@ -672,7 +672,7 @@ export const PAGE_REQUIREMENTS: readonly PageRequirement[] = [
     modules: [legacyModule('app.devices.bind-wizard', 'app.devices.bind-wizard', '配网向导', '完成设备发现、网络配置和命名。', ['当前能力为 MOCK IOT。'])],
   },
   {
-    match: '/devices',
+    match: '/studio/devices',
     pageId: 'app.devices',
     title: '设备管理',
     goal: '查看和绑定门店设备。',

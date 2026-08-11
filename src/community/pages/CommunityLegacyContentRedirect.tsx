@@ -2,7 +2,7 @@
  * `/community/content/:contentId` legacy 路由重定向（COMM-V7.1-01）。
  *
  * Legacy 深链 /community/content/:contentId 以 replace 重定向到 canonical
- * /community/look/:lookId（lookId = contentId），并完整保留 query params
+ * /look/:lookId（lookId = contentId），并完整保留 query params
  * （entry / return_to / shape / length / 筛选参数等）。
  */
 

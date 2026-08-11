@@ -5,8 +5,8 @@ export default function CommunityDiscoverPage() {
     <div data-testid="community-discover-page" data-debug-id="community.discover">
       <CommunityFeed
         mode="discover"
-        title="Discover"
-        subtitle="官方 PGC 与认证创作者 Demo 混合灵感 · 搜索/排序/筛选 URL 可分享"
+        title="Nail Lover Community"
+        subtitle="发现美甲灵感、收藏 Nail Board，并将喜欢的方案带入 Nail Design Studio"
       />
     </div>
   );

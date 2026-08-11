@@ -3,6 +3,7 @@ import { Compass, Monitor, Palette, Users, ArrowRight } from 'lucide-react';
 import { Card, cx } from '@/design-system';
 import { designNewFresh, Routes } from '@/app/routes';
 import { communityHref } from '@/community/lib/entry-link';
+import { communityProductHref } from '@/app/product-navigation';
 import { readOnboarding } from '@/platform/onboarding';
 import { useRequireAuth } from '@/platform/session';
 import { readAllDesigns } from '@/platform/designs';
@@ -20,7 +21,7 @@ interface GuideCard {
 }
 
 /**
- * `/` Dashboard：欢迎语 + 三张引导卡（PRD §2.3）。
+ * `/studio/customers/dashboard` 门店 Dashboard：硬件注册后开放。
  * 完成判定从实际数据派生：绑定设备 / 添加客户 / 创建设计后对应卡片自动消失。
  */
 export default function DashboardPage() {
@@ -101,13 +102,13 @@ export default function DashboardPage() {
             <p className="mt-0.5 text-xs text-gray-500">独立灵感域 · 不依赖当前 Wizard 选择</p>
           </div>
         </div>
-        <Link
-          to={communityHref({ entry: 'dashboard', returnTo: Routes.dashboard })}
+        <a
+          href={communityProductHref(communityHref({ entry: 'dashboard', returnTo: Routes.dashboard }))}
           className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors duration-fast hover:text-primary-hover"
         >
-          进入社区
+          进入 Nail Lover Community
           <ArrowRight size={13} />
-        </Link>
+        </a>
       </Card>
 
       {/* 引导卡片：全部完成后整组消失 */}

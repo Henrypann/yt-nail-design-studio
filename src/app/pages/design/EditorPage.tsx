@@ -1,5 +1,5 @@
 /**
- * `/design/canvas` Studio Editor 页面（模块 4）
+ * `/studio/design/canvas` Studio Editor 页面（模块 4）
  *
  * 进入方式（PRD §13.1）：
  *  ① ?bridge=<designId>  —— Wizard 桥接：先完整展示不可逆警告（§15.3），确认后进入画布；

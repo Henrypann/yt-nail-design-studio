@@ -773,9 +773,9 @@ async function createBoard(repo, title = 'My board') {
 // 12 · Route / card / page wiring + package script + no forbidden copies
 // ---------------------------------------------------------------------------
 {
-  assert.equal(Routes.communityBoards, '/community/boards', 'boards list route');
-  assert.equal(Routes.communityBoardDetail('b-1'), '/community/board/b-1', 'board detail route');
-  assert.equal(Routes.communityBoardShare('tok'), '/community/board/share/tok', 'share route carries only the token');
+  assert.equal(Routes.communityBoards, '/boards', 'boards list route');
+  assert.equal(Routes.communityBoardDetail('b-1'), '/board/b-1', 'board detail route');
+  assert.equal(Routes.communityBoardShare('tok'), '/board/share/tok', 'share route carries only the token');
 
   const app = read('src/app/App.tsx');
   assert.match(app, /Routes\.communityBoards[\s\S]*CommunityBoardsPage/, 'boards route wired');

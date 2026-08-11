@@ -6,7 +6,7 @@
  * 丢失 Wizard 传入的甲型/长度建议。其余搜索状态只属于当前页 URL。
  */
 
-import { Routes } from '@/app/routes';
+import { legacyStudioPathTarget, Routes } from '@/app/routes';
 
 const COMMUNITY_CONTEXT_KEYS = ['entry', 'return_to', 'shape', 'length'] as const;
 
@@ -50,9 +50,11 @@ export function communityInternalHref(path: string, current: URLSearchParams): s
 /** Resolve a local Studio return path without accepting external or Community targets. */
 export function studioReturnPath(
   params: URLSearchParams,
-  fallback: string = Routes.designs,
+  fallback: string = Routes.studio,
 ): string {
   const candidate = params.get('return_to');
   if (!candidate || candidate.startsWith('//')) return fallback;
-  return candidate.startsWith('/design') ? candidate : fallback;
+  if (candidate === Routes.studio || candidate.startsWith(`${Routes.studio}/`)) return candidate;
+  if (candidate === '/design' || candidate.startsWith('/design/')) return legacyStudioPathTarget(candidate);
+  return fallback;
 }

@@ -147,7 +147,7 @@ function bridgeDeps({ probe = { present: false }, convert = wizard, create = { o
 const fresh = bridgeDeps();
 assert.deepEqual(openBridgeV7WithDeps(summary().id, fresh.deps), { ok: true, mode: 'created' });
 assert.equal(fresh.calls.create, 1);
-assert.deepEqual(fresh.calls.navigate, [`/design/canvas?bridge=${summary().id}`]);
+assert.deepEqual(fresh.calls.navigate, [`/studio/design/canvas?bridge=${summary().id}`]);
 
 for (let version = 1; version <= 7; version += 1) {
   const existing = bridgeDeps({ probe: { present: true, schemaVersion: version } });

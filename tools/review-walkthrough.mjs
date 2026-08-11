@@ -40,13 +40,13 @@ try {
   await shot('02-register');
   await page.getByLabel('门店名称').fill(STORE);
   await page.getByRole('button', { name: '完成注册' }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(`${BASE}/studio`);
   await shot('03-dashboard-empty');
   note('登录/注册/Dashboard 完成');
 
   /* 2. 新建客户（完整建档 → 隐私弹窗） */
   await page.getByRole('link', { name: '新建客户' }).first().click();
-  await page.waitForURL('**/customers/new');
+  await page.waitForURL('**/studio/customers/new');
   await page.getByLabel('姓名 *').fill(CUSTOMER);
   await shot('04-customer-form');
   await page.getByRole('button', { name: '提交' }).click();
@@ -55,12 +55,12 @@ try {
   await shot('05-privacy-modal');
   await page.locator('text=*（必选）').click();
   await page.getByRole('button', { name: '确认并创建' }).click();
-  await page.waitForURL('**/customers/**');
+  await page.waitForURL('**/studio/customers/**');
   await shot('06-customer-detail');
   note('客户建档 + 隐私弹窗 完成');
 
   /* 3. Wizard STEP 1 */
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await shot('07-wizard-customer-picker');
   await page.getByRole('button', { name: new RegExp(CUSTOMER) }).click();
   await page.getByRole('button', { name: '确认选择' }).click();
@@ -139,11 +139,11 @@ try {
   await png.saveAs(`${OUT}/export-wizard-${png.suggestedFilename()}`);
   note(`Wizard 导出 PNG: ${png.suggestedFilename()}`);
   await page.getByRole('button', { name: /打开自由画布|返回自由画布/ }).click();
-  await page.waitForURL('**/design/canvas?bridge=**', { timeout: 15000 });
+  await page.waitForURL('**/studio/design/canvas?bridge=**', { timeout: 15000 });
   await page.getByText('你将无法再切换模板').waitFor();
   await shot('20-bridge-warning');
   await page.getByRole('button', { name: '我已了解，进入自由画布' }).click();
-  await page.waitForURL('**/design/canvas?design=**', { timeout: 10000 });
+  await page.waitForURL('**/studio/design/canvas?design=**', { timeout: 10000 });
   await page.waitForTimeout(1800);
   await shot('21-editor-workspace');
   note('桥接进入 Editor');
@@ -197,7 +197,7 @@ try {
   note('顾客已确认 → 冻结只读 完成');
 
   /* 7. 我的设计列表 + 状态机 */
-  await page.goto(`${BASE}/design`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(800);
   await shot('27-design-list');
   /* 已确认 tab → 基于已确认创建新版本 */
@@ -227,7 +227,7 @@ try {
   }
 
   /* 8. MOCK 异常场景: 保存失败 + 渲染失败（在 Wizard 页面注入） */
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: '调试面板' }).click();
   await page.waitForTimeout(400);
   await page.locator('label').filter({ hasText: '保存失败' }).first().click();
@@ -237,7 +237,7 @@ try {
 
   /* 9. 窄视口检查 1280x720 */
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto(`${BASE}/design/new`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/studio/design/new`, { waitUntil: 'networkidle' });
   await shot('32-narrow-wizard-1280');
   const hasHScroll = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   note(`1280x720 横向滚动: ${hasHScroll}`);

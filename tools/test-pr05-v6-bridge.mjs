@@ -84,8 +84,8 @@ assert.deepEqual(openBridgeWithDeps(summary.id, exact.deps), { ok: true, mode: '
 assert.equal(exact.saves, 1);
 assert.equal(JSON.stringify(exact.docs[summary.id]), storedAfterFirst);
 assert.deepEqual(exact.navigations, [
-  '/design/canvas?bridge=wizard-v6-1',
-  '/design/canvas?design=wizard-v6-1',
+  '/studio/design/canvas?bridge=wizard-v6-1',
+  '/studio/design/canvas?design=wizard-v6-1',
 ]);
 
 const existing = harness({ [summary.id]: converted });
@@ -103,7 +103,7 @@ for (const fixture of [editorDocV3Fixture, editorDocV4Fixture, editorDocV5Fixtur
   assert.deepEqual(openBridgeWithDeps(summary.id, legacy.deps), { ok: true, mode: 'existing' });
   assert.equal(legacy.saves, 0);
   assert.equal(JSON.stringify(legacy.docs), before);
-  assert.deepEqual(legacy.navigations, ['/design/canvas?design=wizard-v6-1']);
+  assert.deepEqual(legacy.navigations, ['/studio/design/canvas?design=wizard-v6-1']);
 }
 
 for (const [raw, reason] of [

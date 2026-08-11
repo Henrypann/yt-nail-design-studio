@@ -2,7 +2,7 @@
  * Community V7.1 · COMM-V7.1-02 Explore & Search contract (pure, dependency-free).
  *
  * URL is the single source of truth for Explore/Search state on `/community`
- * (Discover) and `/community/search`:
+ * (Discover) and `/search`:
  *
  *   tab     = looks | creators
  *   q       = free-text query (trimmed, bounded length)

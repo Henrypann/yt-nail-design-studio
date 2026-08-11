@@ -2,20 +2,21 @@
  * Community 独立产品壳：无 Studio 侧栏，不读 Wizard/Editor Store。
  */
 
-import { NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
-import { Compass, Home, Menu, Palette, X } from 'lucide-react';
+import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
+import { ArrowUpRight, Compass, Menu, Palette, X } from 'lucide-react';
 import { useState } from 'react';
-import { Button, cx } from '@/design-system';
+import { cx } from '@/design-system';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
+import { studioProductHref } from '@/app/product-navigation';
 import { communityInternalHref, studioReturnPath } from '@/community/lib/entry-link';
 
 export function CommunityLayout() {
   const { text } = useLocale();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const studioReturn = studioReturnPath(searchParams);
+  const studioHref = studioProductHref(studioReturn);
 
   const navItems = [
     {
@@ -60,7 +61,7 @@ export function CommunityLayout() {
           <div className="flex min-w-0 items-center gap-2">
             <Compass size={16} className="shrink-0 text-primary" />
             <span className="truncate text-sm font-bold text-gray-900">
-              {text('社区', 'Community')}
+              Nail Lover Community
             </span>
           </div>
           <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Community">
@@ -84,24 +85,15 @@ export function CommunityLayout() {
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <LanguageToggle />
-            <Button
-              size="sm"
-              variant="ghost"
-              data-testid="community-enter-dashboard"
-              onClick={() => navigate(Routes.dashboard)}
-            >
-              <Home size={13} />
-              {text('Dashboard', 'Dashboard')}
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
+            <a
+              href={studioHref}
               data-testid="community-enter-studio"
-              onClick={() => navigate(studioReturn)}
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-button bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover"
             >
               <Palette size={13} />
-              {text('进入 Studio', 'Enter Studio')}
-            </Button>
+              {text('进入 Nail Design Studio', 'Open Nail Design Studio')}
+              <ArrowUpRight size={13} />
+            </a>
           </div>
         </div>
         {mobileOpen && (
