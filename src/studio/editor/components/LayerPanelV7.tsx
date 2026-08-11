@@ -32,6 +32,7 @@ import { createDefaultSurfaceEffectPayloadV7, createSurfaceEffectMaskV7 } from '
 import { SurfaceEffectPanelV7 } from './SurfaceEffectPanelV7';
 import { DimensionalDecorationPanelV7 } from './DimensionalDecorationPanelV7';
 import { DIMENSIONAL_DECORATION_LABELS_V7, dimensionalDecorationArchetypeV7 } from '../v7/dimensional-decoration';
+import { FinishCompositePanelV7 } from './FinishCompositePanelV7';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -218,6 +219,8 @@ function InspectorV7() {
               ? <SurfaceEffectPanelV7 />
             : selectedStep.kind === 'dimensional_decoration'
               ? <DimensionalDecorationPanelV7 />
+            : selectedStep.kind === 'surface_finish'
+              ? <FinishCompositePanelV7 />
             : definition
               ? <V7StepToolGate tools={definition.allowedTools} />
               : <p className="text-xs text-gray-500">当前步骤没有可用属性。</p>}

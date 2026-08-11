@@ -6,11 +6,13 @@ import type {
   ProcessStepV7,
   RegionMaskV7,
   SurfaceEffectPayloadV7,
+  SurfaceFinishTypeV7,
   Transform2DV7,
 } from './model';
 import { getProcessStepTypeDefinitionV7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import type { EditorV7IdFactory } from './id';
+import { createSurfaceFinishDefinitionV7, isSurfaceFinishTypeV7 } from './finish';
 
 export type EditorV7CommandFailure =
   | 'missing_document'
@@ -210,6 +212,26 @@ export function setEditorV7SurfaceEffectMask(
   const target = next.nails[finger].steps[found.index];
   if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
   target.mask = structuredClone(mask);
+  return validate(next);
+}
+
+export function setEditorV7SurfaceFinish(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  finishType: SurfaceFinishTypeV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_finish') return reject('not_allowed', 'finish payload requires the unique surface finish step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  if (!isSurfaceFinishTypeV7(finishType)) return reject('invalid_value', 'finish type is invalid');
+  const definition = createSurfaceFinishDefinitionV7(finishType);
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_finish') return reject('not_allowed', 'finish payload requires the unique surface finish step');
+  target.finish = definition.finish;
+  target.materialRefs = [definition.materialRef];
   return validate(next);
 }
 
