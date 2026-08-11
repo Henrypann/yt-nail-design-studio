@@ -77,7 +77,7 @@ export default function CommunityProfilePage() {
             {works.map((c) => (
               <li key={c.contentId}>
                 <Link
-                  to={communityInternalHref(Routes.communityContent(c.contentId), searchParams)}
+                  to={communityInternalHref(Routes.communityLook(c.contentId), searchParams)}
                   className="block rounded-card border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:border-primary/40"
                 >
                   {c.title}

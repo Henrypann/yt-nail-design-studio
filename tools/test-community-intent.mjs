@@ -100,7 +100,7 @@ assert.equal(created.ok, true);
 assert.match(created.href, /communityIntent=/);
 const stored = getStudioImportIntent(created.intentId);
 assert.ok(stored);
-assert.equal(stored.returnTo, `/community/content/${tryable.contentId}`);
+assert.equal(stored.returnTo, `/community/look/${tryable.contentId}`);
 assert.equal(stored.assetRef.templateId, tryable.assetRef.templateId);
 assert.ok(Date.parse(stored.expiresAt) - Date.parse(stored.createdAt) === STUDIO_IMPORT_INTENT_TTL_MS);
 

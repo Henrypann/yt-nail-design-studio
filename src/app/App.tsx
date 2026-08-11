@@ -32,7 +32,8 @@ import PetalVeilFixturePage from '@/studio/petal-veil/PetalVeilFixturePage';
 import CommunityDiscoverPage from '@/community/pages/CommunityDiscoverPage';
 import CommunityOfficialPage from '@/community/pages/CommunityOfficialPage';
 import CommunityCreatorsPage from '@/community/pages/CommunityCreatorsPage';
-import CommunityContentPage from '@/community/pages/CommunityContentPage';
+import CommunityLookPage from '@/community/pages/CommunityLookPage';
+import CommunityLegacyContentRedirect from '@/community/pages/CommunityLegacyContentRedirect';
 import CommunityProfilePage from '@/community/pages/CommunityProfilePage';
 
 const DevDebugPanel = import.meta.env.DEV
@@ -68,7 +69,9 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.community} element={<CommunityDiscoverPage />} />
       <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
       <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
-      <Route path={Routes.communityContentPath} element={<CommunityContentPage />} />
+      <Route path={Routes.communityLookPath} element={<CommunityLookPage />} />
+      {/* legacy 深链：replace 重定向到 canonical look 路由 */}
+      <Route path={Routes.communityContentPath} element={<CommunityLegacyContentRedirect />} />
       <Route path={Routes.communityProfilePath} element={<CommunityProfilePage />} />
     </Route>
     {/* Editor 使用独立沉浸式工作区；返回入口与安全离开由 EditorShell 负责。 */}

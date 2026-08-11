@@ -230,7 +230,7 @@ export function createStudioImportIntent(input: {
 
   const now = Date.now();
   const intentId = createClientId('intent-');
-  const fallbackReturn = Routes.communityContent(content.contentId);
+  const fallbackReturn = Routes.communityLook(content.contentId);
   const intent: StudioImportIntentV1 = {
     v: 1,
     intentId,

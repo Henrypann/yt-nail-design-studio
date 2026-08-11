@@ -175,7 +175,7 @@ export default function WizardPage() {
 
   const recoverFromIntent = (intent?: Pick<StudioImportIntentV1, 'returnTo' | 'contentId'> | null) => {
     const fallback = intent?.contentId
-      ? Routes.communityContent(intent.contentId)
+      ? Routes.communityLook(intent.contentId)
       : Routes.community;
     const target = sanitizeReturnTo(intent?.returnTo, fallback);
     setIntentConflict(null);
@@ -301,7 +301,7 @@ export default function WizardPage() {
       setIntentConflict(null);
       stripIntentParam();
       navigate(
-        sanitizeReturnTo(ui.returnTo, Routes.communityContent(ui.contentId)),
+        sanitizeReturnTo(ui.returnTo, Routes.communityLook(ui.contentId)),
         { replace: true },
       );
       return;
