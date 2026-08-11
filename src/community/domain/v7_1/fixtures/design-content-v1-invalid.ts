@@ -242,13 +242,6 @@ export const DESIGN_CONTENT_V1_INVALID_FIXTURES: readonly DesignContentV1Invalid
     expectedCodes: ['duplicate_asset_ref'],
     parse: parseDesignVersionV1,
   },
-  {
-    name: 'version empty asset revisions',
-    value: { ...BASE_VERSION, assetRevisionRefs: [] },
-    expectedCodes: ['empty_asset_revisions'],
-    parse: parseDesignVersionV1,
-  },
-
   // ---- parent ref ----------------------------------------------------------
   {
     name: 'version self parent',

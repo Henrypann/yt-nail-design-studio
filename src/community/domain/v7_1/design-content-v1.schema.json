@@ -92,7 +92,6 @@
         "releasedAt": { "$ref": "#/$defs/isoTimestamp" },
         "assetRevisionRefs": {
           "type": "array",
-          "minItems": 1,
           "items": { "$ref": "#/$defs/immutableAssetRevisionRefV1" }
         },
         "parentVersionId": { "$ref": "#/$defs/contractId" }

@@ -56,6 +56,8 @@ export const StorageKeys = {
   communityStudioImportIntent: 'community.studio-import-intent',
   /** Wizard 活动草稿（PR-05）：版本化恢复快照，不包含纯 UI 瞬态 */
   wizardDraft: 'wizard.active-draft',
+  /** Studio V7.1 immutable DesignVersion metadata + private released snapshots. */
+  designReleases: 'studio.design-releases-v1',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];
