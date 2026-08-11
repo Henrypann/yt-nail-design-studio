@@ -1,0 +1,282 @@
+[
+  {
+    "width": 1440,
+    "innerWidth": 1440,
+    "clientWidth": 1440,
+    "scrollWidth": 1440,
+    "undersized": [
+      {
+        "label": "发现",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "搜索",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "官方",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "认证创作者",
+        "width": 80,
+        "height": 28
+      },
+      {
+        "label": "Nail Board",
+        "width": 79.5,
+        "height": 28
+      },
+      {
+        "label": "中文",
+        "width": 38,
+        "height": 24.5
+      },
+      {
+        "label": "EN",
+        "width": 30.9,
+        "height": 24.5
+      },
+      {
+        "label": "Dashboard",
+        "width": 105.9,
+        "height": 32
+      },
+      {
+        "label": "进入 Studio",
+        "width": 109.7,
+        "height": 32
+      },
+      {
+        "label": "需求说明",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "label": "调试面板",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 1280,
+    "innerWidth": 1280,
+    "clientWidth": 1280,
+    "scrollWidth": 1280,
+    "undersized": [
+      {
+        "label": "发现",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "搜索",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "官方",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "认证创作者",
+        "width": 80,
+        "height": 28
+      },
+      {
+        "label": "Nail Board",
+        "width": 79.5,
+        "height": 28
+      },
+      {
+        "label": "中文",
+        "width": 38,
+        "height": 24.5
+      },
+      {
+        "label": "EN",
+        "width": 30.9,
+        "height": 24.5
+      },
+      {
+        "label": "Dashboard",
+        "width": 105.9,
+        "height": 32
+      },
+      {
+        "label": "进入 Studio",
+        "width": 109.7,
+        "height": 32
+      },
+      {
+        "label": "需求说明",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "label": "调试面板",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 1024,
+    "innerWidth": 1024,
+    "clientWidth": 1024,
+    "scrollWidth": 1024,
+    "undersized": [
+      {
+        "label": "发现",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "搜索",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "官方",
+        "width": 44,
+        "height": 28
+      },
+      {
+        "label": "认证创作者",
+        "width": 80,
+        "height": 28
+      },
+      {
+        "label": "Nail Board",
+        "width": 79.5,
+        "height": 28
+      },
+      {
+        "label": "中文",
+        "width": 38,
+        "height": 24.5
+      },
+      {
+        "label": "EN",
+        "width": 30.9,
+        "height": 24.5
+      },
+      {
+        "label": "Dashboard",
+        "width": 105.9,
+        "height": 32
+      },
+      {
+        "label": "进入 Studio",
+        "width": 109.7,
+        "height": 32
+      },
+      {
+        "label": "需求说明",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "label": "调试面板",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 768,
+    "innerWidth": 768,
+    "clientWidth": 768,
+    "scrollWidth": 768,
+    "undersized": [
+      {
+        "label": "菜单",
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "中文",
+        "width": 38,
+        "height": 24.5
+      },
+      {
+        "label": "EN",
+        "width": 30.9,
+        "height": 24.5
+      },
+      {
+        "label": "Dashboard",
+        "width": 105.9,
+        "height": 32
+      },
+      {
+        "label": "进入 Studio",
+        "width": 109.7,
+        "height": 32
+      },
+      {
+        "label": "需求说明",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "label": "调试面板",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "innerWidth": 390,
+    "clientWidth": 390,
+    "scrollWidth": 390,
+    "undersized": [
+      {
+        "label": "菜单",
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "中文",
+        "width": 27,
+        "height": 41
+      },
+      {
+        "label": "EN",
+        "width": 30.9,
+        "height": 24.5
+      },
+      {
+        "label": "Dashboard",
+        "width": 105.9,
+        "height": 32
+      },
+      {
+        "label": "进入 Studio",
+        "width": 82.4,
+        "height": 32
+      },
+      {
+        "label": "需求说明",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "label": "调试面板",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "errors": []
+  }
+]

@@ -34,6 +34,13 @@ export const Routes = {
   /** Canonical 可分享详情路由（COMM-V7.1-01）。 */
   communityLook: (lookId: string) => `/community/look/${lookId}`,
   communityLookPath: '/community/look/:lookId',
+  /** Nail Board（COMM-V7.1-03）：收藏参考集，owner 管理与匿名只读分享。 */
+  communityBoards: '/community/boards',
+  communityBoardDetail: (boardId: string) => `/community/board/${boardId}`,
+  communityBoardDetailPath: '/community/board/:boardId',
+  /** 分享链接只携带不可猜测的 token，绝不携带 owner/customer 身份。 */
+  communityBoardShare: (token: string) => `/community/board/share/${token}`,
+  communityBoardSharePath: '/community/board/share/:token',
   communityProfile: (handle: string) => `/community/profile/${handle}`,
   communityProfilePath: '/community/profile/:handle',
 } as const;

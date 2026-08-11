@@ -48,6 +48,7 @@ import { CommunitySortControl } from '../components/CommunitySortControl';
 import { CommunityFilters } from '../components/CommunityFilters';
 import { CommunityLookCard } from '../components/CommunityLookCard';
 import { CommunityCreatorCard } from '../components/CommunityCreatorCard';
+import { NailBoardSaveDialog } from '../components/NailBoardSaveDialog';
 
 type LoadState = 'loading' | 'ready' | 'error';
 type ExploreMode = 'discover' | 'search';
@@ -74,6 +75,8 @@ export function CommunityFeed({
   const [progress, setProgress] = useState<{ ready: number; target: number; gap: number } | null>(null);
   const [retry, setRetry] = useState(0);
   const rankingAsOf = useRef(new Date().toISOString());
+  /** COMM-V7.1-03: Feed 拥有 Save-to-Board 对话框；卡片只上报保存意图。 */
+  const [saveLook, setSaveLook] = useState<PublishedLookReadModelV1 | null>(null);
 
   const exploreState = useMemo(() => {
     const parsed = parseExploreState(searchParams);
@@ -227,6 +230,7 @@ export function CommunityFeed({
                       look={look}
                       publisher={pubMap.get(look.publisherId)}
                       taxonomy={taxonomy}
+                      onSave={(selected) => setSaveLook(selected)}
                     />
                   ))}
                 </div>
@@ -295,6 +299,16 @@ export function CommunityFeed({
             )}
           </p>
         </>
+      )}
+
+      {/* COMM-V7.1-03: Feed 拥有 Save-to-Board 对话框，卡片不直接持久化。 */}
+      {saveLook && (
+        <NailBoardSaveDialog
+          key={saveLook.lookId}
+          look={saveLook}
+          open
+          onClose={() => setSaveLook(null)}
+        />
       )}
     </div>
   );

@@ -38,6 +38,11 @@ export function CommunityLayout() {
       label: text('认证创作者', 'Creators'),
       end: true,
     },
+    {
+      to: communityInternalHref(Routes.communityBoards, searchParams),
+      label: text('Nail Board', 'Nail Board'),
+      end: true,
+    },
   ] as const;
 
   return (
