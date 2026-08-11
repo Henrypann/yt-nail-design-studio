@@ -58,6 +58,8 @@ export const StorageKeys = {
   wizardDraft: 'wizard.active-draft',
   /** Studio V7.1 immutable DesignVersion metadata + private released snapshots. */
   designReleases: 'studio.design-releases-v1',
+  /** Community V7.1 canonical Look → Studio versioned import intents. */
+  versionedStudioImportIntents: 'community.versioned-studio-import-intents-v2',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];
