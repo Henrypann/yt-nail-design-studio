@@ -44,15 +44,15 @@ export function EditorStageBarV7({
   };
 
   return (
-    <nav className="border-b border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="设计阶段" data-testid="v7-stage-bar">
-      <ol className="flex min-w-max items-stretch gap-1 overflow-x-auto">
+    <nav className="min-w-0 overflow-hidden border-b border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="设计阶段" data-testid="v7-stage-bar">
+      <ol className="flex w-full min-w-0 items-stretch gap-1 overflow-x-auto">
         {stages.map((stage, index) => {
           const Icon = STAGE_ICON[stage.id];
           const current = stage.active;
           const unavailable = stage.state === 'unavailable';
           const canNavigate = (stage.targetStepId !== null || (stage.id === 'customer' && customerPreviewEnabled)) && !unavailable;
           return (
-            <li key={stage.id} className="flex items-center">
+            <li key={stage.id} className="flex shrink-0 items-center">
               <button
                 type="button"
                 aria-disabled={!canNavigate}

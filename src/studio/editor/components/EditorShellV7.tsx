@@ -220,6 +220,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   };
 
   const layout = wideWorkspace ? 'wide' : dockedTools ? (mobileWorkspace ? 'mobile' : 'tablet') : 'compact';
+  const communitySource = doc.sourceRefs.find((ref) => ref.domain === 'community');
 
   return (
     <section
@@ -229,12 +230,32 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       data-internal-editor-v7={internalEnabled}
       data-layout={layout}
     >
-      <header className="flex min-h-[52px] flex-wrap items-center gap-1.5 border-b border-gray-200 px-2 py-1.5 sm:gap-2 sm:px-3">
-        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit()}>
-          <ArrowLeft size={14} /> 设计列表
-        </Button>
-        <span className="rounded-full bg-gray-900 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white">Editor V7</span>
-        <input
+      <header className="flex min-h-[52px] flex-col gap-1.5 border-b border-gray-200 px-2 py-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2 sm:px-3">
+        <div className="flex min-w-0 items-center gap-1.5 sm:contents">
+          <Button size="sm" variant="ghost" data-testid={communitySource ? 'editor-return-source' : 'editor-return-designs'} className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(communitySource ? Routes.communityLook(communitySource.sourceId) : Routes.designs)}>
+            <ArrowLeft size={14} />
+            <span className="sm:hidden">{communitySource ? '来源' : '列表'}</span>
+            <span className="hidden sm:inline">{communitySource ? '返回来源 Look' : '设计列表'}</span>
+          </Button>
+          <span className="hidden rounded-full bg-gray-900 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white sm:inline-flex">Editor V7</span>
+          {communitySource && (
+            <span
+              className="min-w-0 flex-1 truncate rounded-full border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-[10px] font-medium text-fuchsia-800 sm:flex-none"
+              data-testid="editor-remix-disclosure"
+              title={`Remix · 来源版本 ${communitySource.revision}`}
+            >
+              Remix · 来源版本 {communitySource.revision}
+            </span>
+          )}
+          <span
+            className={cx('ml-auto shrink-0 text-[11px] sm:ml-0', saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500')}
+            role="status"
+          >
+            {SAVE_LABEL[saveState]}
+          </span>
+        </div>
+        <div className="flex min-w-0 items-center gap-1.5 sm:contents">
+          <input
           value={titleDraft}
           disabled={readOnly || switching}
           aria-label="设计名称"
@@ -247,34 +268,29 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
               event.currentTarget.blur();
             }
           }}
-          className="min-w-[140px] flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-gray-900 hover:border-gray-200 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:text-gray-600"
-        />
-        <span
-          className={cx('text-[11px]', saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500')}
-          role="status"
-        >
-          {SAVE_LABEL[saveState]}
-        </span>
-        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
-          <Undo2 size={14} />
-        </Button>
-        <Button size="sm" variant="ghost" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
-          <Redo2 size={14} />
-        </Button>
-        <Button size="sm" className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
-          <Save size={14} /> {saveState === 'error' ? '重试保存' : '保存'}
-        </Button>
-        <Button
-          size="sm"
-          className="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0"
-          variant="secondary"
-          disabled={saveState !== 'saved' || switching}
-          title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
-          aria-label="打开顾客只读预览"
-          onClick={openCustomerPreview}
-        >
-          <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
-        </Button>
+            className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-gray-900 hover:border-gray-200 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:text-gray-600 sm:min-w-[140px]"
+          />
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
+            <Undo2 size={14} />
+          </Button>
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
+            <Redo2 size={14} />
+          </Button>
+          <Button size="sm" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
+            <Save size={14} /><span className="hidden sm:inline">{saveState === 'error' ? '重试保存' : '保存'}</span>
+          </Button>
+          <Button
+            size="sm"
+            className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0"
+            variant="secondary"
+            disabled={saveState !== 'saved' || switching}
+            title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
+            aria-label="打开顾客只读预览"
+            onClick={openCustomerPreview}
+          >
+            <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
+          </Button>
+        </div>
       </header>
 
       {readOnly && (

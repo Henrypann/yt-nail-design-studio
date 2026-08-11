@@ -113,7 +113,7 @@ for (const mode of ['current','cancel']) {
 {
   const h=importHarness(); h.deps.nextId=()=> 'duplicate';
   const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
-  assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'id_collision');assert.equal(h.writerCalls,0);
+  assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'id_collision');assert.equal(h.writerCalls,0);assert.equal(h.ih.port.peek(h.ih.created.intent.intentId),null);
 }
 
 // Dependency failures are reported, never thrown, and do not write a target.

@@ -60,6 +60,8 @@ export const StorageKeys = {
   designReleases: 'studio.design-releases-v1',
   /** Community V7.1 canonical Look → Studio versioned import intents. */
   versionedStudioImportIntents: 'community.versioned-studio-import-intents-v2',
+  /** Successful Look → Studio conversions; idempotent by versioned intent id. */
+  lookCustomizeEvents: 'community.look-customize-events-v1',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

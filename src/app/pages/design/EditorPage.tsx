@@ -67,6 +67,12 @@ export default function EditorPage() {
   const [blankShape, setBlankShape] = useState<NailShape>('almond');
   const [blankLength, setBlankLength] = useState<NailLength>('medium');
 
+  useEffect(() => {
+    // Immersive workspace must not inherit the document scroll position from
+    // Community/Wizard during SPA navigation, otherwise its header is clipped.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
+
   const loadPersistedDesign = async (designId: string): Promise<PageState> => {
     const probe = inspectEditorDoc(designId);
     const route = resolveEditorWriterRoute(probe, v7Enabled);
