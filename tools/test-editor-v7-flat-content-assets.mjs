@@ -124,8 +124,8 @@ class MemoryStorage {
 }
 
 class MemoryFlatStorage {
-  constructor(initial = null) { this.value = initial; this.writes = 0; this.failWrite = null; this.failRead = null; }
-  read = () => { if (this.failRead) throw this.failRead; return this.value; };
+  constructor(initial = null) { this.value = initial; this.reads = 0; this.writes = 0; this.failWrite = null; this.failRead = null; }
+  read = () => { this.reads += 1; if (this.failRead) throw this.failRead; return this.value; };
   write = (value) => { if (this.failWrite) throw this.failWrite; this.value = value; this.writes += 1; };
 }
 
@@ -684,6 +684,28 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
   assert.equal(lkFlat.writes, 0);
   assertInvariants(lkStore, lkBefore);
 
+  // Hidden/skipped steps are rejected before any flat-asset repository I/O.
+  for (const inactive of ['hidden', 'skipped']) {
+    const { store: inactiveStore, flatStorage: inactiveFlat } = runtime(doc);
+    assert.equal(await inactiveStore.getState().load(doc.designId), 'ok');
+    assert.equal(inactiveStore.getState().addStep('L1', createFlatStep(), 1).ok, true);
+    assert.equal(inactiveStore.getState().setStepFlag(
+      'L1',
+      'step.v7-10.flat',
+      inactive === 'hidden' ? 'visible' : 'skipped',
+      inactive === 'hidden' ? false : true,
+    ).ok, true);
+    const inactiveBefore = captureInvariants(inactiveStore);
+    const readsBefore = inactiveFlat.reads;
+    const writesBefore = inactiveFlat.writes;
+    assert.equal((await inactiveStore.getState().applyPreparedImport('L1', 'step.v7-10.flat', pngPrep)).reason, 'not_allowed');
+    assert.equal((await inactiveStore.getState().relinkImageAsset('L1', 'step.v7-10.flat', 'element.missing', relinkTarget)).reason, 'not_allowed');
+    assert.equal((await inactiveStore.getState().relinkPreparedImageAsset('L1', 'step.v7-10.flat', 'element.missing', relinkPrepared)).reason, 'not_allowed');
+    assert.equal(inactiveFlat.reads, readsBefore);
+    assert.equal(inactiveFlat.writes, writesBefore);
+    assertInvariants(inactiveStore, inactiveBefore);
+  }
+
   // undo/redo targets the latest relink while preserving earlier imported content.
   assert.equal(store.getState().undo().ok, true);
   assert.equal(flatElements(store).find((element) => element.id === stickerElement.id).asset.assetId, getBundledFlatAssetV7('bundled.sticker.sparkle').asset.assetId);
@@ -758,6 +780,7 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
 {
   const files = Object.fromEntries(await Promise.all([
     'src/studio/editor/components/EditorToolRailV7.tsx',
+    'src/studio/editor/components/EditorShellV7.tsx',
     'src/studio/editor/components/EditorResourceDrawerV7.tsx',
     'src/studio/editor/components/V7FlatDesignCanvas.tsx',
     'src/studio/editor/components/CustomerNailPreviewV7.tsx',
@@ -766,8 +789,9 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
     'src/studio/editor/components/FlatContentResourcesV7.tsx',
     'src/studio/editor/components/FlatContentInspectorV7.tsx',
   ].map(async (file) => [file, await readFile(new URL(`../${file}`, import.meta.url), 'utf8')])));
-  assert.match(files['src/studio/editor/components/EditorToolRailV7.tsx'], /setResourceMode\('text'\)/);
-  assert.match(files['src/studio/editor/components/EditorToolRailV7.tsx'], /setResourceMode\('assets'\)/);
+  assert.match(files['src/studio/editor/components/EditorShellV7.tsx'], /setResourceMode\('text'\)/);
+  assert.match(files['src/studio/editor/components/EditorShellV7.tsx'], /setResourceMode\('assets'\)/);
+  assert.match(files['src/studio/editor/components/EditorToolRailV7.tsx'], /onActivateTool/);
   assert.match(files['src/studio/editor/components/EditorResourceDrawerV7.tsx'], /FlatContentResourcesV7/);
   assert.match(files['src/studio/editor/components/V7FlatDesignCanvas.tsx'], /FlatContentArtworkV7/);
   assert.match(files['src/studio/editor/components/CustomerNailPreviewV7.tsx'], /FlatContentArtworkV7/);

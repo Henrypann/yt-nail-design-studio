@@ -58,7 +58,7 @@ export function SurfaceEffectPanelV7() {
   const setMask = useEditorV7Store((state) => state.setSurfaceEffectMask);
   if (step?.kind !== 'surface_effect') return null;
   const effect = step.effect;
-  const canEdit = !readOnly && !switching && !step.locked;
+  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked;
   const report = (result: EditorV7ActionResult) => { if (!result.ok) toast.error(result.message); return result; };
   const update = (next: SurfaceEffectPayloadV7) => report(setEffect(currentFinger, step.id, next));
   const switchType = (effectType: SurfaceEffectPayloadV7['effectType']) => {

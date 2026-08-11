@@ -35,6 +35,16 @@ function reject(reason: EditorV7CommandFailure, message: string): EditorV7Comman
   return { ok: false, reason, message };
 }
 
+/** Canonical authoring gate shared by every middle-step content command. */
+export function editorV7StepAuthoringFailure(
+  step: ProcessStepV7,
+): EditorV7CommandResult | null {
+  if (step.locked) return reject('locked', 'step is locked');
+  if (step.skipped) return reject('not_allowed', 'step is skipped; cancel skipping before editing');
+  if (!step.visible) return reject('not_allowed', 'step is hidden; restore visibility before editing');
+  return null;
+}
+
 function validate(next: EditorDocV7): EditorV7CommandResult {
   const parsed = parseEditorDocV7(next);
   return parsed.ok
@@ -176,6 +186,7 @@ export function setEditorV7StepFlag(
   if (flag !== 'locked' && found.step.locked) return reject('locked', 'step is locked');
   if (flag === 'skipped' && !definition?.skippable) return reject('not_allowed', 'step cannot be skipped');
   if (flag === 'visible' && found.step.kind === 'surface_finish' && !value) return reject('not_allowed', 'finish must remain visible');
+  if (found.step[flag] === value) return reject('not_allowed', `step ${flag} already equals requested value`);
   const next = structuredClone(doc);
   next.nails[finger].steps[found.index][flag] = value;
   return validate(next);
@@ -190,7 +201,8 @@ export function setEditorV7SurfaceEffect(
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
   if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const next = structuredClone(doc);
   const target = next.nails[finger].steps[found.index];
   if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
@@ -207,7 +219,8 @@ export function setEditorV7SurfaceEffectMask(
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
   if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const next = structuredClone(doc);
   const target = next.nails[finger].steps[found.index];
   if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
@@ -243,7 +256,8 @@ export function addEditorV7Element(
 ): EditorV7CommandResult {
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   if (allNodeIds(doc).has(element.id)) return reject('duplicate_id', 'element ID already exists');
   const next = structuredClone(doc);
   const target = next.nails[finger].steps[found.index];
@@ -267,7 +281,8 @@ function findElement(step: ProcessStepV7, elementId: string): { items: EditorV7E
 export function removeEditorV7Element(doc: EditorDocV7, finger: FingerCode, stepId: string, elementId: string): EditorV7CommandResult {
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const located = findElement(found.step, elementId);
   if (!located) return reject('not_found', 'element not found');
   if (located.items[located.index].locked) return reject('locked', 'element is locked');
@@ -287,7 +302,8 @@ export function setEditorV7ElementFlag(
 ): EditorV7CommandResult {
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const located = findElement(found.step, elementId);
   if (!located) return reject('not_found', 'element not found');
   if (flag !== 'locked' && located.items[located.index].locked) return reject('locked', 'element is locked');
@@ -307,7 +323,8 @@ export function setEditorV7ElementTransform(
 ): EditorV7CommandResult {
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const located = findElement(found.step, elementId);
   if (!located) return reject('not_found', 'element not found');
   if (located.items[located.index].locked) return reject('locked', 'element is locked');
@@ -328,7 +345,8 @@ export function replaceEditorV7DimensionalDecoration(
   const found = findStep(doc, finger, stepId);
   if (!found.step) return reject('not_found', 'step not found');
   if (found.step.kind !== 'dimensional_decoration') return reject('not_allowed', 'replacement requires a dimensional decoration step');
-  if (found.step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(found.step);
+  if (unavailable) return unavailable;
   const index = found.step.decorations.findIndex((item) => item.id === elementId);
   if (index < 0) return reject('not_found', 'decoration not found');
   if (found.step.decorations[index].locked) return reject('locked', 'decoration is locked');

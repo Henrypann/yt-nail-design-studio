@@ -6,12 +6,20 @@ import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
+import { EditorGuidedStartV7 } from './EditorGuidedStartV7';
 import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
 import { EditorStageBarV7 } from './EditorStageBarV7';
 import { EditorToolRailV7 } from './EditorToolRailV7';
+import { EditorWorkspaceIntentNoticeV7 } from './EditorWorkspaceIntentNoticeV7';
 import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
 import { captureCustomerPreviewSessionV7 } from '../v7/customer-preview-session';
 import { TenFingerBarV7 } from './TenFingerBarV7';
+import {
+  deriveEditorWorkspaceToolsV7,
+  type EditorWorkspaceToolAvailabilityV7,
+  type EditorWorkspaceToolIdV7,
+} from '../v7/workspace-ia';
+import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -34,11 +42,14 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const saveError = useEditorV7Store((state) => state.saveError);
   const historyCount = useEditorV7Store((state) => state.history.length);
   const futureCount = useEditorV7Store((state) => state.future.length);
+  const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const setTitle = useEditorV7Store((state) => state.setTitle);
   const undo = useEditorV7Store((state) => state.undo);
   const redo = useEditorV7Store((state) => state.redo);
   const save = useEditorV7Store((state) => state.save);
   const unload = useEditorV7Store((state) => state.unload);
+  const addMissingPersonalStep = useEditorV7Store((state) => state.addMissingPersonalStep);
+  const setStepFlag = useEditorV7Store((state) => state.setStepFlag);
   const [titleDraft, setTitleDraft] = useState(doc?.title ?? '');
   const [leaving, setLeaving] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
@@ -47,12 +58,61 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const [wideWorkspace, setWideWorkspace] = useState(() => window.matchMedia('(min-width: 1280px)').matches);
   const [dockedTools, setDockedTools] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
   const [mobileWorkspace, setMobileWorkspace] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  const [pendingToolIntent, setPendingToolIntent] = useState<EditorWorkspaceToolAvailabilityV7 | null>(null);
+  const [dismissedGuides, setDismissedGuides] = useState<Set<string>>(() => new Set());
   const resourceDialogRef = useRef<HTMLDivElement>(null);
   const overlayTriggerRef = useRef<HTMLElement | null>(null);
+  const toolIntentTriggerRef = useRef<HTMLElement | null>(null);
+  const guidedStartRef = useRef<HTMLButtonElement>(null);
+  const guideFocusRequestedRef = useRef(false);
 
   useEffect(() => {
     setTitleDraft(doc?.title ?? '');
   }, [doc?.designId, doc?.title]);
+
+  useEffect(() => {
+    setPendingToolIntent(null);
+    toolIntentTriggerRef.current = null;
+    guideFocusRequestedRef.current = false;
+  }, [currentFinger, doc?.designId]);
+
+  useEffect(() => {
+    if (!guideFocusRequestedRef.current) return;
+    const key = `${doc?.designId ?? ''}:${currentFinger}`;
+    if (dismissedGuides.has(key)) return;
+    const frame = window.requestAnimationFrame(() => {
+      if (!guidedStartRef.current) return;
+      guidedStartRef.current.focus();
+      guideFocusRequestedRef.current = false;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentFinger, dismissedGuides, doc?.designId]);
+
+  useEffect(() => {
+    if (!pendingToolIntent || !currentNail) return;
+    const refreshed = deriveEditorWorkspaceToolsV7(currentNail, {
+      selectedStepId: selectedStep?.id ?? null,
+      readOnly,
+      switching,
+    }).find((tool) => tool.id === pendingToolIntent.id) ?? null;
+    if (!refreshed) {
+      setPendingToolIntent(null);
+      return;
+    }
+    if (refreshed.enabled) {
+      const trigger = toolIntentTriggerRef.current;
+      toolIntentTriggerRef.current = null;
+      setPendingToolIntent(null);
+      queueMicrotask(() => trigger?.isConnected && trigger.focus());
+      return;
+    }
+    if (
+      refreshed.status !== pendingToolIntent.status
+      || refreshed.targetStepId !== pendingToolIntent.targetStepId
+      || refreshed.requiredStepKind !== pendingToolIntent.requiredStepKind
+      || refreshed.reason !== pendingToolIntent.reason
+    ) setPendingToolIntent(refreshed);
+  }, [currentNail, pendingToolIntent, readOnly, selectedStep?.id, switching]);
 
   useEffect(() => {
     const wide = window.matchMedia('(min-width: 1280px)');
@@ -124,16 +184,20 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     });
   }, [blocker, leaving, toast, unload]);
 
-  const rememberOverlayTrigger = () => {
-    overlayTriggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const rememberOverlayTrigger = (trigger?: HTMLElement | null) => {
+    overlayTriggerRef.current = trigger
+      ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
   };
   const restoreOverlayTrigger = () => {
     const trigger = overlayTriggerRef.current;
     overlayTriggerRef.current = null;
-    queueMicrotask(() => trigger?.focus());
+    queueMicrotask(() => {
+      if (trigger?.isConnected) trigger.focus();
+      else document.querySelector<HTMLElement>('[data-tool-status="ready"][aria-pressed="true"]')?.focus();
+    });
   };
-  const openResources = () => {
-    rememberOverlayTrigger();
+  const openResources = (trigger?: HTMLElement | null) => {
+    rememberOverlayTrigger(trigger);
     setWorkspacePanelOpen(false);
     setResourcesOpen(true);
   };
@@ -145,8 +209,8 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     if (resourcesOpen) closeResources();
     else openResources();
   };
-  const openWorkspacePanel = (tab: EditorWorkspacePanelTabV7) => {
-    rememberOverlayTrigger();
+  const openWorkspacePanel = (tab: EditorWorkspacePanelTabV7, trigger?: HTMLElement | null) => {
+    rememberOverlayTrigger(trigger);
     setResourcesOpen(false);
     setWorkspacePanelTab(tab);
     if (!wideWorkspace) setWorkspacePanelOpen(true);
@@ -166,7 +230,13 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       const target = event.target;
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return;
       if (event.key === 'Escape') {
-        if (workspacePanelOpen) {
+        if (pendingToolIntent) {
+          event.preventDefault();
+          const trigger = toolIntentTriggerRef.current;
+          toolIntentTriggerRef.current = null;
+          setPendingToolIntent(null);
+          queueMicrotask(() => trigger?.isConnected && trigger.focus());
+        } else if (workspacePanelOpen) {
           event.preventDefault();
           closeWorkspacePanel();
         } else if (resourcesOpen) {
@@ -182,7 +252,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [redo, resourcesOpen, undo, workspacePanelOpen]);
+  }, [pendingToolIntent, redo, resourcesOpen, undo, workspacePanelOpen]);
 
   if (!doc || !currentNail) return null;
 
@@ -214,6 +284,136 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     if (selectedStep?.id !== stepId) editorV7Store.getState().selectStep(stepId);
   };
 
+  const guideKey = `${doc.designId}:${currentFinger}`;
+  const resolveWorkspaceTool = (toolId: EditorWorkspaceToolIdV7): EditorWorkspaceToolAvailabilityV7 | null => {
+    const state = editorV7Store.getState();
+    const nail = state.doc?.nails[state.currentFinger];
+    if (!nail) return null;
+    return deriveEditorWorkspaceToolsV7(nail, {
+      selectedStepId: state.selectedStepId,
+      readOnly: state.readOnly,
+      switching: state.switching,
+    }).find((tool) => tool.id === toolId) ?? null;
+  };
+  const focusToolDestination = (toolId: EditorWorkspaceToolIdV7) => {
+    window.setTimeout(() => {
+      const panelSelector = toolId === 'effects'
+        ? '[data-testid="v7-surface-effect-panel"]'
+        : toolId === 'decorations'
+          ? '[data-testid="v7-dimensional-decoration-panel"]'
+          : toolId === 'text'
+            ? '[data-testid="v7-flat-text-resources"]'
+            : toolId === 'assets'
+              ? '[data-testid="v7-flat-asset-resources"]'
+              : toolId === 'background'
+                ? '[data-testid="v7-background-panel"]'
+                : '[data-testid="v7-flat-vector-panel"]';
+      const panel = document.querySelector<HTMLElement>(panelSelector);
+      const destination = panel?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
+        ?? Array.from(document.querySelectorAll<HTMLButtonElement>(`[data-tool-id="${toolId}"]`))
+          .find((button) => button.getClientRects().length > 0);
+      destination?.focus();
+    }, 0);
+  };
+  const activateWorkspaceTool = (
+    tool: EditorWorkspaceToolAvailabilityV7,
+    trigger?: HTMLElement | null,
+    focusDestination = false,
+  ) => {
+    const state = editorV7Store.getState();
+    if (tool.targetStepId) state.selectStep(tool.targetStepId);
+    if (tool.id === 'select') state.setActiveFlatTool('select');
+    if (tool.id === 'brush') state.setActiveFlatTool('brush');
+    if (tool.id === 'eraser') state.setActiveFlatTool('eraser');
+    if (tool.id === 'shape') state.setActiveFlatTool('rectangle');
+    if (tool.id === 'text') {
+      state.setResourceMode('text');
+      openResources(trigger);
+    } else if (tool.id === 'assets') {
+      state.setResourceMode('assets');
+      openResources(trigger);
+    } else if (tool.id === 'effects' || tool.id === 'decorations') {
+      openWorkspacePanel('inspector', trigger);
+    } else if (tool.id === 'background' || tool.id === 'brush' || tool.id === 'eraser' || tool.id === 'shape') {
+      state.setResourceMode('vector');
+      openResources(trigger);
+    }
+    if (focusDestination) focusToolDestination(tool.id);
+  };
+  const requestWorkspaceTool = (tool: EditorWorkspaceToolAvailabilityV7, trigger: HTMLButtonElement) => {
+    const currentTool = resolveWorkspaceTool(tool.id) ?? tool;
+    if (currentTool.enabled) {
+      activateWorkspaceTool(currentTool, trigger);
+      return;
+    }
+    toolIntentTriggerRef.current = trigger;
+    setPendingToolIntent(currentTool);
+  };
+  const dismissWorkspaceIntent = () => {
+    const trigger = toolIntentTriggerRef.current;
+    toolIntentTriggerRef.current = null;
+    setPendingToolIntent(null);
+    queueMicrotask(() => trigger?.isConnected && trigger.focus());
+  };
+  const resolveWorkspaceIntent = () => {
+    const intent = pendingToolIntent;
+    if (!intent) return;
+    let result;
+    if (intent.status === 'missing_step') {
+      if (
+        intent.requiredStepKind !== 'flat_design'
+        && intent.requiredStepKind !== 'surface_effect'
+        && intent.requiredStepKind !== 'dimensional_decoration'
+      ) return;
+      result = addMissingPersonalStep(currentFinger, intent.requiredStepKind);
+    } else if (intent.targetStepId && intent.status === 'locked') {
+      result = setStepFlag(currentFinger, intent.targetStepId, 'locked', false);
+    } else if (intent.targetStepId && intent.status === 'skipped') {
+      result = setStepFlag(currentFinger, intent.targetStepId, 'skipped', false);
+    } else if (intent.targetStepId && intent.status === 'hidden') {
+      result = setStepFlag(currentFinger, intent.targetStepId, 'visible', true);
+    } else {
+      return;
+    }
+    const refreshed = resolveWorkspaceTool(intent.id);
+    if (refreshed?.enabled) {
+      const trigger = toolIntentTriggerRef.current;
+      toolIntentTriggerRef.current = null;
+      setPendingToolIntent(null);
+      activateWorkspaceTool(refreshed, trigger, true);
+      return;
+    }
+    if (refreshed) setPendingToolIntent(refreshed);
+    if (!result.ok && !refreshed?.enabled) toast.error(result.message);
+  };
+  const requestGuidedStart = (
+    _kind: EditorWorkspacePersonalStepKindV7,
+    toolId: EditorWorkspaceToolIdV7,
+    trigger: HTMLButtonElement,
+  ) => {
+    const tool = resolveWorkspaceTool(toolId);
+    if (tool) requestWorkspaceTool(tool, trigger);
+  };
+  const showPersonalizationGuide = () => {
+    if (guidedStartRef.current) {
+      guidedStartRef.current.focus();
+      return;
+    }
+    guideFocusRequestedRef.current = true;
+    setDismissedGuides((current) => {
+      if (!current.has(guideKey)) return current;
+      const next = new Set(current);
+      next.delete(guideKey);
+      return next;
+    });
+  };
+  const previewFinishWithoutPersonalization = () => {
+    setDismissedGuides((current) => new Set(current).add(guideKey));
+    const finish = currentNail.steps.find((step) => step.kind === 'surface_finish');
+    if (finish) selectStageStep(finish.id);
+    window.setTimeout(() => document.querySelector<HTMLButtonElement>('[data-stage-id="finish"]')?.focus(), 0);
+  };
+
   const trapResourceFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Tab') return;
     const focusable = Array.from(resourceDialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
@@ -226,6 +426,9 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
 
   const layout = wideWorkspace ? 'wide' : dockedTools ? (mobileWorkspace ? 'mobile' : 'tablet') : 'compact';
   const communitySource = doc.sourceRefs.find((ref) => ref.domain === 'community');
+  const showGuidedStart = !dismissedGuides.has(guideKey) && !currentNail.steps.some((step) => (
+    step.kind === 'flat_design' || step.kind === 'surface_effect' || step.kind === 'dimensional_decoration'
+  ));
 
   return (
     <section
@@ -318,16 +521,19 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </div>
       )}
 
-      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} onOpenCustomerPreview={openCustomerPreview} customerPreviewEnabled={saveState === 'saved' && !switching} />
+      <EditorStageBarV7 nail={currentNail} selectedStepId={selectedStep?.id ?? null} onSelectStep={selectStageStep} onRequestPersonalization={showPersonalizationGuide} onOpenCustomerPreview={openCustomerPreview} customerPreviewEnabled={saveState === 'saved' && !switching} />
+
+      {pendingToolIntent && <EditorWorkspaceIntentNoticeV7 intent={pendingToolIntent} onResolve={resolveWorkspaceIntent} onDismiss={dismissWorkspaceIntent} />}
 
       <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
-        {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}
+        {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} onActivateTool={requestWorkspaceTool} onBlockedTool={requestWorkspaceTool} />}
 
         {wideWorkspace && resourcesOpen && <aside className="h-full w-[232px] shrink-0 border-r border-gray-200" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
 
         <main className="flex min-h-0 min-w-0 flex-1 overflow-auto bg-[#f3f0ee] p-3 sm:p-4" data-testid="v7-canvas-region">
-          <div className="mx-auto flex min-h-full w-full max-w-5xl items-center justify-center">
-            <div className="w-full rounded-[28px] border border-white/80 bg-white/55 p-3 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-5">
+          <div className={cx('mx-auto flex min-h-full w-full max-w-5xl justify-center', showGuidedStart ? 'items-start' : 'items-center')}>
+            <div className="w-full">
+              {showGuidedStart && <EditorGuidedStartV7 ref={guidedStartRef} nail={currentNail} onRequest={requestGuidedStart} onPreviewFinish={previewFinishWithoutPersonalization} />}
               <EditorCanvasHostV7 />
             </div>
           </div>
@@ -343,7 +549,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         </>}
       </div>
 
-      {dockedTools && <EditorToolRailV7 orientation="horizontal" resourcesOpen={resourcesOpen} onOpenResources={openResources} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} />}
+      {dockedTools && <EditorToolRailV7 orientation="horizontal" resourcesOpen={resourcesOpen} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} onActivateTool={requestWorkspaceTool} onBlockedTool={requestWorkspaceTool} />}
 
       <TenFingerBarV7 />
     </section>

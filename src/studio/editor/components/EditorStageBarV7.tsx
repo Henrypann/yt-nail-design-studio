@@ -16,12 +16,14 @@ export function EditorStageBarV7({
   nail,
   selectedStepId,
   onSelectStep,
+  onRequestPersonalization,
   onOpenCustomerPreview,
   customerPreviewEnabled,
 }: {
   nail: NailDesignV7;
   selectedStepId: string | null;
   onSelectStep(stepId: string): void;
+  onRequestPersonalization(trigger: HTMLButtonElement): void;
   onOpenCustomerPreview(): void;
   customerPreviewEnabled: boolean;
 }) {
@@ -51,16 +53,19 @@ export function EditorStageBarV7({
           const current = stage.active;
           const unavailable = stage.state === 'unavailable';
           const canNavigate = (stage.targetStepId !== null || (stage.id === 'customer' && customerPreviewEnabled)) && !unavailable;
+          const canActivate = canNavigate || (stage.id === 'personalize' && stage.targetStepId === null);
           return (
             <li key={stage.id} className="flex shrink-0 items-center">
               <button
                 type="button"
-                aria-disabled={!canNavigate}
+                data-stage-id={stage.id}
+                aria-disabled={!canActivate}
                 aria-current={current ? 'step' : undefined}
                 aria-label={`${stage.label}：${stage.description}`}
-                title={!canNavigate ? stage.description : `前往${stage.label}`}
-                onClick={() => {
+                title={!canActivate ? stage.description : stage.id === 'personalize' && !stage.targetStepId ? '打开开始设计引导' : `前往${stage.label}`}
+                onClick={(event) => {
                   if (stage.targetStepId) onSelectStep(stage.targetStepId);
+                  else if (stage.id === 'personalize') onRequestPersonalization(event.currentTarget);
                   else if (stage.id === 'customer') onOpenCustomerPreview();
                 }}
                 onKeyDown={moveStageFocus}
@@ -69,7 +74,7 @@ export function EditorStageBarV7({
                   stage.lanes ? 'min-w-[210px]' : 'min-w-[142px]',
                   current
                     ? 'border-primary bg-primary-soft text-primary'
-                    : !canNavigate
+                    : !canActivate
                       ? 'cursor-not-allowed border-gray-100 bg-gray-50 text-gray-400'
                       : 'border-transparent bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50',
                 )}
@@ -92,7 +97,7 @@ export function EditorStageBarV7({
                           data-lane-state={lane.state}
                           data-lane-active={lane.active}
                           className={cx(
-                            'rounded-full px-1.5 py-0.5 text-[8px] font-semibold',
+                            'rounded-full px-1.5 py-0.5 text-[9px] font-semibold sm:text-[10px]',
                             lane.active
                               ? 'bg-primary text-white'
                               : lane.state === 'configured'

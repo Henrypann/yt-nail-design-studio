@@ -34,7 +34,7 @@ function TextSectionV7() {
   const switching = useEditorV7Store((state) => state.switching);
   const createTextElement = useEditorV7Store((state) => state.createTextElement);
   const flatStep = step?.kind === 'flat_design' ? step : null;
-  const canEdit = Boolean(flatStep && !flatStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
 
   const [textDraft, setTextDraft] = useState('');
   const [fontIdDraft, setFontIdDraft] = useState(FLAT_FONT_REGISTRY_V7[0].id);
@@ -164,7 +164,7 @@ function AssetsSectionV7() {
   const addBundledImage = useEditorV7Store((state) => state.addBundledImage);
   const applyPreparedImport = useEditorV7Store((state) => state.applyPreparedImport);
   const flatStep = step?.kind === 'flat_design' ? step : null;
-  const canEdit = Boolean(flatStep && !flatStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
   const importInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);

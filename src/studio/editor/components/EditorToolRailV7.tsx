@@ -16,7 +16,11 @@ import type { KeyboardEvent } from 'react';
 import { cx } from '@/design-system';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import type { FlatVectorToolV7 } from '../v7/flat-vector';
-import { deriveEditorWorkspaceToolsV7, type EditorWorkspaceToolIdV7 } from '../v7/workspace-ia';
+import {
+  deriveEditorWorkspaceToolsV7,
+  type EditorWorkspaceToolAvailabilityV7,
+  type EditorWorkspaceToolIdV7,
+} from '../v7/workspace-ia';
 
 const TOOL_META: Record<EditorWorkspaceToolIdV7, { label: string; icon: typeof MousePointer2; flatTool?: FlatVectorToolV7 }> = {
   select: { label: '选择', icon: MousePointer2, flatTool: 'select' },
@@ -32,7 +36,7 @@ const TOOL_META: Record<EditorWorkspaceToolIdV7, { label: string; icon: typeof M
 
 function toolButtonClass(active: boolean, horizontal: boolean): string {
   return cx(
-    'group relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-35',
+    'group relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 aria-[disabled=true]:cursor-not-allowed aria-[disabled=true]:opacity-45',
     horizontal ? 'shrink-0 px-2' : 'w-12 flex-col gap-0.5 py-1',
     active ? 'border-primary bg-primary text-white shadow-sm' : 'border-transparent bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50',
   );
@@ -41,15 +45,17 @@ function toolButtonClass(active: boolean, horizontal: boolean): string {
 export function EditorToolRailV7({
   orientation = 'vertical',
   resourcesOpen,
-  onOpenResources,
   onToggleResources,
   onOpenPanel,
+  onActivateTool,
+  onBlockedTool,
 }: {
   orientation?: 'vertical' | 'horizontal';
   resourcesOpen: boolean;
-  onOpenResources(): void;
   onToggleResources(): void;
   onOpenPanel(tab: 'layers' | 'inspector'): void;
+  onActivateTool(tool: EditorWorkspaceToolAvailabilityV7, trigger: HTMLButtonElement): void;
+  onBlockedTool(tool: EditorWorkspaceToolAvailabilityV7, trigger: HTMLButtonElement): void;
 }) {
   const nail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
@@ -57,9 +63,6 @@ export function EditorToolRailV7({
   const resourceMode = useEditorV7Store((state) => state.resourceMode);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
-  const selectStep = useEditorV7Store((state) => state.selectStep);
-  const setActiveFlatTool = useEditorV7Store((state) => state.setActiveFlatTool);
-  const setResourceMode = useEditorV7Store((state) => state.setResourceMode);
   const horizontal = orientation === 'horizontal';
   if (!nail) return null;
 
@@ -72,7 +75,8 @@ export function EditorToolRailV7({
     const previousKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
     const nextKey = horizontal ? 'ArrowRight' : 'ArrowDown';
     if (![previousKey, nextKey, 'Home', 'End'].includes(event.key)) return;
-    const buttons = Array.from(event.currentTarget.closest('nav')?.querySelectorAll<HTMLButtonElement>('button:not([disabled])') ?? []);
+    const buttons = Array.from(event.currentTarget.closest('nav')?.querySelectorAll<HTMLButtonElement>('button') ?? [])
+      .filter((button) => button.getClientRects().length > 0);
     const currentIndex = buttons.indexOf(event.currentTarget);
     if (currentIndex < 0 || buttons.length === 0) return;
     event.preventDefault();
@@ -86,26 +90,6 @@ export function EditorToolRailV7({
     buttons[nextIndex].focus();
     buttons[nextIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
-  const activateTool = (id: EditorWorkspaceToolIdV7, targetStepId: string | null) => {
-    if (targetStepId) selectStep(targetStepId);
-    const flatTool = TOOL_META[id].flatTool;
-    if (flatTool) setActiveFlatTool(flatTool);
-    if (id === 'select') {
-      return;
-    } else if (id === 'text') {
-      setResourceMode('text');
-      onOpenResources();
-    } else if (id === 'assets') {
-      setResourceMode('assets');
-      onOpenResources();
-    } else if (id === 'effects' || id === 'decorations') {
-      onOpenPanel('inspector');
-    } else if (id === 'background' || flatTool) {
-      setResourceMode('vector');
-      onOpenResources();
-    }
-  };
-
   return (
     <nav
       aria-label="设计工具"
@@ -118,6 +102,7 @@ export function EditorToolRailV7({
       {availability.map((tool) => {
         const meta = TOOL_META[tool.id];
         const Icon = meta.icon;
+        const reasonId = `v7-tool-reason-${orientation}-${tool.id}`;
         const active = tool.id === 'select'
           ? selectedStep !== null && ['flat_design', 'surface_effect', 'dimensional_decoration'].includes(selectedStep.kind) && activeFlatTool === 'select'
           : tool.id === 'background'
@@ -133,16 +118,24 @@ export function EditorToolRailV7({
           <button
             key={tool.id}
             type="button"
-            disabled={!tool.enabled}
-            aria-label={meta.label}
+            aria-disabled={!tool.enabled}
+            aria-label={tool.enabled ? meta.label : `${meta.label}，${tool.reason ?? '当前不可用'}`}
+            aria-describedby={!tool.enabled ? reasonId : undefined}
             aria-pressed={active}
+            data-tool={tool.id}
+            data-tool-id={tool.id}
+            data-tool-status={tool.status}
             title={tool.enabled ? meta.label : tool.reason}
-            onClick={() => activateTool(tool.id, tool.targetStepId)}
+            onClick={(event) => {
+              if (tool.enabled) onActivateTool(tool, event.currentTarget);
+              else onBlockedTool(tool, event.currentTarget);
+            }}
             onKeyDown={moveToolFocus}
             className={toolButtonClass(active, horizontal)}
           >
             <Icon size={16} />
             {!horizontal && <span className="text-[9px] font-medium">{meta.label}</span>}
+            {!tool.enabled && <span id={reasonId} className="sr-only">{tool.reason ?? '当前工具不可用'}</span>}
           </button>
         );
       })}

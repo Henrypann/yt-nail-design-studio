@@ -326,6 +326,7 @@ function requireBackgroundStep(
     return { found: false, result: reject('not_found', `background step missing for ${finger}`) };
   }
   if (step.locked) return { found: false, result: reject('locked', 'background step is locked') };
+  if (!step.visible) return { found: false, result: reject('not_allowed', 'background step is hidden; restore visibility before editing') };
   return { found: true, step };
 }
 

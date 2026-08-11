@@ -136,7 +136,7 @@ export function BackgroundPanelV7() {
   useEffect(() => setOpacityDraft(canonicalOpacity), [canonicalOpacity, currentFinger]);
   if (!background || !step) return null;
 
-  const canEdit = !readOnly && !switching && !step.locked;
+  const canEdit = step.visible && !readOnly && !switching && !step.locked;
   const report = (result: EditorV7ActionResult) => {
     if (!result.ok && result.reason !== 'not_allowed') toast.error(result.message);
     return result;
@@ -209,7 +209,7 @@ export function BackgroundPanelV7() {
               <span className="absolute inset-1 rounded-md" style={{ backgroundColor: canonicalHex }} />
               <CommitColor key={`${currentFinger}-base`} value={canonicalHex} disabled={!canEdit} label="选择背景颜色" onCommit={applyHex} className="absolute inset-0 cursor-pointer opacity-0" />
             </label>
-            <input value={hexDraft} aria-label="背景十六进制颜色" spellCheck={false}
+            <input value={hexDraft} disabled={!canEdit} aria-label="背景十六进制颜色" spellCheck={false}
               onChange={(event) => setHexDraft(event.target.value)} onBlur={() => applyHex(hexDraft)}
               onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); if (event.key === 'Escape') { setHexDraft(canonicalHex); setHexError(null); event.currentTarget.blur(); } }}
               className={cx('h-11 min-w-0 rounded-lg border bg-white px-3 font-mono text-xs uppercase text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary', hexError ? 'border-error' : 'border-gray-300')} />

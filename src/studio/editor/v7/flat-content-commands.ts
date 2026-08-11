@@ -2,6 +2,7 @@ import type { FingerCode } from '../../../lib/types';
 import type { AssetRefV7, EditorDocV7 } from './model';
 import {
   addEditorV7Element,
+  editorV7StepAuthoringFailure,
   type EditorV7CommandFailure,
   type EditorV7CommandResult,
 } from './commands';
@@ -94,7 +95,8 @@ export function replaceTextFlatElementCommand(
   const step = doc.nails[finger].steps.find((candidate) => candidate.id === stepId);
   if (!step) return reject('not_found', 'step not found');
   if (step.kind !== 'flat_design') return reject('not_allowed', 'text update requires a flat design step');
-  if (step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(step);
+  if (unavailable) return unavailable;
   const element = step.elements.find((candidate) => candidate.id === elementId);
   if (!element) return reject('not_found', 'element not found');
   if (element.kind !== 'text') return reject('not_allowed', 'text update requires a text element');
@@ -122,7 +124,8 @@ export function relinkImageAssetCommand(
   const step = doc.nails[finger].steps.find((candidate) => candidate.id === stepId);
   if (!step) return reject('not_found', 'step not found');
   if (step.kind !== 'flat_design') return reject('not_allowed', 'image relink requires a flat design step');
-  if (step.locked) return reject('locked', 'step is locked');
+  const unavailable = editorV7StepAuthoringFailure(step);
+  if (unavailable) return unavailable;
   const element = step.elements.find((candidate) => candidate.id === elementId);
   if (!element) return reject('not_found', 'element not found');
   if (element.kind !== 'image_2d') return reject('not_allowed', 'relink requires an image_2d element');

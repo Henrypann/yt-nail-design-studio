@@ -195,6 +195,7 @@ export interface EditorWorkspaceToolAvailabilityV7 {
   id: EditorWorkspaceToolIdV7;
   enabled: boolean;
   status: EditorWorkspaceToolStatusV7;
+  requiredStepKind: ProcessStepV7['kind'];
   targetStepId: string | null;
   reason?: string;
 }
@@ -265,6 +266,7 @@ export function deriveEditorWorkspaceToolsV7(
       id,
       enabled: resolved.status === 'ready',
       status: resolved.status,
+      requiredStepKind: step?.kind ?? kind,
       targetStepId: step?.id ?? null,
       ...(reason ? { reason } : {}),
     };

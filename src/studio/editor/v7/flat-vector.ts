@@ -1,5 +1,5 @@
 import type { FingerCode } from '../../../lib/types';
-import type { EditorV7CommandFailure, EditorV7CommandResult } from './commands';
+import { editorV7StepAuthoringFailure, type EditorV7CommandFailure, type EditorV7CommandResult } from './commands';
 import type {
   EditorDocV7,
   FlatDesignElementV7,
@@ -340,7 +340,8 @@ function locateFlatElement(doc: EditorDocV7, finger: FingerCode, stepId: string,
   const step = doc.nails[finger].steps[stepIndex];
   if (!step) return { ok: false, result: reject('not_found', 'step not found') };
   if (step.kind !== 'flat_design') return { ok: false, result: reject('not_allowed', 'element edit requires a flat design step') };
-  if (step.locked) return { ok: false, result: reject('locked', 'step is locked') };
+  const unavailable = editorV7StepAuthoringFailure(step);
+  if (unavailable) return { ok: false, result: unavailable };
   const elementIndex = step.elements.findIndex((element) => element.id === elementId);
   const element = step.elements[elementIndex];
   if (!element) return { ok: false, result: reject('not_found', 'element not found') };

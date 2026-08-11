@@ -90,9 +90,11 @@ const clone = (value) => structuredClone(value);
   assert.equal(personal.targetStepId, null);
   const tools = deriveEditorWorkspaceToolsV7(nail);
   for (const id of ['brush', 'text', 'effects', 'decorations']) {
-    assert.equal(tools.find((tool) => tool.id === id).enabled, false);
-    assert.equal(tools.find((tool) => tool.id === id).status, 'missing_step');
-    assert.ok(tools.find((tool) => tool.id === id).reason);
+    const tool = tools.find((candidate) => candidate.id === id);
+    assert.equal(tool.enabled, false);
+    assert.equal(tool.status, 'missing_step');
+    assert.ok(tool.reason);
+    assert.equal(tool.requiredStepKind, id === 'effects' ? 'surface_effect' : id === 'decorations' ? 'dimensional_decoration' : 'flat_design');
   }
   assert.deepEqual(personal.lanes.map(({ id, state, count }) => ({ id, state, count })), [
     { id: 'flat', state: 'empty', count: 0 },
@@ -116,6 +118,7 @@ const clone = (value) => structuredClone(value);
     assert.equal(tools.find((tool) => tool.id === id).status, 'ready');
   }
   assert.equal(tools.find((tool) => tool.id === 'effects').targetStepId, selectedEffect.id);
+  assert.equal(tools.find((tool) => tool.id === 'effects').requiredStepKind, 'surface_effect');
   assert.equal(tools.find((tool) => tool.id === 'select').targetStepId, selectedEffect.id);
   console.log('[v7-workspace-ia] delivered tools and repeated-kind selection routing: PASS');
 }

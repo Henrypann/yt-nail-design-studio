@@ -30,6 +30,7 @@ import {
   setEditorV7SurfaceEffectMask,
   setEditorV7SurfaceFinish,
   type EditorV7CommandResult,
+  editorV7StepAuthoringFailure,
 } from './v7/commands';
 import {
   applyEditorV7SaveResult,
@@ -93,6 +94,7 @@ import {
   type EditorV7FingerScopeKind,
 } from './v7/ten-finger-operations';
 import { repairEditorWorkspaceSelectionV7 } from './v7/workspace-ia';
+import { addMissingEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalStepKindV7 } from './v7/workspace-step-factory';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -173,6 +175,7 @@ export interface EditorV7State {
   setGlitterParameters(finger: FingerCode, parameters: EditorV7GlitterParametersV7): EditorV7ActionResult;
   applyBackgroundPaletteTheme(finger: FingerCode, theme: EditorV7PaletteThemeV7): EditorV7ActionResult;
   addStep(finger: FingerCode, step: ProcessStepV7, index: number): EditorV7ActionResult;
+  addMissingPersonalStep(finger: FingerCode, kind: EditorWorkspacePersonalStepKindV7): EditorV7ActionResult;
   deleteStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
   duplicateStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
@@ -574,6 +577,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setGlitterParameters: (finger, parameters) => commitFingerCommand(finger, (doc) => setEditorV7GlitterParameters(doc, finger, parameters)),
       applyBackgroundPaletteTheme: (finger, theme) => commitFingerCommand(finger, (doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
       addStep: (finger, step, index) => commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index)),
+      addMissingPersonalStep: (finger, kind) => commitFingerCommand(finger, (doc) => addMissingEditorWorkspacePersonalStepV7(doc, finger, kind, idFactory)),
       deleteStep: (finger, stepId) => {
         const before = get();
         const wasSelected = before.currentFinger === finger && before.selectedStepId === stepId;
@@ -622,7 +626,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (step.kind !== 'flat_design') {
           return { ok: false, reason: 'not_allowed', message: 'prepared import requires a flat design step' };
         }
-        if (step.locked) return { ok: false, reason: 'locked', message: 'step is locked' };
+        const unavailable = editorV7StepAuthoringFailure(step);
+        if (unavailable && !unavailable.ok) return publicResult(unavailable);
         // Repository write happens BEFORE the canonical commit; a failed write
         // must never leave a document change behind.
         const put = await flatAssets.put(prepared.asset, prepared.source);
@@ -638,6 +643,11 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
         if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        const step = state.doc.nails[finger]?.steps.find((candidate) => candidate.id === stepId);
+        if (!step) return { ok: false, reason: 'not_found', message: 'step not found' };
+        if (step.kind !== 'flat_design') return { ok: false, reason: 'not_allowed', message: 'relink requires a flat design step' };
+        const unavailable = editorV7StepAuthoringFailure(step);
+        if (unavailable && !unavailable.ok) return publicResult(unavailable);
         const resolved = await flatAssets.get(asset);
         if (resolved.status === 'missing' || resolved.status === 'corrupt') {
           return { ok: false, reason: 'not_found', message: 'asset source is not available for relink' };
@@ -657,7 +667,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         const step = state.doc.nails[finger]?.steps.find((candidate) => candidate.id === stepId);
         if (!step) return { ok: false, reason: 'not_found', message: 'step not found' };
         if (step.kind !== 'flat_design') return { ok: false, reason: 'not_allowed', message: 'relink requires a flat design step' };
-        if (step.locked) return { ok: false, reason: 'locked', message: 'step is locked' };
+        const unavailable = editorV7StepAuthoringFailure(step);
+        if (unavailable && !unavailable.ok) return publicResult(unavailable);
         const element = step.elements.find((candidate) => candidate.id === elementId);
         if (!element) return { ok: false, reason: 'not_found', message: 'element not found' };
         if (element.kind !== 'image_2d') return { ok: false, reason: 'not_allowed', message: 'relink requires an image_2d element' };

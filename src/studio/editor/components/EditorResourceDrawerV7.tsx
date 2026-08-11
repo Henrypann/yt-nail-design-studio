@@ -16,6 +16,7 @@ export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
   const setBackgroundColor = useEditorV7Store((state) => state.setBackgroundColor);
   const canSetBackgroundColor = selectedStep?.kind === 'background'
     && (selectedStep.background.mode === 'solid' || selectedStep.background.mode === 'translucent')
+    && selectedStep.visible
     && !selectedStep.locked
     && !readOnly
     && !switching;

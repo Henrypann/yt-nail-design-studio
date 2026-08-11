@@ -70,7 +70,7 @@ export function V7DimensionalDecorationCanvas() {
   const decorationStep = step?.kind === 'dimensional_decoration' ? step : null;
   const backgroundStep = nail?.steps[0];
   const silhouette = nail ? resolveBackgroundSilhouetteV7(nail.geometryRef) : null;
-  const canEdit = Boolean(decorationStep && !decorationStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(decorationStep && decorationStep.visible && !decorationStep.skipped && !decorationStep.locked && !readOnly && !switching);
   const decorations = useMemo(() => decorationStep?.decorations.map((item) => item.id === draft?.id ? draft : item) ?? [], [decorationStep?.decorations, draft]);
   const aggregateFidelity = decorations.some((item) => dimensionalDecorationFidelityV7(item) === 'unavailable')
     ? 'unavailable'

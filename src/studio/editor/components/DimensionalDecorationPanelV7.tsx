@@ -49,7 +49,7 @@ export function DimensionalDecorationPanelV7() {
   const replaceDecoration = useEditorV7Store((state) => state.replaceDimensionalDecoration);
   if (step?.kind !== 'dimensional_decoration') return null;
   const selected = step.decorations.find((item) => item.id === selectedElementId) ?? null;
-  const canMutateStep = !readOnly && !switching && !step.locked;
+  const canMutateStep = step.visible && !step.skipped && !readOnly && !switching && !step.locked;
   const canEditSelected = Boolean(canMutateStep && selected && !selected.locked);
   const report = (result: EditorV7ActionResult) => { if (!result.ok) toast.error(result.message); return result; };
   const addPreset = (archetype: DimensionalDecorationArchetypeV7) => {

@@ -67,7 +67,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
   const lastOpacityCommit = useRef<number | null>(null);
   const lastFrenchWidthCommit = useRef<number | null>(null);
   const lastFrenchCurvatureCommit = useRef<number | null>(null);
-  const canEdit = Boolean(flatStep && !readOnly && !switching && !flatStep.locked);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && !flatStep.locked);
 
   useEffect(() => {
     const next = selectedElement ? Math.round(selectedElement.opacity * 100) : 100;

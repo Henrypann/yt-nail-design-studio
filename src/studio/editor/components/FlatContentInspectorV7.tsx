@@ -168,7 +168,7 @@ export function FlatContentInspectorV7() {
   if (step?.kind !== 'flat_design') return null;
   const element = step.elements.find((candidate) => candidate.id === selectedElementId);
   if (!element || (element.kind !== 'text' && element.kind !== 'image_2d')) return null;
-  const canEdit = !readOnly && !switching && !step.locked && !element.locked;
+  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked && !element.locked;
   return <div className="mt-3 rounded-xl border border-primary/15 bg-white p-3">{element.kind === 'text'
     ? <TextInspector element={element} canEdit={canEdit} stepId={step.id} finger={finger} />
     : <ImageInspector element={element} canEdit={canEdit} stepId={step.id} finger={finger} />}</div>;

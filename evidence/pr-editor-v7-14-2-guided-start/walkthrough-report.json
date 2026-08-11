@@ -1,0 +1,332 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "expectedLayout": "mobile"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0
+    },
+    "afterCreate": {
+      "revision": 2,
+      "history": 1,
+      "middleKinds": [
+        "flat_design"
+      ],
+      "selectedStepId": "step.0f51848d-1735-426e-a00c-91d1c0820a49",
+      "createdStepId": "step.0f51848d-1735-426e-a00c-91d1c0820a49",
+      "focusedInToolPanel": true,
+      "finishLast": true
+    },
+    "flagged": {
+      "revision": 5,
+      "history": 4
+    },
+    "final": {
+      "layout": "mobile",
+      "bodyClientWidth": 390,
+      "bodyScrollWidth": 390,
+      "minToolButtonHeight": 44,
+      "activeTool": "brush"
+    },
+    "blankLayout": {
+      "optionsOverflow": true,
+      "canvasVisiblePixels": 344.5
+    },
+    "compactResourceFocus": {
+      "initial": true,
+      "afterReverseTab": true,
+      "afterForwardTab": true,
+      "restoredToReadyTool": true
+    },
+    "guideTargets": [
+      {
+        "label": "暂不添加，先预览封层",
+        "width": 168,
+        "height": 44
+      },
+      {
+        "label": "平面设计画笔、文字、贴纸、形状与 2D 导入",
+        "width": 220,
+        "height": 108
+      },
+      {
+        "label": "表面效果局部猫眼、闪粉、镜面与晕染",
+        "width": 220,
+        "height": 108
+      },
+      {
+        "label": "立体装饰浮雕、液滴、堆胶、雕花与饰品",
+        "width": 220,
+        "height": 108
+      }
+    ],
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900,
+      "expectedLayout": "tablet"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0
+    },
+    "afterCreate": {
+      "revision": 2,
+      "history": 1,
+      "middleKinds": [
+        "flat_design"
+      ],
+      "selectedStepId": "step.60a7b137-cc94-4d47-a3ed-4c911615de14",
+      "createdStepId": "step.60a7b137-cc94-4d47-a3ed-4c911615de14",
+      "focusedInToolPanel": true,
+      "finishLast": true
+    },
+    "flagged": {
+      "revision": 5,
+      "history": 4
+    },
+    "final": {
+      "layout": "tablet",
+      "bodyClientWidth": 768,
+      "bodyScrollWidth": 768,
+      "minToolButtonHeight": 44,
+      "activeTool": "brush"
+    },
+    "blankLayout": {
+      "optionsOverflow": false,
+      "canvasVisiblePixels": 300
+    },
+    "compactResourceFocus": {
+      "initial": true,
+      "afterReverseTab": true,
+      "afterForwardTab": true,
+      "restoredToReadyTool": true
+    },
+    "guideTargets": [
+      {
+        "label": "暂不添加，先预览封层",
+        "width": 168,
+        "height": 44
+      },
+      {
+        "label": "平面设计画笔、文字、贴纸、形状与 2D 导入",
+        "width": 228.65625,
+        "height": 108
+      },
+      {
+        "label": "表面效果局部猫眼、闪粉、镜面与晕染",
+        "width": 228.671875,
+        "height": 108
+      },
+      {
+        "label": "立体装饰浮雕、液滴、堆胶、雕花与饰品",
+        "width": 228.671875,
+        "height": 108
+      }
+    ],
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900,
+      "expectedLayout": "compact"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0
+    },
+    "afterCreate": {
+      "revision": 2,
+      "history": 1,
+      "middleKinds": [
+        "flat_design"
+      ],
+      "selectedStepId": "step.63ede672-f8b9-469c-bc74-8687bd9d1bdd",
+      "createdStepId": "step.63ede672-f8b9-469c-bc74-8687bd9d1bdd",
+      "focusedInToolPanel": true,
+      "finishLast": true
+    },
+    "flagged": {
+      "revision": 5,
+      "history": 4
+    },
+    "final": {
+      "layout": "compact",
+      "bodyClientWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "minToolButtonHeight": 44,
+      "activeTool": "brush"
+    },
+    "blankLayout": {
+      "optionsOverflow": false,
+      "canvasVisiblePixels": 300
+    },
+    "compactResourceFocus": {
+      "initial": true,
+      "afterReverseTab": true,
+      "afterForwardTab": true,
+      "restoredToReadyTool": true
+    },
+    "guideTargets": [
+      {
+        "label": "暂不添加，先预览封层",
+        "width": 168,
+        "height": 44
+      },
+      {
+        "label": "平面设计画笔、文字、贴纸、形状与 2D 导入",
+        "width": 292.65625,
+        "height": 108
+      },
+      {
+        "label": "表面效果局部猫眼、闪粉、镜面与晕染",
+        "width": 292.671875,
+        "height": 108
+      },
+      {
+        "label": "立体装饰浮雕、液滴、堆胶、雕花与饰品",
+        "width": 292.65625,
+        "height": 108
+      }
+    ],
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900,
+      "expectedLayout": "wide"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0
+    },
+    "afterCreate": {
+      "revision": 2,
+      "history": 1,
+      "middleKinds": [
+        "flat_design"
+      ],
+      "selectedStepId": "step.bae8da34-70f0-4920-90f0-1c62c86481c3",
+      "createdStepId": "step.bae8da34-70f0-4920-90f0-1c62c86481c3",
+      "focusedInToolPanel": true,
+      "finishLast": true
+    },
+    "flagged": {
+      "revision": 5,
+      "history": 4
+    },
+    "final": {
+      "layout": "wide",
+      "bodyClientWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "minToolButtonHeight": 44,
+      "activeTool": "brush"
+    },
+    "blankLayout": {
+      "optionsOverflow": false,
+      "canvasVisiblePixels": 300
+    },
+    "compactResourceFocus": null,
+    "guideTargets": [
+      {
+        "label": "暂不添加，先预览封层",
+        "width": 168,
+        "height": 44
+      },
+      {
+        "label": "平面设计画笔、文字、贴纸、形状与 2D 导入",
+        "width": 264.65625,
+        "height": 108
+      },
+      {
+        "label": "表面效果局部猫眼、闪粉、镜面与晕染",
+        "width": 264.671875,
+        "height": 108
+      },
+      {
+        "label": "立体装饰浮雕、液滴、堆胶、雕花与饰品",
+        "width": 264.65625,
+        "height": 108
+      }
+    ],
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900,
+      "expectedLayout": "wide"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0
+    },
+    "afterCreate": {
+      "revision": 2,
+      "history": 1,
+      "middleKinds": [
+        "flat_design"
+      ],
+      "selectedStepId": "step.0410aa15-64f7-42bb-8e37-81a6d157df21",
+      "createdStepId": "step.0410aa15-64f7-42bb-8e37-81a6d157df21",
+      "focusedInToolPanel": true,
+      "finishLast": true
+    },
+    "flagged": {
+      "revision": 5,
+      "history": 4
+    },
+    "final": {
+      "layout": "wide",
+      "bodyClientWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "minToolButtonHeight": 44,
+      "activeTool": "brush"
+    },
+    "blankLayout": {
+      "optionsOverflow": false,
+      "canvasVisiblePixels": 300
+    },
+    "compactResourceFocus": null,
+    "guideTargets": [
+      {
+        "label": "暂不添加，先预览封层",
+        "width": 168,
+        "height": 44
+      },
+      {
+        "label": "平面设计画笔、文字、贴纸、形状与 2D 导入",
+        "width": 318,
+        "height": 108
+      },
+      {
+        "label": "表面效果局部猫眼、闪粉、镜面与晕染",
+        "width": 318,
+        "height": 108
+      },
+      {
+        "label": "立体装饰浮雕、液滴、堆胶、雕花与饰品",
+        "width": 318,
+        "height": 108
+      }
+    ],
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

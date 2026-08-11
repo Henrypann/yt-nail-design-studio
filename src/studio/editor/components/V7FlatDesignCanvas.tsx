@@ -113,7 +113,7 @@ export function V7FlatDesignCanvas() {
   const backgroundStep = nail?.steps[0];
   const background = backgroundStep?.kind === 'background' ? backgroundStep : null;
   const selectedElement = flatStep?.elements.find((element) => element.id === selectedElementId) ?? null;
-  const canEdit = Boolean(flatStep && !flatStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
   const silhouette = nail ? resolveBackgroundSilhouetteV7(nail.geometryRef) : null;
   const backgroundPreview = background ? resolveBackgroundPreviewModelV7(background.background, background.visible) : null;
   const clipId = `${rawId}-geometry`;

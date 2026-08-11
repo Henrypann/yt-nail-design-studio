@@ -19,8 +19,7 @@ import {
 } from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import type { ProcessStepV7 } from '../v7/model';
-import { PROCESS_STEP_TYPE_IDS_V7, getProcessStepTypeDefinitionV7 } from '../v7/registry';
-import { generateEditorV7Id } from '../v7/id';
+import { getProcessStepTypeDefinitionV7 } from '../v7/registry';
 import { getProcessStepWorkspacePolicyV7 } from '../v7/workspace';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { V7StepToolGate } from './V7StepToolGate';
@@ -28,11 +27,11 @@ import { BackgroundPanelV7 } from './BackgroundPanelV7';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 import { FlatContentInspectorV7 } from './FlatContentInspectorV7';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
-import { createDefaultSurfaceEffectPayloadV7, createSurfaceEffectMaskV7 } from '../v7/surface-effect';
 import { SurfaceEffectPanelV7 } from './SurfaceEffectPanelV7';
 import { DimensionalDecorationPanelV7 } from './DimensionalDecorationPanelV7';
 import { DIMENSIONAL_DECORATION_LABELS_V7, dimensionalDecorationArchetypeV7 } from '../v7/dimensional-decoration';
 import { FinishCompositePanelV7 } from './FinishCompositePanelV7';
+import { createEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -84,54 +83,9 @@ function ProcessTreeV7() {
     });
   };
 
-  const addFlatStep = () => {
-    const step: ProcessStepV7 = {
-      id: generateEditorV7Id('step'),
-      typeId: PROCESS_STEP_TYPE_IDS_V7.flat_design,
-      kind: 'flat_design',
-      name: '平面设计',
-      visible: true,
-      locked: false,
-      skipped: false,
-      materialRefs: [],
-      elements: [],
-    };
-    const result = addStep(currentFinger, step, nail.steps.length - 1);
-    if (result.ok) selectStep(step.id);
-  };
-
-  const addSurfaceEffectStep = () => {
-    const stepId = generateEditorV7Id('step');
-    const step: ProcessStepV7 = {
-      id: stepId,
-      typeId: PROCESS_STEP_TYPE_IDS_V7.surface_effect,
-      kind: 'surface_effect',
-      name: '局部表面效果',
-      visible: true,
-      locked: false,
-      skipped: false,
-      materialRefs: [],
-      effect: createDefaultSurfaceEffectPayloadV7('cat_eye', `${stepId}-cat-eye`),
-      mask: createSurfaceEffectMaskV7('center'),
-    };
-    const result = addStep(currentFinger, step, nail.steps.length - 1);
-    if (result.ok) selectStep(step.id);
-  };
-
-  const addDimensionalStep = () => {
-    const step: ProcessStepV7 = {
-      id: generateEditorV7Id('step'),
-      typeId: PROCESS_STEP_TYPE_IDS_V7.dimensional_decoration,
-      kind: 'dimensional_decoration',
-      name: '立体装饰',
-      visible: true,
-      locked: false,
-      skipped: false,
-      materialRefs: [],
-      decorations: [],
-    };
-    const result = addStep(currentFinger, step, nail.steps.length - 1);
-    if (result.ok) selectStep(step.id);
+  const addPersonalStep = (kind: EditorWorkspacePersonalStepKindV7) => {
+    const step = createEditorWorkspacePersonalStepV7(kind);
+    addStep(currentFinger, step, nail.steps.length - 1);
   };
 
   return (
@@ -141,7 +95,7 @@ function ProcessTreeV7() {
           <div className="flex items-center gap-2"><Layers3 size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">层级与步骤</h2></div>
           <p className="mt-0.5 text-[10px] text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
         </div>
-        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addFlatStep} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addSurfaceEffectStep} title="在最终封层前添加局部表面效果"><Sparkles size={13} /> 效果</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addDimensionalStep} title="在最终封层前添加立体装饰"><Gem size={13} /> 立体</Button></div>
+        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('flat_design')} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('surface_effect')} title="在最终封层前添加局部表面效果"><Sparkles size={13} /> 效果</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('dimensional_decoration')} title="在最终封层前添加立体装饰"><Gem size={13} /> 立体</Button></div>
       </div>
 
       <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
