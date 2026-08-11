@@ -9,6 +9,8 @@ export {
   readDesignReleaseByVersionIdV1,
   releaseSavedEditorDocV7,
 } from './design-release';
+export { consumeVersionedStudioImportV2, materializeVersionedRemixV2 } from './versioned-import';
+export type { LookCustomizeEventV1, VersionedImportDependenciesV2, VersionedImportModeV2, VersionedImportResultV2 } from './versioned-import';
 export type {
   DesignReleaseDependenciesV1,
   DesignReleaseErrorCodeV1,
