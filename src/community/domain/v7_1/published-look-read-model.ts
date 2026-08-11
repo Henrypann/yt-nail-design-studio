@@ -30,7 +30,7 @@ import type {
   PublisherType,
   VerificationLevel,
 } from '../types';
-import type { EditorDocV7RefV1, PreviewFidelityV1 } from './design-content-model';
+import type { EditorDocV7RefV1, PreviewFidelityV1, PublishedLookV1 } from './design-content-model';
 import type { VisibilityV1 } from './model';
 
 export type PublishedLookReadModelKind = 'CANONICAL' | 'LEGACY_PARTIAL';
@@ -146,6 +146,8 @@ export interface CanonicalPublishedLookReadModelV1 extends PublishedLookReadMode
   creatorProfileId: string;
   visibility: VisibilityV1;
   publicationGateVerified: true;
+  /** Exact canonical authority used by versioned Studio intents. */
+  sourceLook: PublishedLookV1;
 }
 
 /**

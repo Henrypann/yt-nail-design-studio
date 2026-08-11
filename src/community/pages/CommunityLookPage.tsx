@@ -25,6 +25,7 @@ import {
 import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
+import { createVersionedUseIntentForLookV1 } from '@/integration/community-studio/versioned-use-runtime';
 
 function EvidenceRow({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'missing' }) {
   return (
@@ -102,6 +103,7 @@ export default function CommunityLookPage() {
   const style = taxonomy?.mainStyles.find((s) => s.id === look.mainStyleId);
   const tryable = canTryInStudio(content);
   const legacy = look.readModelKind === 'LEGACY_PARTIAL';
+  const canonical = look.readModelKind === 'CANONICAL';
   const evidence = look.evidence;
 
   const publishIntent = () => {
@@ -133,6 +135,16 @@ export default function CommunityLookPage() {
       return;
     }
     publishIntent();
+  };
+
+  const onVersionedUseClick = () => {
+    if (!canonical) return;
+    const result = createVersionedUseIntentForLookV1(look.sourceLook);
+    if (!result.ok) {
+      toast.error('该版本暂不可用于 Studio，请刷新或返回 Explore 重试。');
+      return;
+    }
+    navigate(result.href);
   };
 
   return (
@@ -208,9 +220,17 @@ export default function CommunityLookPage() {
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {tryable ? (
+            {canonical ? (
+              <Button
+                onClick={onVersionedUseClick}
+                data-testid="community-use-versioned"
+                className="min-h-11 bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600"
+              >
+                使用此版本在 Studio 中定制
+              </Button>
+            ) : tryable ? (
               <Button onClick={onTryClick} data-testid="community-try-in-studio">
-                在 Studio 中试用
+                在 Studio 中试用（Legacy 近似）
               </Button>
             ) : look.applicationLevel === 'INSPIRATION_ONLY' ? (
               <p className="text-xs text-gray-500" data-testid="community-inspiration-only">

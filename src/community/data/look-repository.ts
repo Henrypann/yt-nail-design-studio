@@ -12,6 +12,7 @@
 import type { CommunityContentIndexV1 } from '../domain/types';
 import { buildLookReadModels } from '../domain/v7_1/published-look-adapter';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
+import { CANONICAL_USE_DEMO_READ_MODEL_V1 } from '@/integration/community-studio/canonical-use-demo';
 
 const runtimeMode = import.meta.env.MODE;
 
@@ -19,7 +20,10 @@ export async function loadLookReadModels(): Promise<PublishedLookReadModelV1[]> 
   const res = await fetch('/community/content-index.json');
   if (!res.ok) throw new Error('look index load failed');
   const index = (await res.json()) as CommunityContentIndexV1;
-  return buildLookReadModels(index.contents, runtimeMode);
+  const legacy = buildLookReadModels(index.contents, runtimeMode);
+  return runtimeMode === 'development' || runtimeMode === 'integration'
+    ? [CANONICAL_USE_DEMO_READ_MODEL_V1, ...legacy]
+    : legacy;
 }
 
 export async function getLookReadModelById(

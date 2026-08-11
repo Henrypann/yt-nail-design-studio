@@ -15,8 +15,9 @@ import {
 } from '../src/studio/editor/v7/workspace.ts';
 
 assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: '1' }), true);
-assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: 'true' }), false);
-assert.equal(isEditorV7InternalEnabled({}), false);
+assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: 'true' }), true);
+assert.equal(isEditorV7InternalEnabled({}), true);
+assert.equal(isEditorV7InternalEnabled({ VITE_EDITOR_V7: '0' }), false);
 assert.equal(resolveEditorWriterRoute({ present: true, schemaVersion: 7 }, true), 'v7-edit');
 assert.equal(resolveEditorWriterRoute({ present: true, schemaVersion: 7 }, false), 'v7-readonly');
 assert.equal(resolveEditorWriterRoute({ present: true, schemaVersion: 6 }, true), 'v6');
