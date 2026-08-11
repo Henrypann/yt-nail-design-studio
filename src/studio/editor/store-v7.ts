@@ -8,7 +8,10 @@ import type {
   FlatDesignElementV7,
   GradientStopV7,
   ProcessStepV7,
+  RegionMaskV7,
   RgbaColorV7,
+  SurfaceEffectPayloadV7,
+  SurfaceFinishTypeV7,
   Transform2DV7,
 } from './v7/model';
 import type { EditorDocV7MigrationDiagnostic, EditorDocV7MigrationResolvers } from './v7/migrate';
@@ -21,7 +24,11 @@ import {
   removeEditorV7Element,
   setEditorV7ElementFlag,
   setEditorV7ElementTransform,
+  replaceEditorV7DimensionalDecoration,
   setEditorV7StepFlag,
+  setEditorV7SurfaceEffect,
+  setEditorV7SurfaceEffectMask,
+  setEditorV7SurfaceFinish,
   type EditorV7CommandResult,
 } from './v7/commands';
 import {
@@ -117,6 +124,7 @@ export interface EditorV7State {
   selectedFingers: FingerCode[];
   selectedStepId: string | null;
   selectedElementId: string | null;
+  previewFinishType: SurfaceFinishTypeV7 | null;
   activeFlatTool: FlatVectorToolV7;
   resourceMode: EditorResourceModeV7;
   activeFlatColor: RgbaColorV7;
@@ -146,6 +154,7 @@ export interface EditorV7State {
   detachFingerScope(): EditorV7ActionResult;
   selectStep(stepId: string | null): void;
   selectElement(elementId: string | null): void;
+  setPreviewFinishType(finishType: SurfaceFinishTypeV7 | null): void;
   setActiveFlatTool(tool: FlatVectorToolV7): void;
   setResourceMode(mode: EditorResourceModeV7): void;
   setActiveFlatColor(color: RgbaColorV7): void;
@@ -167,11 +176,15 @@ export interface EditorV7State {
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
   duplicateStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   setStepFlag(finger: FingerCode, stepId: string, flag: 'visible' | 'locked' | 'skipped', value: boolean): EditorV7ActionResult;
+  setSurfaceEffect(finger: FingerCode, stepId: string, effect: SurfaceEffectPayloadV7): EditorV7ActionResult;
+  setSurfaceEffectMask(finger: FingerCode, stepId: string, mask: RegionMaskV7): EditorV7ActionResult;
+  setSurfaceFinish(finger: FingerCode, stepId: string, finishType: SurfaceFinishTypeV7): EditorV7ActionResult;
   addElement(finger: FingerCode, stepId: string, element: FlatDesignElementV7 | DimensionalDecorationV7): EditorV7ActionResult;
   removeElement(finger: FingerCode, stepId: string, elementId: string): EditorV7ActionResult;
   setElementFlag(finger: FingerCode, stepId: string, elementId: string, flag: 'visible' | 'locked', value: boolean): EditorV7ActionResult;
   setElementTransform(finger: FingerCode, stepId: string, elementId: string, transform: Transform2DV7): EditorV7ActionResult;
   replaceFlatElement(finger: FingerCode, stepId: string, elementId: string, replacement: FlatDesignElementV7): EditorV7ActionResult;
+  replaceDimensionalDecoration(finger: FingerCode, stepId: string, elementId: string, replacement: DimensionalDecorationV7): EditorV7ActionResult;
   setFlatElementOpacity(finger: FingerCode, stepId: string, elementId: string, opacity: number): EditorV7ActionResult;
   createTextElement(finger: FingerCode, stepId: string, input: Omit<TextFlatElementInputV7, 'id'>): EditorV7ActionResult;
   replaceTextElement(finger: FingerCode, stepId: string, elementId: string, input: TextFlatElementInputV7): EditorV7ActionResult;
@@ -285,6 +298,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectedFingers: [] as FingerCode[],
       selectedStepId: null,
       selectedElementId: null,
+      previewFinishType: null,
       activeFlatTool: 'select' as FlatVectorToolV7,
       resourceMode: 'vector' as EditorResourceModeV7,
       activeFlatColor: { colorSpace: 'srgb' as const, r: 173, g: 34, b: 79, a: 1 },
@@ -338,6 +352,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           selectedFingers: [],
           selectedStepId: firstStep,
           selectedElementId: null,
+          previewFinishType: null,
           history: [],
           future: [],
           saveState: 'saved',
@@ -372,6 +387,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           saveError: null,
           revisionState: createEditorV7RevisionState(doc.revision),
           generation: state.generation + 1,
+          previewFinishType: null,
         });
         return result.status === 'migrated_with_warnings' ? 'ok_with_warnings' : 'ok';
       },
@@ -511,6 +527,10 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       detachFingerScope: () => commitCommand((doc) => detachEditorV7NailScope(doc, currentScope())),
       selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select' }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
+      setPreviewFinishType: (finishType) => {
+        if (get().switching) return;
+        if (finishType === null || finishType === 'gloss' || finishType === 'matte' || finishType === 'frosted') set({ previewFinishType: finishType });
+      },
       setActiveFlatTool: (tool) => set({ activeFlatTool: tool }),
       setResourceMode: (mode) => {
         if (mode === 'vector' || mode === 'text' || mode === 'assets') set({ resourceMode: mode });
@@ -544,6 +564,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       moveStep: (finger, stepId, targetIndex) => commitFingerCommand(finger, (doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
       duplicateStep: (finger, stepId) => commitFingerCommand(finger, (doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
       setStepFlag: (finger, stepId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
+      setSurfaceEffect: (finger, stepId, effect) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffect(doc, finger, stepId, effect)),
+      setSurfaceEffectMask: (finger, stepId, mask) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffectMask(doc, finger, stepId, mask)),
+      setSurfaceFinish: (finger, stepId, finishType) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceFinish(doc, finger, stepId, finishType)),
       addElement: (finger, stepId, element) => commitFingerCommand(finger, (doc) => addEditorV7Element(doc, finger, stepId, element)),
       removeElement: (finger, stepId, elementId) => {
         const wasSelected = get().selectedElementId === elementId;
@@ -554,6 +577,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setElementFlag: (finger, stepId, elementId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
       setElementTransform: (finger, stepId, elementId, transform) => commitFingerCommand(finger, (doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
       replaceFlatElement: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
+      replaceDimensionalDecoration: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7DimensionalDecoration(doc, finger, stepId, elementId, replacement)),
       setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitFingerCommand(finger, (doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
       createTextElement: (finger, stepId, input) => commitFingerCommand(finger, (doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
       replaceTextElement: (finger, stepId, elementId, input) => commitFingerCommand(finger, (doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),

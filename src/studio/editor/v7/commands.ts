@@ -4,11 +4,15 @@ import type {
   EditorDocV7,
   FlatDesignElementV7,
   ProcessStepV7,
+  RegionMaskV7,
+  SurfaceEffectPayloadV7,
+  SurfaceFinishTypeV7,
   Transform2DV7,
 } from './model';
 import { getProcessStepTypeDefinitionV7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import type { EditorV7IdFactory } from './id';
+import { createSurfaceFinishDefinitionV7, isSurfaceFinishTypeV7 } from './finish';
 
 export type EditorV7CommandFailure =
   | 'missing_document'
@@ -177,6 +181,60 @@ export function setEditorV7StepFlag(
   return validate(next);
 }
 
+export function setEditorV7SurfaceEffect(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  effect: SurfaceEffectPayloadV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect payload requires a surface effect step');
+  target.effect = structuredClone(effect);
+  return validate(next);
+}
+
+export function setEditorV7SurfaceEffectMask(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  mask: RegionMaskV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_effect') return reject('not_allowed', 'surface effect mask requires a surface effect step');
+  target.mask = structuredClone(mask);
+  return validate(next);
+}
+
+export function setEditorV7SurfaceFinish(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  finishType: SurfaceFinishTypeV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'surface_finish') return reject('not_allowed', 'finish payload requires the unique surface finish step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  if (!isSurfaceFinishTypeV7(finishType)) return reject('invalid_value', 'finish type is invalid');
+  const definition = createSurfaceFinishDefinitionV7(finishType);
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'surface_finish') return reject('not_allowed', 'finish payload requires the unique surface finish step');
+  target.finish = definition.finish;
+  target.materialRefs = [definition.materialRef];
+  return validate(next);
+}
+
 export function addEditorV7Element(
   doc: EditorDocV7,
   finger: FingerCode,
@@ -257,5 +315,27 @@ export function setEditorV7ElementTransform(
   const nextLocated = findElement(next.nails[finger].steps[found.index], elementId);
   if (!nextLocated) return reject('not_found', 'element not found');
   nextLocated.items[nextLocated.index].transform = structuredClone(transform);
+  return validate(next);
+}
+
+export function replaceEditorV7DimensionalDecoration(
+  doc: EditorDocV7,
+  finger: FingerCode,
+  stepId: string,
+  elementId: string,
+  replacement: DimensionalDecorationV7,
+): EditorV7CommandResult {
+  const found = findStep(doc, finger, stepId);
+  if (!found.step) return reject('not_found', 'step not found');
+  if (found.step.kind !== 'dimensional_decoration') return reject('not_allowed', 'replacement requires a dimensional decoration step');
+  if (found.step.locked) return reject('locked', 'step is locked');
+  const index = found.step.decorations.findIndex((item) => item.id === elementId);
+  if (index < 0) return reject('not_found', 'decoration not found');
+  if (found.step.decorations[index].locked) return reject('locked', 'decoration is locked');
+  if (replacement.id !== elementId) return reject('invalid_value', 'replacement must preserve the decoration ID');
+  const next = structuredClone(doc);
+  const target = next.nails[finger].steps[found.index];
+  if (target.kind !== 'dimensional_decoration') return reject('not_allowed', 'replacement requires a dimensional decoration step');
+  target.decorations[index] = structuredClone(replacement);
   return validate(next);
 }

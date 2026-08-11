@@ -7,9 +7,11 @@ import {
   Copy,
   Eye,
   EyeOff,
+  Gem,
   Layers3,
   Lock,
   Plus,
+  Sparkles,
   SkipForward,
   SlidersHorizontal,
   Trash2,
@@ -26,6 +28,11 @@ import { BackgroundPanelV7 } from './BackgroundPanelV7';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 import { FlatContentInspectorV7 } from './FlatContentInspectorV7';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
+import { createDefaultSurfaceEffectPayloadV7, createSurfaceEffectMaskV7 } from '../v7/surface-effect';
+import { SurfaceEffectPanelV7 } from './SurfaceEffectPanelV7';
+import { DimensionalDecorationPanelV7 } from './DimensionalDecorationPanelV7';
+import { DIMENSIONAL_DECORATION_LABELS_V7, dimensionalDecorationArchetypeV7 } from '../v7/dimensional-decoration';
+import { FinishCompositePanelV7 } from './FinishCompositePanelV7';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -93,6 +100,40 @@ function ProcessTreeV7() {
     if (result.ok) selectStep(step.id);
   };
 
+  const addSurfaceEffectStep = () => {
+    const stepId = generateEditorV7Id('step');
+    const step: ProcessStepV7 = {
+      id: stepId,
+      typeId: PROCESS_STEP_TYPE_IDS_V7.surface_effect,
+      kind: 'surface_effect',
+      name: '局部表面效果',
+      visible: true,
+      locked: false,
+      skipped: false,
+      materialRefs: [],
+      effect: createDefaultSurfaceEffectPayloadV7('cat_eye', `${stepId}-cat-eye`),
+      mask: createSurfaceEffectMaskV7('center'),
+    };
+    const result = addStep(currentFinger, step, nail.steps.length - 1);
+    if (result.ok) selectStep(step.id);
+  };
+
+  const addDimensionalStep = () => {
+    const step: ProcessStepV7 = {
+      id: generateEditorV7Id('step'),
+      typeId: PROCESS_STEP_TYPE_IDS_V7.dimensional_decoration,
+      kind: 'dimensional_decoration',
+      name: '立体装饰',
+      visible: true,
+      locked: false,
+      skipped: false,
+      materialRefs: [],
+      decorations: [],
+    };
+    const result = addStep(currentFinger, step, nail.steps.length - 1);
+    if (result.ok) selectStep(step.id);
+  };
+
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label={`${currentFinger} 制作步骤`} data-testid="v7-layer-panel">
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-3">
@@ -100,7 +141,7 @@ function ProcessTreeV7() {
           <div className="flex items-center gap-2"><Layers3 size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">层级与步骤</h2></div>
           <p className="mt-0.5 text-[10px] text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
         </div>
-        <Button size="sm" variant="secondary" disabled={readOnly || switching} onClick={addFlatStep} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面步骤</Button>
+        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addFlatStep} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addSurfaceEffectStep} title="在最终封层前添加局部表面效果"><Sparkles size={13} /> 效果</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={addDimensionalStep} title="在最终封层前添加立体装饰"><Gem size={13} /> 立体</Button></div>
       </div>
 
       <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
@@ -141,6 +182,13 @@ function ProcessTreeV7() {
                     {step.elements.map((element, elementIndex) => <button key={element.id} type="button" aria-current={selectedElementId === element.id ? 'true' : undefined} onClick={() => { selectElement(element.id); setActiveFlatTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{elementIndex + 1}</span><span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>{element.locked && <Lock size={10} className="text-gray-400" />}</button>)}
                   </div>
                 </div>}
+                {selected && step.kind === 'dimensional_decoration' && <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50/45 p-2" aria-label="立体装饰树">
+                  <p className="mb-1.5 text-[10px] font-semibold text-amber-700">装饰 · {step.decorations.length}</p>
+                  <div className="max-h-40 space-y-1 overflow-y-auto" aria-label="立体装饰列表">
+                    {step.decorations.length === 0 && <p className="rounded-lg border border-dashed border-amber-200 px-2 py-3 text-center text-[10px] text-gray-400">从属性面板添加浮雕、液滴或饰品。</p>}
+                    {step.decorations.map((decoration, decorationIndex) => <button key={decoration.id} type="button" aria-current={selectedElementId === decoration.id ? 'true' : undefined} onClick={() => selectElement(decoration.id)} className={cx('flex min-h-11 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === decoration.id ? 'bg-amber-100 font-semibold text-amber-900' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{decorationIndex + 1}</span><span className="min-w-0 flex-1 truncate">{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(decoration)]}</span>{decoration.locked && <Lock size={10} className="text-gray-400" />}</button>)}
+                  </div>
+                </div>}
               </div>}
             </li>
           );
@@ -167,6 +215,12 @@ function InspectorV7() {
           ? <BackgroundPanelV7 />
           : selectedStep.kind === 'flat_design'
             ? <><FlatVectorPanelV7 variant="inspector" /><FlatContentInspectorV7 /></>
+            : selectedStep.kind === 'surface_effect'
+              ? <SurfaceEffectPanelV7 />
+            : selectedStep.kind === 'dimensional_decoration'
+              ? <DimensionalDecorationPanelV7 />
+            : selectedStep.kind === 'surface_finish'
+              ? <FinishCompositePanelV7 />
             : definition
               ? <V7StepToolGate tools={definition.allowedTools} />
               : <p className="text-xs text-gray-500">当前步骤没有可用属性。</p>}

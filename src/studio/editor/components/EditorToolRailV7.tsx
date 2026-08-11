@@ -90,6 +90,8 @@ export function EditorToolRailV7({
     } else if (id === 'assets') {
       setResourceMode('assets');
       onOpenResources();
+    } else if (id === 'effects' || id === 'decorations') {
+      onOpenPanel('inspector');
     } else if (id === 'background' || flatTool) {
       setResourceMode('vector');
       onOpenResources();

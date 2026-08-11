@@ -1,0 +1,255 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844
+    },
+    "metrics": {
+      "layout": "mobile",
+      "bodyClientWidth": 390,
+      "bodyScrollWidth": 390,
+      "canvasWidth": 340,
+      "fidelity": "unavailable",
+      "effectType": "glitter",
+      "finishCount": 1,
+      "finishLast": true
+    },
+    "compactInteractionMetrics": {
+      "initialFocusInside": true,
+      "trappedFocusInside": true,
+      "buttonTargets": [
+        {
+          "label": "层级",
+          "height": 44
+        },
+        {
+          "label": "属性",
+          "height": 44
+        },
+        {
+          "label": "关闭工作区面板",
+          "height": 44
+        },
+        {
+          "label": "局部猫眼",
+          "height": 44
+        },
+        {
+          "label": "局部闪粉",
+          "height": 44
+        },
+        {
+          "label": "局部镜面",
+          "height": 44
+        },
+        {
+          "label": "局部晕染",
+          "height": 44
+        },
+        {
+          "label": "全甲",
+          "height": 44
+        },
+        {
+          "label": "甲尖",
+          "height": 44
+        },
+        {
+          "label": "中央",
+          "height": 44
+        },
+        {
+          "label": "斜切",
+          "height": 44
+        }
+      ],
+      "minButtonHeight": 44,
+      "focusRestored": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "tablet",
+      "bodyClientWidth": 768,
+      "bodyScrollWidth": 768,
+      "canvasWidth": 694,
+      "fidelity": "unavailable",
+      "effectType": "glitter",
+      "finishCount": 1,
+      "finishLast": true
+    },
+    "compactInteractionMetrics": {
+      "initialFocusInside": true,
+      "trappedFocusInside": true,
+      "buttonTargets": [
+        {
+          "label": "层级",
+          "height": 44
+        },
+        {
+          "label": "属性",
+          "height": 44
+        },
+        {
+          "label": "关闭工作区面板",
+          "height": 44
+        },
+        {
+          "label": "局部猫眼",
+          "height": 44
+        },
+        {
+          "label": "局部闪粉",
+          "height": 44
+        },
+        {
+          "label": "局部镜面",
+          "height": 44
+        },
+        {
+          "label": "局部晕染",
+          "height": 44
+        },
+        {
+          "label": "全甲",
+          "height": 44
+        },
+        {
+          "label": "甲尖",
+          "height": 44
+        },
+        {
+          "label": "中央",
+          "height": 44
+        },
+        {
+          "label": "斜切",
+          "height": 44
+        }
+      ],
+      "minButtonHeight": 44,
+      "focusRestored": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "compact",
+      "bodyClientWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "canvasWidth": 886,
+      "fidelity": "unavailable",
+      "effectType": "glitter",
+      "finishCount": 1,
+      "finishLast": true
+    },
+    "compactInteractionMetrics": {
+      "initialFocusInside": true,
+      "trappedFocusInside": true,
+      "buttonTargets": [
+        {
+          "label": "层级",
+          "height": 44
+        },
+        {
+          "label": "属性",
+          "height": 44
+        },
+        {
+          "label": "关闭工作区面板",
+          "height": 44
+        },
+        {
+          "label": "局部猫眼",
+          "height": 44
+        },
+        {
+          "label": "局部闪粉",
+          "height": 44
+        },
+        {
+          "label": "局部镜面",
+          "height": 44
+        },
+        {
+          "label": "局部晕染",
+          "height": 44
+        },
+        {
+          "label": "全甲",
+          "height": 44
+        },
+        {
+          "label": "甲尖",
+          "height": 44
+        },
+        {
+          "label": "中央",
+          "height": 44
+        },
+        {
+          "label": "斜切",
+          "height": 44
+        }
+      ],
+      "minButtonHeight": 44,
+      "focusRestored": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "wide",
+      "bodyClientWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "canvasWidth": 802,
+      "fidelity": "unavailable",
+      "effectType": "glitter",
+      "finishCount": 1,
+      "finishLast": true
+    },
+    "compactInteractionMetrics": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900
+    },
+    "metrics": {
+      "layout": "wide",
+      "bodyClientWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "canvasWidth": 962,
+      "fidelity": "unavailable",
+      "effectType": "glitter",
+      "finishCount": 1,
+      "finishLast": true
+    },
+    "compactInteractionMetrics": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

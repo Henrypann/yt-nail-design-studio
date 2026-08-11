@@ -6,6 +6,7 @@ import { getOfficialTemplatePatternAssetV7 } from './official-template-assets';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import { materializeMercuryDewV7 } from './mercury-dew';
+import { createSurfaceFinishDefinitionV7 } from './finish';
 
 export const PRODUCT_GEOMETRY_REVISION_V7 = 'shape-params-v3';
 
@@ -84,6 +85,7 @@ function createSteps(
       elements: [templateElement],
     });
   }
+  const finishDefinition = createSurfaceFinishDefinitionV7(finish);
   steps.push({
     id: `step.${token}.${finger}.finish`,
     typeId: PROCESS_STEP_TYPE_IDS_V7.surface_finish,
@@ -92,11 +94,8 @@ function createSteps(
     visible: true,
     locked: false,
     skipped: false,
-    materialRefs: [{ materialId: `material.finish.${finish}`, revision: '1' }],
-    finish: {
-      type: finish,
-      materialPresetRef: { id: `preset.finish.${finish}`, revision: '1' },
-    },
+    materialRefs: [finishDefinition.materialRef],
+    finish: finishDefinition.finish,
   });
   return steps;
 }
