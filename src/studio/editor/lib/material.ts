@@ -144,6 +144,7 @@ export interface DecorationDef {
 }
 
 interface ShapeParamsFile {
+  version?: number;
   shapes: Record<string, { name: string; name_en?: string }>;
   lengths?: Record<string, { name?: string; lengthMm?: number }>;
 }
@@ -153,6 +154,7 @@ export interface EditorShapeCapability {
   label_en: string;
   tier: 1 | 2;
   order: number;
+  geometry_id?: NailShape | null;
   capabilities: {
     geometry: 'placeholder' | 'generated' | 'in_review' | 'signed_off';
     editor: 'disabled' | 'experimental' | 'enabled';
@@ -160,6 +162,7 @@ export interface EditorShapeCapability {
 }
 
 interface ShapeCapabilitiesFile {
+  version?: number;
   shapes: EditorShapeCapability[];
 }
 
@@ -220,6 +223,20 @@ export const LOOK_PRESETS: readonly TaxonomyLookPreset[] = taxonomy?.look_preset
 export const COLOR_PRESETS: readonly TaxonomyColorPreset[] = taxonomy?.color_presets ?? [];
 export const SURFACE_PRESETS: readonly TaxonomySurfacePreset[] = taxonomy?.surface_presets ?? [];
 
+/** Geometry registry metadata. Shape parameters remain the sole geometry source. */
+export const SHAPE_PARAMS_VERSION = Number.isInteger(shapeParams?.version)
+  ? shapeParams!.version as number
+  : 0;
+export const SHAPE_CAPABILITIES_VERSION = Number.isInteger(shapeCapabilities?.version)
+  ? shapeCapabilities!.version as number
+  : 0;
+export const EDITOR_SHAPE_CAPABILITIES: readonly EditorShapeCapability[] =
+  shapeCapabilities?.shapes ?? [];
+
+export function editorShapeCapability(shape: NailShape): EditorShapeCapability | null {
+  return EDITOR_SHAPE_CAPABILITIES.find((entry) => entry.id === shape) ?? null;
+}
+
 export function shapeName(shape: NailShape, locale: Locale = 'en'): string {
   const fallback = shapeParams?.shapes?.[shape];
   return taxonomyLabel('shape', shape, locale, { zh: fallback?.name, en: fallback?.name_en });
@@ -230,7 +247,7 @@ export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
 }
 
 export const TIER_ONE_EDITOR_SHAPES: readonly EditorShapeCapability[] = (
-  shapeCapabilities?.shapes ?? []
+  EDITOR_SHAPE_CAPABILITIES
 )
   .filter((shape) => shape.tier === 1)
   .sort((a, b) => {

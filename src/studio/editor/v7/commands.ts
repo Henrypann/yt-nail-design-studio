@@ -20,6 +20,7 @@ export type EditorV7CommandFailure =
   | 'not_found'
   | 'locked'
   | 'not_allowed'
+  | 'geometry_unavailable'
   | 'invalid_position'
   | 'invalid_value'
   | 'duplicate_id'

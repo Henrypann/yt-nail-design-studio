@@ -11,6 +11,7 @@ import type {
   SurfaceFinishTypeV7,
 } from './model';
 import { flatContentAssetStatusV7 } from './flat-content-assets';
+import { combineGeometryPreviewFidelityV7, resolveEditorGeometryV7 } from './geometry-registry';
 
 export interface CustomerPreviewScenarioV7 {
   backgroundColors: Partial<Record<FingerCode, RgbaColorV7>>;
@@ -87,8 +88,15 @@ export function deriveCustomerNailPreviewV7(
     .filter((step) => step.kind === 'dimensional_decoration')
     .flatMap((step) => step.kind === 'dimensional_decoration' ? step.decorations.filter((decoration) => decoration.visible) : []);
   const backgroundPreview = resolveBackgroundPreviewModelV7(background.background, background.visible);
+  const geometry = resolveEditorGeometryV7(nail.geometryRef, nail.finger);
   const warnings: string[] = [];
-  let fidelity: PreviewFidelityV7 = backgroundOverride ? 'exact' : backgroundPreview.fidelity;
+  let fidelity: PreviewFidelityV7 = combineGeometryPreviewFidelityV7(
+    geometry.fidelity,
+    backgroundOverride ? 'exact' : backgroundPreview.fidelity,
+  );
+
+  if (geometry.fidelity === 'approximate') warnings.push('甲型使用尚未签收的生成轮廓，整体预览降级为近似');
+  if (geometry.fidelity === 'unavailable') warnings.push('甲型轮廓不可用，整体预览使用通用边界且不可视为设计定稿');
 
   // Finish is represented as a deterministic 2D viewing aid until V7-14 final 3D.
   fidelity = maxFidelity(fidelity, 'approximate');

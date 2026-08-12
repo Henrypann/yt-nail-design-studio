@@ -21,7 +21,7 @@ import { Button, cx } from '@/design-system';
 import type { ProcessStepV7 } from '../v7/model';
 import { getProcessStepTypeDefinitionV7 } from '../v7/registry';
 import { getProcessStepWorkspacePolicyV7 } from '../v7/workspace';
-import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { V7StepToolGate } from './V7StepToolGate';
 import { BackgroundPanelV7 } from './BackgroundPanelV7';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
@@ -63,6 +63,7 @@ function ProcessTreeV7() {
   const selectedElementId = useEditorV7Store((state) => state.selectedElementId);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const selectStep = useEditorV7Store((state) => state.selectStep);
   const selectElement = useEditorV7Store((state) => state.selectElement);
   const setActiveFlatTool = useEditorV7Store((state) => state.setActiveFlatTool);
@@ -95,8 +96,10 @@ function ProcessTreeV7() {
           <div className="flex items-center gap-2"><Layers3 size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">层级与步骤</h2></div>
           <p className="mt-0.5 text-[10px] text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
         </div>
-        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('flat_design')} title="在最终封层前添加平面设计步骤"><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('surface_effect')} title="在最终封层前添加局部表面效果"><Sparkles size={13} /> 效果</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching} onClick={() => addPersonalStep('dimensional_decoration')} title="在最终封层前添加立体装饰"><Gem size={13} /> 立体</Button></div>
+        <div className="flex flex-wrap justify-end gap-1"><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching || !geometryExact} onClick={() => addPersonalStep('flat_design')} title={geometryExact ? '在最终封层前添加平面设计步骤' : '需要先绑定已签收 2D 甲型轮廓'}><Plus size={13} /> 平面</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching || !geometryExact} onClick={() => addPersonalStep('surface_effect')} title={geometryExact ? '在最终封层前添加局部表面效果' : '需要先绑定已签收 2D 甲型轮廓'}><Sparkles size={13} /> 效果</Button><Button size="sm" variant="secondary" className="min-h-11" disabled={readOnly || switching || !geometryExact} onClick={() => addPersonalStep('dimensional_decoration')} title={geometryExact ? '在最终封层前添加立体装饰' : '需要先绑定已签收 2D 甲型轮廓'}><Gem size={13} /> 立体</Button></div>
       </div>
+
+      {!geometryExact && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900" role="status">当前指位只有近似或不可用轮廓；可查看、整理和删除现有内容，但新增或复制空间步骤需先绑定已签收 2D 甲型轮廓。</p>}
 
       <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" aria-label="Canonical process steps">
         {nail.steps.map((step, index) => {
@@ -125,7 +128,7 @@ function ProcessTreeV7() {
                   <button type="button" className={iconButtonClass(step.skipped)} disabled={!canMutate || !policy.canSkip} onClick={() => setStepFlag(currentFinger, step.id, 'skipped', !step.skipped)} aria-label={`${step.skipped ? '取消跳过' : '跳过'} ${step.name}`} title={policy.canSkip ? '切换跳过状态' : '此步骤不可跳过'}><SkipForward size={14} /></button>
                   <button type="button" className={iconButtonClass()} disabled={!canMutate || !policy.canMoveUp} onClick={() => moveStep(currentFinger, step.id, index - 1)} aria-label={`上移 ${step.name}`} title="上移一步"><ChevronsUp size={14} /></button>
                   <button type="button" className={iconButtonClass()} disabled={!canMutate || !policy.canMoveDown} onClick={() => moveStep(currentFinger, step.id, index + 1)} aria-label={`下移 ${step.name}`} title="下移一步"><ChevronsDown size={14} /></button>
-                  <button type="button" className={iconButtonClass()} disabled={!canMutate || !policy.canDuplicate} onClick={() => duplicateStep(currentFinger, step.id)} aria-label={`复制 ${step.name}`} title={policy.canDuplicate ? '复制步骤' : '此步骤不可复制'}><Copy size={14} /></button>
+                  <button type="button" className={iconButtonClass()} disabled={!canMutate || !policy.canDuplicate || !geometryExact} onClick={() => duplicateStep(currentFinger, step.id)} aria-label={`复制 ${step.name}`} title={!geometryExact ? '需要先绑定已签收 2D 甲型轮廓' : policy.canDuplicate ? '复制步骤' : '此步骤不可复制'}><Copy size={14} /></button>
                   <button type="button" className={cx(iconButtonClass(), 'hover:border-error/30 hover:text-error')} disabled={!canMutate || !policy.canDelete} onClick={() => deleteStep(currentFinger, step.id)} aria-label={`删除 ${step.name}`} title={policy.canDelete ? '删除步骤' : '此步骤不可删除'}><Trash2 size={14} /></button>
                 </div>
 
@@ -155,6 +158,7 @@ function ProcessTreeV7() {
 function InspectorV7() {
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   if (!selectedStep) return null;
   const definition = getProcessStepTypeDefinitionV7(selectedStep.typeId);
 
@@ -164,6 +168,7 @@ function InspectorV7() {
         <div className="flex items-center gap-2"><SlidersHorizontal size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">属性</h2></div>
         <p className="mt-0.5 truncate text-[10px] text-gray-500">{selectedStep.name} · {STEP_LABEL[selectedStep.kind]}</p>
       </div>
+      {!geometryExact && selectedStep.kind !== 'background' && selectedStep.kind !== 'surface_finish' && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900" role="status" data-testid="v7-inspector-geometry-gate">当前甲型不能安全进行空间编辑。图案、局部效果和立体装饰属性已停用；背景和封层仍可调整。</p>}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
         {selectedStep.kind === 'background'
           ? <BackgroundPanelV7 />

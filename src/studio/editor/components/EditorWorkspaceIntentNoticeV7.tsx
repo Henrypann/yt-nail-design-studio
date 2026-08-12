@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Eye, EyeOff, Layers3, Lock, X } from 'lucide-react';
+import { Eye, EyeOff, Layers3, Lock, ScanLine, X } from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import type { EditorWorkspaceToolAvailabilityV7 } from '../v7/workspace-ia';
 import { EDITOR_WORKSPACE_PERSONAL_STEP_META_V7 } from '../v7/workspace-step-factory';
@@ -11,6 +11,7 @@ const STATUS_LABEL = {
   locked: '步骤已锁定',
   skipped: '步骤已跳过',
   hidden: '步骤已隐藏',
+  geometry_unavailable: '甲型轮廓不可用于空间编辑',
   ready: '可以使用',
 } as const;
 
@@ -21,6 +22,7 @@ const STATUS_ICON = {
   locked: Lock,
   skipped: EyeOff,
   hidden: EyeOff,
+  geometry_unavailable: ScanLine,
   ready: Eye,
 } as const;
 

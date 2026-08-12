@@ -236,12 +236,33 @@ export type {
 } from './v7/schema';
 export { isEditorDocV7, parseEditorDocV7, validateEditorDocV7 } from './v7/schema';
 export { migrateEditorDocV7 } from './v7/migrate';
+export { EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS } from './v7/migration-resolvers';
 export {
   PRODUCT_GEOMETRY_REVISION_V7,
   createBlankEditorDocV7,
-  createProductGeometryRefV7,
   wizardDesignToEditorDocV7,
 } from './v7/create';
+export {
+  GENERIC_NAIL_SILHOUETTE_V7,
+  PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7,
+  PRODUCT_GEOMETRY_LENGTHS_V7,
+  combineGeometryPreviewFidelityV7,
+  isExactEditorGeometryV7,
+  listEditorGeometryRegistryV7,
+  resolveEditorGeometryV7,
+  resolveSignedProductGeometryRefV7,
+} from './v7/geometry-registry';
+export type {
+  GeometryEvidenceV7,
+  GeometryResolutionV7,
+  GeometryUnavailableReasonV7,
+} from './v7/geometry-registry';
+export { materializeIndependentEditorDocV7 } from './v7/materialize';
+export type {
+  IndependentEditorDocMaterializationResultV7,
+  IndependentEditorDocMaterializationV7,
+  IndependentEditorDocMaterializerDependenciesV7,
+} from './v7/materialize';
 export type {
   BlankEditorDocV7Input,
   EditorDocV7CreationFailure,

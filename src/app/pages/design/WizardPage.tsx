@@ -440,6 +440,13 @@ export default function WizardPage() {
       try {
         const result = await consumeVersionedUseIntentV2(current.intentId, choice);
         if (!result.ok) {
+          if (result.reason === 'geometry_unavailable') {
+            toast.warning('该 Look 的十指甲型轮廓尚未全部签收，暂不能创建可空间编辑的 V7 副本。已返回 Community，当前设计未改变。');
+            setVersionedIntent(null);
+            stripVersionedIntentParam();
+            navigate(current.returnTo, { replace: true });
+            return;
+          }
           toast[result.retryable ? 'error' : 'warning'](
             result.retryable
               ? 'Studio 暂时无法创建定制副本，版本化意图已保留，可重试或取消。'

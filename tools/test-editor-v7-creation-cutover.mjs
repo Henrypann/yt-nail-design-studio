@@ -72,7 +72,7 @@ assert.equal(blank.doc.schemaVersion, 7);
 assert.equal(Object.keys(blank.doc.nails).length, 10);
 for (const finger of FINGER_CODES) {
   assert.equal(blank.doc.nails[finger].geometryRef.assetId, `geometry.oval.long.${finger}`);
-  assert.equal(resolveBackgroundSilhouetteV7(blank.doc.nails[finger].geometryRef).source, 'product');
+  assert.equal(resolveBackgroundSilhouetteV7(blank.doc.nails[finger].geometryRef, finger).source, 'product');
 }
 
 // Representable Wizard content becomes V7 without losing template or per-finger color.
@@ -84,7 +84,7 @@ assert.equal(wizard.doc.nails.R2.steps[0].background.color.r, 17);
 const allIds = [];
 for (const finger of FINGER_CODES) {
   const nail = wizard.doc.nails[finger];
-  assert.equal(resolveBackgroundSilhouetteV7(nail.geometryRef).source, 'product');
+  assert.equal(resolveBackgroundSilhouetteV7(nail.geometryRef, finger).source, 'product');
   const flat = nail.steps.find((step) => step.kind === 'flat_design');
   assert.ok(flat);
   assert.equal(flat.elements.length, 1);

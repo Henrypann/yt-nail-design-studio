@@ -26,7 +26,7 @@ export function V7BackgroundCanvas() {
 
   const background = backgroundStep.background;
   const preview = resolveBackgroundPreviewModelV7(background, backgroundStep.visible);
-  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef);
+  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const clipId = `v7-background-clip-${currentFinger}`;
   const gridId = `v7-alpha-grid-${currentFinger}`;
   const gradientId = `v7-background-gradient-${currentFinger}`;

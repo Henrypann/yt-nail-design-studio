@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { ImagePlus, Type } from 'lucide-react';
 import type { FingerCode } from '@/lib/types';
-import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { parseHexColorV7 } from '../v7/background';
 import {
   FLAT_FONT_REGISTRY_V7,
@@ -165,10 +165,11 @@ export function FlatContentInspectorV7() {
   const finger = useEditorV7Store((state) => state.currentFinger);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   if (step?.kind !== 'flat_design') return null;
   const element = step.elements.find((candidate) => candidate.id === selectedElementId);
   if (!element || (element.kind !== 'text' && element.kind !== 'image_2d')) return null;
-  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked && !element.locked;
+  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked && !element.locked && geometryExact;
   return <div className="mt-3 rounded-xl border border-primary/15 bg-white p-3">{element.kind === 'text'
     ? <TextInspector element={element} canEdit={canEdit} stepId={step.id} finger={finger} />
     : <ImageInspector element={element} canEdit={canEdit} stepId={step.id} finger={finger} />}</div>;

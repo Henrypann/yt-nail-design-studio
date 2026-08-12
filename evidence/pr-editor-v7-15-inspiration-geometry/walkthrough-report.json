@@ -1,0 +1,185 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "layout": "mobile"
+    },
+    "setup": {
+      "finger": "R4",
+      "flatId": "step.c84bfaf6-15c4-4cf9-bee5-eb5e2b86841f"
+    },
+    "metrics": {
+      "layout": "mobile",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "minButtonHeight": 44,
+      "undersizedButtons": []
+    },
+    "exact": "已签收 2D 轮廓",
+    "generated": "生成轮廓（近似）",
+    "unavailable": "通用回退（未注册引用）",
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900,
+      "layout": "tablet"
+    },
+    "setup": {
+      "finger": "R4",
+      "flatId": "step.95be48a6-132d-4060-b8bf-7e5432c4426d"
+    },
+    "metrics": {
+      "layout": "tablet",
+      "clientWidth": 768,
+      "scrollWidth": 768,
+      "minButtonHeight": 44,
+      "undersizedButtons": []
+    },
+    "exact": "已签收 2D 轮廓",
+    "generated": "生成轮廓（近似）",
+    "unavailable": "通用回退（未注册引用）",
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900,
+      "layout": "compact"
+    },
+    "setup": {
+      "finger": "R4",
+      "flatId": "step.e700aa7b-63c0-4f06-a86f-3f79fc69096b"
+    },
+    "metrics": {
+      "layout": "compact",
+      "clientWidth": 1024,
+      "scrollWidth": 1024,
+      "minButtonHeight": 32,
+      "undersizedButtons": [
+        {
+          "label": "列表设计列表",
+          "height": 32
+        },
+        {
+          "label": "撤销",
+          "height": 32
+        },
+        {
+          "label": "重做",
+          "height": 32
+        },
+        {
+          "label": "保存",
+          "height": 32
+        },
+        {
+          "label": "打开顾客只读预览",
+          "height": 32
+        }
+      ]
+    },
+    "exact": "已签收 2D 轮廓",
+    "generated": "生成轮廓（近似）",
+    "unavailable": "通用回退（未注册引用）",
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900,
+      "layout": "wide"
+    },
+    "setup": {
+      "finger": "R4",
+      "flatId": "step.e8ea9d69-8689-437f-ad59-c4393ef834ad"
+    },
+    "metrics": {
+      "layout": "wide",
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "minButtonHeight": 32,
+      "undersizedButtons": [
+        {
+          "label": "列表设计列表",
+          "height": 32
+        },
+        {
+          "label": "撤销",
+          "height": 32
+        },
+        {
+          "label": "重做",
+          "height": 32
+        },
+        {
+          "label": "保存",
+          "height": 32
+        },
+        {
+          "label": "打开顾客只读预览",
+          "height": 32
+        }
+      ]
+    },
+    "exact": "已签收 2D 轮廓",
+    "generated": "生成轮廓（近似）",
+    "unavailable": "通用回退（未注册引用）",
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900,
+      "layout": "wide"
+    },
+    "setup": {
+      "finger": "R4",
+      "flatId": "step.39a10838-c63e-4c60-832a-42871580a70d"
+    },
+    "metrics": {
+      "layout": "wide",
+      "clientWidth": 1440,
+      "scrollWidth": 1440,
+      "minButtonHeight": 32,
+      "undersizedButtons": [
+        {
+          "label": "列表设计列表",
+          "height": 32
+        },
+        {
+          "label": "撤销",
+          "height": 32
+        },
+        {
+          "label": "重做",
+          "height": 32
+        },
+        {
+          "label": "保存",
+          "height": 32
+        },
+        {
+          "label": "打开顾客只读预览",
+          "height": 32
+        }
+      ]
+    },
+    "exact": "已签收 2D 轮廓",
+    "generated": "生成轮廓（近似）",
+    "unavailable": "通用回退（未注册引用）",
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

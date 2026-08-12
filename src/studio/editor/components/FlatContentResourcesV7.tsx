@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { ImagePlus, Type } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
-import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import {
   FLAT_BUNDLED_ASSET_REGISTRY_V7,
   FLAT_FONT_REGISTRY_V7,
@@ -32,9 +32,10 @@ function TextSectionV7() {
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const createTextElement = useEditorV7Store((state) => state.createTextElement);
   const flatStep = step?.kind === 'flat_design' ? step : null;
-  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching && geometryExact);
 
   const [textDraft, setTextDraft] = useState('');
   const [fontIdDraft, setFontIdDraft] = useState(FLAT_FONT_REGISTRY_V7[0].id);
@@ -161,10 +162,11 @@ function AssetsSectionV7() {
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const addBundledImage = useEditorV7Store((state) => state.addBundledImage);
   const applyPreparedImport = useEditorV7Store((state) => state.applyPreparedImport);
   const flatStep = step?.kind === 'flat_design' ? step : null;
-  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching && geometryExact);
   const importInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);

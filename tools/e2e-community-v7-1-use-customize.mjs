@@ -5,7 +5,8 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 
 const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:5214';
-const output = path.resolve('evidence/pr-comm-v7-1-04-use-customize/screenshots');
+const evidenceRoot = path.resolve(process.env.COMMUNITY_V7_E2E_OUTPUT ?? 'evidence/pr-comm-v7-1-04-use-customize');
+const output = path.join(evidenceRoot, 'screenshots');
 await fs.mkdir(output, { recursive: true });
 
 const viewports = [
@@ -115,7 +116,7 @@ for (const viewport of viewports) {
 }
 
 await fs.writeFile(
-  path.resolve('evidence/pr-comm-v7-1-04-use-customize/walkthrough-report.json'),
+  path.join(evidenceRoot, 'walkthrough-report.json'),
   `${JSON.stringify({ baseURL, report, current: 'PASS', cancel: 'PASS' }, null, 2)}\n`,
 );
 await browser.close();

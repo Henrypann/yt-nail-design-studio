@@ -113,8 +113,8 @@ export function V7FlatDesignCanvas() {
   const backgroundStep = nail?.steps[0];
   const background = backgroundStep?.kind === 'background' ? backgroundStep : null;
   const selectedElement = flatStep?.elements.find((element) => element.id === selectedElementId) ?? null;
-  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching);
-  const silhouette = nail ? resolveBackgroundSilhouetteV7(nail.geometryRef) : null;
+  const silhouette = nail ? resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger) : null;
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !flatStep.locked && !readOnly && !switching && silhouette?.fidelity === 'exact');
   const backgroundPreview = background ? resolveBackgroundPreviewModelV7(background.background, background.visible) : null;
   const clipId = `${rawId}-geometry`;
   const stepMaskId = `${rawId}-step-mask`;
@@ -286,7 +286,7 @@ export function V7FlatDesignCanvas() {
           所有 pointer 坐标先转换为 u/v 0–1 再写入 EditorDoc；SVG 仅是派生视图。
         </div>
         <dl className="grid grid-cols-2 gap-2 text-[10px]">
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">Geometry clip</dt><dd className="mt-1 font-semibold text-gray-800">{silhouette.source === 'product' ? '产品轮廓' : '通用回退轮廓'}</dd></div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">Geometry clip</dt><dd className="mt-1 font-semibold text-gray-800">{silhouette.source === 'product' ? '已签收 2D 轮廓' : silhouette.source === 'generated' ? '生成轮廓（近似）' : '通用回退轮廓'}</dd></div>
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">遮罩策略</dt><dd className="mt-1 font-semibold text-gray-800">非破坏 · 顺序生效</dd></div>
         </dl>
         <p className="rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2 text-[10px] leading-4 text-gray-500">

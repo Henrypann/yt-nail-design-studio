@@ -11,7 +11,7 @@ import {
   dimensionalDecorationFidelityV7,
   type DimensionalDecorationArchetypeV7,
 } from '../v7/dimensional-decoration';
-import { selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
 
 const ARCHETYPES: DimensionalDecorationArchetypeV7[] = ['relief', 'droplet', 'gel_stack', 'carving', 'accessory'];
 
@@ -43,13 +43,14 @@ export function DimensionalDecorationPanelV7() {
   const selectedElementId = useEditorV7Store((state) => state.selectedElementId);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const addElement = useEditorV7Store((state) => state.addElement);
   const removeElement = useEditorV7Store((state) => state.removeElement);
   const setElementFlag = useEditorV7Store((state) => state.setElementFlag);
   const replaceDecoration = useEditorV7Store((state) => state.replaceDimensionalDecoration);
   if (step?.kind !== 'dimensional_decoration') return null;
   const selected = step.decorations.find((item) => item.id === selectedElementId) ?? null;
-  const canMutateStep = step.visible && !step.skipped && !readOnly && !switching && !step.locked;
+  const canMutateStep = step.visible && !step.skipped && !readOnly && !switching && !step.locked && geometryExact;
   const canEditSelected = Boolean(canMutateStep && selected && !selected.locked);
   const report = (result: EditorV7ActionResult) => { if (!result.ok) toast.error(result.message); return result; };
   const addPreset = (archetype: DimensionalDecorationArchetypeV7) => {

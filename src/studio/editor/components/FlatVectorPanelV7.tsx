@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
 import { PALETTE } from '../lib/material';
-import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { generateEditorV7Id } from '../v7/id';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
 import {
@@ -50,6 +50,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
   const widthMm = useEditorV7Store((state) => state.activeFlatWidthMm);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const setActiveTool = useEditorV7Store((state) => state.setActiveFlatTool);
   const setColor = useEditorV7Store((state) => state.setActiveFlatColor);
   const setWidthMm = useEditorV7Store((state) => state.setActiveFlatWidthMm);
@@ -67,7 +68,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
   const lastOpacityCommit = useRef<number | null>(null);
   const lastFrenchWidthCommit = useRef<number | null>(null);
   const lastFrenchCurvatureCommit = useRef<number | null>(null);
-  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && !flatStep.locked);
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && !flatStep.locked && geometryExact);
 
   useEffect(() => {
     const next = selectedElement ? Math.round(selectedElement.opacity * 100) : 100;

@@ -148,7 +148,7 @@ const fullMiddleSteps = (finger) => [
 export function createMinimalEditorDocV7Fixture() {
   const nails = Object.fromEntries(FINGERS.map((finger, index) => [finger, {
     finger,
-    geometryRef: { assetId: `geometry.almond.medium.${finger}`, revision: 'shape-params-v3' },
+    geometryRef: { assetId: `geometry.almond.medium.${finger}`, revision: 'geometry-v1-p3-c1-adde3f42d79d7b561eb32759ba75a1171bdc0c263d1909b787ea86b0831897ba' },
     steps: [backgroundFor(finger, index, true), finishFor(finger, index)],
   }]));
   return structuredClone({
@@ -173,7 +173,7 @@ export function createFullEditorDocV7Fixture() {
   };
   const nails = Object.fromEntries(FINGERS.map((finger, index) => [finger, {
     finger,
-    geometryRef: { assetId: `geometry.almond.medium.${finger}`, revision: 'shape-params-v3' },
+    geometryRef: { assetId: `geometry.almond.medium.${finger}`, revision: 'geometry-v1-p3-c1-adde3f42d79d7b561eb32759ba75a1171bdc0c263d1909b787ea86b0831897ba' },
     steps: [backgroundFor(finger, index), ...(index === 0 ? fullMiddleSteps(finger) : []), finishFor(finger, index)],
     compositionProvenance: { compositionId: compositionMeta.compositionId, revision: compositionMeta.revision, syncState: index === 9 ? 'detached' : 'linked' },
   }]));

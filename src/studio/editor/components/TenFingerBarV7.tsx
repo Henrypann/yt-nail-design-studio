@@ -7,6 +7,7 @@ import {
   resolveEditorV7FingerScope,
   type EditorV7FingerScopeKind,
 } from '../v7/ten-finger-operations';
+import { isExactEditorGeometryV7 } from '../v7/geometry-registry';
 
 const SCOPE_LABEL: Record<EditorV7FingerScopeKind, string> = {
   current: '当前指',
@@ -99,7 +100,11 @@ export function TenFingerBarV7() {
   }, [currentFinger, fingerScope, selectedFingers]);
   const writeTargets = scopeTargets.filter((finger) => finger !== currentFinger);
   const disabled = readOnly || switching;
-  const canMaterialize = !disabled && writeTargets.length > 0;
+  const spatialScope = [...new Set([currentFinger, ...writeTargets])];
+  const unavailableGeometry = spatialScope.filter((finger) => (
+    !doc || !isExactEditorGeometryV7(doc.nails[finger].geometryRef, finger)
+  ));
+  const canMaterialize = !disabled && writeTargets.length > 0 && unavailableGeometry.length === 0;
   const syncCohort = new Set([currentFinger, ...scopeTargets]);
   const linkedOutsideScope = FINGER_CODES.filter((finger) => (
     doc?.nails[finger].compositionProvenance?.syncState === 'linked' && !syncCohort.has(finger)
@@ -168,7 +173,7 @@ export function TenFingerBarV7() {
 
   const actionControls = (
     <div className="flex flex-wrap items-center gap-1.5" data-testid="v7-cross-finger-actions">
-      <Button className="min-h-11" size="sm" variant="secondary" disabled={!canMaterialize} onClick={(event) => openConfirmation('copy', event)}>
+      <Button className="min-h-11" size="sm" variant="secondary" disabled={!canMaterialize} title={unavailableGeometry.length ? `以下指位缺少已签收 2D 甲型轮廓：${unavailableGeometry.join('、')}` : undefined} onClick={(event) => openConfirmation('copy', event)}>
         <Copy size={14} />复制一次
       </Button>
       <Button
@@ -178,6 +183,8 @@ export function TenFingerBarV7() {
         disabled={!canSync}
         title={fingerScope === 'mirror'
           ? '镜像只支持一次性复制，不建立持续同步关系'
+          : unavailableGeometry.length > 0
+            ? `以下指位缺少已签收 2D 甲型轮廓：${unavailableGeometry.join('、')}`
           : linkedOutsideScope.length > 0
             ? `范围外仍有同步成员：${linkedOutsideScope.join('、')}；请先解除或选择全部十指`
             : undefined}
@@ -195,6 +202,7 @@ export function TenFingerBarV7() {
 
   return (
     <footer className="relative border-t border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="十指编辑与跨指操作" data-testid="v7-ten-finger-bar">
+      {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">跨指复制与同步已停用：{unavailableGeometry.join('、')} 缺少已签收 2D 甲型轮廓。解除同步仍可使用。</p>}
       <div className="flex min-w-0 flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
         <div className="min-w-0 overflow-x-auto" aria-label="选择手指">
           <div className="flex min-w-max items-center gap-1">

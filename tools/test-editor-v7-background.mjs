@@ -13,6 +13,7 @@ import {
 } from '../src/studio/editor/v7/background.ts';
 import { createEditorDocV7Repository } from '../src/studio/editor/v7/repository.ts';
 import { createEditorV7Store } from '../src/studio/editor/store-v7.ts';
+import { PRODUCT_GEOMETRY_REVISION_V7 } from '../src/studio/editor/v7/geometry-registry.ts';
 
 const clone = (value) => structuredClone(value);
 const rgba = (r, g, b, a = 1) => ({ colorSpace: 'srgb', r, g, b, a });
@@ -68,11 +69,13 @@ function createRuntime(doc) {
 
 // Product geometry is used only for a recognized asset reference; fixture refs fall back without mutation.
 {
-  const productRef = { assetId: 'geometry.almond.medium.L1', revision: 'registry-1' };
+  const productRef = { assetId: 'geometry.almond.medium.L1', revision: PRODUCT_GEOMETRY_REVISION_V7 };
   const productBefore = clone(productRef);
-  assert.equal(resolveBackgroundSilhouetteV7(productRef).source, 'product');
+  assert.equal(resolveBackgroundSilhouetteV7(productRef, 'L1').source, 'product');
   assert.deepEqual(productRef, productBefore);
-  assert.equal(resolveBackgroundSilhouetteV7({ assetId: 'geometry.L1', revision: 'scan-4' }).source, 'generic');
+  assert.equal(resolveBackgroundSilhouetteV7({ assetId: 'geometry.square.medium.L1', revision: PRODUCT_GEOMETRY_REVISION_V7 }, 'L1').source, 'generated');
+  assert.equal(resolveBackgroundSilhouetteV7({ ...productRef, revision: 'registry-1' }, 'L1').source, 'generic');
+  assert.equal(resolveBackgroundSilhouetteV7({ assetId: 'geometry.L1', revision: 'scan-4' }, 'L1').source, 'generic');
   console.log('[v7-background] geometry-derived silhouette fallback policy: PASS');
 }
 

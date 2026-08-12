@@ -1,15 +1,11 @@
 import { readData, StorageKeys } from '@/lib/storage';
 import type { EditorDocV7 } from './model';
+import { EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS } from './migration-resolvers';
 import {
   getEditorDocV7Result,
   type EditorDocV7Map,
   type EditorDocV7MigrationResolvers,
 } from './repository-contract';
-
-const previewResolvers: EditorDocV7MigrationResolvers = {
-  resolveGeometry: () => null,
-  resolveFinishPreset: () => null,
-};
 
 export type CustomerPreviewLoadResultV7 =
   | { status: 'ready'; doc: EditorDocV7; warnings: string[] }
@@ -18,7 +14,7 @@ export type CustomerPreviewLoadResultV7 =
 export function readCustomerPreviewDocV7FromMap(
   docs: EditorDocV7Map,
   designId: string,
-  resolvers: EditorDocV7MigrationResolvers = previewResolvers,
+  resolvers: EditorDocV7MigrationResolvers = EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS,
 ): CustomerPreviewLoadResultV7 {
   const result = getEditorDocV7Result(docs, designId, resolvers);
   if (result.status === 'migrated' || result.status === 'migrated_with_warnings') {

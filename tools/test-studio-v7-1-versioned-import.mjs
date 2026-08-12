@@ -9,6 +9,7 @@ const fixtures = await import(pathToFileURL(path.join(root,'src/studio/editor/fi
 const releaseApi = await import(pathToFileURL(path.join(root,'src/studio/versioning/design-release.ts')).href);
 const intentApi = await import(pathToFileURL(path.join(root,'src/community/domain/v7_1/versioned-studio-intent.ts')).href);
 const importApi = await import(pathToFileURL(path.join(root,'src/studio/versioning/versioned-import.ts')).href);
+const geometryApi = await import(pathToFileURL(path.join(root,'src/studio/editor/v7/geometry-registry.ts')).href);
 const digest = async (value) => createHash('sha256').update(value).digest('hex');
 
 async function releasedFull() {
@@ -60,6 +61,7 @@ function importHarness() {
   const targetsByIntent=new Map();
   const deps={
     intents:ih.port,getLook:async()=>structuredClone(look),getRelease:async()=>structuredClone(release),canReadLook:async()=>allow,
+    sha256:digest,
     assetAvailable:async()=>assetOk,createTarget:async({intentId,doc})=>{writerCalls+=1;if(!writerOk)return{ok:false,message:'quota'};const prior=targetsByIntent.get(intentId);if(prior)return{ok:true,created:false,doc:structuredClone(prior)};createdDoc=structuredClone(doc);targetsByIntent.set(intentId,createdDoc);return{ok:true,created:true,doc:structuredClone(createdDoc)};},
     nextId:(scope)=>`${scope}.fresh.${++id}`,now:()=> '2026-08-11T07:03:00.000Z',
   };
@@ -106,6 +108,32 @@ for (const mode of ['current','cancel']) {
   assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'asset_unavailable');assert.equal(h.ids,before);assert.equal(h.writerCalls,0);assert.ok(h.ih.port.peek(h.ih.created.intent.intentId));
 }
 {
+  const h=importHarness(); const before=h.ids;
+  const tamperedRelease=structuredClone(release);
+  tamperedRelease.editorDocSnapshot.nails.R1.geometryRef.revision='shape-params-v2';
+  h.deps.getRelease=async()=>tamperedRelease;
+  const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
+  assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'invalid_release');
+  assert.equal(h.ids,before,'release verification happens before ID generation');
+  assert.equal(h.writerCalls,0);
+  assert.equal(h.ih.port.peek(h.ih.created.intent.intentId),null,'tampered release is a final authority failure');
+}
+{
+  const h=importHarness(); const before=h.ids;
+  const approximateRelease=structuredClone(release);
+  approximateRelease.editorDocSnapshot.nails.R1.geometryRef={assetId:'geometry.square.medium.R1',revision:geometryApi.PRODUCT_GEOMETRY_REVISION_V7};
+  const manifest=releaseApi.buildDesignReleaseManifestV1(approximateRelease.editorDocSnapshot);
+  assert.equal(manifest.ok,true);if(!manifest.ok)throw new Error(manifest.message);
+  approximateRelease.manifest=manifest.manifest;
+  approximateRelease.designVersion.editorDocRef.sha256=await digest(releaseApi.canonicalJsonV1(approximateRelease.editorDocSnapshot));
+  h.deps.getRelease=async()=>approximateRelease;
+  const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
+  assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'geometry_unavailable');
+  assert.equal(h.ids,before,'geometry preflight happens before ID generation');
+  assert.equal(h.writerCalls,0);
+  assert.equal(h.ih.port.peek(h.ih.created.intent.intentId),null,'unusable geometry is a final authority failure');
+}
+{
   const h=importHarness(); h.setWriter(false);
   const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
   assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'write_failed');assert.equal(h.writerCalls,1);assert.ok(h.ih.port.peek(h.ih.created.intent.intentId),'writer failure retains intent');
@@ -114,6 +142,12 @@ for (const mode of ['current','cancel']) {
   const h=importHarness(); h.deps.nextId=()=> 'duplicate';
   const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
   assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'id_collision');assert.equal(h.writerCalls,0);assert.equal(h.ih.port.peek(h.ih.created.intent.intentId),null);
+}
+{
+  const h=importHarness(); h.deps.nextId=()=>{throw new Error('id service offline')};
+  const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
+  assert.equal(r.ok,false);if(!r.ok){assert.equal(r.reason,'dependency');assert.equal(r.retryable,true);}
+  assert.equal(h.writerCalls,0);assert.ok(h.ih.port.peek(h.ih.created.intent.intentId),'ID dependency failure retains intent');
 }
 
 // Dependency failures are reported, never thrown, and do not write a target.

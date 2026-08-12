@@ -19,7 +19,7 @@ import { buildDesignReleaseManifestV1, type DesignReleaseRecordV1 } from '@/stud
 export const CANONICAL_USE_DEMO_LOOK_ID = 'look.v7-1.petal-veil';
 export const CANONICAL_USE_DEMO_VERSION_ID = 'dv.v7-1.petal-veil.1';
 export const CANONICAL_USE_DEMO_DESIGN_ID = 'design.v7-1.petal-veil.source';
-export const CANONICAL_USE_DEMO_EDITOR_SHA256 = '081ca2b381b907e1eb9b1ab5b07197858d08cc64d3d710fbb0d17ea24dd4eeed';
+export const CANONICAL_USE_DEMO_EDITOR_SHA256 = '0bdbb6ab83b01f221bcea547db403116a4ea652a89a03ad6beee3ed52593f357';
 const PREVIEW_SHA256 = 'bb43c1d444f4661410992a66cfc199f29eda66d7423d0d93672b1f59df58b342';
 const CREATED_AT = '2026-08-11T06:00:00.000Z';
 

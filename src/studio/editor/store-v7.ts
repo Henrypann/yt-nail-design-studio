@@ -14,7 +14,7 @@ import type {
   SurfaceFinishTypeV7,
   Transform2DV7,
 } from './v7/model';
-import type { EditorDocV7MigrationDiagnostic, EditorDocV7MigrationResolvers } from './v7/migrate';
+import type { EditorDocV7MigrationDiagnostic } from './v7/migrate';
 import {
   addEditorV7Element,
   addEditorV7Step,
@@ -90,11 +90,14 @@ import {
   detachEditorV7NailScope,
   detachLinkedEditorV7NailAfterEdit,
   materializeEditorV7NailScope,
+  resolveEditorV7FingerScope,
   type EditorV7FingerScope,
   type EditorV7FingerScopeKind,
 } from './v7/ten-finger-operations';
 import { repairEditorWorkspaceSelectionV7, resolveSelectionContinuityV7 } from './v7/workspace-ia';
 import { addMissingEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalStepKindV7 } from './v7/workspace-step-factory';
+import { isExactEditorGeometryV7 } from './v7/geometry-registry';
+import { EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS } from './v7/migration-resolvers';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -301,6 +304,30 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         ? { ...result, doc: detachLinkedEditorV7NailAfterEdit(result.doc, finger) }
         : result;
     }, finger);
+
+    const commitSpatialFingerCommand = (
+      finger: FingerCode,
+      command: (doc: EditorDocV7) => EditorV7CommandResult,
+    ): EditorV7ActionResult => commitFingerCommand(finger, (doc) => {
+      const nail = doc.nails[finger];
+      if (!nail || !isExactEditorGeometryV7(nail.geometryRef, finger)) {
+        return { ok: false, reason: 'geometry_unavailable', message: 'spatial authoring requires signed-off geometry for this finger' };
+      }
+      return command(doc);
+    });
+
+    const commitSpatialScopeCommand = (
+      command: (doc: EditorDocV7) => EditorV7CommandResult,
+    ): EditorV7ActionResult => commitCommand((doc) => {
+      const resolution = resolveEditorV7FingerScope(currentScope());
+      if (!resolution.ok) return command(doc);
+      const targets = new Set([get().currentFinger, ...resolution.targets.map((target) => target.finger)]);
+      const unavailable = [...targets].find((finger) => !isExactEditorGeometryV7(doc.nails[finger].geometryRef, finger));
+      if (unavailable) {
+        return { ok: false, reason: 'geometry_unavailable', message: `spatial scope requires signed-off geometry for ${unavailable}` };
+      }
+      return command(doc);
+    });
 
     const currentScope = (): EditorV7FingerScope => {
       const state = get();
@@ -579,12 +606,12 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         set({ selectedFingers: FINGER_CODES.filter((candidate) => selected.has(candidate)) });
       },
       clearSelectedFingers: () => set({ selectedFingers: [] }),
-      copyFingerScope: () => commitCommand((doc) => materializeEditorV7NailScope(doc, {
+      copyFingerScope: () => commitSpatialScopeCommand((doc) => materializeEditorV7NailScope(doc, {
         sourceFinger: get().currentFinger,
         scope: currentScope(),
         mode: 'copy-detached',
       }, idFactory)),
-      syncFingerScope: () => commitCommand((doc) => materializeEditorV7NailScope(doc, {
+      syncFingerScope: () => commitSpatialScopeCommand((doc) => materializeEditorV7NailScope(doc, {
         sourceFinger: get().currentFinger,
         scope: currentScope(),
         mode: 'sync-linked',
@@ -616,8 +643,12 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       setCatEyeParameters: (finger, parameters) => commitFingerCommand(finger, (doc) => setEditorV7CatEyeParameters(doc, finger, parameters)),
       setGlitterParameters: (finger, parameters) => commitFingerCommand(finger, (doc) => setEditorV7GlitterParameters(doc, finger, parameters)),
       applyBackgroundPaletteTheme: (finger, theme) => commitFingerCommand(finger, (doc) => applyEditorV7PaletteTheme(doc, finger, theme)),
-      addStep: (finger, step, index) => commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index)),
-      addMissingPersonalStep: (finger, kind) => commitFingerCommand(finger, (doc) => addMissingEditorWorkspacePersonalStepV7(doc, finger, kind, idFactory)),
+      addStep: (finger, step, index) => (
+        step.kind === 'background' || step.kind === 'surface_finish'
+          ? commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index))
+          : commitSpatialFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index))
+      ),
+      addMissingPersonalStep: (finger, kind) => commitSpatialFingerCommand(finger, (doc) => addMissingEditorWorkspacePersonalStepV7(doc, finger, kind, idFactory)),
       deleteStep: (finger, stepId) => {
         const before = get();
         const wasSelected = before.currentFinger === finger && before.selectedStepId === stepId;
@@ -631,12 +662,14 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         return result;
       },
       moveStep: (finger, stepId, targetIndex) => commitFingerCommand(finger, (doc) => moveEditorV7Step(doc, finger, stepId, targetIndex)),
-      duplicateStep: (finger, stepId) => commitFingerCommand(finger, (doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
+      // Only repeatable spatial steps can be duplicated; require signed-off
+      // geometry before generating IDs or mutating history.
+      duplicateStep: (finger, stepId) => commitSpatialFingerCommand(finger, (doc) => duplicateEditorV7Step(doc, finger, stepId, idFactory)),
       setStepFlag: (finger, stepId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7StepFlag(doc, finger, stepId, flag, value)),
-      setSurfaceEffect: (finger, stepId, effect) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffect(doc, finger, stepId, effect)),
-      setSurfaceEffectMask: (finger, stepId, mask) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceEffectMask(doc, finger, stepId, mask)),
+      setSurfaceEffect: (finger, stepId, effect) => commitSpatialFingerCommand(finger, (doc) => setEditorV7SurfaceEffect(doc, finger, stepId, effect)),
+      setSurfaceEffectMask: (finger, stepId, mask) => commitSpatialFingerCommand(finger, (doc) => setEditorV7SurfaceEffectMask(doc, finger, stepId, mask)),
       setSurfaceFinish: (finger, stepId, finishType) => commitFingerCommand(finger, (doc) => setEditorV7SurfaceFinish(doc, finger, stepId, finishType)),
-      addElement: (finger, stepId, element) => commitFingerCommand(finger, (doc) => addEditorV7Element(doc, finger, stepId, element)),
+      addElement: (finger, stepId, element) => commitSpatialFingerCommand(finger, (doc) => addEditorV7Element(doc, finger, stepId, element)),
       removeElement: (finger, stepId, elementId) => {
         const wasSelected = get().selectedElementId === elementId;
         const result = commitFingerCommand(finger, (doc) => removeEditorV7Element(doc, finger, stepId, elementId));
@@ -644,18 +677,21 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         return result;
       },
       setElementFlag: (finger, stepId, elementId, flag, value) => commitFingerCommand(finger, (doc) => setEditorV7ElementFlag(doc, finger, stepId, elementId, flag, value)),
-      setElementTransform: (finger, stepId, elementId, transform) => commitFingerCommand(finger, (doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
-      replaceFlatElement: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
-      replaceDimensionalDecoration: (finger, stepId, elementId, replacement) => commitFingerCommand(finger, (doc) => replaceEditorV7DimensionalDecoration(doc, finger, stepId, elementId, replacement)),
-      setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitFingerCommand(finger, (doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
-      createTextElement: (finger, stepId, input) => commitFingerCommand(finger, (doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
-      replaceTextElement: (finger, stepId, elementId, input) => commitFingerCommand(finger, (doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
-      addBundledImage: (finger, stepId, bundleId) => commitFingerCommand(finger, (doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
+      setElementTransform: (finger, stepId, elementId, transform) => commitSpatialFingerCommand(finger, (doc) => setEditorV7ElementTransform(doc, finger, stepId, elementId, transform)),
+      replaceFlatElement: (finger, stepId, elementId, replacement) => commitSpatialFingerCommand(finger, (doc) => replaceEditorV7FlatElement(doc, finger, stepId, elementId, replacement)),
+      replaceDimensionalDecoration: (finger, stepId, elementId, replacement) => commitSpatialFingerCommand(finger, (doc) => replaceEditorV7DimensionalDecoration(doc, finger, stepId, elementId, replacement)),
+      setFlatElementOpacity: (finger, stepId, elementId, opacity) => commitSpatialFingerCommand(finger, (doc) => setEditorV7FlatElementOpacity(doc, finger, stepId, elementId, opacity)),
+      createTextElement: (finger, stepId, input) => commitSpatialFingerCommand(finger, (doc) => addTextFlatElementCommand(doc, finger, stepId, { ...input, id: idFactory('element') })),
+      replaceTextElement: (finger, stepId, elementId, input) => commitSpatialFingerCommand(finger, (doc) => replaceTextFlatElementCommand(doc, finger, stepId, elementId, input)),
+      addBundledImage: (finger, stepId, bundleId) => commitSpatialFingerCommand(finger, (doc) => addBundledFlatAssetCommand(doc, finger, stepId, bundleId, idFactory('element'))),
       applyPreparedImport: async (finger, stepId, prepared) => {
         const state = get();
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
         if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        if (!isExactEditorGeometryV7(state.doc.nails[finger].geometryRef, finger)) {
+          return { ok: false, reason: 'geometry_unavailable', message: 'spatial authoring requires signed-off geometry for this finger' };
+        }
         if (!prepared || typeof prepared !== 'object' || !prepared.asset || typeof prepared.source !== 'string') {
           return { ok: false, reason: 'invalid_value', message: 'prepared import payload is not well formed' };
         }
@@ -672,7 +708,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         // must never leave a document change behind.
         const put = await flatAssets.put(prepared.asset, prepared.source);
         if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
-        const result = commitFingerCommand(finger, (doc) => addPreparedImportCommand(doc, finger, stepId, idFactory('element'), prepared.asset));
+        const result = commitSpatialFingerCommand(finger, (doc) => addPreparedImportCommand(doc, finger, stepId, idFactory('element'), prepared.asset));
         // Known limitation: if the canonical commit fails AFTER a successful
         // repository write, the orphan asset entry may remain in the flat
         // asset repository, but EditorDocV7 is guaranteed unchanged.
@@ -683,6 +719,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
         if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        if (!isExactEditorGeometryV7(state.doc.nails[finger].geometryRef, finger)) {
+          return { ok: false, reason: 'geometry_unavailable', message: 'spatial authoring requires signed-off geometry for this finger' };
+        }
         const step = state.doc.nails[finger]?.steps.find((candidate) => candidate.id === stepId);
         if (!step) return { ok: false, reason: 'not_found', message: 'step not found' };
         if (step.kind !== 'flat_design') return { ok: false, reason: 'not_allowed', message: 'relink requires a flat design step' };
@@ -692,13 +731,16 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         if (resolved.status === 'missing' || resolved.status === 'corrupt') {
           return { ok: false, reason: 'not_found', message: 'asset source is not available for relink' };
         }
-        return commitFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
+        return commitSpatialFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, asset));
       },
       relinkPreparedImageAsset: async (finger, stepId, elementId, prepared) => {
         const state = get();
         if (!state.doc) return { ok: false, reason: 'missing_document', message: 'no V7 document loaded' };
         if (state.switching) return { ok: false, reason: 'busy', message: 'document switch is in progress' };
         if (state.readOnly) return { ok: false, reason: 'read_only', message: 'document is read-only' };
+        if (!isExactEditorGeometryV7(state.doc.nails[finger].geometryRef, finger)) {
+          return { ok: false, reason: 'geometry_unavailable', message: 'spatial authoring requires signed-off geometry for this finger' };
+        }
         if (!prepared || typeof prepared !== 'object' || !prepared.asset || typeof prepared.source !== 'string') {
           return { ok: false, reason: 'invalid_value', message: 'prepared relink payload is not well formed' };
         }
@@ -720,7 +762,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         // must never leave a document change behind.
         const put = await flatAssets.put(prepared.asset, prepared.source);
         if (!put.ok) return { ok: false, reason: put.reason, message: put.message };
-        const result = commitFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, prepared.asset));
+        const result = commitSpatialFingerCommand(finger, (doc) => relinkImageAssetCommand(doc, finger, stepId, elementId, prepared.asset));
         // Known limitation: if the canonical commit fails AFTER a successful
         // repository write, the orphan asset entry may remain in the flat
         // asset repository, but EditorDocV7 is guaranteed unchanged.
@@ -731,13 +773,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
   });
 }
 
-const identityOnlyResolvers: EditorDocV7MigrationResolvers = {
-  resolveGeometry: () => null,
-  resolveFinishPreset: () => null,
-};
-
 export const editorV7Store = createEditorV7Store({
-  repository: createEditorDocV7Repository(createLocalEditorDocV7Storage(), identityOnlyResolvers),
+  repository: createEditorDocV7Repository(createLocalEditorDocV7Storage(), EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS),
 });
 
 export function useEditorV7Store<T>(selector: (state: EditorV7State) => T): T {
@@ -751,4 +788,9 @@ export function selectCurrentNailV7(state: EditorV7State) {
 export function selectCurrentStepV7(state: EditorV7State) {
   const nail = selectCurrentNailV7(state);
   return nail?.steps.find((step) => step.id === state.selectedStepId) ?? null;
+}
+
+export function selectCurrentGeometryExactV7(state: EditorV7State): boolean {
+  const nail = selectCurrentNailV7(state);
+  return nail ? isExactEditorGeometryV7(nail.geometryRef, nail.finger) : false;
 }

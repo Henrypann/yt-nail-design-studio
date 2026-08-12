@@ -16,14 +16,11 @@
  * physical material transmittance.
  */
 
-import { NAIL_SHAPE_IDS, type NailShape } from '@/generated/shape-types';
-import { getSilhouette } from '@/studio/editor/lib/material';
 import type { FingerCode } from '../../../lib/types';
 import type { EditorV7CommandFailure, EditorV7CommandResult } from './commands';
 import type {
   BackgroundPayloadV7,
   EditorDocV7,
-  GeometryRefV7,
   GradientStopV7,
   PreviewFidelityV7,
   ProcessStepV7,
@@ -62,11 +59,6 @@ export interface EditorV7PaletteThemeV7 {
 }
 
 const HEX_PATTERN = /^#?([0-9a-fA-F]{6})$/;
-/** Mirrors shape-params.json length ids (the only length source of truth). */
-const LENGTH_IDS = ['short', 'medium', 'long', 'extra-long'] as const;
-type ProductLengthV7 = (typeof LENGTH_IDS)[number];
-/** Migration/scan resolvers emit `geometry.<shape>.<length>.<finger>` asset ids. */
-const PRODUCT_GEOMETRY_PATTERN = /^geometry\.([a-z][a-z0-9-]*)\.([a-z][a-z0-9-]*)\.([LR][1-5])$/;
 
 function reject(reason: EditorV7CommandFailure, message: string): EditorV7CommandResult {
   return { ok: false, reason, message };
@@ -263,55 +255,14 @@ export function composeBackgroundAlphaV7(color: RgbaColorV7, opacity: number, fa
   return Math.min(1, Math.max(0, color.a * opacity * factor));
 }
 
-/* ── nail silhouette resolution (geometryRef-derived, fallback-safe) ─── */
-
-export interface NailSilhouetteV7 {
-  source: 'product' | 'generic';
-  pathD: string;
-  viewBox: string;
-  label: string;
-}
-
-export function matchProductSilhouetteRefV7(
-  geometryRef: GeometryRefV7,
-): { shape: NailShape; length: ProductLengthV7; finger: string } | null {
-  const match = PRODUCT_GEOMETRY_PATTERN.exec(geometryRef.assetId);
-  if (!match) return null;
-  const shape = match[1] as NailShape;
-  const length = match[2] as ProductLengthV7;
-  if (!(NAIL_SHAPE_IDS as readonly string[]).includes(shape)) return null;
-  if (!(LENGTH_IDS as readonly string[]).includes(length)) return null;
-  return { shape, length, finger: match[3] };
-}
-
-/** Nail-local generic fallback; explicitly labeled, never mistaken for product geometry. */
-export const GENERIC_NAIL_SILHOUETTE_V7: NailSilhouetteV7 = {
-  source: 'generic',
-  pathD: 'M50 5 C74 5 87 20 88 48 L84 120 C82 144 69 155 50 155 C31 155 18 144 16 120 L12 48 C13 20 26 5 50 5 Z',
-  viewBox: '0 0 100 160',
-  label: '通用甲型轮廓（未关联产品几何）',
-};
-
-/**
- * Resolve the product silhouette only when the geometryRef assetId matches
- * the registered `geometry.<shape>.<length>.<finger>` pattern AND a signed
- * silhouette exists in the material library. Never mutates geometryRef.
- */
-export function resolveBackgroundSilhouetteV7(geometryRef: GeometryRefV7): NailSilhouetteV7 {
-  const product = matchProductSilhouetteRefV7(geometryRef);
-  if (product) {
-    const silhouette = getSilhouette(product.shape, product.length);
-    if (silhouette) {
-      return {
-        source: 'product',
-        pathD: silhouette.pathD,
-        viewBox: silhouette.viewBox,
-        label: `${product.shape} / ${product.length} 产品轮廓`,
-      };
-    }
-  }
-  return GENERIC_NAIL_SILHOUETTE_V7;
-}
+/* Geometry is registry-derived in V7-15. Re-export the compatibility reader so
+ * existing background/canvas imports keep one shared implementation. */
+export {
+  GENERIC_NAIL_SILHOUETTE_V7,
+  matchProductSilhouetteRefV7,
+  resolveBackgroundSilhouetteV7,
+} from './geometry-registry';
+export type { NailSilhouetteV7 } from './geometry-registry';
 
 /* ── background commands ────────────────────────────────────────────── */
 

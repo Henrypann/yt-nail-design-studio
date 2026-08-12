@@ -1,5 +1,6 @@
 import type { NailDesignV7, ProcessStepV7 } from './model';
 import { resolveBackgroundSilhouetteV7 } from './background';
+import { resolveEditorGeometryV7 } from './geometry-registry';
 
 export type EditorWorkspaceStageIdV7 =
   | 'geometry'
@@ -115,7 +116,7 @@ export function deriveEditorWorkspaceStagesV7(
   const background = nail.steps.find((step) => step.kind === 'background') ?? null;
   const personalSteps = nail.steps.filter((step) => PERSONAL_STEP_KINDS.includes(step.kind as (typeof PERSONAL_STEP_KINDS)[number]));
   const finish = nail.steps.find((step) => step.kind === 'surface_finish') ?? null;
-  const geometry = resolveBackgroundSilhouetteV7(nail.geometryRef);
+  const geometry = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const lanes = deriveEditorWorkspaceStepLanesV7(nail, selectedStepId);
   const activePersonalSteps = personalSteps.filter((step) => step.visible && !step.skipped).length;
   const hiddenPersonalSteps = personalSteps.filter((step) => !step.visible).length;
@@ -127,7 +128,7 @@ export function deriveEditorWorkspaceStagesV7(
       label: '甲型与适配',
       shortLabel: '甲型',
       description: geometry.label,
-      state: geometry.source === 'product' ? 'configured' : 'attention',
+      state: geometry.fidelity === 'exact' ? 'configured' : 'attention',
       active: currentStage === 'geometry',
       targetStepId: null,
     },
@@ -205,6 +206,7 @@ export type EditorWorkspaceToolStatusV7 =
   | 'switching'
   | 'read_only'
   | 'missing_step'
+  | 'geometry_unavailable'
   | 'locked'
   | 'skipped'
   | 'hidden';
@@ -255,12 +257,21 @@ export function deriveEditorWorkspaceToolsV7(
   nail: NailDesignV7,
   context: EditorWorkspaceToolContextV7 = {},
 ): EditorWorkspaceToolAvailabilityV7[] {
+  const geometry = resolveEditorGeometryV7(nail.geometryRef, nail.finger);
   return (Object.keys(TOOL_STEP_KIND) as EditorWorkspaceToolIdV7[]).map((id) => {
     const kind = TOOL_STEP_KIND[id];
     const step = id === 'select'
       ? preferredSelectableStepV7(nail, context.selectedStepId)
       : preferredStepForKindV7(nail, kind, context.selectedStepId);
-    const resolved = toolStatusForStepV7(step, context);
+    let resolved = toolStatusForStepV7(step, context);
+    if (resolved.status === 'ready' && id !== 'background' && id !== 'select' && geometry.fidelity !== 'exact') {
+      resolved = {
+        status: 'geometry_unavailable',
+        reason: geometry.fidelity === 'approximate'
+          ? '当前指位只有未签收的近似轮廓；空间编辑需绑定已签收 2D geometry'
+          : '当前指位未解析到可用 geometry；空间编辑已停用，原引用保持不变',
+      };
+    }
     const reason = resolved.status === 'missing_step' ? MISSING_STEP_REASON[kind] : resolved.reason;
     return {
       id,

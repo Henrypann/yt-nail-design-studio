@@ -7,14 +7,16 @@ import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import { materializeMercuryDewV7 } from './mercury-dew';
 import { createSurfaceFinishDefinitionV7 } from './finish';
+import { isExactEditorGeometryV7, PRODUCT_GEOMETRY_REVISION_V7 } from './geometry-registry';
 
-export const PRODUCT_GEOMETRY_REVISION_V7 = 'shape-params-v3';
+export { PRODUCT_GEOMETRY_REVISION_V7 } from './geometry-registry';
 
 export type EditorDocV7CreationFailure =
   | 'invalid_input'
   | 'unsupported_finish'
   | 'unsupported_recipe'
   | 'unsupported_decoration'
+  | 'geometry_unavailable'
   | 'template_asset_missing';
 
 export type EditorDocV7CreationResult =
@@ -43,7 +45,7 @@ function idToken(value: string): string {
   return value.replace(/[^A-Za-z0-9._:-]/g, '-').slice(0, 48) || 'design';
 }
 
-export function createProductGeometryRefV7(
+function createProductGeometryRefV7(
   shape: NailShape,
   length: NailLength,
   finger: FingerCode,
@@ -127,9 +129,17 @@ function buildEditorDocV7(
       transform: identityTransform(),
       asset,
     } : null;
+    const geometryRef = createProductGeometryRefV7(input.shape, input.length, finger);
+    if (!isExactEditorGeometryV7(geometryRef, finger)) {
+      return {
+        ok: false,
+        reason: 'geometry_unavailable',
+        message: `${input.shape}/${input.length}/${finger} has no signed-off V7 geometry`,
+      };
+    }
     nails[finger] = {
       finger,
-      geometryRef: createProductGeometryRefV7(input.shape, input.length, finger),
+      geometryRef,
       steps: createSteps(token, finger, color, finish, templateElement),
     };
   }

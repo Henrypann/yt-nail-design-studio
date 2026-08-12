@@ -1,9 +1,16 @@
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { VersionedIntentPortV2, VersionedStudioImportIntentV2 } from '@/community/domain/v7_1/versioned-studio-intent';
 import { sameVersionedIntentAssetsV2 } from '@/community/domain/v7_1/versioned-studio-intent';
-import type { EditorDocV7, ProcessStepV7, RecipeInstanceV7 } from '@/studio/editor/v7/model';
+import { FINGER_CODES } from '@/lib/types';
+import type { EditorDocV7 } from '@/studio/editor/v7/model';
+import { resolveEditorGeometryV7 } from '@/studio/editor/v7/geometry-registry';
+import { materializeIndependentEditorDocV7 } from '@/studio/editor/v7/materialize';
 import { parseEditorDocV7 } from '@/studio/editor/v7/schema';
-import type { DesignReleaseRecordV1 } from './design-release';
+import {
+  canonicalJsonV1,
+  parseDesignReleaseStoreV1,
+  type DesignReleaseRecordV1,
+} from './design-release';
 
 export type VersionedImportModeV2 = 'current' | 'new' | 'cancel';
 export interface LookCustomizeEventV1 {
@@ -19,6 +26,7 @@ export interface VersionedImportDependenciesV2 {
   intents: VersionedIntentPortV2;
   getLook(lookId: string): Promise<PublishedLookV1 | null>;
   getRelease(designVersionId: string): Promise<DesignReleaseRecordV1 | null>;
+  sha256(value: string): Promise<string>;
   canReadLook(look: PublishedLookV1): Promise<boolean>;
   assetAvailable(asset: { assetId: string; revision: number; sha256: string; mimeType?: string }): Promise<boolean>;
   /** Must be idempotent by intentId and return the persisted document. */
@@ -32,22 +40,7 @@ export interface VersionedImportDependenciesV2 {
 export type VersionedImportResultV2 =
   | { ok: true; mode: 'current'|'cancel'; created: false; returnTo: string }
   | { ok: true; mode: 'new'; created: true; doc: EditorDocV7; event: LookCustomizeEventV1; returnTo: string }
-  | { ok: false; reason: 'missing_or_expired'|'permission'|'look_unavailable'|'version_mismatch'|'release_unavailable'|'asset_mismatch'|'asset_unavailable'|'invalid_release'|'id_collision'|'write_failed'|'dependency'; retryable: boolean; message: string };
-
-const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
-
-function remapStep(step: ProcessStepV7, ids: Map<string,string>, next: () => string): ProcessStepV7 {
-  const copy = structuredClone(step);
-  copy.id = next(); ids.set(step.id, copy.id);
-  if (copy.recipeInstanceId) copy.recipeInstanceId = ids.get(copy.recipeInstanceId) ?? copy.recipeInstanceId;
-  if (copy.kind === 'flat_design') {
-    copy.elements = copy.elements.map((element) => { const value = structuredClone(element); value.id = next(); ids.set(element.id, value.id); return value; });
-  }
-  if (copy.kind === 'dimensional_decoration') {
-    copy.decorations = copy.decorations.map((decoration) => { const value = structuredClone(decoration); value.id = next(); ids.set(decoration.id, value.id); return value; });
-  }
-  return copy;
-}
+  | { ok: false; reason: 'missing_or_expired'|'permission'|'look_unavailable'|'version_mismatch'|'release_unavailable'|'asset_mismatch'|'asset_unavailable'|'geometry_unavailable'|'invalid_release'|'id_collision'|'write_failed'|'dependency'; retryable: boolean; message: string };
 
 export function materializeVersionedRemixV2(
   source: EditorDocV7,
@@ -57,44 +50,15 @@ export function materializeVersionedRemixV2(
   let now: string;
   try { now = deps.now(); }
   catch { return { ok: false, reason: 'dependency' }; }
-  if (!Number.isFinite(Date.parse(now))) return { ok: false, reason: 'dependency' };
-  const generated = new Set<string>();
-  const fresh = (scope: 'design'|'node') => {
-    const value = deps.nextId(scope);
-    if (!ID.test(value) || generated.has(value)) throw new Error('id_collision');
-    generated.add(value); return value;
-  };
-  try {
-    const designId = fresh('design');
-    const recipeIds = new Map<string,string>();
-    const recipes: Record<string,RecipeInstanceV7> = {};
-    for (const [key, recipe] of Object.entries(source.recipeInstances)) {
-      const id = fresh('node'); recipeIds.set(key,id);
-      recipes[id] = { ...structuredClone(recipe), instanceId: id };
-    }
-    const nodeIds = new Map(recipeIds);
-    const nails = structuredClone(source.nails);
-    for (const nail of Object.values(nails)) {
-      nail.steps = nail.steps.map((step) => remapStep(step, nodeIds, () => fresh('node')));
-      for (const step of nail.steps) if (step.recipeInstanceId) step.recipeInstanceId = recipeIds.get(step.recipeInstanceId) ?? step.recipeInstanceId;
-      delete nail.compositionProvenance;
-    }
-    // Recipe refs were copied before steps; remap the original ids explicitly.
-    for (const nail of Object.values(nails)) {
-      for (const step of nail.steps) {
-        const original = source.nails[nail.finger].steps.find((candidate) => nodeIds.get(candidate.id) === step.id);
-        if (original?.recipeInstanceId) step.recipeInstanceId = recipeIds.get(original.recipeInstanceId);
-      }
-    }
-    const candidate: EditorDocV7 = {
-      schemaVersion: 7, designId, title: `${source.title} Remix`, nails,
-      recipeInstances: recipes,
-      sourceRefs: [{ domain: 'community', sourceId: intent.lookId, revision: intent.designVersionId }],
-      communicationRefs: [], outputIntent: 'design', revision: 1, createdAt: now, updatedAt: now,
-    };
-    const parsed = parseEditorDocV7(candidate);
-    return parsed.ok ? { ok: true, doc: parsed.doc } : { ok: false, reason: 'dependency' };
-  } catch { return { ok: false, reason: 'id_collision' }; }
+  const materialized = materializeIndependentEditorDocV7(source, {
+    sourceRef: { domain: 'community', sourceId: intent.lookId, revision: intent.designVersionId },
+    title: `${source.title} Remix`,
+    now,
+  }, { nextId: deps.nextId });
+  if (materialized.ok) return materialized;
+  return materialized.reason === 'id_collision'
+    ? { ok: false, reason: 'id_collision' }
+    : { ok: false, reason: 'dependency' };
 }
 
 export async function consumeVersionedStudioImportV2(intentId: string, mode: VersionedImportModeV2, deps: VersionedImportDependenciesV2): Promise<VersionedImportResultV2> {
@@ -128,6 +92,19 @@ export async function consumeVersionedStudioImportV2(intentId: string, mode: Ver
   }
   if (look.designVersionId !== intent.designVersionId) return rejectFinal('version_mismatch', 'look now references a different version');
   if (!release || release.designVersion.designVersionId !== intent.designVersionId) return { ok: false, reason: 'release_unavailable', retryable: true, message: 'released source unavailable' };
+  const verifiedEnvelope = parseDesignReleaseStoreV1({
+    schemaVersion: 1,
+    kind: 'STUDIO_DESIGN_RELEASE_STORE',
+    records: [release],
+  });
+  if (!verifiedEnvelope.ok) return rejectFinal('invalid_release', 'release record or manifest is invalid');
+  release = verifiedEnvelope.store.records[0];
+  let editorDocSha256: string;
+  try { editorDocSha256 = await deps.sha256(canonicalJsonV1(release.editorDocSnapshot)); }
+  catch { return { ok: false, reason: 'dependency', retryable: true, message: 'release checksum validation failed' }; }
+  if (editorDocSha256 !== release.designVersion.editorDocRef.sha256) {
+    return rejectFinal('invalid_release', 'release snapshot checksum mismatch');
+  }
   if (!sameVersionedIntentAssetsV2(intent.assetRevisionRefs, release.designVersion.assetRevisionRefs)) return rejectFinal('asset_mismatch', 'immutable asset set changed');
   for (const asset of intent.assetRevisionRefs) {
     try { if (!await deps.assetAvailable(asset)) return { ok: false, reason: 'asset_unavailable', retryable: true, message: `asset unavailable: ${asset.assetId}` }; }
@@ -135,6 +112,12 @@ export async function consumeVersionedStudioImportV2(intentId: string, mode: Ver
   }
   const source = parseEditorDocV7(release.editorDocSnapshot);
   if (!source.ok || source.doc.designId !== release.designVersion.designId || source.doc.revision !== release.designVersion.revision) return rejectFinal('invalid_release', 'release snapshot invalid');
+  for (const finger of FINGER_CODES) {
+    const geometry = resolveEditorGeometryV7(source.doc.nails[finger].geometryRef, finger);
+    if (geometry.fidelity !== 'exact') {
+      return rejectFinal('geometry_unavailable', `geometry unavailable for ${finger}: ${geometry.status === 'unresolved' ? geometry.reason : geometry.evidence}`);
+    }
+  }
   const materialized = materializeVersionedRemixV2(source.doc, intent, deps);
   if (!materialized.ok) return materialized.reason === 'id_collision'
     ? rejectFinal('id_collision', 'failed to create independent V7 document')

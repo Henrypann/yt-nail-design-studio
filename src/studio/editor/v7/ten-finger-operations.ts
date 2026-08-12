@@ -3,6 +3,7 @@ import { normalizeBackgroundDirectionV7 } from './background';
 import type { EditorV7CommandFailure, EditorV7CommandResult } from './commands';
 import { mapNailPathDataV7 } from './flat-vector';
 import type { EditorV7IdFactory } from './id';
+import { isExactEditorGeometryV7 } from './geometry-registry';
 import type {
   EditorDocV7,
   NailPointV7,
@@ -290,6 +291,13 @@ export function materializeEditorV7NailScope(
   }
   const targets = resolution.targets.filter((target) => target.finger !== request.sourceFinger);
   if (targets.length === 0) return reject('not_allowed', 'scope has no target finger');
+  const geometryTargets = [request.sourceFinger, ...targets.map((target) => target.finger)];
+  const unavailableGeometry = geometryTargets.find((finger) => (
+    !isExactEditorGeometryV7(doc.nails[finger].geometryRef, finger)
+  ));
+  if (unavailableGeometry) {
+    return reject('geometry_unavailable', `spatial scope requires signed-off geometry for ${unavailableGeometry}`);
+  }
   if (targets.some((target) => hasLockedContent(doc, target.finger))) {
     return reject('locked', 'one or more target fingers contain locked content');
   }

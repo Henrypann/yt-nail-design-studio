@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Info, Sparkles } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
-import { selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
+import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
 import type { RgbaColorV7, SurfaceEffectPayloadV7 } from '../v7/model';
 import { parseHexColorV7, rgbaToHexV7 } from '../v7/background';
 import {
@@ -54,11 +54,12 @@ export function SurfaceEffectPanelV7() {
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
+  const geometryExact = useEditorV7Store(selectCurrentGeometryExactV7);
   const setEffect = useEditorV7Store((state) => state.setSurfaceEffect);
   const setMask = useEditorV7Store((state) => state.setSurfaceEffectMask);
   if (step?.kind !== 'surface_effect') return null;
   const effect = step.effect;
-  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked;
+  const canEdit = step.visible && !step.skipped && !readOnly && !switching && !step.locked && geometryExact;
   const report = (result: EditorV7ActionResult) => { if (!result.ok) toast.error(result.message); return result; };
   const update = (next: SurfaceEffectPayloadV7) => report(setEffect(currentFinger, step.id, next));
   const switchType = (effectType: SurfaceEffectPayloadV7['effectType']) => {

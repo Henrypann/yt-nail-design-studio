@@ -13,6 +13,7 @@ import { deriveFinishCompositeV7 } from '../v7/finish-composite';
 import { SURFACE_FINISH_LABELS_V7 } from '../v7/finish';
 import type { DimensionalDecorationV7, FlatDesignElementV7, ProcessStepV7, Transform2DV7 } from '../v7/model';
 import { createSurfaceEffectParticlesV7, rgbaCssV7, surfaceEffectMaskPathToCanvasV7 } from '../v7/surface-effect';
+import { combineGeometryPreviewFidelityV7 } from '../v7/geometry-registry';
 
 const WIDTH = 100;
 const HEIGHT = 160;
@@ -83,7 +84,7 @@ export function V7FinishCompositeCanvas() {
   const step = useEditorV7Store(selectCurrentStepV7);
   const previewFinishType = useEditorV7Store((state) => state.previewFinishType);
   if (!nail || step?.kind !== 'surface_finish') return null;
-  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef);
+  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const model = deriveFinishCompositeV7(nail, previewFinishType);
   const background = nail.steps[0];
   if (background.kind !== 'background') return null;
@@ -109,10 +110,11 @@ export function V7FinishCompositeCanvas() {
       ? <rect width={WIDTH} height={HEIGHT} fill="#f8eee9" opacity={model.finishAppearance.veilOpacity} />
       : <><rect width={WIDTH} height={HEIGHT} fill="#f6efec" opacity={model.finishAppearance.veilOpacity} /><rect width={WIDTH} height={HEIGHT} fill={`url(#${frostedPatternId})`} opacity={model.finishAppearance.grainOpacity} /></>;
   const middleSteps = nail.steps.slice(1, -1).filter((candidate) => candidate.visible && !candidate.skipped);
-  const fidelityTone = model.fidelity === 'exact' ? 'border-success/25 bg-success-soft text-success' : model.fidelity === 'approximate' ? 'border-warning/25 bg-warning-soft text-warning' : 'border-gray-300 bg-gray-100 text-gray-600';
+  const previewFidelity = combineGeometryPreviewFidelityV7(silhouette.fidelity, model.fidelity);
+  const fidelityTone = previewFidelity === 'exact' ? 'border-success/25 bg-success-soft text-success' : previewFidelity === 'approximate' ? 'border-warning/25 bg-warning-soft text-warning' : 'border-gray-300 bg-gray-100 text-gray-600';
 
   return (
-    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(190px,0.9fr)_minmax(210px,1fr)] sm:items-center" data-testid="v7-finish-composite-canvas" data-preview-finish={model.previewFinishType} data-canonical-finish={model.canonicalFinishType} data-preview-only={String(model.previewOnly)} data-preview-fidelity={model.fidelity} data-active-step-count={model.activeStepIds.length}>
+    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(190px,0.9fr)_minmax(210px,1fr)] sm:items-center" data-testid="v7-finish-composite-canvas" data-preview-finish={model.previewFinishType} data-canonical-finish={model.canonicalFinishType} data-preview-only={String(model.previewOnly)} data-preview-fidelity={previewFidelity} data-active-step-count={model.activeStepIds.length}>
       <div className="relative mx-auto aspect-[5/8] w-full max-w-[260px] rounded-[32px] border border-white bg-white/80 p-3 shadow-[0_26px_70px_rgba(77,53,67,0.2)]" style={{ transform: 'perspective(900px) rotateX(5deg) rotateY(-4deg)' }}>
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full overflow-visible" role="img" aria-label={`${nail.finger} ${SURFACE_FINISH_LABELS_V7[model.previewFinishType]}组合模拟预览`}>
           <defs>
@@ -133,7 +135,8 @@ export function V7FinishCompositeCanvas() {
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/92 p-4 shadow-sm">
         <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Simulated 3D · SVG 2.5D</p></div>
         <h2 className="mt-2 text-lg font-semibold text-gray-900">{SURFACE_FINISH_LABELS_V7[model.previewFinishType]}组合预览</h2>
-        <div className="mt-3 flex flex-wrap gap-2"><span className={cx('inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold', fidelityTone)}>{model.fidelity === 'unavailable' ? '部分不可表达 · 2D 保底' : '近似组合预览'}</span>{model.previewOnly && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700">仅预览 · 未应用</span>}</div>
+        <div className="mt-3 flex flex-wrap gap-2"><span className={cx('inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold', fidelityTone)}>{previewFidelity === 'unavailable' ? '部分不可表达 · 2D 保底' : '近似组合预览'}</span>{model.previewOnly && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-700">仅预览 · 未应用</span>}</div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，最终组合预览已相应降级。</p>}
         <div className="mt-4 grid grid-cols-5 gap-1 text-center text-[9px] text-gray-500"><span><Layers3 size={13} className="mx-auto mb-1" />背景<br />{model.layerCounts.background}</span><span>2D<br />{model.layerCounts.flat}</span><span><Sparkles size={13} className="mx-auto mb-1" />效果<br />{model.layerCounts.surface}</span><span><Box size={13} className="mx-auto mb-1" />立体<br />{model.layerCounts.dimensional}</span><span>封层<br />{model.layerCounts.finish}</span></div>
         {model.warnings.length > 0 && <div className="mt-4 space-y-1 text-[10px] leading-4 text-gray-500">{model.warnings.map((warning) => <p key={warning}>• {warning}</p>)}</div>}
         <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />这是 WebGL-free 模拟组合预览，未证明真实 3D、材料外观、UV/LED 固化状态或物理可制造性。</div>

@@ -25,13 +25,13 @@ const MM_TO_CANVAS_UNITS = 8;
 type FlatStepV7 = Extract<ProcessStepV7, { kind: 'flat_design' }>;
 
 const FIDELITY_LABEL = {
-  exact: '2D 精确',
-  approximate: '2D 近似',
-  unavailable: '部分不可预览',
+  exact: '已签收 2D 轮廓',
+  approximate: '含近似预览',
+  unavailable: '预览不可用',
 } as const;
 
 const FIDELITY_SHORT_LABEL = {
-  exact: '精确',
+  exact: '已签收',
   approximate: '近似',
   unavailable: '注意',
 } as const;
@@ -140,7 +140,7 @@ export function CustomerNailPreviewV7({
   size?: 'overview' | 'focus';
 }) {
   const rawId = useId().replace(/:/g, '');
-  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef);
+  const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const silhouetteTransform = silhouetteToCanvasTransform(silhouette.viewBox);
   const backgroundStep = nail.steps[0];
   if (backgroundStep.kind !== 'background') return null;

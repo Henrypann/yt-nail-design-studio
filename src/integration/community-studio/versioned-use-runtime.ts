@@ -11,8 +11,10 @@ import { createClientId, readData, StorageKeys, writeEnvelope } from '@/lib/stor
 import { createEditorDocV7InLocalStorage } from '@/studio/editor/v7/repository';
 import { parseEditorDocV7 } from '@/studio/editor/v7/schema';
 import type { EditorDocV7 } from '@/studio/editor/v7/model';
+import { representativeBackgroundColorV7, rgbaToHexV7 } from '@/studio/editor/v7/background';
+import { resolveEditorGeometryV7 } from '@/studio/editor/v7/geometry-registry';
 import { getDesign, removeEditorDoc, upsertDesign } from '@/studio/editor/lib/repo-v6';
-import { canonicalJsonV1, createBrowserSha256V1 } from '@/studio/versioning/design-release';
+import { createBrowserSha256V1 } from '@/studio/versioning/design-release';
 import {
   consumeVersionedStudioImportV2,
   type LookCustomizeEventV1,
@@ -65,14 +67,26 @@ function readExistingTarget(designId: string) {
 
 function ensureEditableSummary(doc: EditorDocV7): void {
   if (getDesign(doc.designId)) return;
+  const nail = doc.nails.L1;
+  const geometry = resolveEditorGeometryV7(nail.geometryRef, 'L1');
+  if (geometry.status !== 'resolved' || geometry.fidelity !== 'exact') {
+    throw new Error('persisted remix has no signed-off L1 geometry');
+  }
+  const background = nail.steps[0];
+  const finish = nail.steps[nail.steps.length - 1];
+  if (background?.kind !== 'background' || finish?.kind !== 'surface_finish') {
+    throw new Error('persisted remix has no canonical background/finish');
+  }
   upsertDesign({
     id: doc.designId,
-    customerId: '',
+    customerId: doc.customerRef ?? '',
     title: doc.title,
-    shape: 'almond',
-    length: 'medium',
-    baseColor: '#F4DCE5',
-    finish: 'gloss',
+    shape: geometry.shape,
+    length: geometry.length,
+    baseColor: rgbaToHexV7(representativeBackgroundColorV7(background.background)),
+    // DesignSummary is a legacy list index and cannot represent `frosted`.
+    // Map it to matte for list filtering only; EditorDocV7 remains canonical.
+    finish: finish.finish.type === 'frosted' ? 'matte' : finish.finish.type,
     status: 'draft',
     source: 'editor',
     version: 1,
@@ -102,18 +116,16 @@ export async function consumeVersionedUseIntentV2(
   mode: VersionedImportModeV2,
 ): Promise<VersionedImportResultV2> {
   const nextId = deterministicIds(intentId);
+  const sha256 = createBrowserSha256V1();
   const result = await consumeVersionedStudioImportV2(intentId, mode, {
     intents: versionedIntentPortV2,
     getLook: async (lookId) => lookId === CANONICAL_USE_DEMO_LOOK_ID
       ? structuredClone(CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1)
       : null,
-    getRelease: async (versionId) => {
-      if (versionId !== CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId) return null;
-      const checksum = await createBrowserSha256V1()(canonicalJsonV1(CANONICAL_USE_DEMO_RELEASE_RECORD_V1.editorDocSnapshot));
-      return checksum === CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.editorDocRef.sha256
-        ? structuredClone(CANONICAL_USE_DEMO_RELEASE_RECORD_V1)
-        : null;
-    },
+    getRelease: async (versionId) => versionId === CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId
+      ? structuredClone(CANONICAL_USE_DEMO_RELEASE_RECORD_V1)
+      : null,
+    sha256,
     canReadLook: async (look) => look.visibility === 'PUBLIC' && look.status === 'PUBLISHED',
     assetAvailable: async (asset) => CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.assetRevisionRefs.some((candidate) => (
       candidate.assetId === asset.assetId && candidate.revision === asset.revision

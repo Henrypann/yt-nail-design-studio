@@ -20,7 +20,7 @@ export function EditorStageContextNoticeV7({
   title: string;
   description: string;
   details?: readonly EditorStageContextDetailV7[];
-  source?: 'product' | 'generic';
+  source?: 'product' | 'generated' | 'generic';
   disclaimer?: string;
   onDismiss(): void;
 }) {
@@ -42,7 +42,7 @@ export function EditorStageContextNoticeV7({
       data-geometry-source={context === 'geometry' ? source : undefined}
       className={cx(
         'border-b px-3 py-3 text-xs',
-        context === 'geometry' && source === 'generic'
+        context === 'geometry' && source !== 'product'
           ? 'border-amber-200 bg-amber-50 text-amber-950'
           : 'border-info/20 bg-info-soft text-info',
       )}

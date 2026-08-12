@@ -21,13 +21,31 @@ import {
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
 import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
-import { matchProductSilhouetteRefV7, resolveBackgroundSilhouetteV7 } from '../v7/background';
+import { resolveBackgroundSilhouetteV7 } from '../v7/background';
+import { resolveEditorGeometryV7 } from '../v7/geometry-registry';
 
 const SAVE_LABEL = {
   saved: '已保存',
   dirty: '有未保存更改',
   saving: '正在保存…',
   error: '保存失败，可重试',
+} as const;
+
+const GEOMETRY_FIDELITY_LABEL = {
+  exact: '已签收 2D 轮廓',
+  approximate: '生成轮廓（近似）',
+  unavailable: '不可用（通用回退）',
+} as const;
+
+const GEOMETRY_STATUS_LABEL = {
+  signed_off: '已签收',
+  generated: '已生成，待签收',
+  in_review: '审核中',
+  unknown_asset: '未注册引用',
+  revision_mismatch: '版本不匹配',
+  finger_mismatch: '指位不匹配',
+  silhouette_missing: '轮廓资产缺失',
+  capability_unavailable: '甲型能力未开放',
 } as const;
 
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -480,8 +498,8 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const showGuidedStart = !dismissedGuides.has(guideKey) && !currentNail.steps.some((step) => (
     step.kind === 'flat_design' || step.kind === 'surface_effect' || step.kind === 'dimensional_decoration'
   ));
-  const geometrySilhouette = resolveBackgroundSilhouetteV7(currentNail.geometryRef);
-  const productGeometry = matchProductSilhouetteRefV7(currentNail.geometryRef);
+  const geometrySilhouette = resolveBackgroundSilhouetteV7(currentNail.geometryRef, currentFinger);
+  const geometryResolution = resolveEditorGeometryV7(currentNail.geometryRef, currentFinger);
 
   return (
     <section
@@ -493,7 +511,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     >
       <header className="flex min-h-[52px] flex-col gap-1.5 border-b border-gray-200 px-2 py-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2 sm:px-3">
         <div className="flex min-w-0 items-center gap-1.5 sm:contents">
-          <Button size="sm" variant="ghost" data-testid={communitySource ? 'editor-return-source' : 'editor-return-designs'} className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(communitySource ? Routes.communityLook(communitySource.sourceId) : Routes.designs)}>
+          <Button size="sm" variant="ghost" data-testid={communitySource ? 'editor-return-source' : 'editor-return-designs'} className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(communitySource ? Routes.communityLook(communitySource.sourceId) : Routes.designs)}>
             <ArrowLeft size={14} />
             <span className="sm:hidden">{communitySource ? '来源' : '列表'}</span>
             <span className="hidden sm:inline">{communitySource ? '返回来源 Look' : '设计列表'}</span>
@@ -531,18 +549,18 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
           }}
             className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-gray-900 hover:border-gray-200 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:text-gray-600 sm:min-w-[140px]"
           />
-          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
             <Undo2 size={14} />
           </Button>
-          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
             <Redo2 size={14} />
           </Button>
-          <Button size="sm" className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
+          <Button size="sm" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
             <Save size={14} /><span className="hidden sm:inline">{saveState === 'error' ? '重试保存' : '保存'}</span>
           </Button>
           <Button
             size="sm"
-            className="min-h-11 min-w-11 shrink-0 sm:min-h-0 sm:min-w-0"
+            className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0"
             variant="secondary"
             disabled={saveState !== 'saved' || switching}
             title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
@@ -591,17 +609,21 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
           context="geometry"
           source={geometrySilhouette.source}
           title={`${currentFinger} · ${geometrySilhouette.label}`}
-          description={geometrySilhouette.source === 'product'
-            ? '当前设计按产品甲型轮廓裁剪预览。甲型与长度由 Wizard / DesignVersion 的 geometryRef 绑定，Editor 不在此重写。'
-            : '当前未解析到正式产品几何，预览使用通用轮廓；原 geometryRef 保持不变，正式绑定留给 V7-15。'}
+          description={geometryResolution.fidelity === 'exact'
+            ? '当前设计按已签收的 2D 产品轮廓裁剪预览。甲型与长度由 Wizard / DesignVersion 的 geometryRef 绑定，Editor 不在此重写。'
+            : geometryResolution.fidelity === 'approximate'
+              ? '当前引用命中已生成但尚未签收的轮廓；可以查看近似预览，空间编辑保持停用，原 geometryRef 不变。'
+              : '当前几何不可用，预览使用通用轮廓；空间编辑保持停用，原 geometryRef 不变且不会自动换甲型。'}
           details={[
             { label: '指位', value: currentFinger },
-            ...(productGeometry ? [
-              { label: '甲型 / 长度', value: `${productGeometry.shape} / ${productGeometry.length}` },
+            ...(geometryResolution.shape && geometryResolution.length ? [
+              { label: '甲型 / 长度', value: `${geometryResolution.shape} / ${geometryResolution.length}` },
             ] : []),
+            { label: '2D 轮廓可信度', value: GEOMETRY_FIDELITY_LABEL[geometryResolution.fidelity] },
+            { label: '资产状态', value: GEOMETRY_STATUS_LABEL[geometryResolution.status === 'resolved' ? geometryResolution.evidence : geometryResolution.reason] },
             { label: '几何引用', value: `${currentNail.geometryRef.assetId} @ ${currentNail.geometryRef.revision}` },
           ]}
-          disclaimer="这是结构化预览映射，不代表扫描、贴合、物理或制造验证。"
+          disclaimer="这是结构化 2D 轮廓预览，不代表逐指扫描、贴合、材料、物理或制造验证。"
           onDismiss={closeStageContext}
         />
       )}
