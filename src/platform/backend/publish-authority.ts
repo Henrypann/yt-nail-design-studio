@@ -110,7 +110,7 @@ export function createLocalPublishPackageAuthorityPortV1(input?: {
   return {
     adapterKind: 'LOCAL_PROTOTYPE',
     async read(context) {
-      const allowed = requireServicePermissionV1(context, BACKEND_PERMISSIONS_V1.publicationRead);
+      const allowed = requireServicePermissionV1(context, BACKEND_PERMISSIONS_V1.packageReferenceRead);
       return allowed.ok ? repository.read() : allowed;
     },
     async replace(context, value, expectedEtag) {
@@ -168,7 +168,7 @@ export async function registerPublishPackageArtifactsV1(input: {
   if (uploaded.value.some((record) => record.status !== 'READY')) {
     return serviceErrorV1('PRECONDITION_FAILED', 'publish.assets_not_ready', false, assetContext.value.correlationId);
   }
-  const readContext = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.publicationRead });
+  const readContext = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.packageReferenceRead });
   if (!readContext.ok) return readContext;
   const current = await input.authority.read(readContext.value);
   if (!current.ok) return current;
@@ -252,7 +252,7 @@ export async function readAuthoritativePackageByVersionV1(input: {
   authority: PublishPackageAuthorityPortV1;
   designVersionId: string;
 }): Promise<ServiceResultV1<PublishPackageAuthorityRecordV1>> {
-  const context = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.publicationRead });
+  const context = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.packageReferenceRead });
   if (!context.ok) return context;
   const current = await input.authority.read(context.value);
   if (!current.ok) return current;

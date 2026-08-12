@@ -29,6 +29,7 @@ import {
   buildDesignReleaseManifestV1,
   canonicalJsonV1,
   type DesignReleaseRecordV1,
+  type ReleasedAssetReferenceMappingV1,
 } from '@/studio/versioning/design-release';
 import {
   PUBLISH_COVER_SIZE,
@@ -120,10 +121,12 @@ function validateReleaseRecord(
   if (!isRecord(record) || record.schemaVersion !== 1) {
     return { ok: false, message: 'release record must be a schemaVersion 1 object' };
   }
-  if (!Object.keys(record).every((key) => ['schemaVersion', 'designVersion', 'manifest', 'editorDocSnapshot'].includes(key))) {
+  if (!Object.keys(record).every((key) => ['schemaVersion', 'designVersion', 'manifest', 'assetReferenceMappings', 'editorDocSnapshot'].includes(key))) {
     return { ok: false, message: 'release record contains unknown fields' };
   }
-  if (!isRecord(record.designVersion) || !isRecord(record.manifest) || !isRecord(record.editorDocSnapshot)) {
+  if (!isRecord(record.designVersion) || !isRecord(record.manifest)
+    || (record.assetReferenceMappings !== undefined && !Array.isArray(record.assetReferenceMappings))
+    || !isRecord(record.editorDocSnapshot)) {
     return { ok: false, message: 'release record is missing designVersion/manifest/editorDocSnapshot' };
   }
   const version = parseDesignVersionV1(record.designVersion);
@@ -133,7 +136,10 @@ function validateReleaseRecord(
   if (version.value.designId !== doc.doc.designId || version.value.revision !== doc.doc.revision) {
     return { ok: false, message: 'release record designVersion refs do not match the snapshot' };
   }
-  const derived = buildDesignReleaseManifestV1(doc.doc);
+  const derived = buildDesignReleaseManifestV1(
+    doc.doc,
+    record.assetReferenceMappings as unknown as ReleasedAssetReferenceMappingV1[] | undefined,
+  );
   if (!derived.ok) return { ok: false, message: `release manifest cannot be re-derived: ${derived.message}` };
   if (canonicalJsonV1(derived.manifest) !== canonicalJsonV1(record.manifest)) {
     return { ok: false, message: 'release manifest does not match the immutable snapshot' };

@@ -41,6 +41,25 @@ function createIntent() {
   return { created, intent };
 }
 
+async function readCustomizeEvents() {
+  const result = await runtime.readLookCustomizeEventsV1();
+  assert.equal(result.ok, true);
+  if (!result.ok) throw new Error(result.error.reason);
+  return result.value;
+}
+
+// A visible creator-like Look without a corresponding authoritative release
+// must not create an intent, target document or analytics event.
+localStorage.clear();
+const unsupportedLook = structuredClone(fixture.CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1);
+unsupportedLook.lookId = 'look.public-without-release';
+unsupportedLook.designVersionId = 'design-version.missing-authority';
+const unsupported = runtime.createVersionedUseIntentForLookV1(unsupportedLook);
+assert.deepEqual(unsupported, { ok: false, reason: 'release_unavailable' });
+assert.equal(readData(StorageKeys.versionedStudioImportIntents), null, 'no handoff writer without release authority');
+assert.equal(readData(StorageKeys.editorDocs), null, 'no target writer without release authority');
+assert.equal((await readCustomizeEvents()).length, 0, 'no event writer without release authority');
+
 // current/cancel preserve current Wizard/editor storage and do not emit success.
 for (const mode of ['current', 'cancel']) {
   localStorage.clear();
@@ -53,7 +72,7 @@ for (const mode of ['current', 'cancel']) {
   assert.equal(result.ok && result.created === false, true);
   assert.equal(JSON.stringify(readData(StorageKeys.wizardDraft)), beforeDraft);
   assert.equal(JSON.stringify(readData(StorageKeys.editorDocs)), beforeDocs);
-  assert.equal(runtime.readLookCustomizeEventsV1().length, 0);
+  assert.equal((await readCustomizeEvents()).length, 0);
   assert.equal(runtime.versionedIntentPortV2.peek(created.intentId), null);
 }
 
@@ -76,8 +95,8 @@ assert.equal(JSON.stringify(readData(StorageKeys.wizardDraft)), draftBefore, 'Wi
 assert.equal(JSON.stringify(fixture.CANONICAL_USE_DEMO_EDITOR_DOC_V7), sourceBefore, 'source immutable');
 assert.equal(parseEditorDocV7(readData(StorageKeys.editorDocs)[createdResult.doc.designId]).ok, true);
 assert.equal(readData(StorageKeys.designs).find((summary) => summary.id === createdResult.doc.designId)?.status, 'draft');
-assert.equal(runtime.readLookCustomizeEventsV1().length, 1);
-assert.equal(runtime.readLookCustomizeEventsV1()[0].targetDesignId, createdResult.doc.designId);
+assert.equal((await readCustomizeEvents()).length, 1);
+assert.equal((await readCustomizeEvents())[0].targetDesignId, createdResult.doc.designId);
 assert.equal(runtime.versionedIntentPortV2.peek(created.intentId), null);
 
 const sourceIds = [];
@@ -105,7 +124,7 @@ assert.equal(replay.ok && replay.created, true);
 if (!replay.ok || !replay.created) throw new Error(replay.message);
 assert.equal(replay.doc.designId, createdResult.doc.designId);
 assert.equal(Object.keys(readData(StorageKeys.editorDocs)).length, 1);
-assert.equal(runtime.readLookCustomizeEventsV1().length, 1);
+assert.equal((await readCustomizeEvents()).length, 1);
 
 // Expiry removes only the exact intent.
 localStorage.clear();

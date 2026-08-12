@@ -89,6 +89,7 @@ export const CANONICAL_USE_DEMO_RELEASE_RECORD_V1: DesignReleaseRecordV1 = {
     assetRevisionRefs: structuredClone(manifest.manifest.assetRevisionRefs),
   },
   manifest: manifest.manifest,
+  assetReferenceMappings: structuredClone(manifest.assetReferenceMappings),
   editorDocSnapshot: structuredClone(CANONICAL_USE_DEMO_EDITOR_DOC_V7),
 };
 

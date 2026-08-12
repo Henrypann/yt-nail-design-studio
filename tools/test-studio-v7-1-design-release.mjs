@@ -8,6 +8,8 @@ const root = process.cwd();
 const fixtureModule = await import(pathToFileURL(path.join(root, 'src/studio/editor/fixtures/editor-doc-v7.mjs')).href);
 const releaseModule = await import(pathToFileURL(path.join(root, 'src/studio/versioning/design-release.ts')).href);
 const designContent = await import(pathToFileURL(path.join(root, 'src/community/domain/v7_1/design-content-parse.ts')).href);
+const backend = await import(pathToFileURL(path.join(root, 'src/platform/backend/index.ts')).href);
+const flatAssets = await import(pathToFileURL(path.join(root, 'src/studio/editor/v7/flat-content-assets.ts')).href);
 const {
   EDITOR_DOC_V7_MINIMAL_FIXTURE,
   EDITOR_DOC_V7_FULL_FIXTURE,
@@ -61,6 +63,73 @@ assert.equal(
   'object key insertion order does not affect canonical JSON',
 );
 assert.notEqual(canonicalJsonV1({ list: [2, 1] }), canonicalJsonV1({ list: [1, 2] }), 'array order remains canonical truth');
+
+// A real bundled flat asset is resolved before release and its source →
+// numeric canonical mapping is frozen into the private release record.
+{
+  const doc = structuredClone(EDITOR_DOC_V7_MINIMAL_FIXTURE);
+  const bundled = flatAssets.FLAT_BUNDLED_ASSET_REGISTRY_V7[0];
+  const element = flatAssets.createImageFlatElementV7({
+    id: 'element.L1.bundled-sparkle', role: bundled.role, asset: bundled.asset,
+  });
+  assert.ok(element, 'bundled asset creates a valid flat element');
+  doc.nails.L1.steps.splice(doc.nails.L1.steps.length - 1, 0, {
+    id: 'step.L1.bundled-flat', typeId: 'builtin.v7.flat_design', kind: 'flat_design',
+    name: 'bundled sparkle', visible: true, locked: false, skipped: false,
+    materialRefs: [], elements: [element],
+  });
+  const identity = backend.createLocalPrototypeIdentityAccessPortV1({
+    actorRef: 'release.asset-resolver', permissions: ['asset.read'],
+    now: () => '2026-08-11T06:00:00.000Z',
+  });
+  const resolver = backend.createAssetReferenceResolverV1({
+    identity,
+    assets: { get: async () => { throw new Error('bundled resolution must not query mutable asset storage'); } },
+    aliases: [],
+    bundled: [{
+      sourceAssetId: bundled.asset.assetId,
+      sourceRevision: bundled.asset.revision,
+      canonicalAssetId: bundled.asset.assetId,
+      canonicalRevision: 1,
+      canonicalRef: {
+        assetId: bundled.asset.assetId, revision: 1,
+        sha256: bundled.asset.sha256, mimeType: bundled.asset.mimeType,
+      },
+    }],
+  });
+  const h = harness({ [doc.designId]: doc });
+  h.deps.assetReferenceResolver = resolver;
+  const released = await releaseSavedEditorDocV7({
+    designId: doc.designId, expectedRevision: doc.revision, runtimeGuard: guard(doc.revision),
+  }, h.deps);
+  assert.equal(released.ok, true, 'bundled flat asset releases through authoritative resolver');
+  if (!released.ok) throw new Error(released.message);
+  assert.deepEqual(released.record.assetReferenceMappings, [{
+    sourceAssetId: bundled.asset.assetId,
+    sourceRevision: 'flat-assets-v1',
+    canonicalRef: {
+      assetId: bundled.asset.assetId, revision: 1,
+      sha256: bundled.asset.sha256, mimeType: bundled.asset.mimeType,
+    },
+  }]);
+  assert.deepEqual(released.record.designVersion.assetRevisionRefs, [released.record.assetReferenceMappings[0].canonicalRef]);
+  const parsed = parseDesignReleaseStoreV1(JSON.parse(h.stored));
+  assert.equal(parsed.ok, true, 'stored canonical mapping round-trips without resolver');
+  const reread = await readDesignReleaseByVersionIdV1(released.record.designVersion.designVersionId, h.deps);
+  assert.equal(reread.ok && reread.record?.assetReferenceMappings[0].sourceRevision === 'flat-assets-v1', true);
+
+  const unknownDoc = structuredClone(doc);
+  const flat = unknownDoc.nails.L1.steps.find((step) => step.kind === 'flat_design');
+  flat.elements[0].asset.assetId = 'asset.flat-content.bundled.unknown';
+  const unknownHarness = harness({ [unknownDoc.designId]: unknownDoc });
+  unknownHarness.deps.assetReferenceResolver = resolver;
+  const unknown = await releaseSavedEditorDocV7({
+    designId: unknownDoc.designId, expectedRevision: unknownDoc.revision, runtimeGuard: guard(unknownDoc.revision),
+  }, unknownHarness.deps);
+  assert.equal(unknown.ok, false, 'unknown bundled alias fails closed');
+  assert.equal(unknownHarness.writes, 0, 'unknown alias is writer-zero');
+  assert.equal(unknownHarness.ids, 0, 'unknown alias generates no release ID');
+}
 
 // Blank valid V7 releases without invented assets.
 {

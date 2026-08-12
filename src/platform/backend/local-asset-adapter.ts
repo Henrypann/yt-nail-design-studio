@@ -142,6 +142,12 @@ export function createLocalAssetUploadPortV1(input: {
         const existingAsset = store.value.records.find((record) => binaryKey(record.object.assetId, record.object.revision) === assetKey);
         if (existingUpload || existingAsset) {
           if (existingUpload && existingUpload === existingAsset && sameUpload(existingUpload, upload)) {
+            try {
+              const bytes = await input.binary.get(assetKey);
+              if (!bytes || bytes.byteLength !== existingUpload.object.byteLength || await input.sha256(bytes) !== existingUpload.object.sha256) {
+                return serviceErrorV1('DATA_CORRUPTED', 'asset.replayed_bytes_missing', false, context.correlationId);
+              }
+            } catch { return serviceErrorV1('UNAVAILABLE', 'asset.local_read_failed', true, context.correlationId); }
             records.push(structuredClone(existingUpload));
             continue;
           }

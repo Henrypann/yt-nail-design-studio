@@ -21,6 +21,8 @@ export type {
   DesignReleaseStorageV1,
   DesignReleaseStoreV1,
   ReleasedGeometryRefV1,
+  ReleasedAssetReferenceMappingV1,
+  DesignReleaseAssetReferenceResolverV1,
   ReleasedCompositionProvenanceV1,
   ReleasedMaterialRefV1,
   ReleasedRecipeRefV1,

@@ -1,18 +1,28 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import {
   createAssetReferenceResolverV1,
+  createClientApprovalApplicationServiceV1,
+  createCreatorWorkspaceApplicationServiceV1,
+  createGovernanceApplicationServiceV1,
   createInMemoryAssetBinaryStorageV1,
   createLocalAssetUploadPortV1,
   createLocalPrototypeIdentityAccessPortV1,
   createLocalPublishPackageAuthorityPortV1,
+  createLocalVersionedUsePersistencePortV1,
   createVersionedJsonRepositoryV1,
   parseAssetUploadRecordV1,
   parseServiceCommandContextV1,
   parseServiceErrorV1,
   registerPublishPackageArtifactsV1,
+  localEtagV1,
   BACKEND_PERMISSIONS_V1,
 } from '../src/platform/backend/index.ts';
+import { StorageKeys, writeEnvelope } from '../src/lib/storage.ts';
+import { createEmptyCreatorPublicationStoreV1 } from '../src/community/domain/v7_1/creator-publication.ts';
+import { emptyGovernanceStoreV1 } from '../src/community/domain/v7_1/governance.ts';
+import { emptyClientApprovalStoreV1 } from '../src/studio/approval/client-approval.ts';
 import {
   buildPublishPackageV1,
   createDeterministicPublishIdFactoryV1,
@@ -20,6 +30,14 @@ import {
 import { CANONICAL_USE_DEMO_RELEASE_RECORD_V1 } from '../src/integration/community-studio/canonical-use-demo.ts';
 
 const now = '2026-08-12T12:00:00.000Z';
+class MemoryStorage {
+  #items = new Map();
+  getItem(key) { return this.#items.get(key) ?? null; }
+  setItem(key, value) { this.#items.set(key, String(value)); }
+  removeItem(key) { this.#items.delete(key); }
+  clear() { this.#items.clear(); }
+}
+globalThis.localStorage = new MemoryStorage();
 let id = 0;
 const identity = createLocalPrototypeIdentityAccessPortV1({
   actorRef: 'profile.local-demo.creator',
@@ -138,4 +156,96 @@ const resolved = await resolver.resolve({ assetId: 'asset.flat-content.bundled.s
 assert.equal(resolved.ok, true); assert.equal(resolved.value.revision, 1);
 assert.equal((await resolver.resolve({ assetId: 'asset.unknown', revision: 'flat-assets-v1' })).error.code, 'NOT_FOUND');
 
-console.log('[GEN-V7.1-04] service/error/identity/atomic etag/idempotency/assets/artifacts/reference authority: PASS');
+// Versioned-use event persistence is async, permission-guarded and fail-closed.
+const versionedUse = createLocalVersionedUsePersistencePortV1();
+const versionedWriteContext = await identity.issueContext({ operation: 'versioned-use.write', idempotencyKey: 'idem.versioned.1' });
+assert.equal(versionedWriteContext.ok, true);
+const customizeEvent = {
+  event: 'look_customize', eventId: 'intent.v2.test', lookId: 'look.test',
+  designVersionId: 'design-version.test', targetDesignId: 'design.target', occurredAt: now,
+};
+const eventSaved = await versionedUse.recordEvent(versionedWriteContext.value, customizeEvent);
+assert.equal(eventSaved.ok, true); assert.equal(eventSaved.changed, true);
+const eventReplay = await versionedUse.recordEvent(versionedWriteContext.value, customizeEvent);
+assert.equal(eventReplay.ok, true); assert.equal(eventReplay.changed, false);
+const versionedReadContext = await identity.issueContext({ operation: 'versioned-use.read' });
+const eventRead = await versionedUse.readEvents(versionedReadContext.value);
+assert.equal(eventRead.ok, true); assert.equal(eventRead.value.length, 1);
+const readOnlyIdentity = createLocalPrototypeIdentityAccessPortV1({
+  actorRef: 'viewer.versioned', permissions: ['versioned-use.read'], now: () => now,
+});
+const readOnlyContext = await readOnlyIdentity.issueContext({ operation: 'versioned-use.read' });
+const forbiddenEvent = await versionedUse.recordEvent(readOnlyContext.value, customizeEvent);
+assert.equal(forbiddenEvent.error.code, 'FORBIDDEN');
+writeEnvelope(StorageKeys.lookCustomizeEvents, { broken: { ...customizeEvent, unexpected: true } });
+const corruptedEvents = await versionedUse.readEvents(versionedReadContext.value);
+assert.equal(corruptedEvents.error.code, 'DATA_CORRUPTED');
+localStorage.clear();
+
+// Application services own identity, time, ETag and domain commands; pages only consume them.
+function memoryPort(initial) {
+  let value = structuredClone(initial);
+  return {
+    adapterKind: 'LOCAL_PROTOTYPE',
+    async read() { return { ok: true, value: { value: structuredClone(value), etag: localEtagV1(value) }, changed: false }; },
+    async replace(_context, next, expectedEtag) {
+      if (expectedEtag !== localEtagV1(value)) return { ok: false, error: { schemaVersion: 1, code: 'CONFLICT', retryable: false, reason: 'repository.etag_mismatch' } };
+      const changed = localEtagV1(next) !== localEtagV1(value); value = structuredClone(next);
+      return { ok: true, value: { value: structuredClone(value), etag: localEtagV1(value) }, changed };
+    },
+  };
+}
+const publicationMemory = memoryPort(createEmptyCreatorPublicationStoreV1());
+const governanceMemory = memoryPort(emptyGovernanceStoreV1());
+const approvalMemory = memoryPort(emptyClientApprovalStoreV1());
+let authorityRecords = [structuredClone(registered.value)];
+const authorityMemory = {
+  adapterKind: 'LOCAL_PROTOTYPE',
+  async read() { const value = { schemaVersion: 1, records: structuredClone(authorityRecords) }; return { ok: true, value: { value, etag: localEtagV1(value) }, changed: false }; },
+  async replace() { throw new Error('not used'); },
+};
+let appId = 0;
+const appNextId = (scope) => `${scope}${++appId}`;
+const app = createCreatorWorkspaceApplicationServiceV1({
+  identity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
+  authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  token: { generate: () => 'raw-client-token', sha256: async (value) => createHash('sha256').update(value).digest('hex') },
+});
+let workspace = await app.createDraft(packageResult.package.designVersionId); assert.equal(workspace.ok, true);
+const draftId = workspace.value.draftId;
+workspace = await app.updateDraft(draftId, { title: 'Backend Authority Look', tags: ['authority'], visibility: 'UNLISTED', copyrightDeclared: true, sourceDeclared: true, step: 3 });
+assert.equal(workspace.ok, true);
+workspace = await app.submitReview(draftId); assert.equal(workspace.ok, true);
+const pendingReview = workspace.value.governance.publicationReviews[0];
+const operatorIdentity = createLocalPrototypeIdentityAccessPortV1({ actorRef: 'operator.1', permissions: ['governance.read', 'governance.write'], now: () => now, nextId: (prefix) => `${prefix}${++appId}` });
+const governanceApp = createGovernanceApplicationServiceV1({ identity: operatorIdentity, governance: governanceMemory, nextId: appNextId });
+const cleared = await governanceApp.decidePublicationReview(pendingReview.reviewId, 'CLEARED'); assert.equal(cleared.ok, true);
+workspace = await app.updateDraft(draftId, { visibility: 'PUBLIC' }); assert.equal(workspace.ok, true);
+workspace = await app.publishDraft(draftId); assert.equal(workspace.ok, true); assert.equal(workspace.value.publication.looks[0].visibility, 'PUBLIC');
+const shared = await app.createClientShare(packageResult.package.designVersionId); assert.equal(shared.ok, true);
+const anonymousIdentity = createLocalPrototypeIdentityAccessPortV1({
+  actorRef: 'anonymous.share', permissions: ['approval.read', 'approval.write', 'package-reference.read'],
+  disclosure: 'ANONYMOUS_SHARE', now: () => now, nextId: (prefix) => `${prefix}${++appId}`,
+});
+const clientApp = createClientApprovalApplicationServiceV1({
+  identity: anonymousIdentity, approvals: approvalMemory, authority: authorityMemory, nextId: appNextId,
+  sha256: async (value) => createHash('sha256').update(value).digest('hex'),
+});
+let clientView = await clientApp.loadByRawToken(shared.value.rawToken); assert.equal(clientView.ok, true);
+clientView = await clientApp.decide(shared.value.rawToken, 'APPROVED', 'Looks good'); assert.equal(clientView.ok, true); assert.equal(clientView.value.existingDecision.decision, 'APPROVED');
+const newer = structuredClone(registered.value); newer.package.designVersionId = 'design-version.newer'; newer.package.version += 1;
+authorityRecords = [...authorityRecords, newer];
+const staleClient = await clientApp.loadByRawToken(shared.value.rawToken); assert.equal(staleClient.error.code, 'STALE', 'approval service compares against authority latest, not share version');
+
+const uiFiles = [
+  'src/community/pages/CreatorWorkspacePage.tsx',
+  'src/community/pages/GovernanceWorkspacePage.tsx',
+  'src/community/pages/ClientSharePage.tsx',
+  'src/integration/community-studio/versioned-use-runtime.ts',
+];
+for (const file of uiFiles) {
+  const source = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /(?:readData|writeEnvelope|localStorage|creator-publication-repository|governance-repository|client-approval-repository|editor\/v7\/repository|repo-v6)/, `${file} must consume application ports, not storage/repositories`);
+}
+
+console.log('[GEN-V7.1-04] service/error/identity/atomic repository/assets/artifacts/reference/application cutover: PASS');

@@ -38,6 +38,7 @@ const record = {
     assetRevisionRefs: structuredClone(manifestResult.manifest.assetRevisionRefs),
   },
   manifest: structuredClone(manifestResult.manifest),
+  assetReferenceMappings: structuredClone(manifestResult.assetReferenceMappings),
   editorDocSnapshot: structuredClone(doc),
 };
 

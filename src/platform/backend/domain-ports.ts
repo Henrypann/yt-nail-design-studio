@@ -33,23 +33,29 @@ import {
 export const BACKEND_PERMISSIONS_V1 = {
   publicationRead: 'publication.read',
   publicationWrite: 'publication.write',
+  packageReferenceRead: 'package-reference.read',
   governanceRead: 'governance.read',
   governanceWrite: 'governance.write',
   approvalRead: 'approval.read',
   approvalWrite: 'approval.write',
   assetRead: 'asset.read',
   assetWrite: 'asset.write',
+  versionedUseRead: 'versioned-use.read',
+  versionedUseWrite: 'versioned-use.write',
 } as const;
 
 export const BACKEND_OPERATIONS_V1 = {
   publicationRead: 'publication.read',
   publicationWrite: 'publication.write',
+  packageReferenceRead: 'package-reference.read',
   governanceRead: 'governance.read',
   governanceWrite: 'governance.write',
   approvalRead: 'approval.read',
   approvalWrite: 'approval.write',
   assetRead: 'asset.read',
   assetWrite: 'asset.write',
+  versionedUseRead: 'versioned-use.read',
+  versionedUseWrite: 'versioned-use.write',
 } as const;
 
 interface DomainStorePortV1<T> {

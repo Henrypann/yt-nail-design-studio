@@ -33,6 +33,19 @@ export interface ReleasedRecipeRefV1 {
   revision: string;
 }
 
+export interface ReleasedAssetReferenceMappingV1 {
+  sourceAssetId: string;
+  sourceRevision: string;
+  canonicalRef: ImmutableAssetRevisionRefV1;
+}
+
+export interface DesignReleaseAssetReferenceResolverV1 {
+  resolve(ref: { assetId: string; revision: string; sha256: string; mimeType: string }): Promise<
+    | { ok: true; value: ImmutableAssetRevisionRefV1; changed: boolean }
+    | { ok: false; error: { code: string; retryable: boolean; reason: string } }
+  >;
+}
+
 export interface ReleasedCompositionProvenanceV1 {
   finger: FingerCode;
   compositionId: string;
@@ -57,6 +70,8 @@ export interface DesignReleaseRecordV1 {
   schemaVersion: 1;
   designVersion: DesignVersionV1;
   manifest: DesignReleaseManifestV1;
+  /** Frozen source → numeric canonical mapping used to re-derive manifest. */
+  assetReferenceMappings: ReleasedAssetReferenceMappingV1[];
   editorDocSnapshot: EditorDocV7;
 }
 
@@ -84,6 +99,8 @@ export interface DesignReleaseDependenciesV1 {
   nextId(): string;
   now(): string;
   releasedByIdentityId(): string | null;
+  /** Required when the document contains backend or bundled asset refs. */
+  assetReferenceResolver?: DesignReleaseAssetReferenceResolverV1;
   /** Test hook for a source race; production leaves it undefined. */
   beforeSourceRecheck?: () => void | Promise<void>;
 }
@@ -201,28 +218,50 @@ function dedupeByKey<T>(
 
 export function buildDesignReleaseManifestV1(
   doc: EditorDocV7,
-): { ok: true; manifest: DesignReleaseManifestV1 } | { ok: false; code: 'unsupported_asset_revision' | 'conflicting_reference'; message: string } {
+  resolvedMappings?: readonly ReleasedAssetReferenceMappingV1[],
+): { ok: true; manifest: DesignReleaseManifestV1; assetReferenceMappings: ReleasedAssetReferenceMappingV1[] } | { ok: false; code: 'unsupported_asset_revision' | 'conflicting_reference'; message: string } {
   const geometryRefs = FINGER_CODES.map((finger) => ({ finger, ...clone(doc.nails[finger].geometryRef) }));
   const assets: AssetRefV7[] = [];
   const materials: MaterialRefV7[] = [];
   collectDeep(doc, assets, materials);
 
+  const mappingBySource = new Map<string, ReleasedAssetReferenceMappingV1>();
+  for (const mapping of resolvedMappings ?? []) {
+    const key = `${mapping.sourceAssetId}#${mapping.sourceRevision}`;
+    const previous = mappingBySource.get(key);
+    if (!ID.test(mapping.sourceAssetId) || typeof mapping.sourceRevision !== 'string' || mapping.sourceRevision.length === 0
+      || !ID.test(mapping.canonicalRef.assetId) || !Number.isSafeInteger(mapping.canonicalRef.revision)
+      || mapping.canonicalRef.revision < 1 || !SHA256.test(mapping.canonicalRef.sha256)
+      || typeof mapping.canonicalRef.mimeType !== 'string' || mapping.canonicalRef.mimeType.length === 0
+      || (previous && canonicalJsonV1(previous) !== canonicalJsonV1(mapping))) {
+      return { ok: false, code: 'conflicting_reference', message: `invalid asset mapping ${key}` };
+    }
+    mappingBySource.set(key, clone(mapping));
+  }
   const immutableAssets: ImmutableAssetRevisionRefV1[] = [];
+  const mappings: ReleasedAssetReferenceMappingV1[] = [];
   for (const asset of assets) {
+    const sourceKey = `${asset.assetId}#${asset.revision}`;
+    const supplied = mappingBySource.get(sourceKey);
     const revision = numericAssetRevision(asset.revision);
-    if (revision === null) {
+    const canonicalRef = supplied?.canonicalRef ?? (revision === null ? null : {
+      assetId: asset.assetId,
+      revision,
+      sha256: asset.sha256,
+      mimeType: asset.mimeType,
+    });
+    if (canonicalRef === null) {
       return {
         ok: false,
         code: 'unsupported_asset_revision',
         message: `asset ${asset.assetId} has non-canonical numeric revision ${asset.revision}`,
       };
     }
-    immutableAssets.push({
-      assetId: asset.assetId,
-      revision,
-      sha256: asset.sha256,
-      mimeType: asset.mimeType,
-    });
+    if (canonicalRef.sha256 !== asset.sha256 || canonicalRef.mimeType !== asset.mimeType) {
+      return { ok: false, code: 'conflicting_reference', message: `asset mapping integrity mismatch ${sourceKey}` };
+    }
+    immutableAssets.push(clone(canonicalRef));
+    mappings.push({ sourceAssetId: asset.assetId, sourceRevision: asset.revision, canonicalRef: clone(canonicalRef) });
   }
   const assetResult = dedupeByKey(immutableAssets, (value) => `${value.assetId}#${value.revision}`);
   const materialResult = dedupeByKey(materials, (value) => `${value.materialId}#${value.revision}`);
@@ -233,6 +272,8 @@ export function buildDesignReleaseManifestV1(
   if (!assetResult.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${assetResult.key}` };
   if (!materialResult.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${materialResult.key}` };
   if (!recipeResult.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${recipeResult.key}` };
+  const mappingResult = dedupeByKey(mappings, (value) => `${value.sourceAssetId}#${value.sourceRevision}`);
+  if (!mappingResult.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${mappingResult.key}` };
   const sourceResult = dedupeByKey(clone(doc.sourceRefs), (value) => `${value.domain}#${value.sourceId}#${value.revision ?? ''}`);
   if (!sourceResult.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${sourceResult.key}` };
   return {
@@ -251,7 +292,36 @@ export function buildDesignReleaseManifestV1(
       }),
       rendererEvidence: RENDERER_EVIDENCE_UNAVAILABLE,
     },
+    assetReferenceMappings: mappingResult.values,
   };
+}
+
+async function buildResolvedDesignReleaseManifestV1(
+  doc: EditorDocV7,
+  resolver?: DesignReleaseAssetReferenceResolverV1,
+): Promise<ReturnType<typeof buildDesignReleaseManifestV1> | { ok: false; code: 'dependency_unavailable'; message: string }> {
+  const assets: AssetRefV7[] = [];
+  const materials: MaterialRefV7[] = [];
+  collectDeep(doc, assets, materials);
+  const sourceAssets = dedupeByKey(assets, (asset) => `${asset.assetId}#${asset.revision}`);
+  if (!sourceAssets.ok) return { ok: false, code: 'conflicting_reference', message: `conflicting immutable reference ${sourceAssets.key}` };
+  if (!resolver) return buildDesignReleaseManifestV1(doc);
+  const mappings: ReleasedAssetReferenceMappingV1[] = [];
+  for (const asset of sourceAssets.values) {
+    let resolved: Awaited<ReturnType<DesignReleaseAssetReferenceResolverV1['resolve']>>;
+    try {
+      resolved = await resolver.resolve({ assetId: asset.assetId, revision: asset.revision, sha256: asset.sha256, mimeType: asset.mimeType });
+    } catch {
+      return { ok: false, code: 'dependency_unavailable', message: `asset resolver unavailable for ${asset.assetId}` };
+    }
+    if (!resolved.ok) {
+      return resolved.error.retryable
+        ? { ok: false, code: 'dependency_unavailable', message: `asset resolver unavailable for ${asset.assetId}` }
+        : { ok: false, code: 'unsupported_asset_revision', message: `asset reference unresolved ${asset.assetId}#${asset.revision}` };
+    }
+    mappings.push({ sourceAssetId: asset.assetId, sourceRevision: asset.revision, canonicalRef: clone(resolved.value) });
+  }
+  return buildDesignReleaseManifestV1(doc, mappings);
 }
 
 function parseManifest(value: unknown): DesignReleaseManifestV1 | null {
@@ -289,7 +359,7 @@ export function parseDesignReleaseStoreV1(value: unknown): { ok: true; store: De
   const ids = new Set<string>();
   const releaseKeys = new Set<string>();
   for (const raw of value.records) {
-    if (!isRecord(raw) || !exactKeys(raw, ['schemaVersion', 'designVersion', 'manifest', 'editorDocSnapshot']) || raw.schemaVersion !== 1) {
+    if (!isRecord(raw) || !exactKeys(raw, ['schemaVersion', 'designVersion', 'manifest', 'assetReferenceMappings', 'editorDocSnapshot']) || raw.schemaVersion !== 1) {
       return { ok: false, reason: 'invalid release record' };
     }
     const version = parseDesignVersionV1(raw.designVersion);
@@ -300,15 +370,26 @@ export function parseDesignReleaseStoreV1(value: unknown): { ok: true; store: De
       || canonicalJsonV1(version.value.assetRevisionRefs) !== canonicalJsonV1(manifest.assetRevisionRefs)) {
       return { ok: false, reason: 'release record reference mismatch' };
     }
-    const derivedManifest = buildDesignReleaseManifestV1(doc.doc);
+    let mappings: ReleasedAssetReferenceMappingV1[];
+    if (raw.assetReferenceMappings === undefined) {
+      const legacyDerived = buildDesignReleaseManifestV1(doc.doc);
+      if (!legacyDerived.ok) return { ok: false, reason: 'release record has no canonical asset mapping' };
+      mappings = legacyDerived.assetReferenceMappings;
+    } else if (Array.isArray(raw.assetReferenceMappings)) {
+      mappings = clone(raw.assetReferenceMappings) as ReleasedAssetReferenceMappingV1[];
+    } else return { ok: false, reason: 'invalid release asset mapping' };
+    const derivedManifest = buildDesignReleaseManifestV1(doc.doc, mappings);
     if (!derivedManifest.ok || canonicalJsonV1(derivedManifest.manifest) !== canonicalJsonV1(manifest)) {
       return { ok: false, reason: 'release manifest does not match immutable snapshot' };
+    }
+    if (canonicalJsonV1(derivedManifest.assetReferenceMappings) !== canonicalJsonV1(mappings)) {
+      return { ok: false, reason: 'release asset mapping is not canonical' };
     }
     const id = version.value.designVersionId;
     const releaseKey = `${version.value.designId}#${version.value.revision}`;
     if (ids.has(id) || releaseKeys.has(releaseKey)) return { ok: false, reason: 'duplicate release record' };
     ids.add(id); releaseKeys.add(releaseKey);
-    records.push({ schemaVersion: 1, designVersion: version.value, manifest, editorDocSnapshot: doc.doc });
+    records.push({ schemaVersion: 1, designVersion: version.value, manifest, assetReferenceMappings: mappings, editorDocSnapshot: doc.doc });
   }
   return { ok: true, store: { schemaVersion: 1, kind: DESIGN_RELEASE_STORE_KIND, records } };
 }
@@ -353,7 +434,7 @@ export async function releaseSavedEditorDocV7(
   const parsed = parseEditorDocV7(rawSource);
   if (!parsed.ok || parsed.doc.designId !== input.designId) return releaseError('invalid_source', parsed.ok ? 'source key/designId mismatch' : parsed.reason);
   if (parsed.doc.revision !== input.expectedRevision) return releaseError('revision_mismatch', 'persisted revision does not match expected revision');
-  const manifest = buildDesignReleaseManifestV1(parsed.doc);
+  const manifest = await buildResolvedDesignReleaseManifestV1(parsed.doc, dependencies.assetReferenceResolver);
   if (!manifest.ok) return releaseError(manifest.code, manifest.message);
 
   let checksum: string;
@@ -411,6 +492,7 @@ export async function releaseSavedEditorDocV7(
     schemaVersion: 1,
     designVersion,
     manifest: manifest.manifest,
+    assetReferenceMappings: clone(manifest.assetReferenceMappings),
     editorDocSnapshot: clone(parsed.doc),
   };
   await dependencies.beforeSourceRecheck?.();
