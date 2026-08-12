@@ -1,6 +1,6 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, Compass, Home, Users, Palette, Monitor, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { cx } from '@/design-system';
 import { readData, removeKey, writeEnvelope, StorageKeys } from '@/lib/storage';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
@@ -9,6 +9,8 @@ import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
 import { useDevicesStore } from '@/platform/devices/device-store';
 import { CrossProductLink } from '@/app/CrossProductLink';
+
+const WORKSPACE_NAV_FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
 interface SessionInfo {
@@ -36,6 +38,7 @@ interface NavGroup {
 export function AppLayout() {
   const { text } = useLocale();
   const navigate = useNavigate();
+  const location = useLocation();
   const session = readData<SessionInfo>(StorageKeys.session) ?? {};
   const hasRegisteredHardware = useDevicesStore((state) => state.devices.length > 0);
   const [collapsed, setCollapsed] = useState(
@@ -44,6 +47,11 @@ export function AppLayout() {
   const [compactViewport, setCompactViewport] = useState(
     () => window.matchMedia('(max-width: 767px)').matches,
   );
+  const [workspaceNavOpen, setWorkspaceNavOpen] = useState(false);
+  const workspaceNavTriggerRef = useRef<HTMLButtonElement>(null);
+  const workspaceNavRef = useRef<HTMLElement>(null);
+  const workspaceUnderlayRef = useRef<HTMLDivElement>(null);
+  const creativeWorkspace = location.pathname === Routes.designNew;
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 767px)');
@@ -52,12 +60,56 @@ export function AppLayout() {
     return () => query.removeEventListener('change', update);
   }, []);
 
-  const sidebarCollapsed = collapsed || compactViewport;
+  useEffect(() => {
+    setWorkspaceNavOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!workspaceNavOpen) return;
+    const underlay = workspaceUnderlayRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    underlay?.setAttribute('inert', '');
+    const close = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setWorkspaceNavOpen(false);
+      queueMicrotask(() => workspaceNavTriggerRef.current?.focus());
+    };
+    window.addEventListener('keydown', close);
+    return () => {
+      window.removeEventListener('keydown', close);
+      document.body.style.overflow = previousOverflow;
+      underlay?.removeAttribute('inert');
+    };
+  }, [workspaceNavOpen]);
+
+  const workspaceNavOverlay = creativeWorkspace && workspaceNavOpen;
+  const sidebarCollapsed = creativeWorkspace ? !workspaceNavOpen : collapsed || compactViewport;
 
   const toggleCollapsed = () => {
+    if (creativeWorkspace) {
+      setWorkspaceNavOpen((open) => !open);
+      return;
+    }
     const next = !collapsed;
     writeEnvelope(StorageKeys.sidebarCollapsed, { collapsed: next });
     setCollapsed(next);
+  };
+
+  const trapWorkspaceNavFocus = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (!workspaceNavOverlay || event.key !== 'Tab') return;
+    const focusable = Array.from(workspaceNavRef.current?.querySelectorAll<HTMLElement>(WORKSPACE_NAV_FOCUSABLE) ?? []);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   };
 
   const handleLogout = () => {
@@ -114,12 +166,33 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen">
+      {workspaceNavOverlay && (
+        <button
+          type="button"
+          tabIndex={-1}
+          className="fixed inset-0 z-40 bg-gray-950/25 backdrop-blur-[1px]"
+          aria-label="关闭 Studio 导航"
+          onClick={() => {
+            setWorkspaceNavOpen(false);
+            queueMicrotask(() => workspaceNavTriggerRef.current?.focus());
+          }}
+        />
+      )}
+      {workspaceNavOverlay && <div className="w-14 shrink-0" aria-hidden="true" />}
       {/* 侧栏（展开 240px / 收起 56px） */}
       <aside
+        ref={workspaceNavRef}
+        role={workspaceNavOverlay ? 'dialog' : undefined}
+        aria-modal={workspaceNavOverlay ? true : undefined}
+        aria-label={workspaceNavOverlay ? 'Studio 导航' : undefined}
+        onKeyDown={trapWorkspaceNavFocus}
         data-debug-id="app.layout.sidebar"
+        data-creative-workspace={creativeWorkspace ? 'true' : 'false'}
+        data-overlay-open={workspaceNavOverlay ? 'true' : 'false'}
         className={cx(
           'flex shrink-0 flex-col border-r border-gray-200 bg-white transition-[width] duration-normal ease-out',
           sidebarCollapsed ? 'w-14' : 'w-60',
+          workspaceNavOverlay && 'fixed inset-y-0 left-0 z-50 shadow-modal',
         )}
       >
         <div
@@ -129,14 +202,16 @@ export function AppLayout() {
           )}
         >
           {!sidebarCollapsed && <span className="text-sm font-bold text-primary">Nail Design Studio</span>}
-          {!compactViewport && (
+          {(!compactViewport || creativeWorkspace) && (
             <button
+              ref={workspaceNavTriggerRef}
               onClick={toggleCollapsed}
-              title={collapsed ? '展开导航' : '收起导航'}
-              aria-label={collapsed ? '展开导航' : '收起导航'}
-              className="rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
+              title={sidebarCollapsed ? '展开导航' : '收起导航'}
+              aria-label={sidebarCollapsed ? '展开导航' : '收起导航'}
+              aria-expanded={!sidebarCollapsed}
+              className={cx('rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700', creativeWorkspace && 'min-h-11 min-w-11')}
             >
-              {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+              {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
             </button>
           )}
         </div>
@@ -191,7 +266,7 @@ export function AppLayout() {
       </aside>
 
       {/* 主区 */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div ref={workspaceUnderlayRef} className="flex min-w-0 flex-1 flex-col">
         {/* 顶栏（PRD §1.3）：门店名纯文本，无跳转 */}
         <header
           data-debug-id="app.layout.topbar"
