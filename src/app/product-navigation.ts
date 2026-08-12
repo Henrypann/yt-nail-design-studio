@@ -63,3 +63,16 @@ export function studioProductHref(
   const origin = configuredOrigin(env.VITE_STUDIO_ORIGIN);
   return origin ? absoluteProductHref(origin, studioDedicatedPath(localPath)) : localPath;
 }
+
+/**
+ * Browser-only Community -> Studio intents currently use localStorage. They can
+ * cross a route mount on the same origin, but must fail closed once the two
+ * products are deployed on different origins.
+ */
+export function canUseLocalStudioHandoff(
+  currentOrigin: string,
+  env: ProductOriginConfig = runtimeProductOrigins,
+): boolean {
+  const studioOrigin = configuredOrigin(env.VITE_STUDIO_ORIGIN);
+  return studioOrigin === null || studioOrigin === currentOrigin;
+}

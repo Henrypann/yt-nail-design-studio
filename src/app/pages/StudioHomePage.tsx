@@ -7,6 +7,7 @@ import { designNewFresh, Routes } from '@/app/routes';
 import { readAllDesigns } from '@/platform/designs';
 import { useDevicesStore } from '@/platform/devices/device-store';
 import { useRequireAuth } from '@/platform/session';
+import { CrossProductLink } from '@/app/CrossProductLink';
 
 export default function StudioHomePage() {
   const session = useRequireAuth();
@@ -51,12 +52,12 @@ export default function StudioHomePage() {
             <h2 className="mt-3 text-base font-semibold text-gray-900">Nail Lover Community</h2>
             <p className="mt-1 text-sm leading-5 text-gray-500">浏览灵感、收藏 Nail Board，再把喜欢的 Look 带回 Studio。</p>
           </div>
-          <a
+          <CrossProductLink
             href={communityProductHref(communityHref({ entry: 'product_switcher', returnTo: Routes.studio }))}
             className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-hover"
           >
             浏览 Community <ArrowRight size={14} />
-          </a>
+          </CrossProductLink>
         </Card>
 
         <Card className="flex min-h-44 flex-col justify-between gap-4" data-testid="studio-hardware-card">

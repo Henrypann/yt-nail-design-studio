@@ -139,7 +139,7 @@ export default function CustomerListPage() {
                 <th className="px-4 py-2.5 font-medium">常用甲型</th>
                 <th className="px-4 py-2.5 font-medium">最近到店</th>
                 <th className="px-4 py-2.5 font-medium">
-                  Twin 状态 <Badge variant="warning" className="ml-1 text-[10px]">MOCK</Badge>
+                  Twin 状态 <Badge variant="warning" className="ml-1 text-nano">MOCK</Badge>
                 </th>
                 <th className="px-4 py-2.5 font-medium text-right">操作</th>
               </tr>

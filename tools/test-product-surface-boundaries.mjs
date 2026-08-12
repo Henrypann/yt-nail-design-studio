@@ -12,6 +12,7 @@ import {
 } from '../src/app/routes.ts';
 import {
   ProductSurfaces,
+  canUseLocalStudioHandoff,
   communityProductHref,
   studioProductHref,
 } from '../src/app/product-navigation.ts';
@@ -38,6 +39,9 @@ assert.equal(communityProductHref('/look/x?from=studio', splitOrigins), 'https:/
 assert.equal(studioProductHref('/studio', splitOrigins), 'https://studio.example.test/');
 assert.equal(studioProductHref('/studio/design/new?fresh=1', splitOrigins), 'https://studio.example.test/design/new?fresh=1');
 assert.equal(studioProductHref('/look/not-studio', splitOrigins), 'https://studio.example.test/');
+assert.equal(canUseLocalStudioHandoff('https://community.example.test', {}), true);
+assert.equal(canUseLocalStudioHandoff('https://studio.example.test', splitOrigins), true);
+assert.equal(canUseLocalStudioHandoff('https://community.example.test', splitOrigins), false);
 
 assert.equal(legacyCommunityPathTarget(LegacyRoutes.communityRoot), '/');
 assert.equal(legacyCommunityPathTarget('/community/look/x'), '/look/x');
@@ -66,6 +70,30 @@ assert.match(hardwareGate, /Navigate to=\{Routes\.studio\} replace/);
 const communityLayout = fs.readFileSync('src/app/layouts/CommunityLayout.tsx', 'utf8');
 assert.match(communityLayout, /Nail Lover Community/);
 assert.match(communityLayout, /href=\{studioHref\}/);
+assert.match(communityLayout, /CrossProductLink/);
 assert.doesNotMatch(communityLayout, /navigate\(studioReturn/);
+
+const crossProductLink = fs.readFileSync('src/app/CrossProductLink.tsx', 'utf8');
+assert.match(crossProductLink, /target="_blank"/);
+assert.match(crossProductLink, /rel="noopener noreferrer"/);
+assert.match(crossProductLink, /event\.currentTarget\.href = result\.href/);
+
+const communityLook = fs.readFileSync('src/community/pages/CommunityLookPage.tsx', 'utf8');
+assert.match(communityLook, /canUseLocalStudioHandoff\(window\.location\.origin\)/);
+assert.match(communityLook, /跨域导入通道尚未配置/);
+assert.doesNotMatch(communityLook, /window\.location\.assign/);
+
+for (const path of [
+  'src/app/layouts/AppLayout.tsx',
+  'src/app/pages/StudioHomePage.tsx',
+  'src/app/pages/DashboardPage.tsx',
+  'src/app/pages/design/WizardPage.tsx',
+  'src/app/pages/design/TemplateGalleryPage.tsx',
+  'src/studio/editor/components/EditorTopBar.tsx',
+  'src/studio/editor/components/EditorShellV7.tsx',
+]) {
+  const source = fs.readFileSync(path, 'utf8');
+  assert.match(source, /CrossProductLink/, `${path} uses the shared product boundary`);
+}
 
 console.log('[product-surfaces] Community home + isolated Studio namespace/origin boundary: PASS');

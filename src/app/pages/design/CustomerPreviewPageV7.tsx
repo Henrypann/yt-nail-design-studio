@@ -28,7 +28,7 @@ export default function CustomerPreviewPageV7() {
   if (result.status === 'ready') return <CustomerPreviewShellV7 doc={result.doc} loadWarnings={result.warnings} initialFinger={initialFinger} returnStepId={returnStepId} />;
 
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-[#f5f1ef] p-4">
+    <main className="flex min-h-[100dvh] items-center justify-center bg-workspace p-4">
       <EmptyState
         title={result.status === 'unsupported' ? '设计来自更高版本' : result.status === 'invalid' ? '设计无法安全预览' : '没有找到预览设计'}
         description={result.message}

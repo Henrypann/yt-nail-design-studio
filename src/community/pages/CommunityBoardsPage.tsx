@@ -165,7 +165,7 @@ export default function CommunityBoardsPage() {
     <div className="flex flex-col gap-6" data-testid="community-boards-page" data-debug-id="community.boards">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">
+          <p className="mb-1 text-nano font-semibold uppercase tracking-[0.18em] text-primary/80">
             {text('你的灵感收藏', 'Your inspiration library')}
           </p>
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
@@ -259,19 +259,19 @@ export default function CommunityBoardsPage() {
                           emptyLabel={text('等待第一份灵感', 'Ready for inspiration')}
                         />
                         {board.items.length > 4 && (
-                          <span className="absolute bottom-3 right-3 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                          <span className="absolute bottom-3 right-3 rounded-full bg-black/65 px-2.5 py-1 text-nano font-semibold text-white backdrop-blur-sm">
                             +{board.items.length - 4}
                           </span>
                         )}
                       </div>
                       <div className="flex items-start justify-between gap-3 px-1 pt-3">
                         <div className="min-w-0">
-                          <h2 className="truncate text-[15px] font-semibold text-gray-950">{board.title}</h2>
+                          <h2 className="truncate text-h3 font-semibold text-gray-950">{board.title}</h2>
                           <p className="mt-0.5 text-xs text-gray-500">
                             {board.items.length} {text('份灵感', board.items.length === 1 ? 'inspiration' : 'inspirations')}
                           </p>
                         </div>
-                        <span className="mt-0.5 flex shrink-0 items-center gap-1 rounded-full bg-white px-2 py-1 text-[10px] font-medium text-gray-500 ring-1 ring-gray-200">
+                        <span className="mt-0.5 flex shrink-0 items-center gap-1 rounded-full bg-white px-2 py-1 text-nano font-medium text-gray-500 ring-1 ring-gray-200">
                           <VisibilityIcon visibility={board.visibility} />
                           {text(label.zh, label.en)}
                         </span>
@@ -283,7 +283,7 @@ export default function CommunityBoardsPage() {
             </ul>
           )}
 
-          <details className="self-start text-[11px] text-gray-400" data-testid="boards-local-demo-disclosure">
+          <details className="self-start text-nano text-gray-400" data-testid="boards-local-demo-disclosure">
             <summary className="min-h-11 cursor-pointer py-3 text-gray-400 hover:text-gray-600">
               {text('关于当前 Demo 数据', 'About this demo data')}
             </summary>

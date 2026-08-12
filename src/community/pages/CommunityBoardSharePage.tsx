@@ -158,7 +158,7 @@ export default function CommunityBoardSharePage() {
             'Read-only shared view: anonymous visitors cannot edit this board.',
           )}
         </p>
-        <p className="mt-1 text-[11px] text-gray-400">
+        <p className="mt-1 text-nano text-gray-400">
           {board.items.length} {text('款', 'items')}
           {board.visibility === 'PUBLIC' &&
             ` · ${text('公开 Board（链接可读）', 'Public board (readable by link)')}`}
@@ -188,7 +188,7 @@ export default function CommunityBoardSharePage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-gray-900">{look?.title ?? item.lookId}</p>
-                  <p className="mt-0.5 flex flex-wrap gap-1 text-[10px] text-gray-500">
+                  <p className="mt-0.5 flex flex-wrap gap-1 text-nano text-gray-500">
                     {item.sourceKind === 'LEGACY_UNVERSIONED' && (
                       <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-700" data-testid="share-item-legacy">
                         {text('未版本化灵感参考', 'Unversioned inspiration')}

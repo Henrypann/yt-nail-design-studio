@@ -336,7 +336,7 @@ export default function CommunityBoardPage() {
             </div>
             {shareUrl && (
               <div className="flex flex-col gap-1 rounded-button border border-emerald-200 bg-emerald-50 p-2" data-testid="board-share-url">
-                <p className="text-[11px] text-emerald-800">
+                <p className="text-nano text-emerald-800">
                   {text('链接仅显示一次（原始 token 不会存储）：', 'Shown once only (the raw token is never stored):')}
                 </p>
                 <div className="flex flex-col gap-1 sm:flex-row">
@@ -352,7 +352,7 @@ export default function CommunityBoardPage() {
                   </Button>
                 </div>
                 {copyState === 'manual' && (
-                  <p className="text-[11px] text-amber-700">{text('复制失败：请手动选择并复制链接。', 'Copy failed: select the link and copy it manually.')}</p>
+                  <p className="text-nano text-amber-700">{text('复制失败：请手动选择并复制链接。', 'Copy failed: select the link and copy it manually.')}</p>
                 )}
               </div>
             )}
@@ -509,7 +509,7 @@ function BoardItemRow({
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-gray-900">{title}</p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-1 text-[10px] text-gray-500">
+        <p className="mt-0.5 flex flex-wrap items-center gap-1 text-nano text-gray-500">
           {item.sourceKind === 'LEGACY_UNVERSIONED' ? (
             <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-700">
               {text('未版本化灵感参考', 'Unversioned inspiration')}

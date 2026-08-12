@@ -67,7 +67,7 @@ export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) 
         <div className="aspect-[16/10] bg-gray-100">
           {coverFailed ? (
             <div
-              className="flex h-full w-full items-center justify-center text-[11px] text-gray-400"
+              className="flex h-full w-full items-center justify-center text-nano text-gray-400"
               data-testid="community-card-cover-fallback"
             >
               封面暂不可用
@@ -88,12 +88,12 @@ export function CommunityLookCard({ look, publisher, taxonomy, onSave }: Props) 
         <div className="flex flex-wrap gap-1">
           <PublisherBadge publisher={publisher} />
           {style && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600">
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-nano text-gray-600">
               {communityTaxonomyLabel('community-style', style, locale)}
             </span>
           )}
           {topic && (
-            <span className="rounded-full bg-gray-50 px-2 py-0.5 text-[10px] text-gray-500">
+            <span className="rounded-full bg-gray-50 px-2 py-0.5 text-nano text-gray-500">
               {topic}
             </span>
           )}

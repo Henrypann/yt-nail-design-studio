@@ -189,13 +189,13 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           {text('筛选', 'Filters')}
           {advCount > 0 ? ` · ${advCount}` : ''}
         </Button>
-        <span className="text-[11px] text-gray-500">
+        <span className="text-nano text-gray-500">
           {resultCount} {text('个结果', 'results')}
         </span>
         {hasActiveFilters && (
           <button
             type="button"
-            className="min-h-11 rounded-button px-2 text-[11px] text-primary hover:underline"
+            className="min-h-11 rounded-button px-2 text-nano text-primary hover:underline"
             onClick={clearAll}
           >
             {text('清除筛选', 'Clear filters')}
@@ -267,7 +267,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             onToggle={(id) => toggleMulti('mood', id)}
           />
           <div className="flex flex-wrap gap-2">
-            <label className="text-[11px] text-gray-500">
+            <label className="text-nano text-gray-500">
               {text('应用能力', 'Application')}
               <select
                 className="ml-1 min-h-11 rounded border border-gray-200 px-1 text-xs"
@@ -281,7 +281,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
                 <option value="REPRODUCIBLE">{text('可复现', 'Reproducible')}</option>
               </select>
             </label>
-            <label className="text-[11px] text-gray-500">
+            <label className="text-nano text-gray-500">
               {text('验证证据', 'Verification')}
               <select
                 className="ml-1 min-h-11 rounded border border-gray-200 px-1 text-xs"
@@ -328,7 +328,7 @@ function FilterChips({
 }) {
   return (
     <div>
-      <p className="mb-1 text-[11px] font-medium text-gray-700">{title}</p>
+      <p className="mb-1 text-nano font-medium text-gray-700">{title}</p>
       <div className="flex flex-wrap gap-1">
         {options.map((id) => {
           const active = values.includes(id);
@@ -340,7 +340,7 @@ function FilterChips({
               aria-pressed={active}
               onClick={() => onSelect(id)}
               className={cx(
-                'min-h-11 rounded-full border px-2.5 py-1 text-[11px]',
+                'min-h-11 rounded-full border px-2.5 py-1 text-nano',
                 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 active
                   ? 'border-primary bg-primary-soft text-primary'
@@ -373,7 +373,7 @@ function FilterGroup({
 }) {
   return (
     <div>
-      <p className="mb-1 text-[11px] font-medium text-gray-700">{title}</p>
+      <p className="mb-1 text-nano font-medium text-gray-700">{title}</p>
       <div className="flex flex-wrap gap-1">
         {items.map((item) => (
           <button
@@ -382,7 +382,7 @@ function FilterGroup({
             aria-pressed={selected.includes(item.id)}
             onClick={() => onToggle(item.id)}
             className={cx(
-              'min-h-11 rounded-full border px-2.5 py-1 text-[11px]',
+              'min-h-11 rounded-full border px-2.5 py-1 text-nano',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
               selected.includes(item.id)
                 ? 'border-primary bg-primary-soft text-primary'

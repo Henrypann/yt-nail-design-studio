@@ -10,6 +10,7 @@ import { LanguageToggle, useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
 import { studioProductHref } from '@/app/product-navigation';
 import { communityInternalHref, studioReturnPath } from '@/community/lib/entry-link';
+import { CrossProductLink } from '@/app/CrossProductLink';
 
 export function CommunityLayout() {
   const { text } = useLocale();
@@ -47,7 +48,7 @@ export function CommunityLayout() {
   ] as const;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F7F3EE]" data-debug-id="community.layout">
+    <div className="flex min-h-screen flex-col bg-canvas" data-debug-id="community.layout">
       <header className="sticky top-0 z-40 border-b border-gray-200/80 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-[1200px] items-center gap-3 px-4 sm:px-6">
           <button
@@ -101,7 +102,7 @@ export function CommunityLayout() {
               </Link>
             </div>
             <LanguageToggle />
-            <a
+            <CrossProductLink
               href={studioHref}
               data-testid="community-enter-studio"
               className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-button bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover"
@@ -109,7 +110,7 @@ export function CommunityLayout() {
               <Palette size={13} />
               {text('进入 Nail Design Studio', 'Open Nail Design Studio')}
               <ArrowUpRight size={13} />
-            </a>
+            </CrossProductLink>
           </div>
         </div>
         {mobileOpen && (
@@ -156,7 +157,7 @@ export function CommunityLayout() {
       <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6">
         <Outlet />
       </main>
-      <footer className="border-t border-gray-200/70 py-3 text-center text-[10px] text-gray-400">
+      <footer className="border-t border-gray-200/70 py-3 text-center text-nano text-gray-400">
         {text(
           '灵感参考 · 预览通过 ≠ 可制造 · 开放上传尚未启用',
           'Inspiration only · Preview ≠ manufacturable · Upload not enabled',

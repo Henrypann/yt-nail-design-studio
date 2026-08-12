@@ -202,7 +202,7 @@ export default function CustomerNewPage() {
               type="checkbox"
               checked={quickPrivacyConsent}
               onChange={(e) => setQuickPrivacyConsent(e.target.checked)}
-              className="mt-0.5 accent-[#C2497A]"
+              className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-700">
               客户已阅读并同意隐私政策 <span className="text-error">*</span>
@@ -286,7 +286,7 @@ export default function CustomerNewPage() {
               type="checkbox"
               checked={privacyConsent}
               onChange={(e) => setPrivacyConsent(e.target.checked)}
-              className="mt-0.5 accent-[#C2497A]"
+              className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-800">
               客户已阅读并同意隐私政策 <span className="text-error">*（必选）</span>
@@ -297,7 +297,7 @@ export default function CustomerNewPage() {
               type="checkbox"
               checked={twinConsent}
               onChange={(e) => setTwinConsent(e.target.checked)}
-              className="mt-0.5 accent-[#C2497A]"
+              className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-800">
               客户同意保存 Nail Twin 扫描数据（可选，未同意则不保存 Twin 数据）

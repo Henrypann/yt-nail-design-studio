@@ -8,6 +8,7 @@ import { designNewFresh, Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
 import { useDevicesStore } from '@/platform/devices/device-store';
+import { CrossProductLink } from '@/app/CrossProductLink';
 
 /** 会话信息（Mock）：注册/登录模块写入 session envelope，此处只读 */
 interface SessionInfo {
@@ -147,24 +148,24 @@ export function AppLayout() {
                   <group.icon size={14} />
                 </p>
               ) : (
-                <p className="mb-1 flex items-center gap-1.5 px-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                <p className="mb-1 flex items-center gap-1.5 px-2 text-nano font-semibold uppercase tracking-wide text-gray-400">
                   <group.icon size={12} />
                   {group.label}
                 </p>
               )}
               {group.items.map((item) => item.productBoundary ? (
-                <a
+                <CrossProductLink
                   key={item.to}
                   href={item.to}
                   title={sidebarCollapsed ? item.label : undefined}
                   data-testid="nav-community"
                   className={cx(
                     'block rounded-button py-1.5 text-sm text-gray-600 transition-colors duration-fast ease-out hover:bg-gray-100 hover:text-gray-900',
-                    sidebarCollapsed ? 'px-1 text-center text-[11px] leading-tight' : 'px-2.5',
+                    sidebarCollapsed ? 'px-1 text-center text-nano leading-tight' : 'px-2.5',
                   )}
                 >
                   {sidebarCollapsed ? item.label.slice(0, 2) : item.label}
-                </a>
+                </CrossProductLink>
               ) : (
                 <NavLink
                   key={item.to}
@@ -174,7 +175,7 @@ export function AppLayout() {
                   className={({ isActive }) =>
                     cx(
                       'block rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',
-                      sidebarCollapsed ? 'px-1 text-center text-[11px] leading-tight' : 'px-2.5',
+                      sidebarCollapsed ? 'px-1 text-center text-nano leading-tight' : 'px-2.5',
                       isActive
                         ? 'bg-primary-soft font-medium text-primary'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',

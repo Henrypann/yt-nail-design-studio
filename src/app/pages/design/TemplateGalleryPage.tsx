@@ -26,6 +26,9 @@ import {
 } from '@/studio/preview/material-library';
 import { useWizardStore } from '@/studio/wizard/wizard-store';
 import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
+import { CrossProductLink } from '@/app/CrossProductLink';
+import { communityProductHref } from '@/app/product-navigation';
+import { communityHref } from '@/community/lib/entry-link';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -127,10 +130,19 @@ export default function TemplateGalleryPage() {
           <Button size="sm" variant="ghost" onClick={() => navigate(Routes.designNew)}>
             跳过，直接进入画布
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designCommunity)}>
+          <CrossProductLink
+            href={communityProductHref(communityHref({
+              entry: 'template_gallery',
+              returnTo: Routes.designTemplates,
+              shape: appliedShape,
+              length: appliedLength,
+            }))}
+            data-testid="template-gallery-community-entry"
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-button border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
             <Users size={13} />
             进入社区查看更多模板
-          </Button>
+          </CrossProductLink>
         </div>
       </header>
 
@@ -224,12 +236,12 @@ function GalleryCard({ template, shape, shapeNames, tagNameById, selected, onApp
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-50">
         <img src={`/${template.thumbnail_url}`} alt={template.name} className="h-full w-full object-cover" loading="lazy" />
         {tier === 'high' && (
-          <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-nano font-medium text-white">
             推荐
           </span>
         )}
         {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
-          <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+          <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-nano font-medium text-amber-800">
             {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
           </span>
         )}
@@ -238,22 +250,22 @@ function GalleryCard({ template, shape, shapeNames, tagNameById, selected, onApp
         <span className="truncate text-sm font-medium text-gray-900">{template.name}</span>
         <div className="flex flex-wrap gap-1">
           {template.style_tags.map((tag) => (
-            <span key={tag} className="rounded-button bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
+            <span key={tag} className="rounded-button bg-gray-100 px-1.5 py-0.5 text-nano text-gray-500">
               {tagNameById.get(tag) ?? tag}
             </span>
           ))}
         </div>
-        <div className="flex flex-wrap gap-1 text-[10px] text-gray-500">
-          {badges.best && <Badge variant="success" className="px-1 py-0 text-[10px]">★ {shapeName(badges.best)}</Badge>}
+        <div className="flex flex-wrap gap-1 text-nano text-gray-500">
+          {badges.best && <Badge variant="success" className="px-1 py-0 text-nano">★ {shapeName(badges.best)}</Badge>}
           {badges.good.length > 0 && (
-            <Badge variant="gray" className="px-1 py-0 text-[10px]">✓ {badges.good.map(shapeName).join(', ')}</Badge>
+            <Badge variant="gray" className="px-1 py-0 text-nano">✓ {badges.good.map(shapeName).join(', ')}</Badge>
           )}
           {badges.bad.length > 0 && (
-            <Badge variant="warning" className="px-1 py-0 text-[10px]">⚠ {badges.bad.map(shapeName).join(', ')}</Badge>
+            <Badge variant="warning" className="px-1 py-0 text-nano">⚠ {badges.bad.map(shapeName).join(', ')}</Badge>
           )}
         </div>
         {tier === 'not' && reason && (
-          <p className="text-[10px] leading-snug text-warning">⚠ {reason}。仍可选择。</p>
+          <p className="text-nano leading-snug text-warning">⚠ {reason}。仍可选择。</p>
         )}
         <div className="mt-auto pt-1.5">
           <Button size="sm" variant={selected ? 'secondary' : 'primary'} onClick={onApply} className="h-8 w-full text-xs">

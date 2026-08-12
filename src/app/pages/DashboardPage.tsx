@@ -7,6 +7,7 @@ import { communityProductHref } from '@/app/product-navigation';
 import { readOnboarding } from '@/platform/onboarding';
 import { useRequireAuth } from '@/platform/session';
 import { readAllDesigns } from '@/platform/designs';
+import { CrossProductLink } from '@/app/CrossProductLink';
 import { useCustomerStore } from '@/platform/customers';
 import { readData, StorageKeys } from '@/lib/storage';
 
@@ -102,13 +103,13 @@ export default function DashboardPage() {
             <p className="mt-0.5 text-xs text-gray-500">独立灵感域 · 不依赖当前 Wizard 选择</p>
           </div>
         </div>
-        <a
+        <CrossProductLink
           href={communityProductHref(communityHref({ entry: 'dashboard', returnTo: Routes.dashboard }))}
           className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors duration-fast hover:text-primary-hover"
         >
           进入 Nail Lover Community
           <ArrowRight size={13} />
-        </a>
+        </CrossProductLink>
       </Card>
 
       {/* 引导卡片：全部完成后整组消失 */}

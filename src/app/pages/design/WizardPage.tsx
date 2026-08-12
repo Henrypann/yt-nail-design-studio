@@ -14,6 +14,7 @@ import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
+import { CrossProductLink } from '@/app/CrossProductLink';
 import {
   peekStudioImportIntentRaw,
   sanitizeReturnTo,
@@ -559,26 +560,21 @@ export default function WizardPage() {
         {s.status === 'confirmed' && <Badge variant="blue">已确认 · 只读</Badge>}
 
         <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
-          <Button
-            size="sm"
-            variant="ghost"
+          <CrossProductLink
             data-testid="wizard-community-entry"
             title="进入 Community"
             aria-label="进入 Community"
-            onClick={() =>
-              window.location.assign(
-                communityProductHref(communityHref({
-                  entry: 'wizard',
-                  returnTo: Routes.designNew,
-                  shape: s.appliedShape ?? undefined,
-                  length: s.appliedLength ?? undefined,
-                })),
-              )
-            }
+            href={communityProductHref(communityHref({
+              entry: 'wizard',
+              returnTo: Routes.designNew,
+              shape: s.appliedShape ?? undefined,
+              length: s.appliedLength ?? undefined,
+            }))}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
           >
             <Compass size={13} />
             Community
-          </Button>
+          </CrossProductLink>
           {/* 保存状态：💾 已保存 ↔ ● 未保存 */}
           <span
             className={cx(

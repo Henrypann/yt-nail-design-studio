@@ -325,7 +325,7 @@ export default function EditorPage() {
                   >
                     <span>{shapeName(capability.id, locale)}</span>
                     {enabled && !selected && badge && (
-                      <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>
+                      <span aria-hidden="true" className="ml-1 text-nano opacity-75">{badge}</span>
                     )}
                   </button>
                 );
@@ -355,7 +355,7 @@ export default function EditorPage() {
                     )}
                   >
                     {lengthName(l, locale)}
-                    {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
+                    {!selected && badge && <span aria-hidden="true" className="ml-1 text-nano opacity-75">{badge}</span>}
                   </button>
                 );
               })}

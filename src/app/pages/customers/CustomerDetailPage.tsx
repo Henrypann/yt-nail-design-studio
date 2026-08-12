@@ -84,7 +84,7 @@ function InlineField(props: {
         />
       )}
       {props.multiline && props.maxLength && (
-        <p className="text-right text-[10px] text-gray-400 tnum">
+        <p className="text-right text-nano text-gray-400 tnum">
           {draft.length}/{props.maxLength}
         </p>
       )}

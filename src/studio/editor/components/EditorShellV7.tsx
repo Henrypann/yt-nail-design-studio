@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound } fr
 import { Button, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
+import { CrossProductLink } from '@/app/CrossProductLink';
 import { editorV7Store, selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { EditorCanvasHostV7 } from './EditorCanvasHostV7';
 import { EditorGuidedStartV7 } from './EditorGuidedStartV7';
@@ -69,9 +70,10 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [workspacePanelOpen, setWorkspacePanelOpen] = useState(false);
   const [workspacePanelTab, setWorkspacePanelTab] = useState<EditorWorkspacePanelTabV7>('layers');
-  const [wideWorkspace, setWideWorkspace] = useState(() => window.matchMedia('(min-width: 1280px)').matches);
-  const [dockedTools, setDockedTools] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
-  const [mobileWorkspace, setMobileWorkspace] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  const [fullWorkspace, setFullWorkspace] = useState(() => window.matchMedia('(min-width: 1440px)').matches);
+  const [desktopWorkspace, setDesktopWorkspace] = useState(() => window.matchMedia('(min-width: 1100px)').matches);
+  const [dockedTools, setDockedTools] = useState(() => window.matchMedia('(max-width: 1099px)').matches);
+  const [mobileWorkspace, setMobileWorkspace] = useState(() => window.matchMedia('(max-width: 799px)').matches);
   const [pendingToolIntent, setPendingToolIntent] = useState<EditorWorkspaceToolAvailabilityV7 | null>(null);
   const [stageContext, setStageContext] = useState<'geometry' | 'customer' | null>(null);
   const [dismissedGuides, setDismissedGuides] = useState<Set<string>>(() => new Set());
@@ -137,14 +139,16 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   }, [currentNail, pendingToolIntent, readOnly, selectedStep?.id, switching]);
 
   useEffect(() => {
-    const wide = window.matchMedia('(min-width: 1280px)');
-    const docked = window.matchMedia('(max-width: 1023px)');
-    const mobile = window.matchMedia('(max-width: 767px)');
+    const full = window.matchMedia('(min-width: 1440px)');
+    const desktop = window.matchMedia('(min-width: 1100px)');
+    const docked = window.matchMedia('(max-width: 1099px)');
+    const mobile = window.matchMedia('(max-width: 799px)');
     const update = () => {
-      setWideWorkspace(wide.matches);
+      setFullWorkspace(full.matches);
+      setDesktopWorkspace(desktop.matches);
       setDockedTools(docked.matches);
       setMobileWorkspace(mobile.matches);
-      if (wide.matches) {
+      if (desktop.matches) {
         setWorkspacePanelOpen(false);
         const trigger = overlayTriggerRef.current;
         overlayTriggerRef.current = null;
@@ -152,11 +156,13 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       }
     };
     update();
-    wide.addEventListener('change', update);
+    full.addEventListener('change', update);
+    desktop.addEventListener('change', update);
     docked.addEventListener('change', update);
     mobile.addEventListener('change', update);
     return () => {
-      wide.removeEventListener('change', update);
+      full.removeEventListener('change', update);
+      desktop.removeEventListener('change', update);
       docked.removeEventListener('change', update);
       mobile.removeEventListener('change', update);
     };
@@ -176,11 +182,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     setLeaving(true);
     const result = await unload();
     if (result === 'ok') {
-      if (destination === Routes.community || destination.startsWith('/look/')) {
-        window.location.assign(communityProductHref(destination));
-      } else {
-        navigate(destination);
-      }
+      navigate(destination);
       return;
     }
     setLeaving(false);
@@ -235,7 +237,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     rememberOverlayTrigger(trigger);
     setResourcesOpen(false);
     setWorkspacePanelTab(tab);
-    if (!wideWorkspace) setWorkspacePanelOpen(true);
+    if (!desktopWorkspace) setWorkspacePanelOpen(true);
   };
   const closeWorkspacePanel = () => {
     setWorkspacePanelOpen(false);
@@ -256,9 +258,9 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   }, [customerPreviewAvailability.enabled, stageContext]);
 
   useEffect(() => {
-    if (wideWorkspace || !resourcesOpen) return;
+    if (desktopWorkspace || !resourcesOpen) return;
     resourceDialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
-  }, [resourcesOpen, wideWorkspace]);
+  }, [desktopWorkspace, resourcesOpen]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -484,7 +486,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   };
 
-  const layout = wideWorkspace ? 'wide' : dockedTools ? (mobileWorkspace ? 'mobile' : 'tablet') : 'compact';
+  const layout = fullWorkspace ? 'full' : desktopWorkspace ? 'compact' : mobileWorkspace ? 'tablet' : 'focus';
   const communitySource = doc.sourceRefs.find((ref) => ref.domain === 'community');
   const showGuidedStart = !dismissedGuides.has(guideKey) && !currentNail.steps.some((step) => (
     step.kind === 'flat_design' || step.kind === 'surface_effect' || step.kind === 'dimensional_decoration'
@@ -500,15 +502,27 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     >
       <header className="flex min-h-[52px] flex-col gap-1.5 border-b border-gray-200 px-2 py-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2 sm:px-3">
         <div className="flex min-w-0 items-center gap-1.5 sm:contents">
-          <Button size="sm" variant="ghost" data-testid={communitySource ? 'editor-return-source' : 'editor-return-designs'} className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(communitySource ? Routes.communityLook(communitySource.sourceId) : Routes.designs)}>
-            <ArrowLeft size={14} />
-            <span className="sm:hidden">{communitySource ? '来源' : '列表'}</span>
-            <span className="hidden sm:inline">{communitySource ? '返回来源 Look' : '设计列表'}</span>
-          </Button>
-          <span className="hidden rounded-full bg-gray-900 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white sm:inline-flex">Editor V7</span>
+          {communitySource ? (
+            <CrossProductLink
+              href={communityProductHref(Routes.communityLook(communitySource.sourceId))}
+              data-testid="editor-return-source"
+              className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:min-h-0 lg:min-w-0"
+            >
+              <ArrowLeft size={14} />
+              <span className="sm:hidden">来源</span>
+              <span className="hidden sm:inline">查看来源 Look</span>
+            </CrossProductLink>
+          ) : (
+            <Button size="sm" variant="ghost" data-testid="editor-return-designs" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(Routes.designs)}>
+              <ArrowLeft size={14} />
+              <span className="sm:hidden">列表</span>
+              <span className="hidden sm:inline">设计列表</span>
+            </Button>
+          )}
+          <span className="hidden rounded-full bg-gray-900 px-2 py-1 text-nano font-semibold uppercase tracking-[0.14em] text-white sm:inline-flex">Editor V7</span>
           {communitySource && (
             <span
-              className="min-w-0 flex-1 truncate rounded-full border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-[10px] font-medium text-fuchsia-800 sm:flex-none"
+              className="min-w-0 flex-1 truncate rounded-full border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-nano font-medium text-fuchsia-800 sm:flex-none"
               data-testid="editor-remix-disclosure"
               title={`Remix · 来源版本 ${communitySource.revision}`}
             >
@@ -516,7 +530,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
             </span>
           )}
           <span
-            className={cx('ml-auto shrink-0 text-[11px] sm:ml-0', saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500')}
+            className={cx('ml-auto shrink-0 text-nano sm:ml-0', saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500')}
             role="status"
           >
             {SAVE_LABEL[saveState]}
@@ -618,9 +632,9 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
         {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} onActivateTool={requestWorkspaceTool} onBlockedTool={requestWorkspaceTool} />}
 
-        {wideWorkspace && resourcesOpen && <aside className="h-full w-[280px] shrink-0 border-r border-gray-200" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
+        {desktopWorkspace && resourcesOpen && <aside className="h-full w-[clamp(220px,18vw,320px)] shrink-0 border-r border-hairline" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
 
-        <main className="flex min-h-0 min-w-0 flex-1 overflow-auto bg-[#f3f0ee] p-3 sm:p-4" data-testid="v7-canvas-region">
+        <main className="flex min-h-0 min-w-0 flex-1 overflow-auto bg-workspace p-3 sm:p-4" data-testid="v7-canvas-region">
           <div className={cx('mx-auto flex min-h-full w-full max-w-5xl justify-center', showGuidedStart ? 'items-start' : 'items-center')}>
             <div className="w-full">
               {showGuidedStart && <EditorGuidedStartV7 ref={guidedStartRef} nail={currentNail} onRequest={requestGuidedStart} onPreviewFinish={previewFinishWithoutPersonalization} />}
@@ -629,11 +643,11 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
           </div>
         </main>
 
-        <EditorWorkspaceSidebarV7 compact={!wideWorkspace} open={workspacePanelOpen} tab={workspacePanelTab} onTabChange={setWorkspacePanelTab} onClose={closeWorkspacePanel} />
+        <EditorWorkspaceSidebarV7 compact={!desktopWorkspace} open={workspacePanelOpen} tab={workspacePanelTab} onTabChange={setWorkspacePanelTab} onClose={closeWorkspacePanel} />
 
-        {!wideWorkspace && resourcesOpen && <>
+        {!desktopWorkspace && resourcesOpen && <>
           <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭资源" onClick={closeResources} />
-          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="当前层工具与参数" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-modal md:inset-y-0 md:left-16 md:right-auto md:h-full md:max-h-none md:w-[300px] md:rounded-none" data-overlay-open="true">
+          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="当前层工具与参数" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-hairline bg-surface shadow-modal min-[800px]:inset-y-0 min-[800px]:left-16 min-[800px]:right-auto min-[800px]:h-full min-[800px]:max-h-none min-[800px]:w-[min(360px,42vw)] min-[800px]:rounded-none" data-overlay-open="true">
             <EditorResourceDrawerV7 onClose={closeResources} />
           </aside>
         </>}

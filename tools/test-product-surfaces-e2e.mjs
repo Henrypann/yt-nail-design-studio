@@ -5,7 +5,8 @@ import { chromium } from 'playwright';
 
 const baseURL = process.argv[2] ?? 'http://127.0.0.1:5200';
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+let page = await context.newPage();
 const errors = [];
 page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 page.on('pageerror', (error) => errors.push(error.message));
@@ -25,16 +26,24 @@ try {
   assert.equal(await page.locator('[data-debug-id="community.layout"]').count(), 1);
   assert.equal(await page.locator('[data-debug-id="app.layout.sidebar"]').count(), 0);
   assert.equal(await page.getByTestId('community-enter-studio').getAttribute('href'), '/studio');
+  assert.equal(await page.getByTestId('community-enter-studio').getAttribute('target'), '_blank');
+  assert.equal(await page.getByTestId('community-enter-studio').getAttribute('rel'), 'noopener noreferrer');
 
-  await page.evaluate(() => { window.__communityDocumentMarker = 'must-not-survive'; });
-  await Promise.all([
-    page.waitForURL(`${baseURL}/studio`),
+  await page.evaluate(() => { window.__communityDocumentMarker = 'must-survive'; });
+  const communityPage = page;
+  const [studioPage] = await Promise.all([
+    context.waitForEvent('page'),
     page.getByTestId('community-enter-studio').click(),
   ]);
+  await studioPage.waitForLoadState('networkidle');
+  page = studioPage;
+  assert.equal(communityPage.url(), `${baseURL}/`);
+  assert.equal(await communityPage.evaluate(() => window.__communityDocumentMarker), 'must-survive');
+  assert.equal(await page.evaluate(() => window.opener), null);
+  assert.equal(page.url(), `${baseURL}/studio`);
   await page.getByText('Nail Design Studio', { exact: true }).first().waitFor();
   assert.equal(await page.locator('[data-debug-id="community.layout"]').count(), 0);
   assert.equal(await page.locator('[data-debug-id="app.layout.sidebar"]').count(), 1);
-  assert.equal(await page.evaluate(() => window.__communityDocumentMarker), undefined, 'product switch must reload document');
 
   // Fresh salon: Studio + Community + Bind device are available; customer operations and device list are gated.
   await page.getByTestId('nav-group-studio').waitFor();

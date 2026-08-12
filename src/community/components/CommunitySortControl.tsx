@@ -60,7 +60,7 @@ export function CommunitySortControl({ sort, onChange, trendingFallback }: Props
       {trendingFallback && (
         <p
           data-testid="trending-fallback-disclosure"
-          className="max-w-2xl text-[11px] leading-relaxed text-amber-700"
+          className="max-w-2xl text-nano leading-relaxed text-amber-700"
         >
           {trendingFallback.reason === 'trending_no_signals'
             ? text(

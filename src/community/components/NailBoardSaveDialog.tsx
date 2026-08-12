@@ -172,7 +172,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
       <div className="flex flex-col gap-3" data-testid="nail-board-save-dialog">
         <div className="rounded-card border border-gray-200 bg-gray-50 px-3 py-2">
           <p className="text-sm font-medium text-gray-900">{look.title}</p>
-          <p className="mt-0.5 text-[11px] text-gray-500">
+          <p className="mt-0.5 text-nano text-gray-500">
             {reference.sourceKind === 'CANONICAL_VERSIONED'
               ? text('版本化引用（designVersionId 精确匹配）', 'Versioned reference (exact designVersionId)')
               : text('未版本化灵感参考（legacy）', 'Unversioned inspiration reference (legacy)')}
@@ -253,7 +253,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
                   className="h-4 w-4 accent-primary"
                 />
                 <span className="min-w-0 flex-1 truncate text-gray-900">{board.title}</span>
-                <span className="shrink-0 text-[11px] text-gray-400">
+                <span className="shrink-0 text-nano text-gray-400">
                   {board.items.length} {text('款', 'items')}
                 </span>
               </label>

@@ -169,7 +169,7 @@ export function CommunityFeed({
         <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
         <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>
         {showOfficialProgress && progress && (
-          <p className="mt-1 text-[11px] text-gray-400" data-testid="official-pgc-progress">
+          <p className="mt-1 text-nano text-gray-400" data-testid="official-pgc-progress">
             官方 PGC Metadata Ready {progress.ready}/{progress.target}（缺口 {progress.gap} 仅校验可见，不展示假卡）
           </p>
         )}
@@ -292,7 +292,7 @@ export function CommunityFeed({
             </div>
           )}
 
-          <p className="pt-2 text-center text-[10px] text-gray-400">
+          <p className="pt-2 text-center text-nano text-gray-400">
             {text(
               'Feed 不加载 Three.js · 预览通过 ≠ 可制造 · Made 需要已验证的 Real Result / 履约记录（当前不可用）· Demo 创作者仅 Integration 可见',
               'Feed does not load Three.js · Preview ≠ manufacturable · Made requires a verified Real Result / fulfillment record (unavailable) · Demo creators visible in Integration only',

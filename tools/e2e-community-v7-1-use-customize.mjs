@@ -28,7 +28,7 @@ for (const viewport of viewports) {
     viewport: { width: viewport.width, height: viewport.height },
     ...(viewport.touch ? { hasTouch: true, isMobile: viewport.width < 500 } : {}),
   });
-  const page = await context.newPage();
+  let page = await context.newPage();
   const errors = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
@@ -40,7 +40,16 @@ for (const viewport of viewports) {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true);
   await page.screenshot({ path: path.join(output, `${viewport.name}-look.png`), fullPage: true });
 
-  await page.getByTestId('community-use-versioned').click();
+  const communityPage = page;
+  [page] = await Promise.all([
+    context.waitForEvent('page'),
+    communityPage.getByTestId('community-use-versioned').click(),
+  ]);
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
+  await page.waitForLoadState('networkidle');
+  assert.match(communityPage.url(), /\/look\/look\.v7-1\.petal-veil$/);
+  assert.equal(await page.evaluate(() => window.opener), null);
   await page.getByTestId('versioned-intent-conflict').waitFor();
   await page.waitForTimeout(400); // measure after modal scale-in animation settles
   assert.match(page.url(), /\/studio\/design\/new\?versionedIntent=/);
@@ -84,17 +93,26 @@ for (const viewport of viewports) {
   await page.screenshot({ path: path.join(output, `${viewport.name}-editor.png`), fullPage: true });
   report.push({ viewport: viewport.name, errors, designId: doc.designId, eventCount: Object.keys(stored.events).length });
   assert.deepEqual(errors, []);
-  await page.getByTestId('editor-return-source').click();
-  await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
+  const editorUrl = page.url();
+  const [sourcePage] = await Promise.all([
+    context.waitForEvent('page'),
+    page.getByTestId('editor-return-source').click(),
+  ]);
+  await sourcePage.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
+  assert.equal(page.url(), editorUrl, 'view source must preserve the Editor tab');
   await context.close();
 }
 
 // current keeps the active Wizard session and emits no event.
 {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  const page = await context.newPage();
-  await page.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
-  await page.getByTestId('community-use-versioned').click();
+  const communityPage = await context.newPage();
+  await communityPage.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
+  const [page] = await Promise.all([
+    context.waitForEvent('page'),
+    communityPage.getByTestId('community-use-versioned').click(),
+  ]);
+  await page.waitForLoadState('networkidle');
   const designId = await page.locator('[data-debug-id="studio.wizard.page"]').getAttribute('data-design-id');
   await page.getByTestId('versioned-intent-current').click();
   await page.locator('[data-debug-id="studio.wizard.page"]').waitFor();
@@ -106,9 +124,13 @@ for (const viewport of viewports) {
 // cancel returns to the exact canonical Look and emits no event.
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
-  const page = await context.newPage();
-  await page.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
-  await page.getByTestId('community-use-versioned').click();
+  const communityPage = await context.newPage();
+  await communityPage.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
+  const [page] = await Promise.all([
+    context.waitForEvent('page'),
+    communityPage.getByTestId('community-use-versioned').click(),
+  ]);
+  await page.waitForLoadState('networkidle');
   await page.getByTestId('versioned-intent-cancel').click();
   await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null);

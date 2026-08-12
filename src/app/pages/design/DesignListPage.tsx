@@ -241,7 +241,7 @@ export default function DesignListPage() {
                   {d.thumbnailDataUrl ? (
                     <img src={d.thumbnailDataUrl} alt="" className="h-full w-auto object-contain" />
                   ) : (
-                    <span className="text-[11px] text-gray-400">暂无缩略图 · 打开后保存生成</span>
+                    <span className="text-nano text-gray-400">暂无缩略图 · 打开后保存生成</span>
                   )}
                 </button>
 
@@ -249,13 +249,13 @@ export default function DesignListPage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-gray-800">
                       {d.title ?? '未命名设计'}
-                      <span className="ml-1 text-[10px] font-normal text-gray-400 tnum">v{d.version}</span>
+                      <span className="ml-1 text-nano font-normal text-gray-400 tnum">v{d.version}</span>
                     </p>
-                    <p className="mt-0.5 truncate text-[11px] text-gray-500">
+                    <p className="mt-0.5 truncate text-nano text-gray-500">
                       {customerName(d.customerId)} · {formatTime(d.updatedAt)}
                     </p>
                     {d.confirmation && (
-                      <p className="mt-0.5 text-[10px] text-info">
+                      <p className="mt-0.5 text-nano text-info">
                         {d.confirmation.confirmedBy} 标记于 {formatTime(d.confirmation.confirmedAt)}
                       </p>
                     )}

@@ -104,7 +104,7 @@ export default function DeviceListPage() {
       ) : (
         <Card padding="none" className="overflow-hidden">
           {/* 表头 */}
-          <div className="grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+          <div className="grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2 text-nano font-semibold uppercase tracking-wide text-gray-400">
             <span>设备别名</span>
             <span>类型</span>
             <span>在线状态</span>
@@ -126,7 +126,7 @@ export default function DeviceListPage() {
                   <Monitor size={15} className="shrink-0 text-gray-400" />
                   <span className="truncate text-sm font-medium text-gray-900">{device.alias}</span>
                   {device.type === 'scanner' && (
-                    <Badge variant="info" className="shrink-0 text-[10px]">不同步 MES</Badge>
+                    <Badge variant="info" className="shrink-0 text-nano">不同步 MES</Badge>
                   )}
                 </div>
                 <span className="text-xs text-gray-600">{DEVICE_TYPE_LABEL[device.type]}</span>

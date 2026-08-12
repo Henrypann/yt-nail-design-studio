@@ -49,7 +49,7 @@ export function CommunityCreatorCard({ publisher }: { publisher: CommunityPublis
         {publisher.bio && (
           <p className="line-clamp-2 text-xs leading-relaxed text-gray-600">{publisher.bio}</p>
         )}
-        <span className="mt-auto pt-1 text-[11px] font-medium text-primary">
+        <span className="mt-auto pt-1 text-nano font-medium text-primary">
           {text('查看主页', 'View profile')} →
         </span>
       </Link>

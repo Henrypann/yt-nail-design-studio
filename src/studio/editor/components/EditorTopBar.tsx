@@ -23,6 +23,7 @@ import { Button, Modal, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
 import { communityHref } from '@/community/lib/entry-link';
+import { CrossProductLink } from '@/app/CrossProductLink';
 import { useLocale } from '@/lib/i18n';
 import { confirmDesign } from '@/lib/state-machine';
 import { readData, StorageKeys } from '@/lib/storage';
@@ -159,34 +160,29 @@ export function EditorTopBar(props: {
           <ArrowLeft size={14} />
           {text('返回', 'Back')}
         </button>
-        <button
-          type="button"
+        <CrossProductLink
           data-testid="editor-community-entry"
           title="进入 Community"
           aria-label="进入 Community"
-          onClick={() =>
-            window.location.assign(
-              communityProductHref(communityHref({
-                entry: 'editor',
-                returnTo: `${Routes.designCanvas}?design=${doc.designId}`,
-              })),
-            )
-          }
+          href={communityProductHref(communityHref({
+            entry: 'editor',
+            returnTo: `${Routes.designCanvas}?design=${doc.designId}`,
+          }))}
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
         >
           <Compass size={13} />
           Community
-        </button>
+        </CrossProductLink>
         <span className="hidden items-center gap-1 text-xs text-gray-600 xl:flex">
           <User size={13} className="text-gray-400" />
           {customerName(doc.customerId)}
         </span>
-        <span className="rounded-button bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600">
+        <span className="rounded-button bg-gray-100 px-2 py-0.5 text-nano text-gray-600">
           {shapeName(doc.shape, locale)} · {lengthName(doc.length, locale)}
         </span>
         <span
           className={cx(
-            'text-[11px]',
+            'text-nano',
             saveState === 'error'
               ? 'font-medium text-error'
               : saveState === 'dirty'

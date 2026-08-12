@@ -12,7 +12,8 @@ import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-r
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Badge, Button, Modal, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
-import { studioProductHref } from '@/app/product-navigation';
+import { canUseLocalStudioHandoff, studioProductHref } from '@/app/product-navigation';
+import { CrossProductAction, CrossProductLink } from '@/app/CrossProductLink';
 import { useLocale } from '@/lib/i18n';
 import { communityTaxonomyLabel, taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import { getPublisherById, loadTaxonomy } from '../data/content-repository';
@@ -108,13 +109,17 @@ export default function CommunityLookPage() {
   const canonical = look.readModelKind === 'CANONICAL';
   const evidence = look.evidence;
   const useAvailability = resolveStudioUseAvailabilityV1(look);
+  const localHandoffAvailable = canUseLocalStudioHandoff(window.location.origin);
+  const crossOriginDisabledReason = localHandoffAvailable
+    ? undefined
+    : '跨域导入通道尚未配置；当前不会创建 Studio 导入意图。';
   const useUnavailableMessage = useAvailability.state === 'ASSETS_INCOMPLETE'
     ? 'Studio 素材尚未补齐，暂不可使用'
     : useAvailability.state === 'INSPIRATION_ONLY'
       ? '该 Look 仅供灵感参考，暂不可使用'
       : '该版本依赖暂不可用，请稍后再试';
 
-  const publishIntent = () => {
+  const prepareLegacyIntent = (): { ok: true; href: string } | { ok: false } => {
     const result = createStudioImportIntent({
       content,
       returnTo: Routes.communityLook(look.lookId),
@@ -131,9 +136,9 @@ export default function CommunityLookPage() {
       } else {
         toast.error('无法创建试用意图：内容未发布。');
       }
-      return;
+      return { ok: false };
     }
-    window.location.assign(studioProductHref(result.href));
+    return { ok: true, href: studioProductHref(result.href) };
   };
 
   const onTryClick = () => {
@@ -142,17 +147,16 @@ export default function CommunityLookPage() {
       setApproxOpen(true);
       return;
     }
-    publishIntent();
   };
 
-  const onVersionedUseClick = () => {
-    if (!canonical) return;
+  const prepareVersionedIntent = (): { ok: true; href: string } | { ok: false } => {
+    if (!canonical) return { ok: false };
     const result = createVersionedUseIntentForLookV1(look.sourceLook);
     if (!result.ok) {
       toast.error('该版本暂不可用于 Studio，请刷新或返回 Explore 重试。');
-      return;
+      return { ok: false };
     }
-    window.location.assign(studioProductHref(result.href));
+    return { ok: true, href: studioProductHref(result.href) };
   };
 
   return (
@@ -222,24 +226,38 @@ export default function CommunityLookPage() {
             </div>
           )}
 
-          <p className="text-[11px] leading-relaxed text-gray-500">
+          <p className="text-nano leading-relaxed text-gray-500">
             预览通过 ≠ 可制造 ≠ 已下发生产。试用仅写入 Studio 导入意图，不会由 Community 直接改写 Wizard /
             Editor。
           </p>
 
           <div className="flex flex-wrap gap-2">
             {canonical && useAvailability.enabled ? (
-              <Button
-                onClick={onVersionedUseClick}
+              <CrossProductAction
+                href={studioProductHref(Routes.designNew)}
+                prepareHref={prepareVersionedIntent}
+                disabledReason={crossOriginDisabledReason}
                 data-testid="community-use-versioned"
-                className="min-h-11 bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600"
+                className="inline-flex min-h-11 items-center justify-center rounded-button bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
               >
                 使用此版本在 Studio 中定制
-              </Button>
+              </CrossProductAction>
             ) : tryable && useAvailability.enabled ? (
-              <Button onClick={onTryClick} data-testid="community-try-in-studio">
-                在 Studio 中试用（Legacy 近似）
-              </Button>
+              look.applicationLevel === 'APPROXIMATE' ? (
+                <Button onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
+                  在 Studio 中试用（Legacy 近似）
+                </Button>
+              ) : (
+                <CrossProductAction
+                  href={studioProductHref(Routes.designNew)}
+                  prepareHref={prepareLegacyIntent}
+                  disabledReason={crossOriginDisabledReason}
+                  data-testid="community-try-in-studio"
+                  className="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+                >
+                  在 Studio 中试用
+                </CrossProductAction>
+              )
             ) : (
               <div className="flex flex-col items-start gap-1">
                 <Button
@@ -261,14 +279,13 @@ export default function CommunityLookPage() {
                 </p>
               </div>
             )}
-            <Button
-              size="sm"
-              variant="secondary"
+            <CrossProductLink
+              href={studioProductHref(studioReturnPath(searchParams, Routes.designNew))}
               data-testid="community-open-studio"
-              onClick={() => window.location.assign(studioProductHref(studioReturnPath(searchParams, Routes.designNew)))}
+              className="inline-flex h-9 items-center justify-center rounded-button border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               进入 Studio
-            </Button>
+            </CrossProductLink>
             {look.assetRef?.manifestUrl && (
               <a
                 href={look.assetRef.manifestUrl}
@@ -279,6 +296,11 @@ export default function CommunityLookPage() {
                 <ExternalLink size={14} className="mr-1" />
                 资产清单
               </a>
+            )}
+            {crossOriginDisabledReason && useAvailability.enabled && (
+              <p className="basis-full text-xs text-amber-700" data-testid="community-cross-origin-handoff-disabled">
+                {crossOriginDisabledReason}
+              </p>
             )}
           </div>
         </div>
@@ -358,7 +380,7 @@ export default function CommunityLookPage() {
           </div>
         </div>
 
-        <p className="mt-2 text-[11px] leading-relaxed text-amber-800" data-testid="community-look-source-caveat">
+        <p className="mt-2 text-nano leading-relaxed text-amber-800" data-testid="community-look-source-caveat">
           {legacy
             ? text(
                 '来源：静态 fixture 数据，非实时社区后端；Demo 创作者内容仅开发/集成环境可见。预览通过 ≠ 可制造 ≠ 已下发生产，本记录不含制造/设备证据。',
@@ -377,15 +399,18 @@ export default function CommunityLookPage() {
             <Button variant="ghost" onClick={() => setApproxOpen(false)}>
               取消
             </Button>
-            <Button
-              data-testid="community-approx-confirm"
-              onClick={() => {
-                setApproxOpen(false);
-                publishIntent();
+            <CrossProductAction
+              href={studioProductHref(Routes.designNew)}
+              prepareHref={() => {
+                const result = prepareLegacyIntent();
+                if (result.ok) setApproxOpen(false);
+                return result;
               }}
+              data-testid="community-approx-confirm"
+              className="inline-flex h-9 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
               了解，继续试用
-            </Button>
+            </CrossProductAction>
           </>
         }
       >
