@@ -18,12 +18,15 @@ const now = '2026-08-12T12:00:00.000Z';
 let store = createEmptyCreatorPublicationStoreV1();
 const created = createCreatorPublicationDraftV1({store,draftId:'draft.alpha',creatorProfileId:'profile.creator',package:pkg,now});
 assert.equal(created.ok,true); store=created.value;
+assert.ok(parseCreatorPublicationStoreV1(store),'an untitled new draft must be persistable before metadata entry');
 assert.equal(store.drafts[0].visibility,'PRIVATE'); assert.equal(store.drafts[0].step,1);
 const sourcePackage = structuredClone(pkg); store.drafts[0].package.palette.push('#ffffff'); assert.deepEqual(pkg,sourcePackage,'draft must not share package refs');
 store.drafts[0].package = structuredClone(pkg);
 
 const publicAttempt = updateCreatorPublicationDraftV1({store,draftId:'draft.alpha',patch:{visibility:'PUBLIC'},now});
 assert.equal(publicAttempt.ok,false); assert.equal(publicAttempt.code,'public_locked');
+const publicAllowed = updateCreatorPublicationDraftV1({store,draftId:'draft.alpha',patch:{title:'Public Petal',visibility:'PUBLIC'},now,publicGovernanceCleared:true}); assert.equal(publicAllowed.ok,true); assert.equal(publicAllowed.value.drafts[0].visibility,'PUBLIC');
+assert.equal(publicAllowed.value.drafts[0].contentRevision,2,'review-relevant metadata increments content revision exactly once');
 let updated = updateCreatorPublicationDraftV1({store,draftId:'draft.alpha',patch:{title:'Private Petal',tags:['petal'],visibility:'UNLISTED',sourceType:'REMIX',sourceAttribution:'look.source#1',copyrightDeclared:true,sourceDeclared:true,step:3},now});
 assert.equal(updated.ok,true); store=updated.value;
 const published = publishCreatorDraftV1({store,draftId:'draft.alpha',lookId:'look.private-petal',now});
