@@ -32,7 +32,7 @@ export function EditorToolRail(props: {
           aria-pressed={props.active === item.id && props.drawerOpen}
           onClick={() => props.onSelect(item.id)}
           className={cx(
-            'flex h-10 w-10 flex-col items-center justify-center rounded-button text-[9px] transition-colors duration-fast',
+            'flex h-10 w-10 flex-col items-center justify-center rounded-button text-nano transition-colors duration-fast',
             props.active === item.id && props.drawerOpen
               ? 'bg-primary-soft text-primary'
               : 'text-gray-500 hover:bg-gray-100',

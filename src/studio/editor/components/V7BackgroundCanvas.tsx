@@ -90,16 +90,16 @@ export function V7BackgroundCanvas() {
           </g>
           <path d={silhouette.pathD} fill="none" stroke="#8d7c78" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
         </svg>
-        {!preview.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/80 px-3 py-2 text-[10px] text-white"><EyeOff size={12} />背景已隐藏</span>}
+        {!preview.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/80 px-3 py-2 text-nano text-white"><EyeOff size={12} />背景已隐藏</span>}
       </div>
 
       <div className="min-w-0 space-y-3">
-        <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">2D 背景编辑</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {MODE_LABEL[preview.mode] ?? preview.mode}</h2><p className="mt-1 text-[11px] text-gray-600">{silhouette.label}</p><p className="mt-0.5 truncate font-mono text-[9px] text-gray-400" title={`${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`}>{nail.geometryRef.assetId}</p></div>
-        <dl className="grid grid-cols-2 gap-2 text-[11px]">
+        <div><p className="text-nano font-semibold uppercase tracking-[0.14em] text-gray-400">2D 背景编辑</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {MODE_LABEL[preview.mode] ?? preview.mode}</h2><p className="mt-1 text-nano text-gray-600">{silhouette.label}</p><p className="mt-0.5 truncate font-mono text-nano text-gray-400" title={`${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`}>{nail.geometryRef.assetId}</p></div>
+        <dl className="grid grid-cols-2 gap-2 text-nano">
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">代表色</dt><dd className="mt-1 flex items-center gap-2 font-mono font-semibold text-gray-800"><span className="h-4 w-4 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />{hex.toUpperCase()}</dd></div>
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景透明度</dt><dd className="mt-1 font-semibold tabular-nums text-gray-800">{Math.round(background.opacity * 100)}%</dd></div>
         </dl>
-        <div className={cx('flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[10px] leading-4', preview.fidelity === 'exact' ? 'border-success/20 bg-success-soft text-success' : 'border-info/20 bg-info-soft text-info')}>
+        <div className={cx('flex items-start gap-2 rounded-xl border px-3 py-2.5 text-nano leading-4', preview.fidelity === 'exact' ? 'border-success/20 bg-success-soft text-success' : 'border-info/20 bg-info-soft text-info')}>
           <Info size={13} className="mt-0.5 shrink-0" />
           <span>{preview.fidelity === 'unavailable'
             ? `${MODE_LABEL[background.mode]} 当前标记为不可预览；保留文档参数并显示甲面边界，不伪造效果。`
@@ -115,7 +115,7 @@ export function V7BackgroundCanvas() {
                   ? '透色为 2D 近似效果，不代表真实材料透光率。'
                   : '单色背景由 EditorDocV7 的 canonical sRGB 与 opacity 直接派生。'}</span>
         </div>
-        {silhouette.source === 'generic' && <p className="rounded-xl border border-dashed border-warning/30 bg-warning-soft px-3 py-2 text-[10px] leading-4 text-warning">{silhouette.label}；未修改原 geometryRef，关联正式轮廓后会自动替换预览边界。</p>}
+        {silhouette.source === 'generic' && <p className="rounded-xl border border-dashed border-warning/30 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{silhouette.label}；未修改原 geometryRef，关联正式轮廓后会自动替换预览边界。</p>}
       </div>
     </div>
   );

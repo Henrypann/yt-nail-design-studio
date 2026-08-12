@@ -77,13 +77,13 @@ export function V6OutputPanel() {
         <h3 className="text-xs font-semibold text-gray-700">{text('顾客输出', 'Customer output')}</h3>
         <Badge variant={status.kind === 'adapter_loaded' ? 'blue' : 'gray'}>{status.statusLabel}</Badge>
       </div>
-      <p className="text-[10px] leading-4 text-gray-500">
+      <p className="text-nano leading-4 text-gray-500">
         {'message' in status ? status.message : text('模拟 3D 适配器已加载；输出仍标记为未制造验证。', 'Simulated 3D adapter loaded; output remains manufacturing-unverified.')}
       </p>
-      <p className="rounded bg-warning-soft px-2 py-1.5 text-[10px] leading-4 text-warning">
+      <p className="rounded bg-warning-soft px-2 py-1.5 text-nano leading-4 text-warning">
         {text('模拟预览 · 尚未完成制造验证，不可作为生产指令。', 'Simulated preview · manufacturing unverified; not a production command.')}
       </p>
-      <label className="block text-[10px] text-gray-500">{text('输出意图', 'Output intent')}
+      <label className="block text-nano text-gray-500">{text('输出意图', 'Output intent')}
         <select value={doc.outputIntent} disabled={readOnly} onChange={(event) => setOutputIntent(event.target.value as typeof doc.outputIntent)} className="mt-1 w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs disabled:bg-gray-100">
           <option value="design">{text('设计编辑', 'Design editing')}</option>
           <option value="customer">{text('顾客展示', 'Customer presentation')}</option>

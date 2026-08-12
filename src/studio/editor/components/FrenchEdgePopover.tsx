@@ -64,7 +64,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
       data-testid="french-edge-popover"
     >
       <header className="flex items-center justify-between border-b border-gray-100 px-2 py-1.5">
-        <span className="text-[11px] font-semibold text-gray-800">法式边模板</span>
+        <span className="text-nano font-semibold text-gray-800">法式边模板</span>
         <button
           type="button"
           onClick={onClose}
@@ -101,13 +101,13 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
                 strokeLinecap="round"
               />
             </svg>
-            <span className="text-[9px]">{FRENCH_VARIANT_LABELS[v]}</span>
+            <span className="text-nano">{FRENCH_VARIANT_LABELS[v]}</span>
           </button>
         ))}
       </div>
 
       <div className="flex flex-col gap-2 border-t border-gray-100 px-2 py-2">
-        <label className="flex items-center justify-between text-[10px] text-gray-500">
+        <label className="flex items-center justify-between text-nano text-gray-500">
           <span>甲尖颜色</span>
           <input
             type="color"
@@ -116,19 +116,19 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
             className="h-6 w-10 cursor-pointer"
           />
         </label>
-        <label className="flex cursor-pointer items-center justify-between text-[10px] text-gray-500">
+        <label className="flex cursor-pointer items-center justify-between text-nano text-gray-500">
           <span>{variant === 'double' ? '双线边线（必选）' : '添加金属细边'}</span>
           <input
             type="checkbox"
             checked={outlineEnabled || variant === 'double'}
             disabled={variant === 'double'}
             onChange={(e) => setOutlineEnabled(e.target.checked)}
-            className="accent-[#C2497A]"
+            className="accent-primary"
           />
         </label>
         {(outlineEnabled || variant === 'double') && (
           <>
-            <label className="flex items-center justify-between text-[10px] text-gray-500">
+            <label className="flex items-center justify-between text-nano text-gray-500">
               <span>边线颜色</span>
               <input
                 type="color"
@@ -137,7 +137,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
                 className="h-6 w-10 cursor-pointer"
               />
             </label>
-            <label className="text-[10px] text-gray-400">
+            <label className="text-nano text-gray-400">
               细边宽度 {strokeWidth}
               <input
                 type="range"
@@ -145,12 +145,12 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
                 max={10}
                 value={strokeWidth}
                 onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                className="w-full accent-[#C2497A]"
+                className="w-full accent-primary"
               />
             </label>
           </>
         )}
-        <p className="text-[9px] leading-4 text-gray-400">
+        <p className="text-nano leading-4 text-gray-400">
           甲尖色块会自动贴合当前甲型外轮廓，添加后可微调微笑线深度。
         </p>
       </div>

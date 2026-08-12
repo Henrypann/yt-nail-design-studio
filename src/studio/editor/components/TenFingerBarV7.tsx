@@ -209,13 +209,13 @@ export function TenFingerBarV7() {
 
   return (
     <footer className="relative border-t border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="十指编辑与跨指操作" data-testid="v7-ten-finger-bar">
-      {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">跨指复制与同步已停用：{unavailableGeometry.join('、')} 缺少已签收 2D 甲型轮廓。解除同步仍可使用。</p>}
+      {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-nano text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">跨指复制与同步已停用：{unavailableGeometry.join('、')} 缺少已签收 2D 甲型轮廓。解除同步仍可使用。</p>}
       <div className="flex min-w-0 flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
         <div className="min-w-0 overflow-x-auto pb-0.5 max-sm:overflow-x-hidden" aria-label="选择手指" data-testid="v7-finger-locator">
           <div className="flex min-w-max items-start gap-3 max-sm:min-w-0 max-sm:flex-col max-sm:gap-1">
             {EDITOR_FINGER_ROWS_V7.map((row) => (
               <section key={row.id} className="flex items-center gap-1 max-sm:w-full" aria-label={`${row.label}五指`} data-hand={row.id}>
-                <span className="mr-0.5 text-[9px] font-semibold text-gray-400 [writing-mode:vertical-rl] max-sm:w-7 max-sm:[writing-mode:horizontal-tb]">{row.label}</span>
+                <span className="mr-0.5 text-nano font-semibold text-gray-400 [writing-mode:vertical-rl] max-sm:w-7 max-sm:[writing-mode:horizontal-tb]">{row.label}</span>
                 {row.fingers.map((identity) => {
                   const finger = identity.finger;
                   const current = currentFinger === finger;
@@ -237,7 +237,7 @@ export function TenFingerBarV7() {
                       onClick={() => chooseFinger(finger)}
                       onKeyDown={(event) => moveFingerFocus(event, finger)}
                       className={cx(
-                        'relative flex min-h-[58px] min-w-[50px] flex-col items-center justify-end rounded-xl border px-1 pb-1 pt-1 text-[9px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 max-sm:min-h-11 max-sm:min-w-11 max-sm:flex-1 max-sm:flex-row max-sm:justify-center max-sm:gap-1 max-sm:px-0.5',
+                        'relative flex min-h-[58px] min-w-[50px] flex-col items-center justify-end rounded-xl border px-1 pb-1 pt-1 text-nano focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 max-sm:min-h-11 max-sm:min-w-11 max-sm:flex-1 max-sm:flex-row max-sm:justify-center max-sm:gap-1 max-sm:px-0.5',
                         current ? 'border-primary bg-primary-soft font-semibold text-primary' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
                         fingerScope === 'selected' && selected && 'ring-2 ring-primary/35 ring-offset-1',
                       )}
@@ -252,9 +252,9 @@ export function TenFingerBarV7() {
                         aria-hidden="true"
                       />
                       <span className="leading-3 max-sm:hidden">{identity.name}</span>
-                      <span className="text-[8px] font-normal leading-3 text-gray-400">{finger}</span>
+                      <span className="text-nano font-normal leading-3 text-gray-400">{finger}</span>
                       {syncState && (
-                        <span className={cx('absolute right-0.5 top-0.5 rounded px-0.5 text-[8px] font-semibold leading-3', syncState === 'linked' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800')}>
+                        <span className={cx('absolute right-0.5 top-0.5 rounded px-0.5 text-nano font-semibold leading-3', syncState === 'linked' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800')}>
                           {syncState === 'linked' ? '同' : '独'}
                         </span>
                       )}
@@ -292,15 +292,15 @@ export function TenFingerBarV7() {
         </div>
       </div>
 
-      <p className="mt-1.5 truncate text-[10px] text-gray-500" role="status">
+      <p className="mt-1.5 truncate text-nano text-gray-500" role="status">
         正在编辑：<strong className="font-semibold text-gray-800">{fingerDisplayNameV7(currentFinger)}（{currentFinger}）</strong> · {FINGER_CONTENT_STATE_LABEL_V7[currentContentState]} · 范围 {SCOPE_LABEL[fingerScope]} · {writeTargets.length > 0 ? `将覆盖 ${writeTargets.join('、')}` : '当前没有可写目标'}
         {fingerScope === 'mirror' ? ' · 布局镜像，文字与素材本体保持正向' : ''}
       </p>
-      <p className="mt-0.5 text-[9px] text-gray-400" aria-hidden="true">粉色边框 = 当前指 · 粉色实心 = 有设计 · 虚线 = 空白 · 黄色 = 内容已隐藏</p>
-      {selectionStatus && <p className="mt-1 break-words text-[11px] leading-4 text-amber-700" role="status" aria-atomic="true" data-testid="v7-finger-selection-status">{selectionStatus}</p>}
-      {doc.compositionMeta && <p className="mt-0.5 text-[9px] text-gray-400">状态：同 = 已同步当前快照；独 = 已解除同步、可单独编辑</p>}
+      <p className="mt-0.5 text-nano text-gray-400" aria-hidden="true">粉色边框 = 当前指 · 粉色实心 = 有设计 · 虚线 = 空白 · 黄色 = 内容已隐藏</p>
+      {selectionStatus && <p className="mt-1 break-words text-nano leading-4 text-amber-700" role="status" aria-atomic="true" data-testid="v7-finger-selection-status">{selectionStatus}</p>}
+      {doc.compositionMeta && <p className="mt-0.5 text-nano text-gray-400">状态：同 = 已同步当前快照；独 = 已解除同步、可单独编辑</p>}
       {fingerScope !== 'mirror' && linkedOutsideScope.length > 0 && (
-        <p className="mt-0.5 text-[10px] text-amber-700">范围外仍有同步成员 {linkedOutsideScope.join('、')}；为避免暗改，需先解除它们或选择全部十指。</p>
+        <p className="mt-0.5 text-nano text-amber-700">范围外仍有同步成员 {linkedOutsideScope.join('、')}；为避免暗改，需先解除它们或选择全部十指。</p>
       )}
 
       {actionsOpen && (

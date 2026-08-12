@@ -114,7 +114,7 @@ export function FingerNailContent({
         <path
           d={silhouetteD}
           fill="none"
-          stroke="#C2497A"
+          stroke="var(--color-primary)"
           strokeWidth={2.6 / strokeScale}
           strokeLinejoin="round"
         />

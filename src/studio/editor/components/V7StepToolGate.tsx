@@ -27,8 +27,8 @@ export function V7StepToolGate({ tools, compact = false }: { tools: readonly Edi
   return (
     <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/80 p-2.5" data-testid="v7-tool-gate">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-500">适用工具</p>
-        <span className="text-[9px] text-gray-400">后续 PR 开放创作</span>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-500">适用工具</p>
+        <span className="text-nano text-gray-400">后续 PR 开放创作</span>
       </div>
       <div className={cx('mt-2 flex flex-wrap gap-1.5', compact && 'gap-1')}>
         {tools.map((tool) => (
@@ -38,7 +38,7 @@ export function V7StepToolGate({ tools, compact = false }: { tools: readonly Edi
             disabled
             aria-label={`${TOOL_LABELS[tool]}，尚未开放`}
             title="当前 PR 只验证步骤与工具权限；具体创作将在后续 PR 开放"
-            className="min-h-8 rounded-full border border-gray-200 bg-white px-2.5 text-[10px] text-gray-500 disabled:cursor-not-allowed disabled:opacity-70"
+            className="min-h-8 rounded-full border border-gray-200 bg-white px-2.5 text-nano text-gray-500 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {TOOL_LABELS[tool]}
           </button>

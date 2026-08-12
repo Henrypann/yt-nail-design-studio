@@ -68,7 +68,7 @@ export function LayerPanelV6() {
           >
             {/* Visibility toggle */}
             <span
-              className={`cursor-pointer text-[10px] ${layer.visible ? 'text-gray-400' : 'text-gray-300'}`}
+              className={`cursor-pointer text-nano ${layer.visible ? 'text-gray-400' : 'text-gray-300'}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (!readOnly) toggleLayerVisibleOnCurrent(layer.id);
@@ -80,7 +80,7 @@ export function LayerPanelV6() {
 
             {/* Lock toggle */}
             <span
-              className={`cursor-pointer text-[10px] ${layer.locked ? 'text-amber-500' : 'text-gray-300'}`}
+              className={`cursor-pointer text-nano ${layer.locked ? 'text-amber-500' : 'text-gray-300'}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (!readOnly) toggleLayerLockedOnCurrent(layer.id);
@@ -94,7 +94,7 @@ export function LayerPanelV6() {
             <span className="flex-1 truncate">{layerLabel(layer, locale)}</span>
 
             {/* Element count */}
-            <span className="text-[10px] text-gray-400">
+            <span className="text-nano text-gray-400">
               {layer.elements.length > 0 ? layer.elements.length : ''}
             </span>
 
@@ -102,7 +102,7 @@ export function LayerPanelV6() {
             {!readOnly && layer.typeId !== 'builtin.base_surface' && (
               <span className="flex gap-0.5">
                 <span
-                  className="cursor-pointer text-[10px] text-gray-300 hover:text-gray-500"
+                  className="cursor-pointer text-nano text-gray-300 hover:text-gray-500"
                   onClick={(e) => {
                     e.stopPropagation();
                     reorderLayerOnCurrent(layer.id, 'up');
@@ -112,7 +112,7 @@ export function LayerPanelV6() {
                   ↑
                 </span>
                 <span
-                  className="cursor-pointer text-[10px] text-gray-300 hover:text-gray-500"
+                  className="cursor-pointer text-nano text-gray-300 hover:text-gray-500"
                   onClick={(e) => {
                     e.stopPropagation();
                     reorderLayerOnCurrent(layer.id, 'down');
@@ -122,7 +122,7 @@ export function LayerPanelV6() {
                   ↓
                 </span>
                 <span
-                  className="cursor-pointer text-[10px] text-red-300 hover:text-red-500"
+                  className="cursor-pointer text-nano text-red-300 hover:text-red-500"
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteLayerOnCurrent(layer.id);

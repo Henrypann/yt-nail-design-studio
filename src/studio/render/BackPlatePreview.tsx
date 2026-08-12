@@ -155,7 +155,7 @@ export function BackPlatePreview({
             )}
             {/* 逐指例外标记（甲根右侧小圆点） */}
             {!failed && override && (override.baseColor || override.decorationId) && (
-              <circle cx={rootRightStage.x + 7} cy={rootRightStage.y - 3} r={4} fill="#C2497A" opacity={0.9} />
+              <circle cx={rootRightStage.x + 7} cy={rootRightStage.y - 3} r={4} fill="var(--color-primary)" opacity={0.9} />
             )}
           </g>
         );

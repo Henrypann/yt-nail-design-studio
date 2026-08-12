@@ -43,7 +43,7 @@ export function FingerPanel() {
     <section className="rounded-panel border border-gray-200 bg-white p-3">
       <header className="mb-2 flex items-center justify-between">
         <h3 className="text-xs font-semibold text-gray-800">十指编排</h3>
-        <span className="text-[10px] text-gray-400">
+        <span className="text-nano text-gray-400">
           {syncMode ? '● 十指同步' : `○ 逐指解锁（${unlocked.length} 指独立）`}
         </span>
       </header>
@@ -60,7 +60,7 @@ export function FingerPanel() {
               onClick={() => setCurrentFinger(f)}
               onDoubleClick={() => !readOnly && setMasterFinger(f)}
               className={cx(
-                'relative flex flex-col items-center rounded-button border px-1 py-1.5 text-[10px] transition-colors duration-fast',
+                'relative flex flex-col items-center rounded-button border px-1 py-1.5 text-nano transition-colors duration-fast',
                 isCurrent
                   ? 'border-primary bg-primary-soft text-primary'
                   : 'border-gray-200 text-gray-600 hover:bg-gray-50',
@@ -76,7 +76,7 @@ export function FingerPanel() {
         })}
       </div>
 
-      <p className="mt-2 text-[10px] leading-4 text-gray-400">
+      <p className="mt-2 text-nano leading-4 text-gray-400">
         当前编辑：{currentFinger}（{FINGER_LABEL[currentFinger]}）
         {isFingerUnlocked(doc, currentFinger) ? ' · 独立数据' : ' · 与十指同步'}；双击指位设为主视觉指
       </p>

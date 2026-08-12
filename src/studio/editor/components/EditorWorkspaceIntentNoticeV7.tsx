@@ -84,7 +84,7 @@ export function EditorWorkspaceIntentNoticeV7({
         <Icon size={15} className="mt-0.5 shrink-0" />
         <span><strong className="block font-semibold">{STATUS_LABEL[intent.status]}</strong><span className="mt-0.5 block leading-5">{intent.reason ?? '当前工具尚不可用。'}</span></span>
       </span>
-      <span className="flex flex-wrap gap-1 text-[10px]" aria-label="工具与层级目标">
+      <span className="flex flex-wrap gap-1 text-nano" aria-label="工具与层级目标">
         <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">工具 · {TOOL_LABEL[intent.id]}</span>
         <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">步骤 · {STEP_LABEL[intent.requiredStepKind]}</span>
         <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">恢复后同步高亮</span>

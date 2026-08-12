@@ -38,11 +38,11 @@ function DesignInspector() {
       data-testid="editor-design-inspector"
       data-debug-id="studio.editor.inspector.design"
     >
-      <p className="rounded-button bg-info-soft px-2 py-1.5 text-[10px] leading-relaxed text-info">
+      <p className="rounded-button bg-info-soft px-2 py-1.5 text-nano leading-relaxed text-info">
         {text('甲型、长度和表面属于整套设计；颜色遵循底部“编辑范围”。', 'Shape, length and surface apply to the set. Color follows EDIT SCOPE below.')}
       </p>
       <section>
-        <p className="mb-2 text-[11px] font-medium text-gray-700">NAIL SHAPE</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">NAIL SHAPE</p>
         <div className="grid grid-cols-3 gap-1.5">
           {TIER_ONE_EDITOR_SHAPES.map((capability) => {
             const enabled = isEditorShapeEnabled(capability);
@@ -60,22 +60,22 @@ function DesignInspector() {
               data-compatibility={enabled ? compatibility.severity : undefined}
               onClick={() => commit((draft) => { draft.shape = capability.id; })}
               className={cx(
-                'rounded-button border px-2 py-1.5 text-[11px]',
+                'rounded-button border px-2 py-1.5 text-nano',
                 selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
                 enabled && compatibilityToneClass(compatibility, selected),
                 !enabled && 'cursor-not-allowed opacity-45',
               )}
             >
               {shapeName(capability.id, locale)}
-              {enabled && !selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
+              {enabled && !selected && badge && <span aria-hidden="true" className="ml-1 text-nano opacity-75">{badge}</span>}
             </button>
             );
           })}
         </div>
-        <p className="mt-1 text-[10px] text-gray-400">Almond / Oval / Coffin available. Squoval / Square remain gated until geometry sign-off.</p>
+        <p className="mt-1 text-nano text-gray-400">Almond / Oval / Coffin available. Squoval / Square remain gated until geometry sign-off.</p>
       </section>
       <section>
-        <p className="mb-2 text-[11px] font-medium text-gray-700">{text('长度 · 扫描相对值', 'LENGTH · RELATIVE TO SCAN')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{text('长度 · 扫描相对值', 'LENGTH · RELATIVE TO SCAN')}</p>
         <div className="grid grid-cols-2 gap-1.5">
           {LENGTHS.map((length) => {
             const selected = doc.lengthPreset === length.id;
@@ -98,24 +98,24 @@ function DesignInspector() {
                   })
                 }
                 className={cx(
-                  'flex items-center justify-between rounded-button border px-2 py-1.5 text-[11px]',
+                  'flex items-center justify-between rounded-button border px-2 py-1.5 text-nano',
                   selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
                   compatibilityToneClass(compatibility, selected),
                 )}
               >
                 <span>
                   {taxonomyLabel('design-length', length.id, locale, { zh: length.label })}
-                  {!selected && badge && <span aria-hidden="true" className="ml-1 text-[9px] opacity-75">{badge}</span>}
+                  {!selected && badge && <span aria-hidden="true" className="ml-1 text-nano opacity-75">{badge}</span>}
                 </span>
                 <span className="tnum opacity-65">{length.extension}</span>
               </button>
             );
           })}
         </div>
-        <p className="mt-1 text-[10px] text-gray-400">{text('无扫描时回退为 14 / 18 / 22 / 26mm。', 'Fallback without scan: 14 / 18 / 22 / 26mm.')}</p>
+        <p className="mt-1 text-nano text-gray-400">{text('无扫描时回退为 14 / 18 / 22 / 26mm。', 'Fallback without scan: 14 / 18 / 22 / 26mm.')}</p>
       </section>
       <section>
-        <p className="mb-2 text-[11px] font-medium text-gray-700">{text('色彩预设', 'COLOR PRESETS')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{text('色彩预设', 'COLOR PRESETS')}</p>
         <div className="grid grid-cols-5 gap-1">
           {COLOR_PRESETS.map((color) => (
             <button
@@ -124,7 +124,7 @@ function DesignInspector() {
               disabled={readOnly}
               onClick={() => editCurrentFingerData((data) => { data.baseColor = color.hex; })}
               className={cx(
-                'flex flex-col items-center gap-1 rounded-button p-1 text-[9px] text-gray-500',
+                'flex flex-col items-center gap-1 rounded-button p-1 text-nano text-gray-500',
                 currentData.baseColor.toLowerCase() === color.hex.toLowerCase() && 'bg-primary-soft text-primary ring-1 ring-primary',
               )}
             >
@@ -135,7 +135,7 @@ function DesignInspector() {
         </div>
       </section>
       <section>
-        <p className="mb-2 text-[11px] font-medium text-gray-700">{text('表面预设', 'SURFACE')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{text('表面预设', 'SURFACE')}</p>
         <div className="grid grid-cols-2 gap-1.5">
           {SURFACE_PRESETS.map((surface) => {
             const available = surface.id === 'gloss' || surface.id === 'matte';
@@ -154,7 +154,7 @@ function DesignInspector() {
                   })
                 }
                 className={cx(
-                  'flex items-center justify-between rounded-button border px-2 py-1.5 text-[11px]',
+                  'flex items-center justify-between rounded-button border px-2 py-1.5 text-nano',
                   selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
                   !available && 'cursor-not-allowed opacity-45',
                 )}
@@ -164,7 +164,7 @@ function DesignInspector() {
                     ? taxonomyLabel('top-finish', surface.id, locale, { zh: surface.name })
                     : taxonomyLabel('optical-effect', surface.id, locale, { zh: surface.name })}
                 </span>
-                {!available && <span className="text-[9px]">E3</span>}
+                {!available && <span className="text-nano">E3</span>}
               </button>
             );
           })}
@@ -195,7 +195,7 @@ export function EditorInspector(props: {
             aria-selected={props.tab === tab.id}
             onClick={() => props.onTabChange(tab.id)}
             className={cx(
-              'rounded-button px-2 py-1.5 text-[11px]',
+              'rounded-button px-2 py-1.5 text-nano',
               props.tab === tab.id ? 'bg-primary-soft font-medium text-primary' : 'text-gray-500 hover:bg-gray-50',
             )}
           >
@@ -210,7 +210,7 @@ export function EditorInspector(props: {
           <div className="flex flex-col gap-3" data-debug-id="studio.editor.inspector.check">
             <section className="rounded-panel border border-gray-200 bg-white p-3">
               <h3 className="text-xs font-semibold text-gray-800">二维风险检查</h3>
-              <p className="mt-1 text-[11px] leading-relaxed text-gray-500">
+              <p className="mt-1 text-nano leading-relaxed text-gray-500">
                 当前只检查附件数量、高度参数和边缘距离。结果不等于生产可行。
               </p>
               <Button size="sm" variant="secondary" className="mt-3 w-full" onClick={props.onOpenRisk}>
@@ -218,7 +218,7 @@ export function EditorInspector(props: {
                 P0 风险筛查 · MOCK
               </Button>
             </section>
-            <section className="rounded-panel border border-dashed border-gray-200 bg-white p-3 text-[11px] text-gray-500">
+            <section className="rounded-panel border border-dashed border-gray-200 bg-white p-3 text-nano text-gray-500">
               猫眼、极光、丝绸和三维模拟属于 E3+，本轮未以占位效果冒充完成。
             </section>
           </div>

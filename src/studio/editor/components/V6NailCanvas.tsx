@@ -35,7 +35,7 @@ function elementGraphic(element: EditorElementV6) {
       .filter((point): point is { x: number; y: number } => Boolean(point) && typeof point === 'object')
       .map((point) => `${point.x},${point.y}`)
       .join(' ');
-    return <polyline points={points} fill="none" stroke={String(element.color ?? '#C2497A')} strokeWidth={Number(element.size ?? 6)} strokeLinecap="round" opacity={Number(element.opacity ?? 1)} />;
+    return <polyline points={points} fill="none" stroke={String(element.color ?? '#F04E7E')} strokeWidth={Number(element.size ?? 6)} strokeLinecap="round" opacity={Number(element.opacity ?? 1)} />;
   }
   if (element.kind === 'image' && typeof element.dataUrl === 'string') {
     return <image href={element.dataUrl} x={-30} y={-42} width={60} height={84} preserveAspectRatio="xMidYMid slice" />;

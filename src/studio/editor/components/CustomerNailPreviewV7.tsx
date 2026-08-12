@@ -256,11 +256,11 @@ export function CustomerNailPreviewV7({
           </g>
           <g transform={silhouetteTransform} pointerEvents="none"><path d={silhouette.pathD} fill="none" stroke="#6f625f" strokeWidth="1" vectorEffect="non-scaling-stroke" /></g>
         </svg>
-        {(readModel.backgroundScenarioActive || readModel.finishScenarioActive) && <span className="absolute right-2 top-2 rounded-full bg-violet-600 px-2 py-1 text-[9px] font-semibold text-white">临时比较</span>}
+        {(readModel.backgroundScenarioActive || readModel.finishScenarioActive) && <span className="absolute right-2 top-2 rounded-full bg-violet-600 px-2 py-1 text-nano font-semibold text-white">临时比较</span>}
       </div>
       <div className="flex items-center gap-1.5 text-center">
         <span className="whitespace-nowrap text-xs font-semibold text-gray-900">{fingerDisplayNameV7(nail.finger)} <span className="font-normal text-gray-400">{nail.finger}</span></span>
-        <span title={FIDELITY_LABEL[readModel.fidelity]} className={cx('whitespace-nowrap rounded-full px-1.5 py-0.5 text-[9px]', readModel.fidelity === 'unavailable' ? 'bg-warning-soft text-warning' : readModel.fidelity === 'approximate' ? 'bg-violet-50 text-violet-700' : 'bg-success-soft text-success')}>
+        <span title={FIDELITY_LABEL[readModel.fidelity]} className={cx('whitespace-nowrap rounded-full px-1.5 py-0.5 text-nano', readModel.fidelity === 'unavailable' ? 'bg-warning-soft text-warning' : readModel.fidelity === 'approximate' ? 'bg-violet-50 text-violet-700' : 'bg-success-soft text-success')}>
           {size === 'overview' ? <><span className="sm:hidden">{FIDELITY_SHORT_LABEL[readModel.fidelity]}</span><span className="hidden sm:inline">{FIDELITY_LABEL[readModel.fidelity]}</span></> : FIDELITY_LABEL[readModel.fidelity]}
         </span>
       </div>

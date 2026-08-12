@@ -56,13 +56,13 @@ export function EditorStageContextNoticeV7({
             <dl className="mt-2 flex flex-wrap gap-2">
               {details.map((detail) => (
                 <div key={detail.label} className="min-w-[118px] rounded-xl border border-current/10 bg-white/75 px-3 py-2">
-                  <dt className="text-[9px] opacity-60">{detail.label}</dt>
-                  <dd className="mt-0.5 break-all font-mono text-[10px] font-semibold">{detail.value}</dd>
+                  <dt className="text-nano opacity-60">{detail.label}</dt>
+                  <dd className="mt-0.5 break-all font-mono text-nano font-semibold">{detail.value}</dd>
                 </div>
               ))}
             </dl>
           )}
-          {disclaimer && <p className="mt-2 flex items-start gap-1.5 text-[10px] leading-4 opacity-75"><Info size={12} className="mt-0.5 shrink-0" />{disclaimer}</p>}
+          {disclaimer && <p className="mt-2 flex items-start gap-1.5 text-nano leading-4 opacity-75"><Info size={12} className="mt-0.5 shrink-0" />{disclaimer}</p>}
         </div>
         <button ref={closeRef} type="button" aria-label="关闭阶段说明" onClick={onDismiss} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>
       </div>

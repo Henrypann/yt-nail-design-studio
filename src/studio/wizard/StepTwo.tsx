@@ -149,7 +149,7 @@ export function StepTwo() {
       <p className="mt-1 text-xs leading-relaxed text-gray-500">
         五瓣低浮雕花 · 0.18mm · UV 0.62 / 0.56。其余九指固定为奶雾微法式。
       </p>
-      <p className="mt-3 text-[10px] text-warning">Canonical Fixture 待人工视觉签收 · 制造未验证</p>
+      <p className="mt-3 text-nano text-warning">Canonical Fixture 待人工视觉签收 · 制造未验证</p>
     </div>
   ) : (
     <FingerDetailPanel
@@ -277,7 +277,7 @@ export function StepTwo() {
                       ))}
                     </div>
                   )}
-                  <span className="hidden text-[10px] text-gray-400 xl:inline">
+                  <span className="hidden text-nano text-gray-400 xl:inline">
                     {petalP0 ? 'Canonical Three.js PBR · 双击 R4 看单指细节' : 'NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节'}
                   </span>
                   <span className="relative">
@@ -293,7 +293,7 @@ export function StepTwo() {
                         role="status"
                       >
                         <p className="text-xs font-medium text-gray-900">已保存 ✓ 转给客人看看效果？</p>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">
+                        <p className="mt-0.5 text-nano leading-relaxed text-gray-500">
                           顾客展示会全屏呈现设计，客人点头后可直接标记「顾客已确认」。
                         </p>
                         <div className="mt-2 flex justify-end gap-1.5">
@@ -406,15 +406,15 @@ export function StepTwo() {
             {editorCompatibility.ok ? <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-success" /> : <AlertTriangle size={17} className="mt-0.5 shrink-0 text-warning" />}
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-gray-900">{editorCompatibility.ok ? '已通过 Editor V7 资产预检' : '暂不能进入 Editor V7'}</p>
-              <p className="mt-1 text-[10px] leading-4 text-gray-500">{editorCompatibility.ok ? editorCompatibility.warning : editorCompatibility.message}</p>
+              <p className="mt-1 text-nano leading-4 text-gray-500">{editorCompatibility.ok ? editorCompatibility.warning : editorCompatibility.message}</p>
             </div>
           </div>
           <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
             {editorCompatibility.items.map((item) => (
               <div key={item.id} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2" data-fidelity={item.fidelity}>
-                <dt className="text-[9px] text-gray-400">{item.label}</dt>
-                <dd className="mt-0.5 text-[10px] font-semibold text-gray-700">{item.value}</dd>
-                <p className={cx('mt-1 text-[9px]', item.fidelity === 'unavailable' ? 'text-warning' : item.fidelity === 'approximate' ? 'text-violet-600' : 'text-success')}>{item.fidelity === 'exact' ? '可编辑' : item.fidelity === 'approximate' ? '模拟/近似' : '不可用'}</p>
+                <dt className="text-nano text-gray-400">{item.label}</dt>
+                <dd className="mt-0.5 text-nano font-semibold text-gray-700">{item.value}</dd>
+                <p className={cx('mt-1 text-nano', item.fidelity === 'unavailable' ? 'text-warning' : item.fidelity === 'approximate' ? 'text-violet-600' : 'text-success')}>{item.fidelity === 'exact' ? '可编辑' : item.fidelity === 'approximate' ? '模拟/近似' : '不可用'}</p>
               </div>
             ))}
           </dl>

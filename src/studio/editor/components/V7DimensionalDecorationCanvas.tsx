@@ -139,8 +139,8 @@ export function V7DimensionalDecorationCanvas() {
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/90 p-4 shadow-sm">
         <div className="flex items-center gap-2"><Box size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Dimensional · 2D/2.5D</p></div>
         <h2 className="mt-2 text-lg font-semibold text-gray-900">{decorations.length} 个立体装饰</h2>
-        <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold', tone)}>{DIMENSIONAL_FIDELITY_LABELS_V7[previewFidelity]}</div>
-        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体投影已相应降级。</p>}
+        <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', tone)}>{DIMENSIONAL_FIDELITY_LABELS_V7[previewFidelity]}</div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体投影已相应降级。</p>}
         <div className="mt-4 space-y-1 text-xs text-gray-600">{decorations.slice(0, 4).map((item) => <p key={item.id}>{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(item)]} · {item.heightMm.toFixed(2)} mm</p>)}</div>
         <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />俯视阴影和高度仅为编辑态 2.5D 投影；Mesh 状态不代表物理结构、装配或可制造性。</div>
       </div>

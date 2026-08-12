@@ -113,8 +113,7 @@ export function PresentationMode({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col animate-fade-in"
-      style={{ backgroundColor: '#F7F3EE' }}
+      className="fixed inset-0 z-50 flex flex-col bg-canvas animate-fade-in"
       data-debug-id="studio.presentation"
       role="dialog"
       aria-label="顾客展示模式"
@@ -165,7 +164,7 @@ export function PresentationMode({
               </button>
             )
           )}
-          <span className="text-[11px] text-gray-400">Esc 退出</span>
+          <span className="text-nano text-gray-400">Esc 退出</span>
           <button
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 transition-colors duration-fast hover:text-gray-900"

@@ -271,25 +271,25 @@ export function V7FlatDesignCanvas() {
             return <circle key={`${index}-${anchor.u}-${anchor.v}`} cx={displayPoint.u * CANVAS_WIDTH} cy={displayPoint.v * CANVAS_HEIGHT} r="3.4" fill="white" stroke="#7c3aed" strokeWidth="1.4" className="cursor-crosshair" onPointerDown={(event) => { event.stopPropagation(); if (!canEdit || selectedElement.locked) return; svgRef.current?.setPointerCapture(event.pointerId); setGesture({ mode: 'anchor', pointerId: event.pointerId, anchorIndex: index, element: selectedElement, pathData: selectedElement.pathData }); }} />;
           })}
         </svg>
-        {flatStep.locked && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-[10px] text-white"><Lock size={12} />当前步骤已锁定</span>}
-        {!flatStep.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-[10px] text-white"><EyeOff size={12} />当前步骤已隐藏</span>}
+        {flatStep.locked && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><Lock size={12} />当前步骤已锁定</span>}
+        {!flatStep.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><EyeOff size={12} />当前步骤已隐藏</span>}
       </div>
 
       <div className="min-w-0 space-y-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-500">2D SVG 矢量编辑</p>
+          <p className="text-nano font-semibold uppercase tracking-[0.14em] text-violet-500">2D SVG 矢量编辑</p>
           <h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {flatStep.name}</h2>
-          <p className="mt-1 text-[11px] text-gray-500">{flatStep.elements.length} 个元素 · 工具：{activeTool}</p>
+          <p className="mt-1 text-nano text-gray-500">{flatStep.elements.length} 个元素 · 工具：{activeTool}</p>
         </div>
-        <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-[10px] leading-4 text-violet-800">
+        <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-nano leading-4 text-violet-800">
           <Info size={13} className="mr-1.5 inline -translate-y-px" />
           所有 pointer 坐标先转换为 u/v 0–1 再写入 EditorDoc；SVG 仅是派生视图。
         </div>
-        <dl className="grid grid-cols-2 gap-2 text-[10px]">
+        <dl className="grid grid-cols-2 gap-2 text-nano">
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">Geometry clip</dt><dd className="mt-1 font-semibold text-gray-800">{silhouette.source === 'product' ? '已签收 2D 轮廓' : silhouette.source === 'generated' ? '生成轮廓（近似）' : '通用回退轮廓'}</dd></div>
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">遮罩策略</dt><dd className="mt-1 font-semibold text-gray-800">非破坏 · 顺序生效</dd></div>
         </dl>
-        <p className="rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2 text-[10px] leading-4 text-gray-500">
+        <p className="rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2 text-nano leading-4 text-gray-500">
           参数图形在创建时显式物化为 canonical pathData；V7 当前合同不保存矩形/圆/星形的额外参数字段。
         </p>
       </div>

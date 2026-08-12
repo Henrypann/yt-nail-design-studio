@@ -202,12 +202,12 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
           loading="lazy"
         />
         {tier === 'high' && (
-          <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-nano font-medium text-white">
             推荐
           </span>
         )}
         {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
-          <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+          <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-nano font-medium text-amber-800">
             {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
           </span>
         )}
@@ -218,29 +218,29 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
         </div>
         <div className="flex flex-wrap gap-1">
           {template.style_tags.map((tag) => (
-            <span key={tag} className="rounded-button bg-gray-100 px-1 py-0.5 text-[10px] text-gray-500">
+            <span key={tag} className="rounded-button bg-gray-100 px-1 py-0.5 text-nano text-gray-500">
               {tagNameById.get(tag) ?? tag}
             </span>
           ))}
         </div>
         {/* 最佳甲型 badge（方向 B） */}
-        <div className="flex flex-wrap gap-1 text-[10px] text-gray-500">
-          {badges.best && <Badge variant="success" className="px-1 py-0 text-[10px]">★ {shapeName(badges.best)}</Badge>}
+        <div className="flex flex-wrap gap-1 text-nano text-gray-500">
+          {badges.best && <Badge variant="success" className="px-1 py-0 text-nano">★ {shapeName(badges.best)}</Badge>}
           {badges.good.length > 0 && (
-            <Badge variant="gray" className="px-1 py-0 text-[10px]">✓ {badges.good.map(shapeName).join(', ')}</Badge>
+            <Badge variant="gray" className="px-1 py-0 text-nano">✓ {badges.good.map(shapeName).join(', ')}</Badge>
           )}
           {badges.bad.length > 0 && (
-            <Badge variant="warning" className="px-1 py-0 text-[10px]">⚠ {badges.bad.map(shapeName).join(', ')}</Badge>
+            <Badge variant="warning" className="px-1 py-0 text-nano">⚠ {badges.bad.map(shapeName).join(', ')}</Badge>
           )}
         </div>
         {/* 不建议原因（不建议 ≠ 禁止，仍可应用） */}
         {tier === 'not' && reason && (
-          <p className="text-[10px] leading-snug text-warning">
+          <p className="text-nano leading-snug text-warning">
             ⚠ {reason}。仍可选择。
           </p>
         )}
         {template.asset_status === 'CONCEPT' && template.capability_summary && (
-          <div className="space-y-0.5 rounded-button bg-amber-50 px-1.5 py-1 text-[10px] leading-snug">
+          <div className="space-y-0.5 rounded-button bg-amber-50 px-1.5 py-1 text-nano leading-snug">
             <p className="text-success">✓ {template.capability_summary.supported.join(' / ')}</p>
             <p className="text-amber-800">○ {template.capability_summary.pending.join(' / ')}</p>
             {template.asset_spec_url && (
@@ -261,7 +261,7 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
             variant={selected ? 'secondary' : 'primary'}
             disabled={disabled}
             onClick={onApply}
-            className="h-7 w-full text-[11px]"
+            className="h-7 w-full text-nano"
           >
             {template.asset_status === 'CONCEPT'
               ? selected

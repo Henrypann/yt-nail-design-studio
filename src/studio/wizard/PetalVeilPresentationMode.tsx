@@ -39,7 +39,7 @@ export function PetalVeilPresentationMode({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-[#F7F3EE]"
+      className="fixed inset-0 z-50 flex flex-col bg-canvas"
       data-debug-id="studio.presentation.petal-hq"
       role="dialog"
       aria-label="Petal Veil 顾客展示"
@@ -85,7 +85,7 @@ export function PetalVeilPresentationMode({
               </button>
             )
           )}
-          <span className="text-[11px] text-gray-400">Esc 退出</span>
+          <span className="text-nano text-gray-400">Esc 退出</span>
           <button
             type="button"
             onClick={onClose}

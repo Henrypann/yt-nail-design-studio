@@ -104,8 +104,8 @@ export function V7SurfaceEffectCanvas() {
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/90 p-4 shadow-sm">
         <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Surface Effect · 2D</p></div>
         <h2 className="mt-2 text-lg font-semibold text-gray-900">{SURFACE_EFFECT_LABELS_V7[effect.effectType]}</h2>
-        <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold', fidelityTone)}>{SURFACE_EFFECT_FIDELITY_LABELS_V7[previewFidelity]}</div>
-        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体预览已相应降级。</p>}
+        <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', fidelityTone)}>{SURFACE_EFFECT_FIDELITY_LABELS_V7[previewFidelity]}</div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体预览已相应降级。</p>}
         <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" /><p>{effect.previewFidelity === 'unavailable' ? '当前 adapter 无法表达此效果，画布保留遮罩边界与数据。' : '这是由结构化参数派生的编辑态 2D 预览。'} 不代表最终 3D、材料性能或物理可制造性。</p></div>
       </div>
     </div>

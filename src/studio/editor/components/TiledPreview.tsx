@@ -102,7 +102,7 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
           <h2 className="text-sm font-semibold text-gray-900">
             {presentation ? '顾客确认展示' : '十指平铺预览'}
           </h2>
-          <span className="text-[10px] text-gray-400">
+          <span className="text-nano text-gray-400">
             {presentation ? '全屏只读 · Esc 退出' : 'Back 手背'}
           </span>
         </div>
@@ -171,7 +171,7 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                         style={{ height: `${176 * displayRatio}px`, width: `${96 * displayRatio}px` }}
                       >
                         <span className="text-lg">⚠️</span>
-                        <span className="text-[10px] text-gray-500">渲染失败</span>
+                        <span className="text-nano text-gray-500">渲染失败</span>
                       </div>
                     ) : (
                       <svg
@@ -183,7 +183,7 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                       />
                     )}
                   </div>
-                  <span className="flex flex-wrap items-center justify-center gap-1 text-[10px] text-gray-500">
+                  <span className="flex flex-wrap items-center justify-center gap-1 text-nano text-gray-500">
                     <span className="font-medium tnum">{finger}</span>
                     {!presentation && isMaster && <span title="主视觉指">💗</span>}
                     {!presentation && (isUnlocked ? (
@@ -200,13 +200,13 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
         )}
       </main>
 
-      <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-[11px] text-gray-500">
+      <footer className="flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-t border-gray-200 bg-white px-4 text-nano text-gray-500">
         <span>
           {presentation
             ? `${shapeName(doc.shape, locale)} · ${lengthName(doc.length, locale)} · ${doc.lengthPreset}`
             : `点击指位切换编辑指并返回单甲画布${hasBrush ? ' · 导出 PNG 含手绘/法式' : ''}`}
         </span>
-        <span className="text-[10px] text-gray-400">
+        <span className="text-nano text-gray-400">
           {presentation
             ? `设计号 ${doc.designId}`
             : syncMode

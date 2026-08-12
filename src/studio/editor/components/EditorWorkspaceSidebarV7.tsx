@@ -38,7 +38,7 @@ export function EditorWorkspaceSidebarV7({
 
   if (!compact) {
     return (
-      <aside className="grid h-full min-h-0 w-[380px] shrink-0 grid-rows-[minmax(300px,1.25fr)_minmax(190px,0.75fr)] border-l border-gray-200 bg-white" data-testid="v7-workspace-sidebar" data-overlay-open="false">
+      <aside className="grid h-full min-h-0 w-[clamp(220px,22vw,340px)] shrink-0 grid-rows-[minmax(260px,1.2fr)_minmax(180px,0.8fr)] border-l border-hairline bg-surface" data-testid="v7-workspace-sidebar" data-overlay-open="false">
         <div className="flex min-h-0 border-b border-gray-200"><LayerPanelV7 mode="tree" /></div>
         <div className="flex min-h-0"><LayerPanelV7 mode="inspector" /></div>
       </aside>
@@ -55,7 +55,7 @@ export function EditorWorkspaceSidebarV7({
         aria-modal="true"
         aria-label={tab === 'layers' ? '层级面板' : '属性面板'}
         onKeyDown={trapFocus}
-        className="fixed inset-0 z-[100] flex min-h-0 flex-col overflow-hidden border border-gray-200 bg-white shadow-modal md:left-auto md:w-[360px]"
+        className="fixed inset-0 z-[100] flex min-h-0 flex-col overflow-hidden border border-hairline bg-surface shadow-modal min-[800px]:left-auto min-[800px]:w-[min(360px,42vw)]"
         data-testid="v7-workspace-sidebar"
         data-overlay-open="true"
       >

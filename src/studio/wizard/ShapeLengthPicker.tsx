@@ -184,7 +184,7 @@ function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelec
       </span>
 
       {!enabled && (
-        <span className="rounded-full bg-gray-200 px-1.5 py-px text-[10px] leading-4 text-gray-500">
+        <span className="rounded-full bg-gray-200 px-1.5 py-px text-nano leading-4 text-gray-500">
           {availability}
         </span>
       )}
@@ -192,7 +192,7 @@ function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelec
         <span
           aria-hidden="true"
           className={cx(
-            'rounded-full px-1.5 py-px text-[10px] leading-4',
+            'rounded-full px-1.5 py-px text-nano leading-4',
             compatibility.severity === 'recommended' && 'bg-success-soft text-success',
             compatibility.severity === 'caution' && 'bg-warning-soft text-warning',
             compatibility.severity === 'strong' && 'bg-gray-200 text-gray-500',
@@ -311,7 +311,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
               >
                 {taxonomyLabel('geometry-length', item, locale, { zh: meta?.name })}
                 {selected && meta && <span className="text-xs opacity-80 tnum">{meta.lengthMm}mm</span>}
-                {!selected && badge && <span aria-hidden="true" className="text-[10px] opacity-80">{badge}</span>}
+                {!selected && badge && <span aria-hidden="true" className="text-nano opacity-80">{badge}</span>}
               </button>
             );
           })}

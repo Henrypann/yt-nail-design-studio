@@ -145,7 +145,7 @@ export function PetalVeilTiledPreview({
             key={finger}
             type="button"
             className={cx(
-              'pointer-events-auto h-8 rounded-button text-[10px] font-medium transition-colors',
+              'pointer-events-auto h-8 rounded-button text-nano font-medium transition-colors',
               selectedFinger === finger ? 'bg-primary text-white' : 'bg-white/80 text-gray-500 hover:bg-white',
             )}
             onClick={() => onFingerClick?.(finger)}
@@ -176,7 +176,7 @@ export function PetalVeilSinglePreview({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-900">{finger} · 单指细节</p>
-          <p className="text-[10px] text-gray-400">{model.appearanceChecksum}</p>
+          <p className="text-nano text-gray-400">{model.appearanceChecksum}</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="warning">HQ 候选 · 待视觉签收</Badge>

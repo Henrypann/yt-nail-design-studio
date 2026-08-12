@@ -191,12 +191,12 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                       onError={() => setFailedCovers((current) => new Set(current).add(st.id))}
                     />
                   )}
-                  <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-amber-200">
+                  <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-nano font-medium text-amber-200">
                     TOP {st.priority}
                   </span>
                   {st.cover_status === 'CONCEPT' && (
                     <span className="absolute right-2 top-2">
-                      <Badge variant="warning" className="bg-white/90 text-[10px] backdrop-blur-sm">
+                      <Badge variant="warning" className="bg-white/90 text-nano backdrop-blur-sm">
                         高保真概念
                       </Badge>
                     </span>
@@ -207,17 +207,17 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                 <div className="flex flex-1 flex-col gap-1.5 px-3.5 py-3">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-sm font-semibold text-gray-900">{locale === 'en' ? st.name_en : st.name}</span>
-                    {locale === 'zh' && <span className="truncate text-[11px] text-gray-400">{st.name_en}</span>}
+                    {locale === 'zh' && <span className="truncate text-nano text-gray-400">{st.name_en}</span>}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px]">
+                  <div className="flex items-center gap-1.5 text-nano">
                     <span className="text-gray-500">最佳长度 {st.best_length_label}</span>
                     {lengthFit && (
-                      <Badge variant="success" className="text-[10px]">适配当前长度</Badge>
+                      <Badge variant="success" className="text-nano">适配当前长度</Badge>
                     )}
                   </div>
                   <p className="line-clamp-3 text-xs leading-relaxed text-gray-600">{st.reason}</p>
                   {st.cover_status === 'CONCEPT' && (
-                    <div className="rounded-button border border-warning/20 bg-warning-soft px-2 py-1.5 text-[10px] leading-relaxed text-warning">
+                    <div className="rounded-button border border-warning/20 bg-warning-soft px-2 py-1.5 text-nano leading-relaxed text-warning">
                       <p>{st.concept_note ?? '概念封面用于审美方向；当前画布为近似基础方案。'}</p>
                       {st.base_template_name && (
                         <p className="mt-0.5 opacity-80">{st.recipe_ref ? '基础渲染：' : '当前应用：'}{st.base_template_name}</p>

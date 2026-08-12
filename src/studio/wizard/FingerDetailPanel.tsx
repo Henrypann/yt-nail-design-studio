@@ -64,7 +64,7 @@ export function FingerDetailPanel({
         {selectedFinger && onExpand && (
           <button
             onClick={onExpand}
-            className="flex items-center gap-1 rounded-button px-1.5 py-0.5 text-[10px] text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
+            className="flex items-center gap-1 rounded-button px-1.5 py-0.5 text-nano text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
             title="切换到单指细节视图"
           >
             <Maximize2 size={11} />
@@ -73,7 +73,7 @@ export function FingerDetailPanel({
         )}
       </div>
       {patternError && (
-        <p role="alert" className="rounded-button border border-error/20 bg-error-soft px-2 py-1.5 text-[10px] text-error">
+        <p role="alert" className="rounded-button border border-error/20 bg-error-soft px-2 py-1.5 text-nano text-error">
           {patternError}
         </p>
       )}
@@ -182,7 +182,7 @@ function FingerDetailBody({
           />
         </svg>
       </div>
-      <div className="flex flex-col gap-1 text-[11px] text-gray-600">
+      <div className="flex flex-col gap-1 text-nano text-gray-600">
         <p className="font-medium text-gray-900">
           {finger} · {FINGER_LABEL[finger]}
         </p>
@@ -190,11 +190,11 @@ function FingerDetailBody({
           底色
           <span className="inline-block h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: color }} />
           <span className="tnum">{color}</span>
-          {override?.baseColor && <span style={{ color: '#C2497A' }}>（单独定制）</span>}
+          {override?.baseColor && <span style={{ color: 'var(--color-primary)' }}>（单独定制）</span>}
         </p>
         <p>
           附件{decoration ? `：${decoration.name}` : '：无'}
-          {override?.decorationId && <span style={{ color: '#C2497A' }}>（单独定制）</span>}
+          {override?.decorationId && <span style={{ color: 'var(--color-primary)' }}>（单独定制）</span>}
         </p>
       </div>
     </>

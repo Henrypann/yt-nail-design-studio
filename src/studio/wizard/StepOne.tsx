@@ -35,7 +35,7 @@ function TwinNotice({ customer }: { customer: Customer }) {
         <div className="flex items-center gap-2 text-xs text-success">
           <CheckCircle2 size={14} />
           十指已全部扫描
-          <Badge variant="gray" className="text-[10px]">MOCK · 预览使用标准尺寸</Badge>
+          <Badge variant="gray" className="text-nano">MOCK · 预览使用标准尺寸</Badge>
         </div>
       );
     case 'MOCK_LOW_CONFIDENCE':
@@ -43,7 +43,7 @@ function TwinNotice({ customer }: { customer: Customer }) {
         <div className="flex flex-wrap items-center gap-2 text-xs text-warning">
           <AlertTriangle size={14} />
           {mockUnscannedCount(customer.id)} 指未扫描。可跳过，提交生产前须补全。
-          <Badge variant="gray" className="text-[10px]">MOCK · 预览使用标准尺寸</Badge>
+          <Badge variant="gray" className="text-nano">MOCK · 预览使用标准尺寸</Badge>
         </div>
       );
     case 'NO_DATA':
@@ -116,14 +116,14 @@ function LiveShapePreview() {
             readOnly
             size="md"
           />
-          <p className="text-center text-[11px] text-gray-500">{label}</p>
+          <p className="text-center text-nano text-gray-500">{label}</p>
         </>
       ) : (
         <div className="flex h-full min-h-[140px] flex-col items-center justify-center gap-2 text-center">
           <div className="flex h-16 w-12 items-center justify-center rounded-lg border border-dashed border-gray-300 text-gray-300">
             💅
           </div>
-          <p className="text-[11px] leading-relaxed text-gray-400">
+          <p className="text-nano leading-relaxed text-gray-400">
             选择甲型与长度
             <br />
             这里即时预览效果

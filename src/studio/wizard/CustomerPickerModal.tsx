@@ -147,7 +147,7 @@ export function CustomerPickerModal({ open, onConfirm, onContinueWithoutCustomer
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 accent-[#C2497A]"
+                className="mt-0.5 accent-primary"
               />
               客户已阅读并同意《隐私政策》，同意门店保存其个人信息用于美甲服务。
             </label>

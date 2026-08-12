@@ -52,7 +52,7 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
       data-testid="brand-palette-popover"
     >
       <header className="flex items-center justify-between border-b border-gray-100 px-2 py-1.5">
-        <span className="text-[11px] font-semibold text-gray-800">品牌色板</span>
+        <span className="text-nano font-semibold text-gray-800">品牌色板</span>
         <button
           type="button"
           onClick={onClose}
@@ -70,7 +70,7 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
             type="button"
             onClick={() => setBrand(b)}
             className={cx(
-              'flex-1 rounded-button py-0.5 text-[9px]',
+              'flex-1 rounded-button py-0.5 text-nano',
               brand === b ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-50',
             )}
           >
@@ -84,12 +84,12 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
         placeholder="搜索色名/HEX"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="mx-2 mt-1.5 rounded-button border border-gray-200 px-2 py-1 text-[10px]"
+        className="mx-2 mt-1.5 rounded-button border border-gray-200 px-2 py-1 text-nano"
       />
 
       <div className="max-h-48 overflow-y-auto p-2">
         {loading ? (
-          <p className="py-4 text-center text-[10px] text-gray-400">加载中…</p>
+          <p className="py-4 text-center text-nano text-gray-400">加载中…</p>
         ) : (
           <div className="grid grid-cols-6 gap-1">
             {filtered.map((c) => (
@@ -110,7 +110,7 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
           </div>
         )}
       </div>
-      <p className="border-t border-gray-100 px-2 py-1 text-[9px] text-gray-400">
+      <p className="border-t border-gray-100 px-2 py-1 text-nano text-gray-400">
         {filtered.length} 色 · 异步加载
       </p>
     </div>

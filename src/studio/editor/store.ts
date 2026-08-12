@@ -160,7 +160,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   currentFinger: 'R4',
   editScope: 'single',
   tool: 'brush',
-  brushColor: '#C2497A',
+  brushColor: '#F04E7E',
   brushSize: BRUSH_PRESET_SIZES.standard,
   brushPreset: 'standard',
   brushOpacity: 1,

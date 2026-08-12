@@ -26,7 +26,7 @@ export function FingerStrip() {
       data-debug-id="studio.editor.finger-strip"
     >
       <div className="w-[218px] shrink-0">
-        <p className="mb-1 text-[10px] font-semibold text-gray-700">
+        <p className="mb-1 text-nano font-semibold text-gray-700">
           {text('编辑范围', 'EDIT SCOPE')}
         </p>
         <div className="grid grid-cols-2 rounded-button border border-gray-200 bg-gray-50 p-0.5">
@@ -35,7 +35,7 @@ export function FingerStrip() {
             aria-pressed={editScope === 'single'}
             onClick={() => setEditScope('single')}
             className={cx(
-              'rounded-button px-2 py-1 text-[11px]',
+              'rounded-button px-2 py-1 text-nano',
               editScope === 'single' ? 'bg-white font-medium text-primary shadow-sm' : 'text-gray-500',
             )}
           >
@@ -46,14 +46,14 @@ export function FingerStrip() {
             aria-pressed={editScope === 'all'}
             onClick={() => setEditScope('all')}
             className={cx(
-              'rounded-button px-2 py-1 text-[11px]',
+              'rounded-button px-2 py-1 text-nano',
               editScope === 'all' ? 'bg-white font-medium text-primary shadow-sm' : 'text-gray-500',
             )}
           >
             {text('十指同步', 'ALL 10')}
           </button>
         </div>
-        <p className="mt-1 truncate text-[9px] text-gray-400">
+        <p className="mt-1 truncate text-nano text-gray-400">
           {editScope === 'single'
             ? text('绘制、款式和图层只修改当前指', 'Draw, recipes and layers affect this nail only')
             : text('修改共享设计；已有单指例外不覆盖', 'Edits the shared design; overrides stay independent')}
@@ -70,7 +70,7 @@ export function FingerStrip() {
               key={finger}
               onClick={() => setCurrent(finger)}
               className={cx(
-                'relative flex h-11 min-w-0 items-center justify-center gap-0.5 rounded-button border text-[10px]',
+                'relative flex h-11 min-w-0 items-center justify-center gap-0.5 rounded-button border text-nano',
                 selected ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50',
               )}
               title={`${finger}${master ? ' · Accent nail' : ''}${unlocked ? ' · Individual override' : ''}`}

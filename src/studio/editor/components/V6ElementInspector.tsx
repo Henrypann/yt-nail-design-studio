@@ -28,7 +28,7 @@ export function V6ElementInspector() {
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold text-gray-700">{String(element.name ?? element.kind)}</p>
-          <p className="text-[10px] text-gray-400">{element.domain} · {element.kind}</p>
+          <p className="text-nano text-gray-400">{element.domain} · {element.kind}</p>
         </div>
         <div className="flex gap-1">
           <button type="button" disabled={state.readOnly || layer?.locked} onClick={state.toggleSelectedElementVisible} title={element.visible ? text('隐藏元素', 'Hide element') : text('显示元素', 'Show element')} className="rounded p-1 text-gray-500 hover:bg-gray-100 disabled:opacity-40">
@@ -42,15 +42,15 @@ export function V6ElementInspector() {
 
       <div className="grid grid-cols-2 gap-2">
         {(['x', 'y'] as const).map((key) => (
-          <label key={key} className="text-[10px] uppercase text-gray-500">{key}
+          <label key={key} className="text-nano uppercase text-gray-500">{key}
             <input type="number" value={Math.round(transform[key] * 10) / 10} disabled={blocked} onChange={(event) => updateNumber(key, event.target.value)} className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-xs disabled:bg-gray-100" />
           </label>
         ))}
       </div>
-      <label className="block text-[10px] text-gray-500">{text('缩放', 'Scale')} · {transform.scale.toFixed(2)}
+      <label className="block text-nano text-gray-500">{text('缩放', 'Scale')} · {transform.scale.toFixed(2)}
         <input type="range" min="0.15" max="4" step="0.05" value={transform.scale} disabled={blocked} onChange={(event) => updateNumber('scale', event.target.value)} className="mt-1 w-full" />
       </label>
-      <label className="block text-[10px] text-gray-500">{text('旋转', 'Rotation')} · {Math.round(transform.rotation)}°
+      <label className="block text-nano text-gray-500">{text('旋转', 'Rotation')} · {Math.round(transform.rotation)}°
         <input type="range" min="-180" max="180" step="1" value={transform.rotation} disabled={blocked} onChange={(event) => updateNumber('rotation', event.target.value)} className="mt-1 w-full" />
       </label>
 
@@ -60,7 +60,7 @@ export function V6ElementInspector() {
       </div>
 
       <div className="rounded-button border border-gray-200 bg-gray-50 p-2">
-        <p className="text-[10px] font-medium text-gray-600">{text('逐指编排', 'Finger placement')}</p>
+        <p className="text-nano font-medium text-gray-600">{text('逐指编排', 'Finger placement')}</p>
         <div className="mt-2 flex gap-2">
           <select value={targetFinger.value} onChange={(event) => targetFinger.set(event.target.value as FingerCode)} className="min-w-0 flex-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs">
             {FINGER_CODES.filter((finger) => finger !== state.currentFinger).map((finger) => <option key={finger}>{finger}</option>)}

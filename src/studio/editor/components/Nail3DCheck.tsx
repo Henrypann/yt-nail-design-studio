@@ -121,7 +121,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
       faces.sort((f1, f2) => f1.zAvg - f2.zAvg);
       for (const f of faces) {
         const shade = Math.max(0, Math.min(1, 0.55 + f.nz / 9000));
-        const base = [194, 73, 122]; // 主色 #C2497A
+        const base = [240, 78, 126]; // DESIGN v1.1 主色 #F04E7E
         ctx.fillStyle = `rgb(${base.map((c) => Math.round(c * shade + 40 * (1 - shade))).join(',')})`;
         ctx.beginPath();
         ctx.moveTo(f.pts[0].x, f.pts[0].y);
@@ -203,7 +203,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-5">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-gray-100">3D 单甲检查 · {currentFinger}</h2>
-          <span className="rounded-button border border-warning/40 bg-warning/15 px-2 py-0.5 text-[10px] font-medium text-warning">
+          <span className="rounded-button border border-warning/40 bg-warning/15 px-2 py-0.5 text-nano font-medium text-warning">
             原型期几何与热力图为 MOCK · 只读
           </span>
         </div>
@@ -261,7 +261,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
         />
       </main>
 
-      <footer className="flex h-10 shrink-0 items-center justify-center border-t border-white/10 text-[11px] text-gray-400">
+      <footer className="flex h-10 shrink-0 items-center justify-center border-t border-white/10 text-nano text-gray-400">
         拖拽旋转检查浮雕高度与边缘刮手 · 3D 视图是检查工具，不可编辑 · 正式几何由算法组工艺映射引擎产出
       </footer>
     </div>

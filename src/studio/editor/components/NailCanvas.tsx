@@ -187,7 +187,7 @@ export function NailCanvas() {
         ({ key, x, y }) =>
           `<g data-french-handle="${key}" style="cursor:ns-resize">` +
           `<circle cx="${x}" cy="${y}" r="10" fill="transparent"/>` +
-          `<circle cx="${x}" cy="${y}" r="4.5" fill="#C2497A" stroke="#FFFFFF" stroke-width="2" pointer-events="none"/>` +
+          `<circle cx="${x}" cy="${y}" r="4.5" fill="#F04E7E" stroke="#FFFFFF" stroke-width="2" pointer-events="none"/>` +
           `</g>`,
       )
       .join('');
@@ -472,7 +472,7 @@ export function NailCanvas() {
         </button>
       )}
       {selectedClassic && (
-        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-panel border border-primary/20 bg-white/95 px-3 py-2 text-center text-[11px] text-gray-600 shadow-float">
+        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-panel border border-primary/20 bg-white/95 px-3 py-2 text-center text-nano text-gray-600 shadow-float">
           {text('拖动甲面上的左翼、中心、右翼三个粉色控制点', 'Drag the left, center and right pink handles on the nail')}
         </div>
       )}
@@ -480,7 +480,7 @@ export function NailCanvas() {
       <button
         type="button"
         onClick={fitCanvas}
-        className="absolute right-3 top-3 flex items-center gap-1 rounded-button border border-gray-200 bg-white/95 px-2 py-1.5 text-[11px] text-gray-600 shadow-float hover:text-primary"
+        className="absolute right-3 top-3 flex items-center gap-1 rounded-button border border-gray-200 bg-white/95 px-2 py-1.5 text-nano text-gray-600 shadow-float hover:text-primary"
         title="适合画布"
       >
         <Maximize2 size={12} />

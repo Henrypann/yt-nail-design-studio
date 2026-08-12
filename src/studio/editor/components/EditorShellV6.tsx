@@ -209,7 +209,7 @@ export function EditorShellV6() {
         />
         <span
           className={cx(
-            'text-[11px]',
+            'text-nano',
             saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500',
           )}
           role="status"
@@ -304,9 +304,9 @@ export function EditorShellV6() {
               </div>
             ) : activeToolSection === 'draw' ? (
               <div className="mt-3 space-y-2">
-                <Button size="sm" variant="ghost" className="w-full" disabled={readOnly} onClick={() => addPresetElement('builtin.draw', text('手绘', 'Draw'), { domain: 'pattern', kind: 'brush', name: text('可移动笔触', 'Movable stroke'), points: [{ x: -24, y: 0 }, { x: 0, y: -10 }, { x: 24, y: 0 }], color: '#C2497A', size: 7, opacity: 1, transform: { x: 0, y: -82, scale: 1, rotation: 0 } })}><Paintbrush size={14} /> {text('添加笔触', 'Add stroke')}</Button>
+                <Button size="sm" variant="ghost" className="w-full" disabled={readOnly} onClick={() => addPresetElement('builtin.draw', text('手绘', 'Draw'), { domain: 'pattern', kind: 'brush', name: text('可移动笔触', 'Movable stroke'), points: [{ x: -24, y: 0 }, { x: 0, y: -10 }, { x: 24, y: 0 }], color: '#F04E7E', size: 7, opacity: 1, transform: { x: 0, y: -82, scale: 1, rotation: 0 } })}><Paintbrush size={14} /> {text('添加笔触', 'Add stroke')}</Button>
                 <Button size="sm" variant="ghost" className="w-full" disabled={readOnly} onClick={() => addPresetElement('builtin.art_2d', text('二维素材', '2D art'), { domain: 'pattern', kind: 'french_edge', name: text('法式边', 'French edge'), strokeColor: '#FFFFFF', strokeWidth: 8, transform: { x: 0, y: -122, scale: 1, rotation: 0 } })}>{text('添加法式边', 'Add French edge')}</Button>
-                <p className="text-[10px] leading-4 text-gray-500">{text('添加后可在画布拖动，或用方向键微调。', 'Drag on canvas or use arrow keys for precise movement.')}</p>
+                <p className="text-nano leading-4 text-gray-500">{text('添加后可在画布拖动，或用方向键微调。', 'Drag on canvas or use arrow keys for precise movement.')}</p>
               </div>
             ) : activeToolSection === 'components' ? (
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -332,7 +332,7 @@ export function EditorShellV6() {
           <div className={cx('flex w-full items-center justify-center rounded-[28px] border border-white/80 bg-white/70 p-3 shadow-sm', viewMode === 'overview' ? 'h-[390px] max-w-5xl' : 'h-[360px] max-w-[360px]')}>
             <V6NailCanvas />
           </div>
-          <p className="mt-3 text-center text-[11px] text-gray-500">
+          <p className="mt-3 text-center text-nano text-gray-500">
             {text(
               `V6 真源 · ${preview.nail.layers.length} 个图层 · ${preview.visibleElementCount} 个可见元素`,
               `V6 canonical document · ${preview.nail.layers.length} layers · ${preview.visibleElementCount} visible elements`,
@@ -343,7 +343,7 @@ export function EditorShellV6() {
         <aside className="max-h-[460px] w-full shrink-0 overflow-auto border-t border-gray-200 bg-white lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
           <div className="border-b border-gray-200 p-3">
             <h2 className="text-xs font-semibold text-gray-700">{text('设计属性', 'Design properties')}</h2>
-            <label className="mt-3 block text-[11px] text-gray-500">
+            <label className="mt-3 block text-nano text-gray-500">
               {text('甲型', 'Shape')}
               <select
                 value={doc.defaultGeometry.shape}
@@ -354,7 +354,7 @@ export function EditorShellV6() {
                 {SHAPES.map((shape) => <option key={shape} value={shape}>{shapeName(shape)}</option>)}
               </select>
             </label>
-            <label className="mt-2 block text-[11px] text-gray-500">
+            <label className="mt-2 block text-nano text-gray-500">
               {text('长度', 'Length')}
               <select
                 value={doc.defaultGeometry.length}
@@ -365,7 +365,7 @@ export function EditorShellV6() {
                 {LENGTHS.map((length) => <option key={length} value={length}>{lengthName(length)}</option>)}
               </select>
             </label>
-            <label className="mt-2 block text-[11px] text-gray-500">
+            <label className="mt-2 block text-nano text-gray-500">
               {text('封层', 'Top finish')}
               <select
                 value={doc.appearance.topFinish}

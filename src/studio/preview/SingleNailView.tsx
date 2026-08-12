@@ -177,11 +177,11 @@ export function SingleNailView({
         </span>
         {decoration && <span>附件：{decoration.name}</span>}
         {override && (override.baseColor || override.decorationId) && (
-          <span className="rounded-button px-1.5 py-0.5 text-[10px]" style={{ backgroundColor: '#C2497A1A', color: '#C2497A' }}>
+          <span className="rounded-button px-1.5 py-0.5 text-nano" style={{ backgroundColor: 'var(--color-primary-soft)', color: 'var(--color-primary)' }}>
             单独定制
           </span>
         )}
-        <span className="ml-auto text-[10px] text-gray-400">←/→ 切指 · Esc 返回</span>
+        <span className="ml-auto text-nano text-gray-400">←/→ 切指 · Esc 返回</span>
       </div>
 
       {/* 十指搭配条 */}

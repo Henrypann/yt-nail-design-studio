@@ -146,7 +146,7 @@ export function EditorToolRailV7({
             className={toolButtonClass(active, horizontal)}
           >
             <Icon size={16} />
-            {!horizontal && <span className="text-[9px] font-medium">{meta.label}</span>}
+            {!horizontal && <span className="text-nano font-medium">{meta.label}</span>}
             {!tool.enabled && <span id={reasonId} className="sr-only">{tool.reason ?? '当前工具不可用'}</span>}
           </button>
         );
@@ -155,15 +155,15 @@ export function EditorToolRailV7({
       <span className={cx('bg-gray-200', horizontal ? 'mx-1 h-7 w-px shrink-0' : 'my-1 h-px w-9')} aria-hidden="true" />
       <button type="button" aria-label="当前层工具与参数" aria-pressed={resourcesOpen} onClick={onToggleResources} onKeyDown={moveToolFocus} className={toolButtonClass(resourcesOpen, horizontal)} title="打开当前层工具与参数">
         <LibraryBig size={16} />
-        {!horizontal && <span className="text-[9px] font-medium">参数</span>}
+        {!horizontal && <span className="text-nano font-medium">参数</span>}
       </button>
       <button type="button" aria-label="层级" onClick={() => onOpenPanel('layers')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title="打开层级">
         <Layers3 size={16} />
-        {!horizontal && <span className="text-[9px] font-medium">层级</span>}
+        {!horizontal && <span className="text-nano font-medium">层级</span>}
       </button>
       <button type="button" aria-label="属性" onClick={() => onOpenPanel('inspector')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title="打开属性">
         <SlidersHorizontal size={16} />
-        {!horizontal && <span className="text-[9px] font-medium">属性</span>}
+        {!horizontal && <span className="text-nano font-medium">属性</span>}
       </button>
     </nav>
   );

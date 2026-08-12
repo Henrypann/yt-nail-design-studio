@@ -157,8 +157,8 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
   return (
     <div className="mt-2 space-y-3 rounded-xl border border-violet-200 bg-violet-50/55 p-3" data-testid="v7-flat-vector-panel">
       {(variant === 'full' || contextualPanel) && <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-700">{contextualPanel?.label ?? '平面矢量工具'}</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">{contextualPanel?.description ?? `仅修改 ${currentFinger} · 画布坐标固定为 nail-local 0–1。`}</p>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-violet-700">{contextualPanel?.label ?? '平面矢量工具'}</p>
+        <p className="mt-1 text-nano leading-4 text-gray-500">{contextualPanel?.description ?? `仅修改 ${currentFinger} · 画布坐标固定为 nail-local 0–1。`}</p>
       </div>}
 
       {showResources && <div className="grid grid-cols-2 gap-1.5" role="toolbar" aria-label="平面设计工具">
@@ -170,7 +170,7 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
             aria-pressed={activeTool === tool}
             onClick={() => selectTool(tool)}
             className={cx(
-              'flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-2 text-left text-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40',
+              'flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-2 text-left text-nano focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40',
               activeTool === tool ? 'border-violet-500 bg-violet-600 text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300',
             )}
           >
@@ -181,7 +181,7 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
       </div>}
 
       {showDrawingStyle && <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
-        <legend className="text-[10px] font-semibold text-gray-600">绘制样式</legend>
+        <legend className="text-nano font-semibold text-gray-600">绘制样式</legend>
         <div className="grid grid-cols-5 gap-1.5">
           {PALETTE.slice(0, 5).map((item) => (
             <button
@@ -198,7 +198,7 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
         </div>
         <div className="grid grid-cols-[44px_1fr] items-center gap-2">
           <input type="color" value={colorHex} aria-label="自定义绘制颜色" onChange={(event) => { const next = parseHexColorV7(event.target.value); if (next) setColor(next); }} className="h-11 w-11 rounded-lg border border-gray-300 bg-white p-1" />
-          <label className="grid grid-cols-[1fr_auto] items-center gap-2 text-[10px] text-gray-600">
+          <label className="grid grid-cols-[1fr_auto] items-center gap-2 text-nano text-gray-600">
             <input type="range" min="0.05" max="3" step="0.05" value={widthMm} aria-label="画笔线宽" onChange={(event) => setWidthMm(Number(event.target.value))} className="h-11 w-full accent-violet-600" />
             <span className="w-12 text-right tabular-nums">{widthMm.toFixed(2)} mm</span>
           </label>
@@ -208,16 +208,16 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
 
       {showElementList && <div className="rounded-lg border border-gray-200 bg-white p-2">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold text-gray-700">元素 · {flatStep.elements.length}</p>
+          <p className="text-nano font-semibold text-gray-700">元素 · {flatStep.elements.length}</p>
           <button type="button" disabled={!canEditSelected} onClick={() => selectedElement && resultToast(removeElement(currentFinger, flatStep.id, selectedElement.id))} className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-error disabled:opacity-35" aria-label="删除所选元素"><Trash2 size={14} /></button>
         </div>
         <div className="mt-1.5 max-h-36 space-y-1 overflow-y-auto" aria-label="平面元素列表">
-          {flatStep.elements.length === 0 && <p className="rounded-md border border-dashed border-gray-200 px-2 py-3 text-center text-[10px] text-gray-400">在甲面上绘制，元素将保存到当前步骤。</p>}
+          {flatStep.elements.length === 0 && <p className="rounded-md border border-dashed border-gray-200 px-2 py-3 text-center text-nano text-gray-400">在甲面上绘制，元素将保存到当前步骤。</p>}
           {flatStep.elements.map((element, index) => (
-            <button key={element.id} type="button" onClick={() => { selectElement(element.id); setActiveTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-gray-50')}>
+            <button key={element.id} type="button" onClick={() => { selectElement(element.id); setActiveTool('select'); }} className={cx('flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-nano', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-gray-50')}>
               <span className="w-5 tabular-nums text-gray-400">{index + 1}</span>
               <span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>
-              {element.locked && <span className="text-[9px] text-gray-400">锁定</span>}
+              {element.locked && <span className="text-nano text-gray-400">锁定</span>}
             </button>
           ))}
         </div>
@@ -225,29 +225,29 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
 
       {showInspector && selectedElement && (
         <div className="space-y-2 rounded-lg border border-violet-200 bg-white p-2.5">
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-violet-800"><Hand size={13} />所选：{flatElementLabelV7(selectedElement)}</div>
-          <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-[10px] text-gray-600">
+          <div className="flex items-center gap-2 text-nano font-semibold text-violet-800"><Hand size={13} />所选：{flatElementLabelV7(selectedElement)}</div>
+          <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">
             透明度
             <input type="range" min="0" max="100" step="1" value={opacityDraft} disabled={!canEditSelected} onChange={(event) => setOpacityDraft(Number(event.target.value))} onPointerUp={commitOpacity} onKeyUp={commitOpacity} onBlur={commitOpacity} className="h-11 w-full accent-violet-600 disabled:opacity-40" />
             <span className="w-9 text-right tabular-nums">{opacityDraft}%</span>
           </label>
           {selectedElement.kind === 'french_edge' && (
             <>
-              <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-[10px] text-gray-600">宽度<input type="range" min="0" max="1" step="0.01" value={frenchWidthDraft} disabled={!canEditSelected} onChange={(event) => setFrenchWidthDraft(Number(event.target.value))} onPointerUp={() => commitFrench('widthRatio')} onKeyUp={() => commitFrench('widthRatio')} onBlur={() => commitFrench('widthRatio')} className="h-11 accent-violet-600" /><span>{Math.round(frenchWidthDraft * 100)}%</span></label>
-              <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-[10px] text-gray-600">弧度<input type="range" min="-1" max="1" step="0.05" value={frenchCurvatureDraft} disabled={!canEditSelected} onChange={(event) => setFrenchCurvatureDraft(Number(event.target.value))} onPointerUp={() => commitFrench('curvature')} onKeyUp={() => commitFrench('curvature')} onBlur={() => commitFrench('curvature')} className="h-11 accent-violet-600" /><span>{frenchCurvatureDraft.toFixed(2)}</span></label>
+              <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">宽度<input type="range" min="0" max="1" step="0.01" value={frenchWidthDraft} disabled={!canEditSelected} onChange={(event) => setFrenchWidthDraft(Number(event.target.value))} onPointerUp={() => commitFrench('widthRatio')} onKeyUp={() => commitFrench('widthRatio')} onBlur={() => commitFrench('widthRatio')} className="h-11 accent-violet-600" /><span>{Math.round(frenchWidthDraft * 100)}%</span></label>
+              <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">弧度<input type="range" min="-1" max="1" step="0.05" value={frenchCurvatureDraft} disabled={!canEditSelected} onChange={(event) => setFrenchCurvatureDraft(Number(event.target.value))} onPointerUp={() => commitFrench('curvature')} onKeyUp={() => commitFrench('curvature')} onBlur={() => commitFrench('curvature')} className="h-11 accent-violet-600" /><span>{frenchCurvatureDraft.toFixed(2)}</span></label>
             </>
           )}
           {editablePath && (
             <div>
-              <label className="text-[10px] font-semibold text-gray-600" htmlFor="v7-path-data">nail-local 路径 / 锚点</label>
-              <textarea id="v7-path-data" value={pathDraft} disabled={!canEditSelected} onChange={(event) => setPathDraft(event.target.value)} onBlur={commitPath} rows={3} className="mt-1 w-full resize-y rounded-lg border border-gray-300 px-2 py-1.5 font-mono text-[10px] leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45" />
-              <p className="mt-1 text-[9px] leading-3.5 text-gray-500">允许 M/L/Q/C/Z；锚点坐标均为 0–1。非法输入不会覆盖上一版本。</p>
+              <label className="text-nano font-semibold text-gray-600" htmlFor="v7-path-data">nail-local 路径 / 锚点</label>
+              <textarea id="v7-path-data" value={pathDraft} disabled={!canEditSelected} onChange={(event) => setPathDraft(event.target.value)} onBlur={commitPath} rows={3} className="mt-1 w-full resize-y rounded-lg border border-gray-300 px-2 py-1.5 font-mono text-nano leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45" />
+              <p className="mt-1 text-nano leading-3.5 text-gray-500">允许 M/L/Q/C/Z；锚点坐标均为 0–1。非法输入不会覆盖上一版本。</p>
             </div>
           )}
         </div>
       )}
 
-      {showInspector && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-[9px] leading-3.5 text-gray-500">
+      {showInspector && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-nano leading-3.5 text-gray-500">
         橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。文字与素材的专属属性在下方检查器中编辑。
       </p>}
     </div>

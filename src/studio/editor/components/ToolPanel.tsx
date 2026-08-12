@@ -152,7 +152,7 @@ export function ToolPanel() {
                 title={`${p.label}线`}
                 onClick={() => setBrushPreset(p.key)}
                 className={cx(
-                  'flex-1 rounded-button py-0.5 text-[9px] font-medium',
+                  'flex-1 rounded-button py-0.5 text-nano font-medium',
                   brushPreset === p.key
                     ? 'bg-primary-soft text-primary'
                     : 'bg-gray-100 text-gray-500 hover:bg-gray-200',
@@ -197,7 +197,7 @@ export function ToolPanel() {
               }}
               title="打开 120 色品牌色板"
               className={cx(
-                'flex w-full items-center justify-center gap-1 rounded-button border py-1 text-[9px]',
+                'flex w-full items-center justify-center gap-1 rounded-button border py-1 text-nano',
                 paletteOpen
                   ? 'border-primary bg-primary-soft text-primary'
                   : 'border-gray-200 text-gray-600 hover:bg-gray-50',
@@ -220,7 +220,7 @@ export function ToolPanel() {
             className="h-6 w-10 cursor-pointer"
             title="自定义颜色"
           />
-          <label className="w-full text-center text-[10px] text-gray-400">
+          <label className="w-full text-center text-nano text-gray-400">
             粗细 {brushSize}
             <input
               type="range"
@@ -228,10 +228,10 @@ export function ToolPanel() {
               max={30}
               value={brushSize}
               onChange={(e) => setBrush({ size: Number(e.target.value) })}
-              className="w-full accent-[#C2497A]"
+              className="w-full accent-primary"
             />
           </label>
-          <label className="w-full text-center text-[10px] text-gray-400">
+          <label className="w-full text-center text-nano text-gray-400">
             透明 {Math.round(brushOpacity * 100)}%
             <input
               type="range"
@@ -239,13 +239,13 @@ export function ToolPanel() {
               max={100}
               value={Math.round(brushOpacity * 100)}
               onChange={(e) => setBrush({ opacity: Number(e.target.value) / 100 })}
-              className="w-full accent-[#C2497A]"
+              className="w-full accent-primary"
             />
           </label>
         </div>
       )}
       {tool === 'eraser' && !readOnly && (
-        <label className="w-full px-1 text-center text-[10px] text-gray-400">
+        <label className="w-full px-1 text-center text-nano text-gray-400">
           橡皮 {eraserSize}
           <input
             type="range"
@@ -253,7 +253,7 @@ export function ToolPanel() {
             max={40}
             value={eraserSize}
             onChange={(e) => setEraserSize(Number(e.target.value))}
-            className="w-full accent-[#C2497A]"
+            className="w-full accent-primary"
           />
         </label>
       )}
@@ -270,7 +270,7 @@ export function ToolPanel() {
                 d.shape = e.target.value as typeof d.shape;
               })
             }
-            className="w-full rounded-button border border-gray-300 px-1 py-1 text-[10px] disabled:opacity-40"
+            className="w-full rounded-button border border-gray-300 px-1 py-1 text-nano disabled:opacity-40"
             title={`${text('甲型', 'Shape')}：${shapeName(doc.shape, locale)}`}
           >
             {SHAPES.map((s) => (
@@ -287,7 +287,7 @@ export function ToolPanel() {
                 d.length = e.target.value as typeof d.length;
               })
             }
-            className="w-full rounded-button border border-gray-300 px-1 py-1 text-[10px] disabled:opacity-40"
+            className="w-full rounded-button border border-gray-300 px-1 py-1 text-nano disabled:opacity-40"
             title={text('长度', 'Length')}
           >
             {LENGTHS.map((l) => (

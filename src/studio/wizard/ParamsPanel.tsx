@@ -71,7 +71,7 @@ export function ParamsPanel() {
   if (petalP0) {
     return (
       <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">
-        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-[11px] leading-relaxed text-warning">
+        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-nano leading-relaxed text-warning">
           高保真候选 · 待视觉签收<br />
           Canonical Renderer 不代表生产或制造可用。
         </div>
@@ -82,14 +82,14 @@ export function ParamsPanel() {
         )}
         <section className="rounded-panel border border-gray-200 p-3">
           <p className="text-xs font-medium text-gray-900">Petal Veil Signature · 已锁定</p>
-          <dl className="mt-3 grid grid-cols-[72px_1fr] gap-y-2 text-[11px]">
+          <dl className="mt-3 grid grid-cols-[72px_1fr] gap-y-2 text-nano">
             <dt className="text-gray-400">规格</dt><dd className="text-gray-700">Almond · Medium</dd>
             <dt className="text-gray-400">底层</dt><dd className="text-gray-700">奶雾裸透 · 0.92</dd>
             <dt className="text-gray-400">法式</dt><dd className="text-gray-700">柔边微法式 · 0.75</dd>
             <dt className="text-gray-400">重音指</dt><dd className="text-gray-700">仅 R4 · 五瓣低浮雕花</dd>
             <dt className="text-gray-400">渲染器</dt><dd className="break-all text-gray-700">three-pbr/petal-veil-1</dd>
           </dl>
-          <p className="mt-3 text-[10px] leading-relaxed text-gray-400">
+          <p className="mt-3 text-nano leading-relaxed text-gray-400">
             P0 不开放底色、质感、逐指换色或附件枚举。
           </p>
         </section>
@@ -132,7 +132,7 @@ export function ParamsPanel() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">
       {s.recipe?.recipeRef.id === 'mercury-dew' && (
-        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-[11px] text-warning" data-testid="mercury-output-policy">
+        <div className="rounded-panel border border-warning/30 bg-warning-soft px-3 py-2 text-nano text-warning" data-testid="mercury-output-policy">
           模拟效果 · 尚未完成生产验证
         </div>
       )}
@@ -164,7 +164,7 @@ export function ParamsPanel() {
                   className="h-7 w-7 rounded-full border border-gray-200"
                   style={{ backgroundColor: c.hex }}
                 />
-                <span className="text-[10px] text-gray-500">
+                <span className="text-nano text-gray-500">
                   {taxonomyLabel('community-color', c.id, locale, { zh: c.name, en: c.name_en })}
                 </span>
               </button>
@@ -188,7 +188,7 @@ export function ParamsPanel() {
             </option>
           ))}
         </select>
-        <p className="mt-1 text-[10px] text-gray-400">切换后甲面高光与弧面效果即时更新。</p>
+        <p className="mt-1 text-nano text-gray-400">切换后甲面高光与弧面效果即时更新。</p>
       </section>
 
       {/* 参数级逐指例外 */}
@@ -201,7 +201,7 @@ export function ParamsPanel() {
               </p>
               <button
                 onClick={() => s.setSelectedFinger(null)}
-                className="text-[10px] text-gray-400 hover:text-gray-700"
+                className="text-nano text-gray-400 hover:text-gray-700"
               >
                 完成
               </button>
@@ -209,7 +209,7 @@ export function ParamsPanel() {
 
             {/* 附件替换 */}
             <div>
-              <p className="mb-1.5 text-[11px] text-gray-500">附件</p>
+              <p className="mb-1.5 text-nano text-gray-500">附件</p>
               <div className="grid grid-cols-5 gap-1">
                 <button
                   disabled={readOnly}
@@ -244,7 +244,7 @@ export function ParamsPanel() {
 
             {/* 该指单独换底色 */}
             <div>
-              <p className="mb-1.5 text-[11px] text-gray-500">该指底色</p>
+              <p className="mb-1.5 text-nano text-gray-500">该指底色</p>
               <div className="grid grid-cols-8 gap-1">
                 {palette.map((c) => {
                   const active = fingerOverride?.baseColor === c.hex;
@@ -301,7 +301,7 @@ export function ParamsPanel() {
             <Check size={13} />
             已标记「顾客已确认」
             {s.confirmation && (
-              <Badge variant="blue" className="text-[10px]">{s.confirmation.confirmedBy}</Badge>
+              <Badge variant="blue" className="text-nano">{s.confirmation.confirmedBy}</Badge>
             )}
           </div>
         )}

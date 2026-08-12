@@ -80,12 +80,12 @@ export function EditorStageBarV7({
               <Icon size={14} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-1 text-[10px] font-semibold">
+              <span className="flex items-center gap-1 text-nano font-semibold">
                 <span>{index + 1}. {stage.shortLabel}</span>
-                {stage.count !== undefined && stage.count > 0 && <span className="rounded-full bg-white/75 px-1.5 text-[9px]">{stage.count}</span>}
+                {stage.count !== undefined && stage.count > 0 && <span className="rounded-full bg-white/75 px-1.5 text-nano">{stage.count}</span>}
                 {stage.state === 'configured' && <Check size={11} aria-label="已配置" />}
               </span>
-              {!stage.lanes && <span className="mt-0.5 block max-w-[132px] text-[10px] leading-3 opacity-70 line-clamp-2">{description}</span>}
+              {!stage.lanes && <span className="mt-0.5 block max-w-[132px] text-nano leading-3 opacity-70 line-clamp-2">{description}</span>}
             </span>
           </>;
           return (
@@ -110,7 +110,7 @@ export function EditorStageBarV7({
                         onClick={(event) => onActivatePersonalLane(lane, event.currentTarget)}
                         onKeyDown={moveStageFocus}
                         className={cx(
-                          'min-h-11 rounded-lg px-1.5 text-[10px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                          'min-h-11 rounded-lg px-1.5 text-nano font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                           lane.active
                             ? 'bg-primary text-white shadow-sm'
                             : lane.state === 'configured'

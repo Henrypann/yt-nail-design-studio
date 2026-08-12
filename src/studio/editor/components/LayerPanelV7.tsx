@@ -91,12 +91,12 @@ function ProcessTreeV7() {
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-2.5">
         <div>
           <div className="flex items-center gap-2"><Layers3 size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">层级与步骤</h2></div>
-          <p className="mt-0.5 text-[10px] text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
+          <p className="mt-0.5 text-nano text-gray-500">完整 canonical 顺序 · {currentFinger}</p>
         </div>
-        <p className="max-w-[145px] text-right text-[9px] leading-3.5 text-gray-400">新增内容请从左侧对应工具开始</p>
+        <p className="max-w-[145px] text-right text-nano leading-3.5 text-gray-400">新增内容请从左侧对应工具开始</p>
       </div>
 
-      {!geometryExact && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900" role="status">当前指位只有近似或不可用轮廓；可查看、整理和删除现有内容，但新增或复制空间步骤需先绑定已签收 2D 甲型轮廓。</p>}
+      {!geometryExact && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900" role="status">当前指位只有近似或不可用轮廓；可查看、整理和删除现有内容，但新增或复制空间步骤需先绑定已签收 2D 甲型轮廓。</p>}
 
       <ol className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2" aria-label="Canonical process steps">
         {nail.steps.map((step, index) => {
@@ -111,8 +111,8 @@ function ProcessTreeV7() {
               <div className="flex items-center gap-1 p-1.5">
                 <button type="button" onClick={() => selectedStepId !== step.id && selectStep(step.id)} aria-current={selected ? 'step' : undefined} className="min-h-10 min-w-0 flex-1 rounded-lg px-1.5 py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   <span className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[9px] font-semibold text-gray-600">{index + 1}</span>
-                    <span className="min-w-0"><span className="block truncate text-xs font-semibold text-gray-800">{step.name || STEP_LABEL[step.kind]}</span><span className="block truncate text-[10px] text-gray-500">{STEP_LABEL[step.kind]} · {stepSummary(step)}</span></span>
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-nano font-semibold text-gray-600">{index + 1}</span>
+                    <span className="min-w-0"><span className="block truncate text-xs font-semibold text-gray-800">{step.name || STEP_LABEL[step.kind]}</span><span className="block truncate text-nano text-gray-500">{STEP_LABEL[step.kind]} · {stepSummary(step)}</span></span>
                   </span>
                 </button>
                 <button type="button" onClick={() => toggleCollapsed(step.id)} aria-expanded={!isCollapsed} aria-label={`${isCollapsed ? '展开' : '折叠'} ${step.name || STEP_LABEL[step.kind]}`} className={iconButtonClass()}>{isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}</button>
@@ -130,17 +130,17 @@ function ProcessTreeV7() {
                 </div>
 
                 {selected && step.kind === 'flat_design' && <div className="mt-2 rounded-xl border border-violet-100 bg-violet-50/45 p-2" aria-label="平面元素树">
-                  <p className="mb-1.5 text-[10px] font-semibold text-violet-700">元素 · {step.elements.length}</p>
+                  <p className="mb-1.5 text-nano font-semibold text-violet-700">元素 · {step.elements.length}</p>
                   <div className="max-h-40 space-y-1 overflow-y-auto" aria-label="平面元素列表">
-                    {step.elements.length === 0 && <p className="rounded-lg border border-dashed border-violet-200 px-2 py-3 text-center text-[10px] text-gray-400">从左侧工具开始绘制。</p>}
-                    {step.elements.map((element, elementIndex) => <button key={element.id} type="button" aria-current={selectedElementId === element.id ? 'true' : undefined} onClick={() => { selectElement(element.id); setActiveFlatTool('select'); }} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{elementIndex + 1}</span><span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>{element.locked && <Lock size={10} className="text-gray-400" />}</button>)}
+                    {step.elements.length === 0 && <p className="rounded-lg border border-dashed border-violet-200 px-2 py-3 text-center text-nano text-gray-400">从左侧工具开始绘制。</p>}
+                    {step.elements.map((element, elementIndex) => <button key={element.id} type="button" aria-current={selectedElementId === element.id ? 'true' : undefined} onClick={() => { selectElement(element.id); setActiveFlatTool('select'); }} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-nano', selectedElementId === element.id ? 'bg-violet-100 font-semibold text-violet-800' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{elementIndex + 1}</span><span className="min-w-0 flex-1 truncate">{flatElementLabelV7(element)}</span>{element.locked && <Lock size={10} className="text-gray-400" />}</button>)}
                   </div>
                 </div>}
                 {selected && step.kind === 'dimensional_decoration' && <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50/45 p-2" aria-label="立体装饰树">
-                  <p className="mb-1.5 text-[10px] font-semibold text-amber-700">装饰 · {step.decorations.length}</p>
+                  <p className="mb-1.5 text-nano font-semibold text-amber-700">装饰 · {step.decorations.length}</p>
                   <div className="max-h-40 space-y-1 overflow-y-auto" aria-label="立体装饰列表">
-                    {step.decorations.length === 0 && <p className="rounded-lg border border-dashed border-amber-200 px-2 py-2 text-center text-[10px] text-gray-400">从左侧立体工具添加素材。</p>}
-                    {step.decorations.map((decoration, decorationIndex) => <button key={decoration.id} type="button" aria-current={selectedElementId === decoration.id ? 'true' : undefined} onClick={() => selectElement(decoration.id)} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[10px]', selectedElementId === decoration.id ? 'bg-amber-100 font-semibold text-amber-900' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{decorationIndex + 1}</span><span className="min-w-0 flex-1 truncate">{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(decoration)]}</span>{decoration.locked && <Lock size={10} className="text-gray-400" />}</button>)}
+                    {step.decorations.length === 0 && <p className="rounded-lg border border-dashed border-amber-200 px-2 py-2 text-center text-nano text-gray-400">从左侧立体工具添加素材。</p>}
+                    {step.decorations.map((decoration, decorationIndex) => <button key={decoration.id} type="button" aria-current={selectedElementId === decoration.id ? 'true' : undefined} onClick={() => selectElement(decoration.id)} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-nano', selectedElementId === decoration.id ? 'bg-amber-100 font-semibold text-amber-900' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{decorationIndex + 1}</span><span className="min-w-0 flex-1 truncate">{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(decoration)]}</span>{decoration.locked && <Lock size={10} className="text-gray-400" />}</button>)}
                   </div>
                 </div>}
               </div>}
@@ -190,17 +190,17 @@ function InspectorV7() {
     <section className="flex min-h-0 flex-1 flex-col" aria-label={`${currentFinger} 属性检查器`} data-testid="v7-inspector-panel">
       <div className="border-b border-gray-200 px-3 py-2.5">
         <div className="flex items-center gap-2"><SlidersHorizontal size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">属性</h2></div>
-        <p className="mt-0.5 truncate text-[10px] text-gray-500">{selectedStep.name} · {STEP_LABEL[selectedStep.kind]}</p>
+        <p className="mt-0.5 truncate text-nano text-gray-500">{selectedStep.name} · {STEP_LABEL[selectedStep.kind]}</p>
       </div>
-      {!geometryExact && selectedStep.kind !== 'background' && selectedStep.kind !== 'surface_finish' && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-900" role="status" data-testid="v7-inspector-geometry-gate">当前甲型不能安全进行空间编辑。图案、局部效果和立体装饰属性已停用；背景和封层仍可调整。</p>}
+      {!geometryExact && selectedStep.kind !== 'background' && selectedStep.kind !== 'surface_finish' && <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900" role="status" data-testid="v7-inspector-geometry-gate">当前甲型不能安全进行空间编辑。图案、局部效果和立体装饰属性已停用；背景和封层仍可调整。</p>}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
         {selectedStep.kind === 'flat_design'
             ? <><FlatVectorPanelV7 variant="inspector" /><FlatContentInspectorV7 /></>
             : <div className="space-y-3" data-testid="v7-inspector-summary">
-                <dl className="overflow-hidden rounded-xl border border-gray-200 bg-white text-[10px]">
+                <dl className="overflow-hidden rounded-xl border border-gray-200 bg-white text-nano">
                   {summaryRows.map((row) => <div key={row.label} className="grid grid-cols-[88px_minmax(0,1fr)] gap-2 border-b border-gray-100 px-3 py-2.5 last:border-b-0"><dt className="text-gray-400">{row.label}</dt><dd className="truncate font-semibold text-gray-800">{row.value}</dd></div>)}
                 </dl>
-                <p className="rounded-xl border border-primary/15 bg-primary-soft/40 px-3 py-2.5 text-[10px] leading-4 text-gray-600">右侧只负责层级选择与当前对象摘要。素材选择、效果类型和高频参数统一在左侧，避免同一参数出现两套入口。</p>
+                <p className="rounded-xl border border-primary/15 bg-primary-soft/40 px-3 py-2.5 text-nano leading-4 text-gray-600">右侧只负责层级选择与当前对象摘要。素材选择、效果类型和高频参数统一在左侧，避免同一参数出现两套入口。</p>
               </div>}
       </div>
     </section>

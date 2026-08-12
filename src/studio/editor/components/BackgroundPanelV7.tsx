@@ -39,7 +39,7 @@ function CommitRange({ label, value, min, max, step, unit = '', disabled, onComm
   };
   return (
     <label className="block space-y-1.5">
-      <span className="flex items-center justify-between gap-2 text-[10px] font-semibold text-gray-600">
+      <span className="flex items-center justify-between gap-2 text-nano font-semibold text-gray-600">
         <span>{label}</span><span className="tabular-nums text-gray-800">{Number(draft.toFixed(2))}{unit}</span>
       </span>
       <input type="range" min={min} max={max} step={step} value={draft} disabled={disabled}
@@ -138,15 +138,15 @@ export function BackgroundPanelV7() {
   return (
     <div className="mt-2 space-y-3 rounded-xl border border-primary/15 bg-primary-soft/30 p-3" data-testid="v7-background-panel">
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-500">背景铺色</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">只修改 {currentFinger} 的唯一背景；每次确认形成一次可撤销操作。</p>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-500">背景铺色</p>
+        <p className="mt-1 text-nano leading-4 text-gray-500">只修改 {currentFinger} 的唯一背景；每次确认形成一次可撤销操作。</p>
       </div>
 
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-white p-1 sm:grid-cols-5" aria-label="背景模式">
         {(['solid', 'translucent', ...EDITOR_V7_ADVANCED_BACKGROUND_MODES] as const).map((mode) => (
           <button key={mode} type="button" disabled={!canEdit || background.mode === mode}
             aria-pressed={background.mode === mode} onClick={() => switchMode(mode)}
-            className={cx('min-h-11 rounded-lg px-2 text-[10px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed',
+            className={cx('min-h-11 rounded-lg px-2 text-nano font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed',
               background.mode === mode ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50 disabled:opacity-45')}>
             {MODE_LABELS[mode]}
           </button>
@@ -154,7 +154,7 @@ export function BackgroundPanelV7() {
       </div>
 
       {(background.mode === 'translucent' || background.mode === 'cat_eye' || background.mode === 'glitter') && (
-        <p className="rounded-lg border border-info/20 bg-info-soft px-2.5 py-2 text-[10px] leading-4 text-info">
+        <p className="rounded-lg border border-info/20 bg-info-soft px-2.5 py-2 text-nano leading-4 text-info">
           {background.mode === 'translucent'
             ? '透色为确定性 2D 近似预览，不代表真实材料或制造结果。'
             : background.previewFidelity === 'unavailable'
@@ -167,7 +167,7 @@ export function BackgroundPanelV7() {
 
       {(background.mode === 'solid' || background.mode === 'translucent') && (
         <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
-          <legend className="text-[10px] font-semibold text-gray-600">自定义颜色</legend>
+          <legend className="text-nano font-semibold text-gray-600">自定义颜色</legend>
           <div className="grid grid-cols-[44px_1fr] gap-2">
             <label className="relative flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-gray-300 bg-white" title="打开系统颜色选择器">
               <Pipette size={15} className="pointer-events-none absolute z-10 text-white drop-shadow" />
@@ -179,15 +179,15 @@ export function BackgroundPanelV7() {
               onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); if (event.key === 'Escape') { setHexDraft(canonicalHex); setHexError(null); event.currentTarget.blur(); } }}
               className={cx('h-11 min-w-0 rounded-lg border bg-white px-3 font-mono text-xs uppercase text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary', hexError ? 'border-error' : 'border-gray-300')} />
           </div>
-          <p className={cx('text-[10px] leading-4', hexError ? 'text-error' : 'text-gray-500')} role={hexError ? 'alert' : undefined}>{hexError ?? '下方基础色板可快速选色；这里用于编辑精确色值。取色写入 canonical sRGB。'}</p>
+          <p className={cx('text-nano leading-4', hexError ? 'text-error' : 'text-gray-500')} role={hexError ? 'alert' : undefined}>{hexError ?? '下方基础色板可快速选色；这里用于编辑精确色值。取色写入 canonical sRGB。'}</p>
         </fieldset>
       )}
 
       {background.mode === 'gradient' && (
         <div className="space-y-3" data-testid="v7-gradient-controls">
-          <div className="flex items-center justify-between"><p className="text-[10px] font-semibold text-gray-600">渐变色标 · {background.stops.length}/8</p>
+          <div className="flex items-center justify-between"><p className="text-nano font-semibold text-gray-600">渐变色标 · {background.stops.length}/8</p>
             <button type="button" disabled={!canEdit || background.stops.length >= 8} onClick={() => report(addGradientStop(currentFinger))}
-              className="flex min-h-10 items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 text-[10px] text-gray-700 disabled:opacity-40"><Plus size={12} />添加</button></div>
+              className="flex min-h-10 items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 text-nano text-gray-700 disabled:opacity-40"><Plus size={12} />添加</button></div>
           {background.stops.map((stop, index) => (
             <div key={`${index}-${stop.offset}`} className="grid grid-cols-[44px_1fr_38px] items-center gap-2 rounded-lg bg-white p-2">
               <CommitColor key={`${currentFinger}-gradient-${index}-${stop.offset}`} value={rgbaToHexV7(stop.color)} disabled={!canEdit} label={`色标 ${index + 1} 颜色`}
@@ -205,7 +205,7 @@ export function BackgroundPanelV7() {
 
       {background.mode === 'cat_eye' && (
         <div className="space-y-3" data-testid="v7-cat-eye-controls">
-          <label className="flex items-center justify-between gap-3 text-[10px] font-semibold text-gray-600">磁光颜色
+          <label className="flex items-center justify-between gap-3 text-nano font-semibold text-gray-600">磁光颜色
             <CommitColor key={`${currentFinger}-cat-eye`} value={rgbaToHexV7(background.color)} disabled={!canEdit} label="猫眼颜色"
               onCommit={(value) => { const color = parseHexColorV7(value); return color ? report(setCatEye(currentFinger, { ...background, color })) : undefined; }} className="h-11 w-16 rounded-lg border border-gray-300" /></label>
           <CommitRange label="磁光方向" value={background.directionDeg} min={0} max={359} step={1} unit="°" disabled={!canEdit} onCommit={(value) => report(setCatEye(currentFinger, { ...background, directionDeg: value }))} />
@@ -216,9 +216,9 @@ export function BackgroundPanelV7() {
 
       {background.mode === 'glitter' && (
         <div className="space-y-3" data-testid="v7-glitter-controls">
-          <div className="flex items-center justify-between"><p className="text-[10px] font-semibold text-gray-600">闪粉颜色 · {background.colors.length}/8</p>
+          <div className="flex items-center justify-between"><p className="text-nano font-semibold text-gray-600">闪粉颜色 · {background.colors.length}/8</p>
             <button type="button" disabled={!canEdit || background.colors.length >= 8} onClick={() => report(setGlitter(currentFinger, { ...background, colors: [...background.colors, background.colors[background.colors.length - 1]] }))}
-              className="flex min-h-10 items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 text-[10px] text-gray-700 disabled:opacity-40"><Plus size={12} />添加</button></div>
+              className="flex min-h-10 items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 text-nano text-gray-700 disabled:opacity-40"><Plus size={12} />添加</button></div>
           <div className="flex flex-wrap gap-2">{background.colors.map((color, index) => (
             <label key={index} className="relative"><CommitColor key={`${currentFinger}-glitter-${index}`} value={rgbaToHexV7(color)} disabled={!canEdit} label={`闪粉颜色 ${index + 1}`}
               onCommit={(value) => { const next = parseHexColorV7(value); return next ? report(setGlitter(currentFinger, { ...background, colors: background.colors.map((item, current) => current === index ? next : item) })) : undefined; }} className="h-11 w-12 rounded-lg border border-gray-300" />
@@ -227,7 +227,7 @@ export function BackgroundPanelV7() {
           ))}</div>
           <CommitRange label="闪粉密度" value={background.density} min={0} max={1} step={0.01} disabled={!canEdit} onCommit={(value) => report(setGlitter(currentFinger, { ...background, density: value }))} />
           <CommitRange label="粒径" value={background.particleSizeMm} min={0.01} max={2} step={0.01} unit=" mm" disabled={!canEdit} onCommit={(value) => report(setGlitter(currentFinger, { ...background, particleSizeMm: value }))} />
-          <div className="grid grid-cols-[1fr_44px] gap-2"><input value={background.seed} readOnly className="h-11 min-w-0 rounded-lg border border-gray-300 bg-white px-3 font-mono text-[10px] text-gray-600" aria-label="闪粉确定性种子" />
+          <div className="grid grid-cols-[1fr_44px] gap-2"><input value={background.seed} readOnly className="h-11 min-w-0 rounded-lg border border-gray-300 bg-white px-3 font-mono text-nano text-gray-600" aria-label="闪粉确定性种子" />
             <button type="button" title="生成新的确定性布局" aria-label="更换闪粉布局" disabled={!canEdit}
               onClick={() => report(setGlitter(currentFinger, { ...background, seed: `glitter-${hashBackgroundSeedV7(background.seed).toString(16)}` }))}
               className="flex h-11 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 disabled:opacity-40"><RefreshCw size={14} /></button></div>
@@ -235,7 +235,7 @@ export function BackgroundPanelV7() {
       )}
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2"><span className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600"><SlidersHorizontal size={13} />背景透明度</span><span className="text-xs font-semibold tabular-nums text-gray-800">{opacityDraft}%</span></div>
+        <div className="flex items-center justify-between gap-2"><span className="flex items-center gap-1.5 text-nano font-semibold text-gray-600"><SlidersHorizontal size={13} />背景透明度</span><span className="text-xs font-semibold tabular-nums text-gray-800">{opacityDraft}%</span></div>
         <input type="range" min="0" max="100" step="1" value={opacityDraft} disabled={!canEdit} aria-label="背景透明度"
           onChange={(event) => setOpacityDraft(Number(event.target.value))} onPointerUp={applyOpacity} onKeyUp={applyOpacity} onBlur={applyOpacity}
           className="h-11 w-full accent-primary disabled:cursor-not-allowed disabled:opacity-45" />

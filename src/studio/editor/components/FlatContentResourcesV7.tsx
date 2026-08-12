@@ -75,10 +75,10 @@ function TextSectionV7() {
   return (
     <div className="space-y-3" data-testid="v7-flat-text-resources">
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">文字</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">输入仅保存在草稿中；点击“添加文字”才会写入文档（恰好一次）。</p>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-primary">文字</p>
+        <p className="mt-1 text-nano leading-4 text-gray-500">输入仅保存在草稿中；点击“添加文字”才会写入文档（恰好一次）。</p>
       </div>
-      <label className="block text-[10px] font-semibold text-gray-600" htmlFor="flat-text-draft">文字内容</label>
+      <label className="block text-nano font-semibold text-gray-600" htmlFor="flat-text-draft">文字内容</label>
       <textarea
         id="flat-text-draft"
         data-testid="flat-text-draft"
@@ -90,8 +90,8 @@ function TextSectionV7() {
         onChange={(event) => setTextDraft(event.target.value)}
         className="w-full resize-y rounded-lg border border-gray-300 px-2.5 py-2 text-xs leading-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45"
       />
-      <p className="-mt-2 text-right text-[9px] tabular-nums text-gray-400">{[...textDraft].length}/{FLAT_TEXT_MAX_CODE_POINTS_V7}</p>
-      <label className="block text-[10px] font-semibold text-gray-600" htmlFor="flat-text-font">字体</label>
+      <p className="-mt-2 text-right text-nano tabular-nums text-gray-400">{[...textDraft].length}/{FLAT_TEXT_MAX_CODE_POINTS_V7}</p>
+      <label className="block text-nano font-semibold text-gray-600" htmlFor="flat-text-font">字体</label>
       <select
         id="flat-text-font"
         data-testid="flat-text-font"
@@ -104,7 +104,7 @@ function TextSectionV7() {
           <option key={entry.id} value={entry.id}>{entry.label} · {entry.category === 'sans' ? '无衬线' : '衬线'}</option>
         ))}
       </select>
-      <label className="block text-[10px] font-semibold text-gray-600" htmlFor="flat-text-size">字号（mm）</label>
+      <label className="block text-nano font-semibold text-gray-600" htmlFor="flat-text-size">字号（mm）</label>
       <input
         id="flat-text-size"
         data-testid="flat-text-size"
@@ -118,7 +118,7 @@ function TextSectionV7() {
         className="h-11 w-full rounded-lg border border-gray-300 bg-white px-2.5 text-xs tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45"
       />
       <div>
-        <p className="text-[10px] font-semibold text-gray-600">颜色</p>
+        <p className="text-nano font-semibold text-gray-600">颜色</p>
         <div className="mt-1.5 flex items-center gap-2">
           <input
             type="color"
@@ -151,7 +151,7 @@ function TextSectionV7() {
       >
         <Type size={14} />添加文字
       </button>
-      {error && <p className="rounded-lg border border-error/25 bg-red-50 px-2.5 py-2 text-[10px] leading-4 text-error" role="alert" data-testid="flat-text-error">{error}</p>}
+      {error && <p className="rounded-lg border border-error/25 bg-red-50 px-2.5 py-2 text-nano leading-4 text-error" role="alert" data-testid="flat-text-error">{error}</p>}
     </div>
   );
 }
@@ -211,12 +211,12 @@ function AssetsSectionV7() {
   return (
     <div className="space-y-4" data-testid="v7-flat-asset-resources">
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">素材</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">点击一次创建一个独立元素；重复点击印章会生成新的元素与 ID。</p>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-primary">素材</p>
+        <p className="mt-1 text-nano leading-4 text-gray-500">点击一次创建一个独立元素；重复点击印章会生成新的元素与 ID。</p>
       </div>
 
       <div>
-        <p className="text-[10px] font-semibold text-gray-600">贴纸</p>
+        <p className="text-nano font-semibold text-gray-600">贴纸</p>
         <div className="mt-1.5 grid grid-cols-2 gap-2" role="group" aria-label="贴纸素材">
           {stickers.map((entry) => (
             <button
@@ -229,7 +229,7 @@ function AssetsSectionV7() {
               data-asset-role={entry.role}
               data-testid="flat-bundle-sticker"
               onClick={() => placeBundle(entry.id)}
-              className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-left text-[10px] text-gray-700 transition-colors hover:border-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-left text-nano text-gray-700 transition-colors hover:border-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <img src={entry.sourceUrl} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-md bg-gray-50 object-contain" />
               <span className="truncate">{entry.label}</span>
@@ -239,7 +239,7 @@ function AssetsSectionV7() {
       </div>
 
       <div>
-        <p className="text-[10px] font-semibold text-gray-600">印章</p>
+        <p className="text-nano font-semibold text-gray-600">印章</p>
         <div className="mt-1.5 grid grid-cols-2 gap-2" role="group" aria-label="印章素材">
           {stamps.map((entry) => (
             <button
@@ -252,7 +252,7 @@ function AssetsSectionV7() {
               data-asset-role={entry.role}
               data-testid="flat-bundle-stamp"
               onClick={() => placeBundle(entry.id)}
-              className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-left text-[10px] text-gray-700 transition-colors hover:border-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-left text-nano text-gray-700 transition-colors hover:border-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <img src={entry.sourceUrl} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-md bg-gray-50 object-contain" />
               <span className="truncate">{entry.label}</span>
@@ -262,9 +262,9 @@ function AssetsSectionV7() {
       </div>
 
       <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-3">
-        <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600"><ImagePlus size={13} />导入素材</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">支持 PNG 与安全 SVG（≤2 MiB）。导入字节进入独立素材仓库，文档只保存引用，不嵌入图片数据。</p>
-        <label className="mt-2 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-3 text-[10px] font-semibold text-gray-700 transition-colors hover:border-violet-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary disabled:cursor-not-allowed disabled:opacity-40">
+        <p className="flex items-center gap-1.5 text-nano font-semibold text-gray-600"><ImagePlus size={13} />导入素材</p>
+        <p className="mt-1 text-nano leading-4 text-gray-500">支持 PNG 与安全 SVG（≤2 MiB）。导入字节进入独立素材仓库，文档只保存引用，不嵌入图片数据。</p>
+        <label className="mt-2 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-3 text-nano font-semibold text-gray-700 transition-colors hover:border-violet-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary disabled:cursor-not-allowed disabled:opacity-40">
           {importing ? '导入中…' : '选择 PNG / SVG 文件'}
           <input
             ref={importInputRef}
@@ -276,7 +276,7 @@ function AssetsSectionV7() {
             className="sr-only"
           />
         </label>
-        {importError && <p className="mt-2 rounded-lg border border-error/25 bg-red-50 px-2.5 py-2 text-[10px] leading-4 text-error" role="alert" data-testid="flat-import-error">{importError}</p>}
+        {importError && <p className="mt-2 rounded-lg border border-error/25 bg-red-50 px-2.5 py-2 text-nano leading-4 text-error" role="alert" data-testid="flat-import-error">{importError}</p>}
       </div>
     </div>
   );

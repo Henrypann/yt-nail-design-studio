@@ -99,7 +99,7 @@ export function EditorContextDrawer(props: {
       {props.onboardingOpen && (
         <section className="mb-3 rounded-panel border border-primary/20 bg-primary-soft p-3" data-testid="editor-onboarding">
           <p className="text-xs font-semibold text-primary">{text('第一次设计 · 3 步', 'FIRST DESIGN · 3 STEPS')}</p>
-          <ol className="mt-2 flex flex-col gap-2 text-[11px] text-gray-700">
+          <ol className="mt-2 flex flex-col gap-2 text-nano text-gray-700">
             <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('layers')}>{text('1. 选择一个款式预设', '1. Choose a look preset')}</button></li>
             <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('design')}>{text('2. 调整甲型、长度、颜色和表面', '2. Adjust shape, length, color and finish')}</button></li>
             <li><span>{text('3. 在底部选择当前指，并明确选择“仅当前指”或“十指同步”', '3. Select a nail below, then choose CURRENT or ALL 10')}</span></li>
@@ -129,7 +129,7 @@ export function EditorContextDrawer(props: {
               <span className="block text-sm font-medium text-gray-900">
                 {locale === 'en' ? LOOK_NAME_EN[look.id as keyof typeof RECIPE_BY_LOOK] : look.name}
               </span>
-              <span className="mt-0.5 block text-[10px] text-gray-400">
+              <span className="mt-0.5 block text-nano text-gray-400">
                 {look.id === 'solid-color'
                   ? text('纯底色 · 无图案元素', 'Base color · No pattern layer')
                   : look.id === 'classic-french'
@@ -166,7 +166,7 @@ export function EditorContextDrawer(props: {
                     key={preset.id}
                     onClick={() => setBrushPreset(preset.id)}
                     className={cx(
-                      'rounded-button px-2 py-1.5 text-[11px]',
+                      'rounded-button px-2 py-1.5 text-nano',
                       brushPreset === preset.id ? 'bg-primary-soft text-primary' : 'bg-white text-gray-600',
                     )}
                   >
@@ -185,9 +185,9 @@ export function EditorContextDrawer(props: {
                   />
                 ))}
               </div>
-              <label className="text-[11px] text-gray-500">
+              <label className="text-nano text-gray-500">
                 线宽 {brushSize}（{BRUSH_PRESET_SIZES[brushPreset]} 预设）
-                <input type="range" min={2} max={30} value={brushSize} onChange={(event) => setBrush({ size: Number(event.target.value) })} className="w-full accent-[#C2497A]" />
+                <input type="range" min={2} max={30} value={brushSize} onChange={(event) => setBrush({ size: Number(event.target.value) })} className="w-full accent-primary" />
               </label>
             </>
           )}
