@@ -66,6 +66,8 @@ export const StorageKeys = {
   creatorPublications: 'community.creator-publications-v1',
   /** Fixed-version client share links, snapshots and approval events. */
   clientApprovals: 'studio.client-approvals-v1',
+  /** Operator governance queue and immutable audit trail. */
+  governance: 'community.governance-v1',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

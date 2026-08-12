@@ -1,0 +1,3 @@
+import {readData,StorageKeys,writeEnvelope} from '@/lib/storage';import {emptyGovernanceStoreV1,parseGovernanceStoreV1,type GovernanceStoreV1} from '../domain/v7_1/governance';
+export function readGovernanceStoreV1(){const raw=readData<unknown>(StorageKeys.governance);if(raw===null)return{store:emptyGovernanceStoreV1(),corrupted:false};const parsed=parseGovernanceStoreV1(raw);return parsed?{store:parsed,corrupted:false}:{store:emptyGovernanceStoreV1(),corrupted:true};}
+export function persistGovernanceStoreV1(store:GovernanceStoreV1){const parsed=parseGovernanceStoreV1(store);if(!parsed)return false;try{writeEnvelope(StorageKeys.governance,parsed);return true}catch{return false}}
