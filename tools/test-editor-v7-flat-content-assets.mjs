@@ -229,12 +229,12 @@ function flatElements(store, finger = 'L1', stepId = 'step.v7-10.flat') {
 /* ── G2: bundled sticker/stamp registry + schema validity ─────────────── */
 
 {
-  assert.equal(FLAT_BUNDLED_ASSET_REGISTRY_V7.length, 4);
+  assert.equal(FLAT_BUNDLED_ASSET_REGISTRY_V7.length, 5);
   const stickers = FLAT_BUNDLED_ASSET_REGISTRY_V7.filter((entry) => entry.role === 'sticker');
   const stamps = FLAT_BUNDLED_ASSET_REGISTRY_V7.filter((entry) => entry.role === 'stamp');
-  assert.equal(stickers.length, 2);
+  assert.equal(stickers.length, 3);
   assert.equal(stamps.length, 2);
-  assert.equal(new Set(FLAT_BUNDLED_ASSET_REGISTRY_V7.map((entry) => entry.id)).size, 4);
+  assert.equal(new Set(FLAT_BUNDLED_ASSET_REGISTRY_V7.map((entry) => entry.id)).size, 5);
   for (const entry of FLAT_BUNDLED_ASSET_REGISTRY_V7) {
     assert.match(entry.sourceUrl, /^\/editor-v7-assets\/[a-z0-9-]+\.svg$/);
     assert.equal(entry.asset.mimeType, FLAT_ASSET_MIME_SVG_V7);

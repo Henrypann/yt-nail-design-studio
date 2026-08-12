@@ -10,6 +10,7 @@ import { EditorGuidedStartV7 } from './EditorGuidedStartV7';
 import { EditorResourceDrawerV7 } from './EditorResourceDrawerV7';
 import { EditorStageBarV7 } from './EditorStageBarV7';
 import { EditorStageContextNoticeV7 } from './EditorStageContextNoticeV7';
+import { EditorGeometryPanelV7 } from './EditorGeometryPanelV7';
 import { EditorToolRailV7 } from './EditorToolRailV7';
 import { EditorWorkspaceIntentNoticeV7 } from './EditorWorkspaceIntentNoticeV7';
 import { EditorWorkspaceSidebarV7, type EditorWorkspacePanelTabV7 } from './EditorWorkspaceSidebarV7';
@@ -22,31 +23,12 @@ import {
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
 import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
-import { resolveBackgroundSilhouetteV7 } from '../v7/background';
-import { resolveEditorGeometryV7 } from '../v7/geometry-registry';
 
 const SAVE_LABEL = {
   saved: '已保存',
   dirty: '有未保存更改',
   saving: '正在保存…',
   error: '保存失败，可重试',
-} as const;
-
-const GEOMETRY_FIDELITY_LABEL = {
-  exact: '已签收 2D 轮廓',
-  approximate: '生成轮廓（近似）',
-  unavailable: '不可用（通用回退）',
-} as const;
-
-const GEOMETRY_STATUS_LABEL = {
-  signed_off: '已签收',
-  generated: '已生成，待签收',
-  in_review: '审核中',
-  unknown_asset: '未注册引用',
-  revision_mismatch: '版本不匹配',
-  finger_mismatch: '指位不匹配',
-  silhouette_missing: '轮廓资产缺失',
-  capability_unavailable: '甲型能力未开放',
 } as const;
 
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -59,7 +41,7 @@ function customerPreviewAvailabilityV7(
   if (saveState === 'dirty') return { enabled: false, description: '请先保存当前更改' };
   if (saveState === 'saving') return { enabled: false, description: '正在保存，完成后可预览' };
   if (saveState === 'error') return { enabled: false, description: '保存失败，请重试后再预览' };
-  return { enabled: true, description: '只读预览已可用 · 确认 Snapshot 待 V7-16' };
+  return { enabled: true, description: '顾客只读预览可用 · 不可变审批 Snapshot 待 STUDIO-V7.1-04' };
 }
 
 export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean }) {
@@ -504,8 +486,6 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   const showGuidedStart = !dismissedGuides.has(guideKey) && !currentNail.steps.some((step) => (
     step.kind === 'flat_design' || step.kind === 'surface_effect' || step.kind === 'dimensional_decoration'
   ));
-  const geometrySilhouette = resolveBackgroundSilhouetteV7(currentNail.geometryRef, currentFinger);
-  const geometryResolution = resolveEditorGeometryV7(currentNail.geometryRef, currentFinger);
 
   return (
     <section
@@ -612,27 +592,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       />
 
       {stageContext === 'geometry' && (
-        <EditorStageContextNoticeV7
-          context="geometry"
-          source={geometrySilhouette.source}
-          title={`${currentFinger} · ${geometrySilhouette.label}`}
-          description={geometryResolution.fidelity === 'exact'
-            ? '当前设计按已签收的 2D 产品轮廓裁剪预览。甲型与长度由 Wizard / DesignVersion 的 geometryRef 绑定，Editor 不在此重写。'
-            : geometryResolution.fidelity === 'approximate'
-              ? '当前引用命中已生成但尚未签收的轮廓；可以查看近似预览，空间编辑保持停用，原 geometryRef 不变。'
-              : '当前几何不可用，预览使用通用轮廓；空间编辑保持停用，原 geometryRef 不变且不会自动换甲型。'}
-          details={[
-            { label: '指位', value: currentFinger },
-            ...(geometryResolution.shape && geometryResolution.length ? [
-              { label: '甲型 / 长度', value: `${geometryResolution.shape} / ${geometryResolution.length}` },
-            ] : []),
-            { label: '2D 轮廓可信度', value: GEOMETRY_FIDELITY_LABEL[geometryResolution.fidelity] },
-            { label: '资产状态', value: GEOMETRY_STATUS_LABEL[geometryResolution.status === 'resolved' ? geometryResolution.evidence : geometryResolution.reason] },
-            { label: '几何引用', value: `${currentNail.geometryRef.assetId} @ ${currentNail.geometryRef.revision}` },
-          ]}
-          disclaimer="这是结构化 2D 轮廓预览，不代表逐指扫描、贴合、材料、物理或制造验证。"
-          onDismiss={closeStageContext}
-        />
+        <EditorGeometryPanelV7 onDismiss={closeStageContext} />
       )}
 
       {stageContext === 'customer' && (

@@ -381,6 +381,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     applyTemplate: (t) => {
       if (get().status !== 'draft') return;
       const petalP0 = PETAL_VEIL_P0_ENABLED && t.id === 't_petal_veil_french';
+      const petalPearlBloom = t.id === 't_petal_pearl_bloom_simulated';
       set({
         templateId: petalP0 ? t.id : (t.render_template_id ?? t.id),
         templateName: t.name,
@@ -390,7 +391,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
         length: petalP0 ? 'medium' : get().length,
         appliedShape: petalP0 ? 'almond' : get().appliedShape,
         appliedLength: petalP0 ? 'medium' : get().appliedLength,
-        selectedFinger: petalP0 ? 'R4' : get().selectedFinger,
+        selectedFinger: petalP0 ? 'R4' : petalPearlBloom ? 'L2' : get().selectedFinger,
         fingerOverrides: petalP0 ? {} : get().fingerOverrides,
         viewMode: petalP0 ? 'tiled' : get().viewMode,
         recipe: petalP0

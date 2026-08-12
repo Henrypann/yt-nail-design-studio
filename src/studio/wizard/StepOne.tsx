@@ -152,8 +152,6 @@ export function StepOne() {
   const toast = useToast();
   const navigate = useNavigate();
 
-  if (!customer) return null;
-
   const ready = shape !== null && length !== null;
 
   /** [进入画布]：失败由持久内联错误条呈现（applyError），样式/长度选择保留。
@@ -215,15 +213,15 @@ export function StepOne() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-semibold text-gray-900">{customer.name}</span>
-            <span className="text-xs text-gray-400 tnum">{countDesignsByCustomer(customer.id)} 个历史设计</span>
+            <span className="truncate text-sm font-semibold text-gray-900">{customer?.name ?? '未关联客户'}</span>
+            {customer && <span className="text-xs text-gray-400 tnum">{countDesignsByCustomer(customer.id)} 个历史设计</span>}
           </div>
           <div className="mt-1">
-            <TwinNotice customer={customer} />
+            {customer ? <TwinNotice customer={customer} /> : <p className="text-xs text-gray-500">使用标准尺寸完成设计；绑定设备或扫描后可再关联客户。</p>}
           </div>
         </div>
         <Button size="sm" variant="ghost" onClick={openPicker}>
-          更换客户
+          {customer ? '更换客户' : '关联客户'}
         </Button>
       </Card>
 

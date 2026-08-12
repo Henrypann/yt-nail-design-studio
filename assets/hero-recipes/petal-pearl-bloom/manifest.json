@@ -1,0 +1,34 @@
+{
+  "asset_pack_id": "petal_pearl_bloom_v1",
+  "recipe_id": "petal-pearl-bloom",
+  "version": "1.0.0",
+  "generated_at": "2026-08-12",
+  "generator": "openai-built-in-imagegen + deterministic project scripts",
+  "asset_status": "SIMULATED",
+  "canonical_renderer_output": false,
+  "visual_signoff": "pending_designer_trial",
+  "production_validated": false,
+  "layer_contract": [
+    { "kind": "background", "label": "透明裸粉底色", "fingers": ["L1","L2","L3","L4","L5","R1","R2","R3","R4","R5"] },
+    { "kind": "flat_design", "label": "花瓣线稿", "fingers": ["L3","R5"] },
+    { "kind": "surface_effect", "label": "花瓣局部晕染", "fingers": ["L4","R1"] },
+    { "kind": "dimensional_decoration", "label": "水晶花、淡紫珍珠、银色圆珠簇与酒红微珠", "fingers": ["L1","L2","L3","L4","L5","R1","R2","R3","R4","R5"] },
+    { "kind": "surface_finish", "label": "透明亮面", "fingers": ["L1","L2","L3","L4","L5","R1","R2","R3","R4","R5"] }
+  ],
+  "assets": [
+    { "asset_id": "petal-pearl-look-cover-v1", "kind": "look-cover", "path": "look-cover-16x9-v1.png", "width": 1672, "height": 941, "sha256": "6e5cf4564731051e78941d5c7630f247fbe262fbec0a6abe5f7fc36f7fcbda2d" },
+    { "asset_id": "petal-pearl-hero-detail-v1", "kind": "editorial-detail", "path": "hero-detail-16x9-v1.png", "width": 1672, "height": 941, "sha256": "a4ab85a51a76fb622ab704f02dd5dbcb0f06dca18b1b69fa2059e9866aef2147" },
+    { "asset_id": "petal-pearl-editorial-4x5-v1", "kind": "editorial-detail", "path": "editorial-detail-4x5-v1.png", "width": 1122, "height": 1402, "sha256": "5c0351a659d754e17c7c3cbf3075b39423591580bd6b38d3cf60dc5de9a7e1a8" },
+    { "asset_id": "petal-pearl-outline-v1", "kind": "flat-vector", "path": "flat/petal-outline.svg", "sha256": "2e9027bad8823dc7553a70fa6040e0c49321eb4b8bf90f0c60e8679a698ce98f" },
+    { "asset_id": "petal-pearl-tint-v1", "kind": "surface-reference", "path": "surface/petal-tint.svg", "sha256": "e676af4ccb6137b8ac9ab5c591a638fa2c52f95e54e6c769c0a6c93fff078151" },
+    { "asset_id": "petal-pearl-crystal-flower-svg-v1", "kind": "decoration-reference", "path": "decorations/crystal-flower.svg", "sha256": "c26a9b8489e3f438db1852cdbd2de9556742417055e733997f8f0dbaa9c2206f" },
+    { "asset_id": "petal-pearl-lavender-pearl-svg-v1", "kind": "decoration-reference", "path": "decorations/lavender-pearl.svg", "sha256": "1685b45e398b24ce40dfaaff5ea7b7a04f168305bacbac6a671e52dab7f0c590" },
+    { "asset_id": "petal-pearl-silver-studs-svg-v1", "kind": "decoration-reference", "path": "decorations/silver-stud-cluster.svg", "sha256": "c64602e4b6addd6e073ab14d9103d1c63cdcb0d71084a74f62ca0f4e08797217" },
+    { "asset_id": "petal-pearl-ruby-microbeads-svg-v1", "kind": "decoration-reference", "path": "decorations/ruby-microbeads.svg", "sha256": "ada69cf268097f7c5d6ce41e42331da358d818a8815ff976f127e457496ab498" },
+    { "asset_id": "petal-pearl-crystal-flower", "kind": "simulated-glb", "path": "/assets/glb/components/petal-pearl-bloom/crystal-flower/crystal-flower.web.glb", "sha256": "7434b5c2f3f3e51350ff2bffb9eeccb40a702f14ceb034955fa759ed17a7056c" },
+    { "asset_id": "petal-pearl-lavender-pearl", "kind": "simulated-glb", "path": "/assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb", "sha256": "c46c39f9ee94cfbcb0f2947e92cce9e8cc9768fff644a31f5833cfaa524de5ca" },
+    { "asset_id": "petal-pearl-silver-stud-cluster", "kind": "simulated-glb", "path": "/assets/glb/components/petal-pearl-bloom/silver-stud-cluster/silver-stud-cluster.web.glb", "sha256": "f13616eaa756fbc6a81167ae4ea309bcb9968f012fb477f399e5ebeca51bc317" },
+    { "asset_id": "petal-pearl-ruby-microbeads", "kind": "simulated-glb", "path": "/assets/glb/components/petal-pearl-bloom/ruby-microbeads/ruby-microbeads.web.glb", "sha256": "056cf84bc0c7270ab2aea75cce218fcf25471930e6b25ab6e7d164781ba64bc9" }
+  ],
+  "disclaimer": "All 2.5D/GLB/raster outputs are simulated visual references and do not prove fit, adhesion, curing, material safety, or manufacturability."
+}

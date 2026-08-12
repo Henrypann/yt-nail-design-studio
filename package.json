@@ -72,6 +72,8 @@
     "test:editor-v7-ten-finger": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-ten-finger.mjs",
     "test:editor-v7-surface-effect": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-surface-effect.mjs",
     "test:editor-v7-dimensional-decoration": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-dimensional-decoration.mjs",
+    "test:editor-v7-petal-pearl-bloom": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-petal-pearl-bloom.mjs",
+    "walkthrough:petal-pearl-bloom": "node tools/walkthrough-petal-pearl-bloom.mjs",
     "test:editor-v7-finish-composite": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-finish-composite.mjs",
     "test:editor-v7-creation-cutover": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-creation-cutover.mjs",
     "test:editor-v7-inspiration-geometry": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-inspiration-geometry.mjs",

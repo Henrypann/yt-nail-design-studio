@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "manifestId": "nextgen-browser-preview-assets",
-  "manifestVersion": "1.1.0",
-  "updatedAt": "2026-08-11T00:00:00.000Z",
+  "manifestVersion": "1.2.0",
+  "updatedAt": "2026-08-12T00:00:00.000Z",
   "coordinateContract": {
     "unit": "mm",
     "handedness": "right",
@@ -21,7 +21,11 @@
     { "id": "mercury-dew-droplet-0.8", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-0.8.web.glb", "sizeBytes": 23980, "sha256": "79f9b522c53a8e0bddcb9acc1e8a9d6ffe7b67445eb11c70f2faebe5bf48b1c3", "boundsMm": { "min": [-0.4, -0.4, 0], "max": [0.4, 0.4, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
     { "id": "mercury-dew-droplet-1.2", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-1.2.web.glb", "sizeBytes": 23980, "sha256": "c6a325c8e1e98693bc4472b59a9a9bcd15ee6ca76b1fdff602d495a2c2c0beeb", "boundsMm": { "min": [-0.6, -0.6, 0], "max": [0.6, 0.6, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
     { "id": "mercury-dew-droplet-1.8", "revision": "1.0.0-simulated", "category": "droplet", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/mercury-dew/droplet/droplet-1.8.web.glb", "sizeBytes": 23980, "sha256": "ff1212a6c9188c0bb1fab35d40c02be5b7a442f386ad24844a22582800ca63d3", "boundsMm": { "min": [-0.9, -0.9, 0], "max": [0.9, 0.9, 0.18] } }], "statusNote": "Preview-only candidate; visual and manufacturing signoff pending." },
-    { "id": "starfish-bloom-starfish", "revision": "1.0.0-missing", "category": "custom", "evidence": "MISSING", "renderSuitability": "fallback_only", "manufacturingValidated": false, "lods": [], "statusNote": "Starfish Bloom component geometry has not been accepted into this branch." }
+    { "id": "starfish-bloom-starfish", "revision": "1.0.0-missing", "category": "custom", "evidence": "MISSING", "renderSuitability": "fallback_only", "manufacturingValidated": false, "lods": [], "statusNote": "Starfish Bloom component geometry has not been accepted into this branch." },
+    { "id": "petal-pearl-crystal-flower", "revision": "1.0.0-simulated", "category": "custom", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/petal-pearl-bloom/crystal-flower/crystal-flower.web.glb", "sizeBytes": 114224, "sha256": "7434b5c2f3f3e51350ff2bffb9eeccb40a702f14ceb034955fa759ed17a7056c", "boundsMm": { "min": [-4.0743, -3.5734, -0.13], "max": [4.0743, 4.25, 1.04] } }], "statusNote": "AI-directed deterministic preview mesh; visual concept only, manufacturing and attachment engineering unvalidated." },
+    { "id": "petal-pearl-lavender-pearl", "revision": "1.0.0-simulated", "category": "pearl", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb", "sizeBytes": 24136, "sha256": "c46c39f9ee94cfbcb0f2947e92cce9e8cc9768fff644a31f5833cfaa524de5ca", "boundsMm": { "min": [-1.05, -1.05, -0.05], "max": [1.05, 1.05, 2.05] } }], "statusNote": "Preview-only lavender pearl; attachment and material evidence unavailable." },
+    { "id": "petal-pearl-silver-stud-cluster", "revision": "1.0.0-simulated", "category": "stud", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/petal-pearl-bloom/silver-stud-cluster/silver-stud-cluster.web.glb", "sizeBytes": 64808, "sha256": "f13616eaa756fbc6a81167ae4ea309bcb9968f012fb477f399e5ebeca51bc317", "boundsMm": { "min": [-0.9101, -1.0067, 0.0], "max": [1.04, 1.0067, 0.76] } }], "statusNote": "Preview-only polished stud cluster; assembly and manufacturing unvalidated." },
+    { "id": "petal-pearl-ruby-microbeads", "revision": "1.0.0-simulated", "category": "stud", "evidence": "SIMULATED", "renderSuitability": "simulated_preview", "manufacturingValidated": false, "lods": [{ "level": 0, "minScreenCoveragePx": 0, "path": "/assets/glb/components/petal-pearl-bloom/ruby-microbeads/ruby-microbeads.web.glb", "sizeBytes": 40432, "sha256": "056cf84bc0c7270ab2aea75cce218fcf25471930e6b25ab6e7d164781ba64bc9", "boundsMm": { "min": [-0.78, -0.76, -0.01], "max": [0.78, 0.7, 0.63] } }], "statusNote": "Preview-only ruby microbead trio; adhesion and manufacturing unvalidated." }
   ],
   "rendererAdapters": [
     {
@@ -36,6 +40,13 @@
       "recipeRef": { "id": "starfish-bloom-elegance", "version": "1.0.0" },
       "requiredAssetIds": ["starfish-bloom-starfish"],
       "fallbackRendererId": "svg-2d/generic-nail-1",
+      "evidence": "SIMULATED"
+    },
+    {
+      "id": "three-pbr/petal-pearl-bloom-1",
+      "recipeRef": { "id": "petal-pearl-bloom", "version": "1.0.0" },
+      "requiredAssetIds": ["petal-pearl-crystal-flower", "petal-pearl-lavender-pearl", "petal-pearl-silver-stud-cluster", "petal-pearl-ruby-microbeads"],
+      "fallbackRendererId": "svg-2.5d/petal-pearl-bloom-1",
       "evidence": "SIMULATED"
     }
   ]

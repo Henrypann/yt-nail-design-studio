@@ -6,8 +6,9 @@ import {
   resolveBackgroundSilhouetteV7,
 } from '../v7/background';
 import {
+  dimensionalDecorationArchetypeV7,
   dimensionalDecorationFidelityV7,
-  dimensionalDecorationPathToCanvasV7,
+  dimensionalDecorationPreviewPathV7,
   dimensionalDecorationShadowOffsetV7,
 } from '../v7/dimensional-decoration';
 import { surfaceFinishPreviewAppearanceV7 } from '../v7/finish';
@@ -166,13 +167,13 @@ function renderSurfaceEffect(step: Extract<ProcessStepV7, { kind: 'surface_effec
 
 function renderDecoration(decoration: DimensionalDecorationV7): ReactNode {
   if (!decoration.visible) return null;
-  const path = decoration.kind === 'relief_2_5d'
-    ? dimensionalDecorationPathToCanvasV7(decoration.outline.pathData)
-    : 'M28 75 C40 58 60 58 72 75 C61 78 58 91 50 103 C42 91 39 78 28 75 Z';
+  const path = dimensionalDecorationPreviewPathV7(decoration);
   if (!path) return null;
   const unavailable = dimensionalDecorationFidelityV7(decoration) === 'unavailable';
   const shadow = dimensionalDecorationShadowOffsetV7(decoration.heightMm);
-  return transformedElement(decoration, <><path d={path} transform={`translate(${shadow} ${shadow})`} fill="#34232d" fillOpacity=".16" /><path d={path} fill={decoration.kind === 'attachment_3d' ? '#dbc79f' : '#e9bad0'} fillOpacity={unavailable ? 0.2 : 0.85} stroke="#fff" strokeWidth="1" strokeDasharray={unavailable ? '4 3' : undefined} /></>);
+  const archetype = dimensionalDecorationArchetypeV7(decoration);
+  const fill = archetype === 'crystal_flower' ? '#fce4ef' : archetype === 'lavender_pearl' ? '#c9afea' : archetype === 'silver_studs' ? '#dfe5e9' : archetype === 'ruby_microbeads' ? '#a9003b' : decoration.kind === 'attachment_3d' ? '#dbc79f' : '#e9bad0';
+  return transformedElement(decoration, <><path d={path} transform={`translate(${shadow} ${shadow})`} fill="#34232d" fillOpacity=".16" /><path d={path} fill={fill} fillOpacity={unavailable ? 0.2 : archetype === 'crystal_flower' ? 0.58 : 0.85} stroke="#fff" strokeWidth="1" strokeDasharray={unavailable ? '4 3' : undefined} /></>);
 }
 
 export function CustomerNailPreviewV7({

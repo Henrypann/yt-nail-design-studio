@@ -12,7 +12,7 @@
  */
 
 import { Button, useToast, cx } from '@/design-system';
-import { ArrowRight, Presentation, Sparkles } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle2, Presentation, Sparkles } from 'lucide-react';
 import { TenFingerPreview } from '@/studio/preview/TenFingerPreview';
 import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
 import { SingleNailView } from '@/studio/preview/SingleNailView';
@@ -20,6 +20,7 @@ import { loadShapeParams } from '@/studio/preview/material-library';
 import { openBridge } from '@/studio/bridge';
 import { inspectEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { isPetalVeilRecipe } from '@/studio/editor/lib/recipe-model';
+import { inspectWizardEditorV7Compatibility } from '@/studio/editor/v7/create';
 import {
   PetalVeilSinglePreview,
   PetalVeilTiledPreview,
@@ -70,6 +71,15 @@ export function StepTwo() {
   }, [petalP0, s.setViewMode, s.viewMode]);
 
   if (!s.appliedShape || !s.appliedLength) return null;
+
+  const editorCompatibility = inspectWizardEditorV7Compatibility({
+    shape: s.appliedShape,
+    length: s.appliedLength,
+    ...(s.templateId ? { templateId: s.templateId } : {}),
+    finish: s.finish,
+    recipe: s.recipe,
+    fingerOverrides: s.fingerOverrides,
+  });
 
   const handleReapply = async () => {
     await s.applyShapeLengthEdit(); // 失败由持久内联错误条呈现（applyError）
@@ -390,6 +400,27 @@ export function StepTwo() {
         </aside>
       </div>
 
+      {!petalP0 && !bridged && (
+        <section className="order-first rounded-2xl border border-gray-200 bg-white p-4 lg:order-last" aria-label="Editor V7 资产兼容预检" data-testid="wizard-editor-v7-preflight">
+          <div className="flex items-start gap-2">
+            {editorCompatibility.ok ? <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-success" /> : <AlertTriangle size={17} className="mt-0.5 shrink-0 text-warning" />}
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-gray-900">{editorCompatibility.ok ? '已通过 Editor V7 资产预检' : '暂不能进入 Editor V7'}</p>
+              <p className="mt-1 text-[10px] leading-4 text-gray-500">{editorCompatibility.ok ? editorCompatibility.warning : editorCompatibility.message}</p>
+            </div>
+          </div>
+          <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+            {editorCompatibility.items.map((item) => (
+              <div key={item.id} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2" data-fidelity={item.fidelity}>
+                <dt className="text-[9px] text-gray-400">{item.label}</dt>
+                <dd className="mt-0.5 text-[10px] font-semibold text-gray-700">{item.value}</dd>
+                <p className={cx('mt-1 text-[9px]', item.fidelity === 'unavailable' ? 'text-warning' : item.fidelity === 'approximate' ? 'text-violet-600' : 'text-success')}>{item.fidelity === 'exact' ? '可编辑' : item.fidelity === 'approximate' ? '模拟/近似' : '不可用'}</p>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
       {/* 底部：桥接入口（PRD §15：首次转化 + 不可逆警告；已桥接续进画布） */}
       {!petalP0 && <footer
         className="order-first flex flex-col gap-3 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary-soft via-white to-violet-50 p-4 shadow-[0_14px_38px_rgba(154,52,104,0.14)] sm:flex-row sm:items-center sm:justify-between lg:order-last"
@@ -406,12 +437,14 @@ export function StepTwo() {
         </div>
         <Button
           size="md"
-          disabled={readOnly}
+          disabled={readOnly || (!bridged && !editorCompatibility.ok)}
           loading={bridging}
           className="min-h-12 w-full shrink-0 px-5 text-sm shadow-[0_10px_24px_rgba(154,52,104,0.28)] sm:w-auto"
           title={
             readOnly
               ? '设计已冻结只读，不可进入自由画布编辑'
+              : !bridged && !editorCompatibility.ok
+                ? editorCompatibility.message
               : bridged
                 ? '该设计已有 Editor 文档，点击继续编辑'
                 : '首次创建 Editor 文档（创建后模板不可再切换）'

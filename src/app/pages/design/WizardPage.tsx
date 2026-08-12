@@ -634,6 +634,7 @@ export default function WizardPage() {
       <CustomerPickerModal
         open={s.pickerOpen}
         onConfirm={s.setCustomer}
+        onContinueWithoutCustomer={s.closePicker}
         onDismiss={() => (s.customer ? s.closePicker() : navigate(Routes.designs))}
       />
 

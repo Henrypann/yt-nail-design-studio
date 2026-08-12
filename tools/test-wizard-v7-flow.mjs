@@ -32,6 +32,25 @@ const stepTwo = await read('src/studio/wizard/StepTwo.tsx');
 assert.match(stepTwo, />\s*进入 Editor\s*</);
 assert.doesNotMatch(stepTwo, /\{bridged \? ['"]返回自由画布['"] : ['"]打开自由画布['"]\}/);
 assert.match(stepTwo, /v7_content_not_supported/);
+assert.match(stepTwo, /wizard-editor-v7-preflight/);
+assert.match(stepTwo, /disabled=\{readOnly \|\| \(!bridged && !editorCompatibility\.ok\)\}/);
+
+const customerPicker = await read('src/studio/wizard/CustomerPickerModal.tsx');
+const stepOne = await read('src/studio/wizard/StepOne.tsx');
+assert.match(customerPicker, /暂不关联客户，使用标准尺寸/);
+assert.match(stepOne, /customer\?\.name \?\? '未关联客户'/);
+assert.doesNotMatch(stepOne, /if \(!customer\) return null/);
+
+const styleRecommendations = await read('src/studio/wizard/StyleRecommendModal.tsx');
+assert.match(styleRecommendations, /filter\(\(style\) => style\.cover_status !== 'MOCK'\)/);
+assert.doesNotMatch(styleRecommendations, />MOCK 占位图</);
+
+const backgroundInspector = await read('src/studio/editor/components/BackgroundPanelV7.tsx');
+const resourceDrawer = await read('src/studio/editor/components/EditorResourceDrawerV7.tsx');
+assert.match(backgroundInspector, /自定义颜色/);
+assert.doesNotMatch(backgroundInspector, /aria-label=\{`设置背景颜色/);
+assert.match(resourceDrawer, /aria-label="背景资源色板"/);
+assert.match(resourceDrawer, /灵感主题预设/);
 
 const manifestPath = path.join(root, 'assets/hero-recipes/mercury-dew/manifest.json');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));

@@ -87,7 +87,9 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
     ])
       .then(([manifest, index]) => {
         if (!requestGate.current.isCurrent(requestToken)) return;
-        const valid = filterResolvableStyleRecommendations(manifest.recommendations[shape] ?? [], index);
+        // 程序化 MOCK 只属于内部资产 QA，不进入面向设计师的推荐主路径。
+        const valid = filterResolvableStyleRecommendations(manifest.recommendations[shape] ?? [], index)
+          .filter((style) => style.cover_status !== 'MOCK');
         const partitioned = partitionStyles(valid);
         const list = [...partitioned.primary, ...partitioned.concept];
         setStyles(list);
@@ -192,11 +194,6 @@ export function StyleRecommendModal({ open, shape, length, onSelect, onSkip }: S
                   <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-amber-200">
                     TOP {st.priority}
                   </span>
-                  {st.cover_status === 'MOCK' && (
-                    <span className="absolute right-2 top-2">
-                      <Badge variant="gray" className="text-[10px]">MOCK 占位图</Badge>
-                    </span>
-                  )}
                   {st.cover_status === 'CONCEPT' && (
                     <span className="absolute right-2 top-2">
                       <Badge variant="warning" className="bg-white/90 text-[10px] backdrop-blur-sm">

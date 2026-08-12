@@ -1,6 +1,6 @@
 import { useStore } from 'zustand';
 import { createStore, type StoreApi } from 'zustand/vanilla';
-import { FINGER_CODES, type FingerCode } from '@/lib/types';
+import { FINGER_CODES, type FingerCode, type NailLength, type NailShape } from '@/lib/types';
 import type {
   AssetRefV7,
   DimensionalDecorationV7,
@@ -29,6 +29,7 @@ import {
   setEditorV7SurfaceEffect,
   setEditorV7SurfaceEffectMask,
   setEditorV7SurfaceFinish,
+  setEditorV7ProductGeometry,
   type EditorV7CommandResult,
   editorV7StepAuthoringFailure,
 } from './v7/commands';
@@ -199,6 +200,7 @@ export interface EditorV7State {
   setSurfaceEffect(finger: FingerCode, stepId: string, effect: SurfaceEffectPayloadV7): EditorV7ActionResult;
   setSurfaceEffectMask(finger: FingerCode, stepId: string, mask: RegionMaskV7): EditorV7ActionResult;
   setSurfaceFinish(finger: FingerCode, stepId: string, finishType: SurfaceFinishTypeV7): EditorV7ActionResult;
+  setProductGeometry(shape: NailShape, length: NailLength): EditorV7ActionResult;
   addElement(finger: FingerCode, stepId: string, element: FlatDesignElementV7 | DimensionalDecorationV7): EditorV7ActionResult;
   removeElement(finger: FingerCode, stepId: string, elementId: string): EditorV7ActionResult;
   setElementFlag(finger: FingerCode, stepId: string, elementId: string, flag: 'visible' | 'locked', value: boolean): EditorV7ActionResult;
@@ -508,6 +510,8 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       },
 
       retrySave: () => get().save(),
+
+      setProductGeometry: (shape, length) => commitCommand((doc) => setEditorV7ProductGeometry(doc, shape, length)),
 
       undo: () => {
         const state = get();

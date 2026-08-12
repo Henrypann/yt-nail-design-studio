@@ -129,6 +129,7 @@ export const FLAT_BUNDLED_ASSET_REGISTRY_V7: readonly BundledFlatAssetV7[] = [
   bundledEntry('bundled.sticker.heart', '甜蜜爱心', 'sticker', 'sticker-heart.svg', '73a576e72d8ad6dd27fbfaa5225ceeb84992a59159167390457e2c51fcf51dcd'),
   bundledEntry('bundled.stamp.star', '星形印章', 'stamp', 'stamp-star.svg', '657d59b52e948cf83e0cd6f88f9deefac33b933fc57c9d675903086da7c50707'),
   bundledEntry('bundled.stamp.flower', '花瓣印章', 'stamp', 'stamp-flower.svg', 'd2e9d6629937c18e76fd259b206929d6c4d4e5d3f7edbb0ee0e5b426039493c2'),
+  bundledEntry('bundled.sticker.petal-pearl-outline', '花瓣线稿', 'sticker', 'petal-pearl-outline.svg', '2e9027bad8823dc7553a70fa6040e0c49321eb4b8bf90f0c60e8679a698ce98f'),
 ];
 
 export function getBundledFlatAssetV7(id: string): BundledFlatAssetV7 | undefined {

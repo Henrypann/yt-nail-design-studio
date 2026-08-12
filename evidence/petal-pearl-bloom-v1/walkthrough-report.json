@@ -1,0 +1,31 @@
+{
+  "baseURL": "http://127.0.0.1:5201",
+  "reports": [
+    {
+      "viewport": "390",
+      "canonical": {
+        "designId": "d_546a6d31-4c3b-4349-9ebf-eb722dac306b",
+        "title": "Petal Pearl Bloom",
+        "flat": 2,
+        "effect": 2,
+        "dimensional": 10
+      },
+      "bundledOutline": true,
+      "dimensionalLabels": true,
+      "errors": []
+    },
+    {
+      "viewport": "1280",
+      "canonical": {
+        "designId": "d_c922111a-e017-43f1-b30f-a050cb6eb93f",
+        "title": "Petal Pearl Bloom",
+        "flat": 2,
+        "effect": 2,
+        "dimensional": 10
+      },
+      "bundledOutline": true,
+      "dimensionalLabels": true,
+      "errors": []
+    }
+  ]
+}

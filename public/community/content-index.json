@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "officialPgcTarget": 20,
-  "officialMetadataReadyCount": 9,
-  "officialGapCount": 11,
+  "officialMetadataReadyCount": 10,
+  "officialGapCount": 10,
   "contents": [
     {
       "schemaVersion": 1,
@@ -137,6 +137,45 @@
       ],
       "status": "PUBLISHED",
       "publishedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "schemaVersion": 1,
+      "contentId": "cc_petal_pearl_bloom",
+      "contentType": "LOOK_SET",
+      "title": "花瓣珍珠绽放",
+      "titleEn": "Petal Pearl Bloom",
+      "publisherId": "pub_nailstyle_official",
+      "publisherType": "OFFICIAL",
+      "curationStatus": "FEATURED_BY_OFFICIAL",
+      "cover": { "url": "/assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png", "kind": "EDITORIAL" },
+      "media": [
+        { "id": "cc_petal_pearl_bloom_look", "url": "/assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png", "kind": "EDITORIAL" },
+        { "id": "cc_petal_pearl_bloom_detail", "url": "/assets/hero-recipes/petal-pearl-bloom/hero-detail-16x9-v1.png", "kind": "EDITORIAL" },
+        { "id": "cc_petal_pearl_bloom_portrait", "url": "/assets/hero-recipes/petal-pearl-bloom/editorial-detail-4x5-v1.png", "kind": "EDITORIAL" }
+      ],
+      "mainStyleId": "ST-02",
+      "subStyleIds": ["ST-10"],
+      "occasionIds": ["wedding", "date"],
+      "subjectIds": [],
+      "moodIds": ["soft"],
+      "effectIds": ["relief", "pearl", "gloss"],
+      "primaryColorIds": ["nude"],
+      "recommendedShapes": ["oval", "almond"],
+      "supportedShapes": ["oval", "almond", "coffin"],
+      "notRecommendedShapes": { "stiletto": "立体花与珠饰的侧壁安全区尚未验证" },
+      "supportedLengths": ["medium", "long"],
+      "applicationLevel": "STRUCTURED_EDITABLE",
+      "verificationLevel": "RENDER_VERIFIED",
+      "assetRef": {
+        "templateId": "t_petal_pearl_bloom_simulated",
+        "renderTemplateId": "t_petal_pearl_bloom_simulated",
+        "recipeId": "petal-pearl-bloom",
+        "assetVersion": "1.0.0",
+        "manifestUrl": "/assets/hero-recipes/petal-pearl-bloom/manifest.json"
+      },
+      "campaignTags": ["new", "structured-v7", "simulated-assets"],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-08-12T02:00:00.000Z"
     },
     {
       "schemaVersion": 1,

@@ -35,6 +35,33 @@
   ],
   "templates": [
     {
+      "id": "t_petal_pearl_bloom_simulated",
+      "name": "花瓣珍珠绽放",
+      "name_en": "Petal Pearl Bloom",
+      "asset_status": "SIMULATED",
+      "render_template_id": "t_petal_pearl_bloom_simulated",
+      "recipe_ref": { "id": "petal-pearl-bloom", "version": "1.0.0", "preset_id": "signature" },
+      "asset_spec_url": "/assets/hero-recipes/petal-pearl-bloom/ASSET_SPEC.md",
+      "capability_summary": {
+        "supported": ["EditorDocV7 十指分层", "花瓣线稿与局部晕染", "水晶花/珍珠/圆珠/微珠模拟 GLB"],
+        "pending": ["设计师试用签收", "真实材料与装配验证", "生产验证"]
+      },
+      "style_tags": ["trending", "sweet", "luxe"],
+      "default_base_color": "#F4DCE5",
+      "default_finish": "gloss",
+      "shape_compatibility": {
+        "highly_compatible": ["oval", "almond"],
+        "neutral": ["coffin", "squoval", "round"],
+        "not_recommended": {
+          "square": "宽平甲面需要重新平衡水晶花和珠饰密度",
+          "stiletto": "尖端与侧壁的立体附件安全区尚未验证"
+        }
+      },
+      "thumbnail_url": "assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png",
+      "manifest_url": "assets/hero-recipes/petal-pearl-bloom/manifest.json",
+      "sort_order": -1.1
+    },
+    {
       "id": "t_mercury_dew_concept",
       "name": "Mercury Dew",
       "name_en": "Mercury Dew",

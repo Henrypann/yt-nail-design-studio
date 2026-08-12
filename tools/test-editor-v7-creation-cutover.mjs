@@ -15,8 +15,10 @@ import {
 } from '../src/studio/editor/lib/editor-doc-schema-version.ts';
 import {
   createBlankEditorDocV7,
+  inspectWizardEditorV7Compatibility,
   wizardDesignToEditorDocV7,
 } from '../src/studio/editor/v7/create.ts';
+import { setEditorV7ProductGeometry } from '../src/studio/editor/v7/commands.ts';
 import {
   OFFICIAL_TEMPLATE_PATTERN_ASSET_COUNT_V7,
   identifyOfficialTemplatePatternV7,
@@ -96,6 +98,32 @@ for (const finger of FINGER_CODES) {
   allIds.push(...nail.steps.map((step) => step.id), ...flat.elements.map((element) => element.id));
 }
 assert.equal(new Set(allIds).size, allIds.length, 'step/element ids must be globally unique');
+
+// Wizard preflight and the actual writer share the same compatibility gates.
+const preflight = inspectWizardEditorV7Compatibility(summary());
+assert.equal(preflight.ok, true);
+assert.equal(preflight.items.find((item) => item.id === 'geometry').value, '10/10 · almond / medium');
+assert.equal(inspectWizardEditorV7Compatibility(summary({ finish: 'pearl' })).reason, 'unsupported_finish');
+assert.equal(inspectWizardEditorV7Compatibility(summary({ shape: 'square' })).reason, 'geometry_unavailable');
+
+// Geometry switching is one pure ten-finger operation. Nail-local content and
+// IDs remain stable while official template assets follow the target shape.
+const wizardBeforeGeometry = structuredClone(wizard.doc);
+const changedGeometry = setEditorV7ProductGeometry(wizard.doc, 'oval', 'long');
+assert.equal(changedGeometry.ok, true);
+assert.deepEqual(wizard.doc, wizardBeforeGeometry);
+for (const finger of FINGER_CODES) {
+  assert.equal(changedGeometry.doc.nails[finger].geometryRef.assetId, `geometry.oval.long.${finger}`);
+  const beforeSteps = wizard.doc.nails[finger].steps;
+  const afterSteps = changedGeometry.doc.nails[finger].steps;
+  assert.deepEqual(afterSteps.map((step) => step.id), beforeSteps.map((step) => step.id));
+  const flat = afterSteps.find((step) => step.kind === 'flat_design');
+  assert.deepEqual(identifyOfficialTemplatePatternV7(flat.elements[0].asset), {
+    templateId: 't_petal_veil_french',
+    shape: 'oval',
+  });
+}
+assert.equal(setEditorV7ProductGeometry(changedGeometry.doc, 'square', 'medium').reason, 'geometry_unavailable');
 
 // Unsupported semantic content never silently materializes into a lossy V7 doc.
 assert.deepEqual(wizardDesignToEditorDocV7(summary({ finish: 'pearl' })).reason, 'unsupported_finish');

@@ -1,4 +1,4 @@
-import type { FingerCode } from '../../../lib/types';
+import { FINGER_CODES, type FingerCode, type NailLength, type NailShape } from '../../../lib/types';
 import type {
   DimensionalDecorationV7,
   EditorDocV7,
@@ -13,6 +13,8 @@ import { getProcessStepTypeDefinitionV7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import type { EditorV7IdFactory } from './id';
 import { createSurfaceFinishDefinitionV7, isSurfaceFinishTypeV7 } from './finish';
+import { resolveSignedProductGeometryRefV7 } from './geometry-registry';
+import { getOfficialTemplatePatternAssetV7, identifyOfficialTemplatePatternV7 } from './official-template-assets';
 
 export type EditorV7CommandFailure =
   | 'missing_document'
@@ -44,6 +46,57 @@ export function editorV7StepAuthoringFailure(
   if (step.skipped) return reject('not_allowed', 'step is skipped; cancel skipping before editing');
   if (!step.visible) return reject('not_allowed', 'step is hidden; restore visibility before editing');
   return null;
+}
+
+/**
+ * Change the full ten-finger product geometry in one canonical transaction.
+ * Nail-local content stays unchanged and is reprojected by the renderer onto
+ * the new signed silhouette; no SVG/rasterized result is written to the doc.
+ */
+export function setEditorV7ProductGeometry(
+  doc: EditorDocV7,
+  shape: NailShape,
+  length: NailLength,
+): EditorV7CommandResult {
+  const nextRefs = new Map<FingerCode, NonNullable<ReturnType<typeof resolveSignedProductGeometryRefV7>>>();
+  const officialReplacements = new Map<string, NonNullable<ReturnType<typeof getOfficialTemplatePatternAssetV7>>>();
+  for (const finger of FINGER_CODES) {
+    const ref = resolveSignedProductGeometryRefV7(shape, length, finger);
+    if (!ref) return reject('geometry_unavailable', `${shape}/${length}/${finger} has no signed-off V7 geometry`);
+    nextRefs.set(finger, ref);
+    for (const step of doc.nails[finger].steps) {
+      if (step.kind !== 'flat_design') continue;
+      for (const element of step.elements) {
+        if (element.kind !== 'image_2d') continue;
+        const identity = identifyOfficialTemplatePatternV7(element.asset);
+        if (!identity) continue;
+        const replacement = getOfficialTemplatePatternAssetV7(identity.templateId, shape);
+        if (!replacement) return reject('geometry_unavailable', `${identity.templateId}/${shape} has no verified V7 pattern asset`);
+        officialReplacements.set(element.id, replacement);
+      }
+    }
+  }
+  const unchanged = FINGER_CODES.every((finger) => {
+    const current = doc.nails[finger].geometryRef;
+    const target = nextRefs.get(finger)!;
+    return current.assetId === target.assetId && current.revision === target.revision;
+  });
+  if (unchanged) return reject('not_allowed', 'document already uses this product geometry');
+  const next = structuredClone(doc);
+  for (const finger of FINGER_CODES) {
+    const nail = next.nails[finger];
+    nail.geometryRef = structuredClone(nextRefs.get(finger)!);
+    if (nail.compositionProvenance?.syncState === 'linked') nail.compositionProvenance.syncState = 'detached';
+    for (const step of nail.steps) {
+      if (step.kind !== 'flat_design') continue;
+      for (const element of step.elements) {
+        if (element.kind !== 'image_2d') continue;
+        const replacement = officialReplacements.get(element.id);
+        if (replacement) element.asset = structuredClone(replacement);
+      }
+    }
+  }
+  return validate(next);
 }
 
 function validate(next: EditorDocV7): EditorV7CommandResult {

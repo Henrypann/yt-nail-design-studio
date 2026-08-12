@@ -13,7 +13,7 @@ import {
 } from '../v7/dimensional-decoration';
 import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
 
-const ARCHETYPES: DimensionalDecorationArchetypeV7[] = ['relief', 'droplet', 'gel_stack', 'carving', 'accessory'];
+const ARCHETYPES: DimensionalDecorationArchetypeV7[] = ['relief', 'droplet', 'gel_stack', 'carving', 'accessory', 'crystal_flower', 'lavender_pearl', 'silver_studs', 'ruby_microbeads'];
 
 function CommitRange({ label, value, min, max, step, unit = '', disabled, onCommit }: {
   label: string;

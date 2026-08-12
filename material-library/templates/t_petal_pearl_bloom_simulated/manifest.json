@@ -1,0 +1,23 @@
+{
+  "template_id": "t_petal_pearl_bloom_simulated",
+  "version": 1,
+  "asset_status": "SIMULATED",
+  "renderer_id": "svg-2.5d/petal-pearl-bloom-1",
+  "visual_signoff": "pending_designer_trial",
+  "manufacturing": "blocked/unvalidated",
+  "patterns": {
+    "almond": "patterns/almond.svg",
+    "oval": "patterns/oval.svg",
+    "coffin": "patterns/coffin.svg",
+    "squoval": "patterns/squoval.svg",
+    "round": "patterns/round.svg",
+    "square": "patterns/square.svg",
+    "stiletto": "patterns/stiletto.svg"
+  },
+  "uv_params": {
+    "anchor_u": 0.5,
+    "anchor_v": 0.85,
+    "scale_u": 1.0,
+    "scale_v": 1.0
+  }
+}

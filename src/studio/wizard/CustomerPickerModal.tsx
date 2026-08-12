@@ -27,11 +27,13 @@ export function twinSummary(c: Customer): { text: string; tone: 'success' | 'war
 interface CustomerPickerModalProps {
   open: boolean;
   onConfirm: (customer: Customer) => void;
+  /** 无硬件/客户资料时使用标准尺寸继续设计，不创建客户记录。 */
+  onContinueWithoutCustomer?: () => void;
   /** 未选择客户时关闭弹窗（返回上一页） */
   onDismiss?: () => void;
 }
 
-export function CustomerPickerModal({ open, onConfirm, onDismiss }: CustomerPickerModalProps) {
+export function CustomerPickerModal({ open, onConfirm, onContinueWithoutCustomer, onDismiss }: CustomerPickerModalProps) {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [query, setQuery] = useState('');
@@ -95,6 +97,11 @@ export function CustomerPickerModal({ open, onConfirm, onDismiss }: CustomerPick
       closeOnOverlay={false}
       footer={
         <>
+          {onContinueWithoutCustomer && (
+            <Button variant="ghost" onClick={onContinueWithoutCustomer}>
+              暂不关联客户，使用标准尺寸
+            </Button>
+          )}
           <Button
             variant="secondary"
             onClick={() => {

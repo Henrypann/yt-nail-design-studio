@@ -1,0 +1,18 @@
+{
+  "recipeRef": { "id": "petal-pearl-bloom", "version": "1.0.0" },
+  "rendererId": "svg-2.5d/petal-pearl-bloom-1",
+  "shape": "oval",
+  "length": "medium",
+  "evidence": "SIMULATED",
+  "background": { "type": "translucent", "color": "#F4DCE5", "opacity": 0.82, "fingers": "all" },
+  "flatDesign": { "asset": "flat/petal-outline.svg", "fingers": ["L3", "R5"] },
+  "surfaceEffect": { "type": "ink_bloom", "asset": "surface/petal-tint.svg", "fingers": ["L4", "R1"], "previewFidelity": "approximate" },
+  "dimensionalDecoration": {
+    "crystalFlower": { "assetId": "petal-pearl-crystal-flower", "fingers": ["L2", "R4"] },
+    "lavenderPearl": { "assetId": "petal-pearl-lavender-pearl", "fingers": ["L1", "L2", "L5", "R2", "R3", "R4"] },
+    "silverStudCluster": { "assetId": "petal-pearl-silver-stud-cluster", "fingers": ["L1", "R3"] },
+    "rubyMicrobeads": { "assetId": "petal-pearl-ruby-microbeads", "fingers": ["L1", "L2", "R3", "R4"] }
+  },
+  "finish": { "type": "gloss", "fingers": "all" },
+  "manufacturing": { "status": "blocked", "validated": false }
+}

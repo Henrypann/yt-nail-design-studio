@@ -6,10 +6,13 @@ import { getOfficialTemplatePatternAssetV7 } from './official-template-assets';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import { materializeMercuryDewV7 } from './mercury-dew';
+import { materializePetalPearlBloomV7 } from './petal-pearl-bloom';
 import { createSurfaceFinishDefinitionV7 } from './finish';
 import { isExactEditorGeometryV7, PRODUCT_GEOMETRY_REVISION_V7 } from './geometry-registry';
 
 export { PRODUCT_GEOMETRY_REVISION_V7 } from './geometry-registry';
+
+const PETAL_PEARL_BLOOM_TEMPLATE_ID = 't_petal_pearl_bloom_simulated';
 
 export type EditorDocV7CreationFailure =
   | 'invalid_input'
@@ -22,6 +25,26 @@ export type EditorDocV7CreationFailure =
 export type EditorDocV7CreationResult =
   | { ok: true; doc: EditorDocV7 }
   | { ok: false; reason: EditorDocV7CreationFailure; message: string };
+
+export interface WizardEditorV7CompatibilityInput {
+  shape: NailShape;
+  length: NailLength;
+  templateId?: string;
+  finish: DesignSummary['finish'];
+  recipe?: DesignSummary['recipe'];
+  fingerOverrides?: DesignSummary['fingerOverrides'];
+}
+
+export interface WizardEditorV7CompatibilityItem {
+  id: 'geometry' | 'template' | 'recipe' | 'finish' | 'document';
+  label: string;
+  value: string;
+  fidelity: 'exact' | 'approximate' | 'unavailable';
+}
+
+export type WizardEditorV7CompatibilityReport =
+  | { ok: true; items: readonly WizardEditorV7CompatibilityItem[]; warning: string }
+  | { ok: false; reason: EditorDocV7CreationFailure; message: string; items: readonly WizardEditorV7CompatibilityItem[] };
 
 export interface BlankEditorDocV7Input {
   designId: string;
@@ -53,6 +76,74 @@ function createProductGeometryRefV7(
   return {
     assetId: `geometry.${shape}.${length}.${finger}`,
     revision: PRODUCT_GEOMETRY_REVISION_V7,
+  };
+}
+
+function wizardCompatibilityFailure(input: WizardEditorV7CompatibilityInput): Extract<EditorDocV7CreationResult, { ok: false }> | null {
+  if (input.finish === 'pearl') {
+    return { ok: false, reason: 'unsupported_finish', message: '珠光封层尚不能无损转换为 V7 表面完成层' };
+  }
+  if (input.recipe && input.recipe.recipeRef.id !== 'mercury-dew') {
+    return { ok: false, reason: 'unsupported_recipe', message: `配方 ${input.recipe.recipeRef.id} 尚未接入 EditorDocV7` };
+  }
+  const decoration = Object.entries(input.fingerOverrides ?? {}).find(([, override]) => override?.decorationId);
+  if (decoration) {
+    return { ok: false, reason: 'unsupported_decoration', message: `${decoration[0]} 的装饰尚不能无损转换为 V7 立体元素` };
+  }
+  const unavailableFinger = FINGER_CODES.find((finger) => !isExactEditorGeometryV7(
+    createProductGeometryRefV7(input.shape, input.length, finger),
+    finger,
+  ));
+  if (unavailableFinger) {
+    return { ok: false, reason: 'geometry_unavailable', message: `${input.shape}/${input.length}/${unavailableFinger} 尚无已签收 V7 轮廓` };
+  }
+  if (input.templateId && input.templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID && !getOfficialTemplatePatternAssetV7(input.templateId, input.shape)) {
+    return { ok: false, reason: 'template_asset_missing', message: `${input.templateId}/${input.shape} 缺少已验证 SVG 图案资产` };
+  }
+  return null;
+}
+
+/** Writer-zero Wizard → Editor preflight. It mirrors the creation gates without creating or saving a document. */
+export function inspectWizardEditorV7Compatibility(
+  input: WizardEditorV7CompatibilityInput,
+): WizardEditorV7CompatibilityReport {
+  const baseItems: WizardEditorV7CompatibilityItem[] = [
+    { id: 'geometry', label: '十指甲型', value: `10/10 · ${input.shape} / ${input.length}`, fidelity: 'exact' },
+    {
+      id: 'template',
+      label: '模板图案',
+      value: input.templateId ? `${input.templateId} · 10 指可物化` : '未使用模板',
+      fidelity: 'exact',
+    },
+    {
+      id: 'recipe',
+      label: '结构化效果',
+      value: input.recipe ? (input.recipe.recipeRef.id === 'mercury-dew' ? 'Mercury Dew · 模拟预览' : input.recipe.recipeRef.id) : '无额外配方',
+      fidelity: input.recipe ? 'approximate' : 'exact',
+    },
+    { id: 'finish', label: '表面封层', value: input.finish, fidelity: input.finish === 'pearl' ? 'unavailable' : 'exact' },
+    { id: 'document', label: '目标文档', value: 'EditorDocV7 · schema 7', fidelity: 'exact' },
+  ];
+  const failure = wizardCompatibilityFailure(input);
+  if (!failure) {
+    return {
+      ok: true,
+      items: baseItems,
+      warning: input.recipe ? '2D/2.5D/3D 为模拟预览，不代表材料或制造验证。' : '预览通过不代表材料、贴合或制造验证。',
+    };
+  }
+  return {
+    ok: false,
+    reason: failure.reason,
+    message: failure.message,
+    items: baseItems.map((item) => (
+      (failure.reason === 'geometry_unavailable' && item.id === 'geometry')
+      || (failure.reason === 'template_asset_missing' && item.id === 'template')
+      || ((failure.reason === 'unsupported_recipe' || failure.reason === 'unsupported_decoration') && item.id === 'recipe')
+      || (failure.reason === 'unsupported_finish' && item.id === 'finish')
+        ? { ...item, fidelity: 'unavailable' as const }
+        : item
+    )),
   };
 }
 
@@ -115,8 +206,8 @@ function buildEditorDocV7(
   for (const finger of FINGER_CODES) {
     const color = parseHexColorV7(perFingerColor(finger));
     if (!color) return { ok: false, reason: 'invalid_input', message: `Invalid background color for ${finger}` };
-    const asset = templateId ? getOfficialTemplatePatternAssetV7(templateId, input.shape) : null;
-    if (templateId && !asset) {
+    const asset = templateId && templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID ? getOfficialTemplatePatternAssetV7(templateId, input.shape) : null;
+    if (templateId && templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID && !asset) {
       return { ok: false, reason: 'template_asset_missing', message: `No verified ${templateId}/${input.shape} SVG asset exists` };
     }
     const templateElement: FlatDesignElementV7 | null = asset ? {
@@ -171,16 +262,9 @@ export function wizardDesignToEditorDocV7(
   design: DesignSummary,
   now = new Date().toISOString(),
 ): EditorDocV7CreationResult {
-  if (design.finish === 'pearl') {
-    return { ok: false, reason: 'unsupported_finish', message: 'Pearl finish requires the V7 surface-effect adapter' };
-  }
-  if (design.recipe && design.recipe.recipeRef.id !== 'mercury-dew') {
-    return { ok: false, reason: 'unsupported_recipe', message: `Recipe ${design.recipe.recipeRef.id} is not yet losslessly supported by EditorDocV7` };
-  }
-  const decoration = Object.entries(design.fingerOverrides ?? {}).find(([, override]) => override?.decorationId);
-  if (decoration) {
-    return { ok: false, reason: 'unsupported_decoration', message: `Decoration on ${decoration[0]} requires the V7-13 adapter` };
-  }
+  const compatibilityFailure = wizardCompatibilityFailure(design);
+  if (compatibilityFailure) return compatibilityFailure;
+  const petalPearlBloom = design.templateId === PETAL_PEARL_BLOOM_TEMPLATE_ID;
   const base = buildEditorDocV7({
     designId: design.id,
     shape: design.shape,
@@ -188,13 +272,20 @@ export function wizardDesignToEditorDocV7(
     customerRef: design.customerId || undefined,
     title: design.title ?? '未命名设计',
     baseColor: design.baseColor,
-    finish: design.finish,
+    finish: design.finish as SurfaceFinishTypeV7,
     now,
-  }, (finger) => design.fingerOverrides?.[finger]?.baseColor ?? design.baseColor, design.templateId, {
+  }, (finger) => design.fingerOverrides?.[finger]?.baseColor ?? design.baseColor, petalPearlBloom ? undefined : design.templateId, {
     sourceId: design.id,
     revision: String(design.version),
   });
-  if (!base.ok || !design.recipe) return base;
+  if (!base.ok) return base;
+  if (petalPearlBloom) {
+    const materialized = materializePetalPearlBloomV7(base.doc);
+    return materialized
+      ? { ok: true, doc: materialized }
+      : { ok: false, reason: 'unsupported_recipe', message: 'Petal Pearl Bloom V7 materialization failed contract validation' };
+  }
+  if (!design.recipe) return base;
   const materialized = materializeMercuryDewV7(base.doc, design.recipe);
   return materialized
     ? { ok: true, doc: materialized }

@@ -22,8 +22,8 @@ assert.match(petalPreviewSource, /当前区域没有渲染 2D 内容/);
 assert.match(petalPreviewSource, /重试模拟 3D/);
 const fixtureResult = validateAssetManifest(fixture);
 assert.equal(fixtureResult.ok, true, fixtureResult.ok ? '' : fixtureResult.errors.join('\n'));
-assert.equal(fixture.rendererAdapters.length, 2, 'both reference recipes need data-driven adapter descriptors');
-assert.equal(fixture.assets.filter((asset) => asset.evidence === 'SIMULATED').length, 10);
+assert.equal(fixture.rendererAdapters.length, 3, 'all simulated reference recipes need data-driven adapter descriptors');
+assert.equal(fixture.assets.filter((asset) => asset.evidence === 'SIMULATED').length, 14);
 assert.equal(fixture.assets.filter((asset) => asset.evidence === 'MISSING').length, 1);
 assert.ok(fixture.assets.every((asset) => asset.manufacturingValidated === false));
 

@@ -9,7 +9,7 @@ const root = process.cwd();
 const index = JSON.parse(fs.readFileSync(path.join(root, 'material-library/index.json'), 'utf8'));
 const visible = index.templates.filter(isHighFidelityConceptGalleryTemplate);
 
-assert.equal(visible.length, 9, `expected 9 high-fidelity concept cards, got ${visible.length}`);
+assert.equal(visible.length, 10, `expected 10 high-fidelity concept cards, got ${visible.length}`);
 assert.deepEqual(
   index.style_tags.map((tag) => tag.id),
   ['trending', 'sweet', 'minimal', 'luxe'],

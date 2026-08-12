@@ -209,6 +209,37 @@ class FakeTimers {
   clearTimeout = (id) => { this.tasks.delete(id); };
 }
 
+// Editor geometry is a single document-wide transaction: ten refs change,
+// content remains nail-local, and one undo restores the full previous shape.
+{
+  const created = createBlankEditorDocV7({ designId: 'design.v715.geometry-edit', shape: 'almond', length: 'medium' });
+  assert.equal(created.ok, true);
+  if (!created.ok) throw new Error(created.reason);
+  const storage = new MemoryStorage({ [created.doc.designId]: created.doc });
+  const timers = new FakeTimers();
+  const store = createEditorV7Store({
+    repository: createEditorDocV7Repository(storage, EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS),
+    now: () => '2026-08-12T03:00:00.000Z',
+    setTimeout: timers.setTimeout,
+    clearTimeout: timers.clearTimeout,
+  });
+  assert.equal(await store.getState().load(created.doc.designId), 'ok');
+  const before = clone(store.getState().doc);
+  assert.equal(store.getState().setProductGeometry('oval', 'long').ok, true);
+  assert.equal(store.getState().doc.revision, before.revision + 1);
+  assert.equal(store.getState().history.length, 1);
+  assert.equal(timers.tasks.size, 1);
+  for (const finger of FINGER_CODES) {
+    assert.equal(store.getState().doc.nails[finger].geometryRef.assetId, `geometry.oval.long.${finger}`);
+    assert.deepEqual(store.getState().doc.nails[finger].steps, before.nails[finger].steps);
+  }
+  assert.equal(store.getState().setProductGeometry('square', 'medium').reason, 'geometry_unavailable');
+  assert.equal(store.getState().doc.revision, before.revision + 1, 'failed switch is writer-zero');
+  assert.equal(store.getState().undo().ok, true);
+  for (const finger of FINGER_CODES) assert.equal(store.getState().doc.nails[finger].geometryRef.assetId, `geometry.almond.medium.${finger}`);
+  console.log('[v7-inspiration-geometry] atomic ten-finger geometry edit: PASS');
+}
+
 // Approximate/unavailable geometry stays inspectable, but every spatial writer
 // is rejected before ID generation/history/autosave. Background and finish are
 // still editable because they do not claim spatial placement fidelity.

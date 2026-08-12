@@ -9,7 +9,7 @@ import {
   DIMENSIONAL_FIDELITY_LABELS_V7,
   dimensionalDecorationArchetypeV7,
   dimensionalDecorationFidelityV7,
-  dimensionalDecorationPathToCanvasV7,
+  dimensionalDecorationPreviewPathV7,
   dimensionalDecorationShadowOffsetV7,
 } from '../v7/dimensional-decoration';
 import { combineGeometryPreviewFidelityV7 } from '../v7/geometry-registry';
@@ -42,12 +42,17 @@ function transformDecoration(decoration: DimensionalDecorationV7, node: ReactNod
 function decorationArtwork(decoration: DimensionalDecorationV7, selected: boolean): ReactNode {
   const fidelity = dimensionalDecorationFidelityV7(decoration);
   const shadow = dimensionalDecorationShadowOffsetV7(decoration.heightMm);
-  const path = decoration.kind === 'relief_2_5d'
-    ? dimensionalDecorationPathToCanvasV7(decoration.outline.pathData)
-    : 'M28 75 C40 58 60 58 72 75 C61 78 58 91 50 103 C42 91 39 78 28 75 Z';
+  const path = dimensionalDecorationPreviewPathV7(decoration);
   if (!path) return null;
   const archetype = dimensionalDecorationArchetypeV7(decoration);
-  const fill = archetype === 'droplet' ? '#d9f2ff' : archetype === 'gel_stack' ? '#f8d9eb' : archetype === 'carving' ? '#ead4ee' : archetype === 'accessory' ? '#d9c6a3' : '#f1b9ce';
+  const fill = archetype === 'droplet' ? '#d9f2ff'
+    : archetype === 'gel_stack' ? '#f8d9eb'
+      : archetype === 'carving' ? '#ead4ee'
+        : archetype === 'crystal_flower' ? '#fce4ef'
+          : archetype === 'lavender_pearl' ? '#c9afea'
+            : archetype === 'silver_studs' ? '#dfe5e9'
+              : archetype === 'ruby_microbeads' ? '#a9003b'
+                : archetype === 'accessory' ? '#d9c6a3' : '#f1b9ce';
   return transformDecoration(decoration, <>
     <path d={path} transform={`translate(${shadow} ${shadow})`} fill="#3d2634" fillOpacity={0.16} />
     <path d={path} fill={fill} fillOpacity={fidelity === 'unavailable' ? 0.18 : 0.88} stroke={selected ? '#d12f69' : '#ffffff'} strokeWidth={selected ? 2 : 1.1} strokeDasharray={fidelity === 'unavailable' ? '4 3' : undefined} vectorEffect="non-scaling-stroke" />
