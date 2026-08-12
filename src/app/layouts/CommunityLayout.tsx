@@ -3,7 +3,7 @@
  */
 
 import { Link, NavLink, Outlet, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Compass, LogIn, Menu, Palette, UserPlus, X } from 'lucide-react';
+import { ArrowUpRight, Compass, LogIn, Menu, Palette, Sparkles, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
 import { cx } from '@/design-system';
 import { LanguageToggle, useLocale } from '@/lib/i18n';
@@ -85,6 +85,14 @@ export function CommunityLayout() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <Link
+              to={Routes.communityCreatorWorkspace}
+              data-testid="community-creator-workspace-entry"
+              className="hidden min-h-10 items-center gap-1.5 rounded-button border border-primary/20 bg-primary-soft px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary/15 lg:inline-flex"
+            >
+              <Sparkles size={13} aria-hidden />
+              {text('创作者工作台', 'Creator Studio')}
+            </Link>
             <div className="hidden items-center gap-1 lg:flex" aria-label={text('账号', 'Account')}>
               <Link
                 to={Routes.login}
@@ -132,6 +140,15 @@ export function CommunityLayout() {
               </NavLink>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3">
+              <Link
+                to={Routes.communityCreatorWorkspace}
+                data-testid="community-mobile-creator-workspace-entry"
+                onClick={() => setMobileOpen(false)}
+                className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-primary/20 bg-primary-soft px-3 text-sm font-semibold text-primary"
+              >
+                <Sparkles size={15} aria-hidden />
+                {text('创作者工作台', 'Creator Studio')}
+              </Link>
               <Link
                 to={Routes.login}
                 data-testid="community-mobile-login-entry"
