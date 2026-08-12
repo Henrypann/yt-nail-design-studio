@@ -27,7 +27,7 @@ const STATUS_ICON = {
 } as const;
 
 const TOOL_LABEL = {
-  select: '选择', background: '背景', brush: '画笔', eraser: '橡皮', shape: '图形', text: '文字', assets: '素材', effects: '效果', decorations: '立体',
+  select: '选择', background: '背景', brush: '画笔', eraser: '橡皮', line: '线条', french: '法式', shape: '图形', text: '文字', assets: '素材', effects: '效果', decorations: '立体', finish: '封层',
 } as const;
 
 const STEP_LABEL = {

@@ -11,8 +11,20 @@ import {
   editorWorkspaceStageForStepV7,
   repairEditorWorkspaceSelectionV7,
 } from '../src/studio/editor/v7/workspace-ia.ts';
+import { FLAT_TOOL_PANEL_MAP_V7 } from '../src/studio/editor/v7/flat-tool-panel-map.ts';
 
 const clone = (value) => structuredClone(value);
+
+// Every flat rail intent owns one contextual panel; no generic all-tools panel.
+{
+  assert.deepEqual(Object.keys(FLAT_TOOL_PANEL_MAP_V7), ['select', 'brush', 'eraser', 'line', 'shape', 'french']);
+  assert.deepEqual(FLAT_TOOL_PANEL_MAP_V7.shape.tools, ['rectangle', 'circle', 'star']);
+  assert.deepEqual(FLAT_TOOL_PANEL_MAP_V7.eraser.tools, ['eraser', 'region_mask']);
+  assert.deepEqual(FLAT_TOOL_PANEL_MAP_V7.select.tools, ['select', 'anchor']);
+  assert.deepEqual(FLAT_TOOL_PANEL_MAP_V7.line.tools, ['line']);
+  assert.deepEqual(FLAT_TOOL_PANEL_MAP_V7.french.tools, ['french']);
+  console.log('[v7-workspace-ia] flat rail to contextual panel mapping: PASS');
+}
 
 // StageBar is a deterministic read model over canonical nail data and selection.
 {
@@ -94,7 +106,7 @@ const clone = (value) => structuredClone(value);
   assert.equal(personal.state, 'empty');
   assert.equal(personal.targetStepId, null);
   const tools = deriveEditorWorkspaceToolsV7(nail);
-  for (const id of ['brush', 'text', 'effects', 'decorations']) {
+  for (const id of ['brush', 'line', 'french', 'text', 'effects', 'decorations']) {
     const tool = tools.find((candidate) => candidate.id === id);
     assert.equal(tool.enabled, false);
     assert.equal(tool.status, 'missing_step');
@@ -118,7 +130,7 @@ const clone = (value) => structuredClone(value);
   assert.ok(effects.length > 2);
   const selectedEffect = effects[2];
   const tools = deriveEditorWorkspaceToolsV7(nail, { selectedStepId: selectedEffect.id });
-  for (const id of ['select', 'background', 'brush', 'eraser', 'shape', 'text', 'assets', 'effects', 'decorations']) {
+  for (const id of ['select', 'background', 'brush', 'eraser', 'line', 'french', 'shape', 'text', 'assets', 'effects', 'decorations', 'finish']) {
     assert.equal(tools.find((tool) => tool.id === id).enabled, true, `${id} should be enabled`);
     assert.equal(tools.find((tool) => tool.id === id).status, 'ready');
   }
@@ -218,6 +230,7 @@ const clone = (value) => structuredClone(value);
     autosaveTimer: before.autosaveTimer,
   };
   editorV7Store.getState().selectStep(flat.id);
+  editorV7Store.getState().setResourceMode('shape');
   editorV7Store.getState().setActiveFlatTool('brush');
   editorV7Store.getState().setCurrentFinger('R2');
   editorV7Store.getState().setCurrentFinger('L1');
@@ -227,6 +240,7 @@ const clone = (value) => structuredClone(value);
   assert.equal(editorV7Store.getState().saveState, invariant.saveState);
   assert.deepEqual(editorV7Store.getState().revisionState, invariant.revisionState);
   assert.equal(editorV7Store.getState().autosaveTimer, invariant.autosaveTimer);
+  assert.equal(editorV7Store.getState().resourceMode, 'shape');
   console.log('[v7-workspace-ia] UI-only navigation preserves persistence state: PASS');
 }
 

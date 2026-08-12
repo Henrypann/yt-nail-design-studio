@@ -8,6 +8,12 @@ import {
   type EditorV7FingerScopeKind,
 } from '../v7/ten-finger-operations';
 import { isExactEditorGeometryV7 } from '../v7/geometry-registry';
+import {
+  deriveFingerContentStateV7,
+  EDITOR_FINGER_ROWS_V7,
+  FINGER_CONTENT_STATE_LABEL_V7,
+  fingerDisplayNameV7,
+} from '../v7/finger-identity';
 
 const SCOPE_LABEL: Record<EditorV7FingerScopeKind, string> = {
   current: '当前指',
@@ -112,6 +118,7 @@ export function TenFingerBarV7() {
   const linkedInScope = scopeTargets.filter((finger) => doc?.nails[finger].compositionProvenance?.syncState === 'linked');
   const canSync = canMaterialize && fingerScope !== 'mirror' && linkedOutsideScope.length === 0;
   const canDetach = !disabled && linkedInScope.length > 0;
+  const currentContentState = doc ? deriveFingerContentStateV7(doc.nails[currentFinger]) : 'blank';
 
   const switchCurrentFinger = (finger: FingerCode) => {
     if (finger === currentFinger) {
@@ -204,39 +211,58 @@ export function TenFingerBarV7() {
     <footer className="relative border-t border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="十指编辑与跨指操作" data-testid="v7-ten-finger-bar">
       {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">跨指复制与同步已停用：{unavailableGeometry.join('、')} 缺少已签收 2D 甲型轮廓。解除同步仍可使用。</p>}
       <div className="flex min-w-0 flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
-        <div className="min-w-0 overflow-x-auto" aria-label="选择手指">
-          <div className="flex min-w-max items-center gap-1">
-            {FINGER_CODES.map((finger) => {
-              const current = currentFinger === finger;
-              const selected = selectedFingers.includes(finger);
-              const syncState = doc.nails[finger].compositionProvenance?.syncState;
-              return (
-                <button
-                  key={finger}
-                  type="button"
-                  aria-current={current ? 'true' : undefined}
-                  aria-pressed={fingerScope === 'selected' ? selected : current}
-                  data-finger={finger}
-                  data-current={current}
-                  data-selected={selected}
-                  data-sync-state={syncState ?? 'none'}
-                  onClick={() => chooseFinger(finger)}
-                  onKeyDown={(event) => moveFingerFocus(event, finger)}
-                  className={cx(
-                    'relative min-h-11 min-w-11 rounded-lg border px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                    current ? 'border-primary bg-primary-soft font-semibold text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50',
-                    fingerScope === 'selected' && selected && 'ring-2 ring-primary/35 ring-offset-1',
-                  )}
-                >
-                  {finger}
-                  {syncState && (
-                    <span className={cx('absolute right-0.5 top-0.5 rounded px-0.5 text-[8px] font-semibold leading-3', syncState === 'linked' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800')}>
-                      {syncState === 'linked' ? '同' : '独'}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+        <div className="min-w-0 overflow-x-auto pb-0.5 max-sm:overflow-x-hidden" aria-label="选择手指" data-testid="v7-finger-locator">
+          <div className="flex min-w-max items-start gap-3 max-sm:min-w-0 max-sm:flex-col max-sm:gap-1">
+            {EDITOR_FINGER_ROWS_V7.map((row) => (
+              <section key={row.id} className="flex items-center gap-1 max-sm:w-full" aria-label={`${row.label}五指`} data-hand={row.id}>
+                <span className="mr-0.5 text-[9px] font-semibold text-gray-400 [writing-mode:vertical-rl] max-sm:w-7 max-sm:[writing-mode:horizontal-tb]">{row.label}</span>
+                {row.fingers.map((identity) => {
+                  const finger = identity.finger;
+                  const current = currentFinger === finger;
+                  const selected = selectedFingers.includes(finger);
+                  const syncState = doc.nails[finger].compositionProvenance?.syncState;
+                  const contentState = deriveFingerContentStateV7(doc.nails[finger]);
+                  return (
+                    <button
+                      key={finger}
+                      type="button"
+                      aria-label={`${fingerDisplayNameV7(finger)} ${finger}，${FINGER_CONTENT_STATE_LABEL_V7[contentState]}`}
+                      aria-current={current ? 'true' : undefined}
+                      aria-pressed={fingerScope === 'selected' ? selected : current}
+                      data-finger={finger}
+                      data-current={current}
+                      data-selected={selected}
+                      data-sync-state={syncState ?? 'none'}
+                      data-content-state={contentState}
+                      onClick={() => chooseFinger(finger)}
+                      onKeyDown={(event) => moveFingerFocus(event, finger)}
+                      className={cx(
+                        'relative flex min-h-[58px] min-w-[50px] flex-col items-center justify-end rounded-xl border px-1 pb-1 pt-1 text-[9px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 max-sm:min-h-11 max-sm:min-w-11 max-sm:flex-1 max-sm:flex-row max-sm:justify-center max-sm:gap-1 max-sm:px-0.5',
+                        current ? 'border-primary bg-primary-soft font-semibold text-primary' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
+                        fingerScope === 'selected' && selected && 'ring-2 ring-primary/35 ring-offset-1',
+                      )}
+                    >
+                      <span
+                        className={cx(
+                          'mb-0.5 block rounded-t-full rounded-b-[5px] border max-sm:mb-0',
+                          contentState === 'designed' ? 'border-primary/50 bg-primary/25' : contentState === 'inactive' ? 'border-amber-400 bg-amber-50' : 'border-dashed border-gray-300 bg-white',
+                          current && 'ring-2 ring-primary/25',
+                        )}
+                        style={{ width: `${18 * identity.previewWidth}px`, height: `${23 * identity.previewHeight}px` }}
+                        aria-hidden="true"
+                      />
+                      <span className="leading-3 max-sm:hidden">{identity.name}</span>
+                      <span className="text-[8px] font-normal leading-3 text-gray-400">{finger}</span>
+                      {syncState && (
+                        <span className={cx('absolute right-0.5 top-0.5 rounded px-0.5 text-[8px] font-semibold leading-3', syncState === 'linked' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800')}>
+                          {syncState === 'linked' ? '同' : '独'}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </section>
+            ))}
           </div>
         </div>
 
@@ -267,9 +293,10 @@ export function TenFingerBarV7() {
       </div>
 
       <p className="mt-1.5 truncate text-[10px] text-gray-500" role="status">
-        来源 {currentFinger} · 范围 {SCOPE_LABEL[fingerScope]} · {writeTargets.length > 0 ? `将覆盖 ${writeTargets.join('、')}` : '当前没有可写目标'}
+        正在编辑：<strong className="font-semibold text-gray-800">{fingerDisplayNameV7(currentFinger)}（{currentFinger}）</strong> · {FINGER_CONTENT_STATE_LABEL_V7[currentContentState]} · 范围 {SCOPE_LABEL[fingerScope]} · {writeTargets.length > 0 ? `将覆盖 ${writeTargets.join('、')}` : '当前没有可写目标'}
         {fingerScope === 'mirror' ? ' · 布局镜像，文字与素材本体保持正向' : ''}
       </p>
+      <p className="mt-0.5 text-[9px] text-gray-400" aria-hidden="true">粉色边框 = 当前指 · 粉色实心 = 有设计 · 虚线 = 空白 · 黄色 = 内容已隐藏</p>
       {selectionStatus && <p className="mt-1 break-words text-[11px] leading-4 text-amber-700" role="status" aria-atomic="true" data-testid="v7-finger-selection-status">{selectionStatus}</p>}
       {doc.compositionMeta && <p className="mt-0.5 text-[9px] text-gray-400">状态：同 = 已同步当前快照；独 = 已解除同步、可单独编辑</p>}
       {fingerScope !== 'mirror' && linkedOutsideScope.length > 0 && (

@@ -179,7 +179,7 @@ export function BackgroundPanelV7() {
               onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); if (event.key === 'Escape') { setHexDraft(canonicalHex); setHexError(null); event.currentTarget.blur(); } }}
               className={cx('h-11 min-w-0 rounded-lg border bg-white px-3 font-mono text-xs uppercase text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary', hexError ? 'border-error' : 'border-gray-300')} />
           </div>
-          <p className={cx('text-[10px] leading-4', hexError ? 'text-error' : 'text-gray-500')} role={hexError ? 'alert' : undefined}>{hexError ?? '基础色板在左侧“资源”中选择；这里仅编辑精确色值。取色写入 canonical sRGB。'}</p>
+          <p className={cx('text-[10px] leading-4', hexError ? 'text-error' : 'text-gray-500')} role={hexError ? 'alert' : undefined}>{hexError ?? '下方基础色板可快速选色；这里用于编辑精确色值。取色写入 canonical sRGB。'}</p>
         </fieldset>
       )}
 

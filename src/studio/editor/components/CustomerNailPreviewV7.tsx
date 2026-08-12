@@ -32,6 +32,7 @@ import {
   surfaceEffectMaskPathToCanvasV7,
 } from '../v7/surface-effect';
 import { FlatContentArtworkV7 } from './FlatContentArtworkV7';
+import { fingerDisplayNameV7 } from '../v7/finger-identity';
 
 const CANVAS_WIDTH = 100;
 const CANVAS_HEIGHT = 160;
@@ -182,12 +183,14 @@ export function CustomerNailPreviewV7({
   selected = false,
   size = 'overview',
   presentation = '2d',
+  visualProportion,
 }: {
   nail: NailDesignV7;
   readModel: CustomerNailPreviewReadModelV7;
   selected?: boolean;
   size?: 'overview' | 'focus';
   presentation?: '2d' | 'composite';
+  visualProportion?: { width: number; height: number };
 }) {
   const rawId = useId().replace(/:/g, '');
   const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
@@ -216,7 +219,7 @@ export function CustomerNailPreviewV7({
 
   return (
     <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity} data-presentation={presentation}>
-      <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', presentation === 'composite' && 'shadow-[0_24px_60px_rgba(77,53,67,0.2)]', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')} style={presentation === 'composite' ? { transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)' } : undefined}>
+      <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', presentation === 'composite' && 'shadow-[0_24px_60px_rgba(77,53,67,0.2)]', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')} style={{ ...(presentation === 'composite' ? { transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)' } : {}), ...(visualProportion ? { aspectRatio: `${visualProportion.width * 5} / ${visualProportion.height * 8}` } : {}) }}>
         <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={`${nail.finger} 顾客${presentation === 'composite' ? '模拟 3D 组合' : ' 2D'}预览`}>
           <defs>
             <clipPath id={`${rawId}-geometry`} clipPathUnits="userSpaceOnUse"><path d={silhouette.pathD} transform={silhouetteTransform} /></clipPath>
@@ -256,7 +259,7 @@ export function CustomerNailPreviewV7({
         {(readModel.backgroundScenarioActive || readModel.finishScenarioActive) && <span className="absolute right-2 top-2 rounded-full bg-violet-600 px-2 py-1 text-[9px] font-semibold text-white">临时比较</span>}
       </div>
       <div className="flex items-center gap-1.5 text-center">
-        <span className="text-xs font-semibold text-gray-900">{nail.finger}</span>
+        <span className="whitespace-nowrap text-xs font-semibold text-gray-900">{fingerDisplayNameV7(nail.finger)} <span className="font-normal text-gray-400">{nail.finger}</span></span>
         <span title={FIDELITY_LABEL[readModel.fidelity]} className={cx('whitespace-nowrap rounded-full px-1.5 py-0.5 text-[9px]', readModel.fidelity === 'unavailable' ? 'bg-warning-soft text-warning' : readModel.fidelity === 'approximate' ? 'bg-violet-50 text-violet-700' : 'bg-success-soft text-success')}>
           {size === 'overview' ? <><span className="sm:hidden">{FIDELITY_SHORT_LABEL[readModel.fidelity]}</span><span className="hidden sm:inline">{FIDELITY_LABEL[readModel.fidelity]}</span></> : FIDELITY_LABEL[readModel.fidelity]}
         </span>

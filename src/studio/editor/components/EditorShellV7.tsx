@@ -358,8 +358,10 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
             ? '[data-testid="v7-flat-text-resources"]'
             : toolId === 'assets'
               ? '[data-testid="v7-flat-asset-resources"]'
-              : toolId === 'background'
+          : toolId === 'background'
                 ? '[data-testid="v7-background-panel"]'
+                : toolId === 'finish'
+                  ? '[data-testid="v7-finish-composite-panel"]'
                 : '[data-testid="v7-flat-vector-panel"]';
       const panel = document.querySelector<HTMLElement>(panelSelector);
       const destination = panel?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
@@ -375,20 +377,21 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
   ) => {
     const state = editorV7Store.getState();
     if (tool.targetStepId) state.selectStep(tool.targetStepId);
-    if (tool.id === 'select') state.setActiveFlatTool('select');
-    if (tool.id === 'brush') state.setActiveFlatTool('brush');
-    if (tool.id === 'eraser') state.setActiveFlatTool('eraser');
-    if (tool.id === 'shape') state.setActiveFlatTool('rectangle');
+    if (tool.id === 'select') { state.setActiveFlatTool('select'); state.setResourceMode('select'); }
+    if (tool.id === 'brush') { state.setActiveFlatTool('brush'); state.setResourceMode('brush'); }
+    if (tool.id === 'eraser') { state.setActiveFlatTool('eraser'); state.setResourceMode('eraser'); }
+    if (tool.id === 'line') { state.setActiveFlatTool('line'); state.setResourceMode('line'); }
+    if (tool.id === 'french') { state.setActiveFlatTool('french'); state.setResourceMode('french'); }
+    if (tool.id === 'shape') { state.setActiveFlatTool('rectangle'); state.setResourceMode('shape'); }
     if (tool.id === 'text') {
       state.setResourceMode('text');
       openResources(trigger);
     } else if (tool.id === 'assets') {
       state.setResourceMode('assets');
       openResources(trigger);
-    } else if (tool.id === 'effects' || tool.id === 'decorations') {
-      openWorkspacePanel('inspector', trigger);
-    } else if (tool.id === 'background' || tool.id === 'brush' || tool.id === 'eraser' || tool.id === 'shape') {
-      state.setResourceMode('vector');
+    } else if (tool.id === 'effects' || tool.id === 'decorations' || tool.id === 'finish') {
+      openResources(trigger);
+    } else if (tool.id === 'background' || tool.id === 'select' || tool.id === 'brush' || tool.id === 'eraser' || tool.id === 'line' || tool.id === 'french' || tool.id === 'shape') {
       openResources(trigger);
     }
     if (focusDestination) focusToolDestination(tool.id);
@@ -615,7 +618,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
       <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
         {!dockedTools && <EditorToolRailV7 orientation="vertical" resourcesOpen={resourcesOpen} onToggleResources={toggleResources} onOpenPanel={openWorkspacePanel} onActivateTool={requestWorkspaceTool} onBlockedTool={requestWorkspaceTool} />}
 
-        {wideWorkspace && resourcesOpen && <aside className="h-full w-[232px] shrink-0 border-r border-gray-200" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
+        {wideWorkspace && resourcesOpen && <aside className="h-full w-[280px] shrink-0 border-r border-gray-200" data-overlay-open="false"><EditorResourceDrawerV7 onClose={closeResources} /></aside>}
 
         <main className="flex min-h-0 min-w-0 flex-1 overflow-auto bg-[#f3f0ee] p-3 sm:p-4" data-testid="v7-canvas-region">
           <div className={cx('mx-auto flex min-h-full w-full max-w-5xl justify-center', showGuidedStart ? 'items-start' : 'items-center')}>
@@ -630,7 +633,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
 
         {!wideWorkspace && resourcesOpen && <>
           <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭资源" onClick={closeResources} />
-          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="资源与预设" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-modal md:inset-y-0 md:left-16 md:right-auto md:h-full md:max-h-none md:w-[280px] md:rounded-none" data-overlay-open="true">
+          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="当前层工具与参数" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-modal md:inset-y-0 md:left-16 md:right-auto md:h-full md:max-h-none md:w-[300px] md:rounded-none" data-overlay-open="true">
             <EditorResourceDrawerV7 onClose={closeResources} />
           </aside>
         </>}

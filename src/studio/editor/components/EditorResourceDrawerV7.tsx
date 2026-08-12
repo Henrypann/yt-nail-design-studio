@@ -6,6 +6,11 @@ import { selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { parseHexColorV7, rgbaToHexV7, type EditorV7PaletteThemeV7 } from '../v7/background';
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 import { FlatContentResourcesV7 } from './FlatContentResourcesV7';
+import { BackgroundPanelV7 } from './BackgroundPanelV7';
+import { SurfaceEffectPanelV7 } from './SurfaceEffectPanelV7';
+import { DimensionalDecorationPanelV7 } from './DimensionalDecorationPanelV7';
+import { FinishCompositePanelV7 } from './FinishCompositePanelV7';
+import { isFlatToolPanelModeV7 } from '../v7/flat-tool-panel-map';
 
 export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
   const toast = useToast();
@@ -50,23 +55,24 @@ export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
   };
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-white" aria-label="资源与预设" data-testid="v7-resource-drawer">
+    <section className="flex h-full min-h-0 flex-col bg-white" aria-label="当前层工具与参数" data-testid="v7-resource-drawer">
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-3">
         <div>
-          <div className="flex items-center gap-2"><LibraryBig size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">资源与预设</h2></div>
-          <p className="mt-0.5 text-[10px] text-gray-500">工具资源，不创建第二份设计状态</p>
+          <div className="flex items-center gap-2"><LibraryBig size={15} className="text-primary" /><h2 className="text-xs font-semibold text-gray-800">当前层工具与参数</h2></div>
+          <p className="mt-0.5 text-[10px] text-gray-500">随右侧选中层同步 · 不创建第二份状态</p>
         </div>
         <button type="button" aria-label="关闭资源" onClick={onClose} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={16} /></button>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        {selectedStep?.kind === 'flat_design' && resourceMode === 'vector' && <FlatVectorPanelV7 variant="resources" />}
-        {selectedStep?.kind === 'flat_design' && resourceMode !== 'vector' && <FlatContentResourcesV7 mode={resourceMode} />}
+        {selectedStep?.kind === 'flat_design' && isFlatToolPanelModeV7(resourceMode) && <FlatVectorPanelV7 variant="resources" panelMode={resourceMode} />}
+        {selectedStep?.kind === 'flat_design' && (resourceMode === 'text' || resourceMode === 'assets') && <FlatContentResourcesV7 mode={resourceMode} />}
 
         {selectedStep?.kind === 'background' && <div className="space-y-3">
+          <BackgroundPanelV7 />
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">基础色板</p>
-            <p className="mt-1 text-[10px] leading-4 text-gray-500">单色与透色可直接取用；渐变、猫眼和闪粉参数在右侧属性中编辑。</p>
+            <p className="mt-1 text-[10px] leading-4 text-gray-500">单色与透色可直接取用；渐变、猫眼和闪粉参数均在本面板编辑。</p>
           </div>
           <div className="grid grid-cols-4 gap-2" role="group" aria-label="背景资源色板">
             {PALETTE.map((item) => <button key={item.id} type="button" disabled={!canSetBackgroundColor} title={canSetBackgroundColor ? `${item.name} ${item.hex}` : '当前背景模式请在属性中编辑颜色'} aria-label={`应用背景资源 ${item.name}`} onClick={() => applyBackgroundColor(item.hex)} className={cx('aspect-square min-h-11 rounded-xl border border-gray-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-45')} style={{ backgroundColor: item.hex }} />)}
@@ -85,7 +91,9 @@ export function EditorResourceDrawerV7({ onClose }: { onClose(): void }) {
           </div>
         </div>}
 
-        {selectedStep && selectedStep.kind !== 'background' && selectedStep.kind !== 'flat_design' && <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-xs leading-5 text-gray-500">当前工艺步骤的素材与预设尚未开放。步骤数据会继续保留，可在右侧属性查看 fidelity 与 fallback。</div>}
+        {selectedStep?.kind === 'surface_effect' && <SurfaceEffectPanelV7 />}
+        {selectedStep?.kind === 'dimensional_decoration' && <DimensionalDecorationPanelV7 />}
+        {selectedStep?.kind === 'surface_finish' && <FinishCompositePanelV7 />}
       </div>
     </section>
   );

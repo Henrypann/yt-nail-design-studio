@@ -38,7 +38,7 @@ export function EditorWorkspaceSidebarV7({
 
   if (!compact) {
     return (
-      <aside className="grid h-full min-h-0 w-[340px] shrink-0 grid-rows-[minmax(220px,0.9fr)_minmax(280px,1.1fr)] border-l border-gray-200 bg-white" data-testid="v7-workspace-sidebar" data-overlay-open="false">
+      <aside className="grid h-full min-h-0 w-[380px] shrink-0 grid-rows-[minmax(300px,1.25fr)_minmax(190px,0.75fr)] border-l border-gray-200 bg-white" data-testid="v7-workspace-sidebar" data-overlay-open="false">
         <div className="flex min-h-0 border-b border-gray-200"><LayerPanelV7 mode="tree" /></div>
         <div className="flex min-h-0"><LayerPanelV7 mode="inspector" /></div>
       </aside>

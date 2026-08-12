@@ -98,12 +98,13 @@ import {
 import { repairEditorWorkspaceSelectionV7, resolveSelectionContinuityV7 } from './v7/workspace-ia';
 import { addMissingEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalStepKindV7 } from './v7/workspace-step-factory';
 import { isExactEditorGeometryV7 } from './v7/geometry-registry';
+import type { EditorResourceModeV7 } from './v7/flat-tool-panel-map';
 import { EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS } from './v7/migration-resolvers';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
-/** Explicit local UI mode for the resource drawer; never part of EditorDocV7. */
-export type EditorResourceModeV7 = 'vector' | 'text' | 'assets';
+/** Explicit local UI mode for the contextual tool drawer; never part of EditorDocV7. */
+export type { EditorResourceModeV7 } from './v7/flat-tool-panel-map';
 export type EditorV7ActionResult =
   | { ok: true }
   | { ok: false; reason: string; message: string };
@@ -355,7 +356,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       selectedElementId: null,
       previewFinishType: null,
       activeFlatTool: 'select' as FlatVectorToolV7,
-      resourceMode: 'vector' as EditorResourceModeV7,
+      resourceMode: 'select' as EditorResourceModeV7,
       activeFlatColor: { colorSpace: 'srgb' as const, r: 173, g: 34, b: 79, a: 1 },
       activeFlatWidthMm: 0.45,
       history: [],
@@ -621,7 +622,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
         mode: 'sync-linked',
       }, idFactory)),
       detachFingerScope: () => commitCommand((doc) => detachEditorV7NailScope(doc, currentScope())),
-      selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select' }),
+      selectStep: (stepId) => set({ selectedStepId: stepId, selectedElementId: null, activeFlatTool: 'select', resourceMode: 'select' }),
       selectElement: (elementId) => set({ selectedElementId: elementId }),
       setPreviewFinishType: (finishType) => {
         if (get().switching) return;
@@ -629,7 +630,7 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       },
       setActiveFlatTool: (tool) => set({ activeFlatTool: tool }),
       setResourceMode: (mode) => {
-        if (mode === 'vector' || mode === 'text' || mode === 'assets') set({ resourceMode: mode });
+        if (['select', 'brush', 'eraser', 'line', 'shape', 'french', 'text', 'assets'].includes(mode)) set({ resourceMode: mode });
       },
       setActiveFlatColor: (color) => set({ activeFlatColor: clone(color) }),
       setActiveFlatWidthMm: (widthMm) => {

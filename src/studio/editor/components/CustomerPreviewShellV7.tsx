@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Eye, Grid3X3, Info, RotateCcw, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { Button, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
-import { FINGER_CODES, type FingerCode } from '@/lib/types';
+import type { FingerCode } from '@/lib/types';
 import type { EditorDocV7, RgbaColorV7, SurfaceFinishTypeV7 } from '../v7/model';
 import {
   createCustomerPreviewScenarioV7,
@@ -13,6 +13,7 @@ import {
 } from '../v7/customer-preview';
 import { clearCustomerPreviewSessionV7 } from '../v7/customer-preview-session';
 import { CustomerNailPreviewV7 } from './CustomerNailPreviewV7';
+import { EDITOR_FINGER_ROWS_V7, fingerDisplayNameV7 } from '../v7/finger-identity';
 
 const COLOR_SCENARIOS: Array<{ id: string; name: string; color: RgbaColorV7 }> = [
   { id: 'rose', name: '柔雾玫瑰', color: { colorSpace: 'srgb', r: 210, g: 112, b: 142, a: 1 } },
@@ -153,11 +154,25 @@ export function CustomerPreviewShellV7({
           {mode === 'set' ? (
             <div className="mx-auto flex min-h-full max-w-7xl flex-col justify-center gap-4">
               <div className="text-center"><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Customer set preview</p><h1 className="mt-1 text-xl font-semibold text-gray-900">十指整体方案</h1><p className="mt-1 text-xs text-gray-500">点击任意指甲查看细节；可在结构化 2D 与模拟组合之间比较。</p></div>
-              <div className="grid grid-cols-5 gap-2 rounded-[28px] border border-white bg-white/60 p-3 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:gap-3 sm:p-5 lg:grid-cols-10">
-                {FINGER_CODES.map((finger) => {
-                  const model = readModels.find((item) => item.finger === finger) ?? readModels[0];
-                  return <button key={finger} type="button" aria-label={`聚焦 ${finger}`} aria-current={finger === selectedFinger ? 'true' : undefined} onClick={() => focusFinger(finger)} className="min-w-0 rounded-2xl p-1.5 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><CustomerNailPreviewV7 nail={doc.nails[finger]} readModel={model} selected={finger === selectedFinger} presentation={presentation} /></button>;
-                })}
+              <div className="space-y-3 rounded-[28px] border border-white bg-white/60 p-3 shadow-[0_24px_70px_rgba(77,53,67,0.08)] sm:p-5" data-testid="customer-ten-finger-map" data-layout="two-hands-five-by-two">
+                {EDITOR_FINGER_ROWS_V7.map((row) => (
+                  <section key={row.id} className="grid min-w-0 grid-cols-[42px_minmax(0,1fr)] items-center gap-2 sm:grid-cols-[54px_minmax(0,1fr)] sm:gap-3" data-testid={`customer-hand-row-${row.id}`} aria-label={`${row.label}五指`}>
+                    <div className="text-center"><p className="text-[10px] font-semibold text-gray-700 sm:text-xs">{row.label}</p><p className="mt-0.5 text-[8px] text-gray-400">拇指→小指</p></div>
+                    <div className="grid min-w-0 grid-cols-5 items-end gap-1 sm:gap-2">
+                      {row.fingers.map((identity) => {
+                        const finger = identity.finger;
+                        const model = readModels.find((item) => item.finger === finger) ?? readModels[0];
+                        return (
+                          <button key={finger} type="button" aria-label={`聚焦${fingerDisplayNameV7(finger)} ${finger}`} aria-current={finger === selectedFinger ? 'true' : undefined} onClick={() => focusFinger(finger)} className="flex min-h-11 min-w-0 items-end justify-center rounded-2xl px-0.5 py-1.5 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" data-finger={finger} data-finger-name={identity.name}>
+                            <div className="w-full" style={{ width: `${identity.previewWidth * 100}%` }}>
+                              <CustomerNailPreviewV7 nail={doc.nails[finger]} readModel={model} selected={finger === selectedFinger} presentation={presentation} visualProportion={{ width: identity.previewWidth, height: identity.previewHeight }} />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
               </div>
               <div className="mx-auto flex max-w-2xl items-start gap-2 rounded-xl border border-info/20 bg-info-soft px-3 py-2 text-[10px] leading-4 text-info"><Info size={13} className="mt-0.5 shrink-0" /><p>{presentation === '2d' ? '2D 视图展示结构化设计内容。' : '模拟 3D 以 SVG 2.5D 合成表面效果、立体装饰和封层。'} 两者均不证明真实材料、固化、可制造性或设备生产输出。</p></div>
             </div>
@@ -165,7 +180,7 @@ export function CustomerPreviewShellV7({
             <div className="mx-auto grid min-h-full max-w-5xl items-center gap-5 lg:grid-cols-[minmax(280px,0.9fr)_minmax(300px,1.1fr)]">
               <CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation={presentation} />
               <div className="rounded-[24px] border border-white bg-white/75 p-4 shadow-[0_18px_55px_rgba(77,53,67,0.08)] sm:p-5" aria-live="polite" aria-atomic="true">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">{selectedFinger} · Read-only detail</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">{fingerDisplayNameV7(selectedFinger)} · {selectedFinger} · Read-only detail</p>
                 <h1 className="mt-1 text-xl font-semibold text-gray-900">顾客沟通视图</h1>
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-[11px]"><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.backgroundMode}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">封层比较</dt><dd className="mt-1 font-semibold text-gray-800">{FINISH_LABEL[selectedModel.finishType]}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">平面 / 效果 / 立体</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.flatElementCount} / {selectedModel.activeSurfaceEffectCount} / {selectedModel.activeDecorationCount}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">预览等级</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.fidelity}</dd></div></dl>
                 <p className={cx('mt-3 rounded-xl border px-3 py-2 text-[10px] leading-4', confirmationReady ? 'border-success/20 bg-success-soft text-success' : 'border-warning/20 bg-warning-soft text-warning')}>{confirmationReady ? '预览证据已就绪；STUDIO-04 可接管不可变 Approval / Snapshot。' : scenarioCount > 0 ? '当前含临时比较；重置后才能进入正式确认。' : '存在 unavailable 预览内容；修复或明确接受降级后，再由 STUDIO-04 接管确认。'}</p>

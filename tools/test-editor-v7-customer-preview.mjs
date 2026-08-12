@@ -17,9 +17,41 @@ import {
   clearCustomerPreviewSessionV7,
   readCustomerPreviewSessionV7,
 } from '../src/studio/editor/v7/customer-preview-session.ts';
+import {
+  deriveFingerContentStateV7,
+  EDITOR_FINGER_IDENTITY_V7,
+  EDITOR_FINGER_ROWS_V7,
+  fingerDisplayNameV7,
+} from '../src/studio/editor/v7/finger-identity.ts';
 
 const clone = (value) => structuredClone(value);
 const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
+
+// The UI identity model keeps canonical codes while adding two-hand spatial grouping,
+// natural proportions and a content-presence signal derived from canonical steps.
+{
+  const doc = createMinimalEditorDocV7Fixture();
+  assert.deepEqual(EDITOR_FINGER_ROWS_V7.map((row) => row.fingers.map((item) => item.finger)), [
+    ['L1', 'L2', 'L3', 'L4', 'L5'],
+    ['R1', 'R2', 'R3', 'R4', 'R5'],
+  ]);
+  assert.equal(fingerDisplayNameV7('R4'), '右手无名指');
+  assert.ok(EDITOR_FINGER_IDENTITY_V7.L1.previewWidth > EDITOR_FINGER_IDENTITY_V7.L5.previewWidth);
+  assert.ok(EDITOR_FINGER_IDENTITY_V7.L3.previewHeight > EDITOR_FINGER_IDENTITY_V7.L1.previewHeight);
+  assert.equal(deriveFingerContentStateV7(doc.nails.R4), 'blank');
+  const middle = structuredClone(doc.nails.R4.steps[0]);
+  middle.id = 'step.test.flat';
+  middle.kind = 'flat_design';
+  middle.typeId = 'studio.step.flat-design.v1';
+  middle.name = '测试平面';
+  middle.elements = [];
+  delete middle.background;
+  doc.nails.R4.steps.splice(-1, 0, middle);
+  assert.equal(deriveFingerContentStateV7(doc.nails.R4), 'designed');
+  middle.visible = false;
+  assert.equal(deriveFingerContentStateV7(doc.nails.R4), 'inactive');
+  console.log('[v7-customer-preview] finger spatial identity and content state: PASS');
+}
 
 // Scenario updates are immutable, in-memory-only and never mutate EditorDocV7.
 {

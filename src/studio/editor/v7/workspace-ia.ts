@@ -187,11 +187,14 @@ export type EditorWorkspaceToolIdV7 =
   | 'background'
   | 'brush'
   | 'eraser'
+  | 'line'
+  | 'french'
   | 'shape'
   | 'text'
   | 'assets'
   | 'effects'
-  | 'decorations';
+  | 'decorations'
+  | 'finish';
 
 export interface EditorWorkspaceToolAvailabilityV7 {
   id: EditorWorkspaceToolIdV7;
@@ -223,11 +226,14 @@ const TOOL_STEP_KIND: Record<EditorWorkspaceToolIdV7, ProcessStepV7['kind']> = {
   background: 'background',
   brush: 'flat_design',
   eraser: 'flat_design',
+  line: 'flat_design',
+  french: 'flat_design',
   shape: 'flat_design',
   text: 'flat_design',
   assets: 'flat_design',
   effects: 'surface_effect',
   decorations: 'dimensional_decoration',
+  finish: 'surface_finish',
 };
 
 const MISSING_STEP_REASON: Partial<Record<ProcessStepV7['kind'], string>> = {

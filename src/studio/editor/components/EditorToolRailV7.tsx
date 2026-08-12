@@ -4,13 +4,16 @@ import {
   Image,
   Layers3,
   LibraryBig,
+  Minus,
   MousePointer2,
   Paintbrush,
   PaintBucket,
   Shapes,
   SlidersHorizontal,
   Sparkles,
+  ShieldCheck,
   Type,
+  Waves,
 } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
 import { cx } from '@/design-system';
@@ -27,11 +30,14 @@ const TOOL_META: Record<EditorWorkspaceToolIdV7, { label: string; icon: typeof M
   background: { label: '背景', icon: PaintBucket },
   brush: { label: '画笔', icon: Paintbrush, flatTool: 'brush' },
   eraser: { label: '橡皮', icon: Eraser, flatTool: 'eraser' },
+  line: { label: '线条', icon: Minus, flatTool: 'line' },
+  french: { label: '法式', icon: Waves, flatTool: 'french' },
   shape: { label: '图形', icon: Shapes, flatTool: 'rectangle' },
   text: { label: '文字', icon: Type },
   assets: { label: '素材', icon: Image },
   effects: { label: '效果', icon: Sparkles },
   decorations: { label: '立体', icon: Gem },
+  finish: { label: '封层', icon: ShieldCheck },
 };
 
 function toolButtonClass(active: boolean, horizontal: boolean): string {
@@ -59,7 +65,6 @@ export function EditorToolRailV7({
 }) {
   const nail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
-  const activeFlatTool = useEditorV7Store((state) => state.activeFlatTool);
   const resourceMode = useEditorV7Store((state) => state.resourceMode);
   const readOnly = useEditorV7Store((state) => state.readOnly);
   const switching = useEditorV7Store((state) => state.switching);
@@ -71,6 +76,9 @@ export function EditorToolRailV7({
     readOnly,
     switching,
   });
+  const contextualAvailability = selectedStep
+    ? availability.filter((tool) => tool.requiredStepKind === selectedStep.kind && (tool.id !== 'select' || selectedStep.kind === 'flat_design'))
+    : availability;
   const moveToolFocus = (event: KeyboardEvent<HTMLButtonElement>) => {
     const previousKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
     const nextKey = horizontal ? 'ArrowRight' : 'ArrowDown';
@@ -99,21 +107,23 @@ export function EditorToolRailV7({
         horizontal ? 'flex items-center gap-1 overflow-x-auto border-t px-2 py-1.5' : 'flex w-16 shrink-0 flex-col items-center gap-1 overflow-y-auto border-r px-2 py-2',
       )}
     >
-      {availability.map((tool) => {
+      {contextualAvailability.map((tool) => {
         const meta = TOOL_META[tool.id];
         const Icon = meta.icon;
         const reasonId = `v7-tool-reason-${orientation}-${tool.id}`;
         const active = tool.id === 'select'
-          ? selectedStep?.kind === 'flat_design' && activeFlatTool === 'select'
+          ? selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === 'select'
           : tool.id === 'background'
           ? selectedStep?.kind === 'background'
           : tool.id === 'effects'
             ? selectedStep?.kind === 'surface_effect'
             : tool.id === 'decorations'
               ? selectedStep?.kind === 'dimensional_decoration'
+              : tool.id === 'finish'
+                ? selectedStep?.kind === 'surface_finish' && resourcesOpen
           : tool.id === 'text' || tool.id === 'assets'
             ? selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id
-          : meta.flatTool !== undefined && selectedStep?.kind === 'flat_design' && activeFlatTool === meta.flatTool;
+          : meta.flatTool !== undefined && selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id;
         return (
           <button
             key={tool.id}
@@ -143,9 +153,9 @@ export function EditorToolRailV7({
       })}
 
       <span className={cx('bg-gray-200', horizontal ? 'mx-1 h-7 w-px shrink-0' : 'my-1 h-px w-9')} aria-hidden="true" />
-      <button type="button" aria-label="资源" aria-pressed={resourcesOpen} onClick={onToggleResources} onKeyDown={moveToolFocus} className={toolButtonClass(resourcesOpen, horizontal)} title="打开资源与预设">
+      <button type="button" aria-label="当前层工具与参数" aria-pressed={resourcesOpen} onClick={onToggleResources} onKeyDown={moveToolFocus} className={toolButtonClass(resourcesOpen, horizontal)} title="打开当前层工具与参数">
         <LibraryBig size={16} />
-        {!horizontal && <span className="text-[9px] font-medium">资源</span>}
+        {!horizontal && <span className="text-[9px] font-medium">参数</span>}
       </button>
       <button type="button" aria-label="层级" onClick={() => onOpenPanel('layers')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title="打开层级">
         <Layers3 size={16} />

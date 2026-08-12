@@ -24,6 +24,7 @@ import {
   type FlatVectorToolV7,
 } from '../v7/flat-vector';
 import { parseHexColorV7, rgbaToHexV7 } from '../v7/background';
+import { FLAT_TOOL_PANEL_MAP_V7, type FlatToolPanelModeV7 } from '../v7/flat-tool-panel-map';
 
 const TOOL_ITEMS: Array<{ tool: FlatVectorToolV7; label: string; icon: typeof MousePointer2 }> = [
   { tool: 'select', label: '选择/移动', icon: MousePointer2 },
@@ -40,7 +41,7 @@ const TOOL_ITEMS: Array<{ tool: FlatVectorToolV7; label: string; icon: typeof Mo
 
 export type FlatVectorPanelVariantV7 = 'full' | 'resources' | 'inspector';
 
-export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPanelVariantV7 }) {
+export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: FlatVectorPanelVariantV7; panelMode?: FlatToolPanelModeV7 }) {
   const toast = useToast();
   const step = useEditorV7Store(selectCurrentStepV7);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
@@ -91,6 +92,11 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
   const showResources = variant === 'full' || variant === 'resources';
   const showElementList = variant === 'full';
   const showInspector = variant === 'full' || variant === 'inspector';
+  const contextualPanel = panelMode ? FLAT_TOOL_PANEL_MAP_V7[panelMode] : null;
+  const visibleToolItems = contextualPanel
+    ? TOOL_ITEMS.filter((item) => contextualPanel.tools.includes(item.tool as never))
+    : TOOL_ITEMS;
+  const showDrawingStyle = showResources && (contextualPanel?.showDrawingStyle ?? true);
 
   const resultToast = (result: { ok: true } | { ok: false; message: string }) => {
     if (!result.ok) toast.error(result.message);
@@ -150,13 +156,13 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
 
   return (
     <div className="mt-2 space-y-3 rounded-xl border border-violet-200 bg-violet-50/55 p-3" data-testid="v7-flat-vector-panel">
-      {variant === 'full' && <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-700">平面矢量工具</p>
-        <p className="mt-1 text-[10px] leading-4 text-gray-500">仅修改 {currentFinger} · 画布坐标固定为 nail-local 0–1。</p>
+      {(variant === 'full' || contextualPanel) && <div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-700">{contextualPanel?.label ?? '平面矢量工具'}</p>
+        <p className="mt-1 text-[10px] leading-4 text-gray-500">{contextualPanel?.description ?? `仅修改 ${currentFinger} · 画布坐标固定为 nail-local 0–1。`}</p>
       </div>}
 
       {showResources && <div className="grid grid-cols-2 gap-1.5" role="toolbar" aria-label="平面设计工具">
-        {TOOL_ITEMS.map(({ tool, label, icon: Icon }) => (
+        {visibleToolItems.map(({ tool, label, icon: Icon }) => (
           <button
             key={tool}
             type="button"
@@ -174,7 +180,7 @@ export function FlatVectorPanelV7({ variant = 'full' }: { variant?: FlatVectorPa
         ))}
       </div>}
 
-      {showResources && <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
+      {showDrawingStyle && <fieldset disabled={!canEdit} className="space-y-2 disabled:opacity-45">
         <legend className="text-[10px] font-semibold text-gray-600">绘制样式</legend>
         <div className="grid grid-cols-5 gap-1.5">
           {PALETTE.slice(0, 5).map((item) => (
