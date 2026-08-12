@@ -20,6 +20,9 @@ export interface StudioUseAvailabilityV1 {
 export function resolveStudioUseAvailabilityV1(
   look: PublishedLookReadModelV1,
 ): StudioUseAvailabilityV1 {
+  if (look.applicationLevel === 'INSPIRATION_ONLY') {
+    return { enabled: false, state: 'INSPIRATION_ONLY' };
+  }
   if (look.readModelKind === 'CANONICAL') {
     const ready = look.sourceLook.status === 'PUBLISHED'
       && look.sourceLook.visibility === 'PUBLIC'
@@ -29,10 +32,6 @@ export function resolveStudioUseAvailabilityV1(
     return ready
       ? { enabled: true, state: 'VERSIONED_READY' }
       : { enabled: false, state: 'VERSION_UNAVAILABLE' };
-  }
-
-  if (look.applicationLevel === 'INSPIRATION_ONLY') {
-    return { enabled: false, state: 'INSPIRATION_ONLY' };
   }
 
   const asset = look.assetRef;

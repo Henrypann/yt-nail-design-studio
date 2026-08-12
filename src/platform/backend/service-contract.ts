@@ -7,6 +7,7 @@
  */
 export const SERVICE_ERROR_CODES_V1 = [
   'INVALID', 'UNAUTHENTICATED', 'FORBIDDEN', 'NOT_FOUND', 'CONFLICT',
+  'IDEMPOTENCY_CONFLICT',
   'PRECONDITION_FAILED', 'EXPIRED', 'REVOKED', 'STALE',
   'INTEGRITY_MISMATCH', 'PAYLOAD_TOO_LARGE', 'QUOTA_EXCEEDED',
   'DATA_CORRUPTED', 'UNAVAILABLE', 'RATE_LIMITED', 'INTERNAL',
@@ -62,7 +63,11 @@ export function isServiceIdV1(value: unknown): value is string {
 }
 
 export function isServiceTimestampV1(value: unknown): value is string {
-  return typeof value === 'string' && ISO.test(value);
+  if (typeof value !== 'string' || !ISO.test(value)) return false;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return false;
+  const canonical = new Date(parsed).toISOString();
+  return value.includes('.') ? value === canonical : value === canonical.replace('.000Z', 'Z');
 }
 
 export function parseServiceCommandContextV1(value: unknown): ServiceCommandContextV1 | null {

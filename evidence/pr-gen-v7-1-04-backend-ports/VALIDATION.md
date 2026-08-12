@@ -13,10 +13,12 @@
 - Repository reads return `{value, etag}`. Replacements require `expectedEtag` and idempotency; authoritative value plus ledger are committed in one local-storage envelope. Corrupted stores fail closed.
 - Asset upload accepts real bytes and verifies length, SHA-256, MIME signature, dimensions and metadata before `READY`. Public callers cannot mark an asset available. Publish preview purposes remain image-only; STL/GLB are excluded.
 - `PublishPackageResultV1` retains all 11 nonserialized byte artifacts. A package authority record is written only after all 11 assets are `READY`.
+- Package authority freezes the registering actor as `ownerRef`; draft/share/preview/approval paths bind package and artifact ownership to that actor and reject cross-creator access. This is not proof that the actor owns the source DesignRelease.
 - DesignRelease now resolves bundled/backend asset references before writing. The private record freezes source revision → numeric canonical reference mappings; later parse, package generation and round-trip validation use that saved mapping and never call a mutable resolver. Unknown `flat-assets-v1` aliases are writer-zero.
 - Creator draft/review/publish/hide/share, Governance operations and Client Share approval now use async application services. Exact package/design-version authority is reused; the share path does not regenerate a demo package.
-- A PUBLIC creator Look enters Explore only with an authoritative package. Use/Remix fails closed before any intent, EditorDoc or event write when the corresponding immutable release is absent.
-- Versioned-use target/event persistence is an async, permission-guarded `VersionedUsePersistencePortV1`. Only the same-origin trusted-click intent handoff stays synchronous so `_blank` is not popup-blocked; it is explicitly `LOCAL_PROTOTYPE` and is not a remote backend claim.
+- A PUBLIC creator Look enters Explore only with an authoritative package, but is honestly projected as `INSPIRATION_ONLY` until a real DesignRelease materialization path exists. Use/Remix is disabled and writer-zero.
+- Versioned-use target/event persistence is an async, permission-guarded `VersionedUsePersistencePortV1`. Target → event → intent-clear is ordered; retries use the intent timestamp and compare the complete document. Only the same-origin trusted-click intent handoff stays synchronous so `_blank` is not popup-blocked; it is explicitly `LOCAL_PROTOTYPE` and is not a remote backend claim.
+- Legacy numeric-only DesignRelease records without `assetReferenceMappings` remain readable and rebuild the same package; nonnumeric aliases still require frozen mappings.
 
 ## Automated gates
 
@@ -55,3 +57,5 @@
 ## Explicit remaining boundary
 
 Nail Boards are not part of this cutover. `CommunityBoardsPage`, `CommunityBoardPage`, `CommunityBoardSharePage` and `NailBoardSaveDialog` still consume `createBrowserBoardRepository()` directly. They are listed in `HANDOFF.md` as a separate follow-up; this delivery does not claim that every Community UI has moved to backend-neutral services.
+
+Application services currently generate their own command contexts. Repository and asset adapters can replay an identical supplied key, and UI action locks prevent duplicate clicks, but a caller cannot yet supply a stable command identity across a lost-response transport retry. This delivery therefore does not claim end-to-end exactly-once semantics.

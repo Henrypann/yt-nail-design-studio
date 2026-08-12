@@ -116,6 +116,12 @@ for (const forbidden of ['editorDocSnapshot', 'customerRef', 'nails', 'recipeIns
   assert.equal(JSON.stringify(exact.package).includes(`\"${forbidden}\"`), false, `package must not expose ${forbidden}`);
 }
 
+const legacyNumericRecord = structuredClone(record);
+delete legacyNumericRecord.assetReferenceMappings;
+const legacyNumeric = await buildPublishPackageV1(legacyNumericRecord, baseDeps);
+assert.equal(legacyNumeric.ok, true, 'legacy numeric-only release records remain readable without stored alias mappings');
+if (legacyNumeric.ok) assert.deepEqual(legacyNumeric.package, exact.package, 'legacy numeric record rebuilds the same package');
+
 const repeat = await buildPublishPackageV1(record, baseDeps);
 assert.equal(repeat.ok, true);
 if (repeat.ok) assert.deepEqual(repeat.package, exact.package, 'same source and dependencies are deterministic');

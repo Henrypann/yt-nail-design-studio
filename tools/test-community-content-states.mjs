@@ -40,6 +40,13 @@ assert.deepEqual(resolveStudioUseAvailabilityV1(CANONICAL_USE_DEMO_READ_MODEL_V1
   enabled: true,
   state: 'VERSIONED_READY',
 });
+const canonicalInspiration = structuredClone(CANONICAL_USE_DEMO_READ_MODEL_V1);
+canonicalInspiration.applicationLevel = 'INSPIRATION_ONLY';
+canonicalInspiration.sourceContent.applicationLevel = 'INSPIRATION_ONLY';
+assert.deepEqual(resolveStudioUseAvailabilityV1(canonicalInspiration), {
+  enabled: false,
+  state: 'INSPIRATION_ONLY',
+});
 
 const approximateReady = structuredClone(adapt('cc_pearl_tide'));
 approximateReady.assetRef = structuredClone(adapt('cc_mercury_dew').assetRef);

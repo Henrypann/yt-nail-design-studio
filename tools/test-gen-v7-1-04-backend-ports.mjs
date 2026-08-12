@@ -20,7 +20,7 @@ import {
   BACKEND_PERMISSIONS_V1,
 } from '../src/platform/backend/index.ts';
 import { StorageKeys, writeEnvelope } from '../src/lib/storage.ts';
-import { createEmptyCreatorPublicationStoreV1 } from '../src/community/domain/v7_1/creator-publication.ts';
+import { createCreatorPublicationDraftV1, createEmptyCreatorPublicationStoreV1 } from '../src/community/domain/v7_1/creator-publication.ts';
 import { emptyGovernanceStoreV1 } from '../src/community/domain/v7_1/governance.ts';
 import { emptyClientApprovalStoreV1 } from '../src/studio/approval/client-approval.ts';
 import {
@@ -54,6 +54,16 @@ const denied = await createLocalPrototypeIdentityAccessPortV1({ actorRef: 'viewe
 assert.equal(denied.error.code, 'FORBIDDEN');
 assert.ok(parseServiceErrorV1(denied.error));
 assert.equal(parseServiceErrorV1({ ...denied.error, secret: 'x' }), null);
+for (const brokenIdentity of [
+  createLocalPrototypeIdentityAccessPortV1({ actorRef: 'broken.clock', permissions: ['publication.read'], now: () => 'not-a-time' }),
+  createLocalPrototypeIdentityAccessPortV1({ actorRef: 'broken.calendar', permissions: ['publication.read'], now: () => '2026-99-99T00:00:00.000Z' }),
+  createLocalPrototypeIdentityAccessPortV1({ actorRef: 'broken.normalized-calendar', permissions: ['publication.read'], now: () => '2026-02-30T00:00:00.000Z' }),
+  createLocalPrototypeIdentityAccessPortV1({ actorRef: 'broken.id', permissions: ['publication.read'], nextId: () => 'bad id with spaces' }),
+  createLocalPrototypeIdentityAccessPortV1({ actorRef: 'broken.throw', permissions: ['publication.read'], now: () => { throw new Error('clock'); } }),
+]) {
+  const broken = await brokenIdentity.issueContext({ operation: 'publication.read' });
+  assert.equal(broken.ok, false); assert.equal(broken.error.code, 'UNAVAILABLE');
+}
 
 // One storage value atomically commits document + idempotency ledger.
 let authorityRaw = null; let legacyRaw = null; let atomicWrites = 0;
@@ -104,8 +114,21 @@ const assetInput = {
 const uploaded = await assets.upload(assetContext.value, assetInput); assert.equal(uploaded.ok, true); assert.equal(uploaded.value.status, 'READY');
 assert.ok(parseAssetUploadRecordV1(uploaded.value)); assert.equal('bytes' in uploaded.value, false);
 const uploadReplay = await assets.upload(assetContext.value, assetInput); assert.equal(uploadReplay.ok, true); assert.equal(uploadReplay.changed, false);
-const badHash = await assets.upload(assetContext.value, { ...assetInput, uploadId: 'upload.asset.bad', assetId: 'asset.test.bad', sha256: '0'.repeat(64) });
+const sameKeyDifferentCommand = await assets.upload(assetContext.value, { ...assetInput, uploadId: 'upload.asset.other', assetId: 'asset.test.other' });
+assert.equal(sameKeyDifferentCommand.error.code, 'IDEMPOTENCY_CONFLICT');
+assert.equal(assetMetadata.records.length, 1, 'context-key collision is writer-zero');
+const governanceReplayContext = await identity.issueContext({ operation: 'asset.write', idempotencyKey: 'idem.asset.governance-drift' });
+const governanceDrift = await assets.upload(governanceReplayContext.value, {
+  ...assetInput, source: { sourceType: 'AI_ASSISTED' }, copyrightDeclared: false,
+});
+assert.equal(governanceDrift.error.code, 'IDEMPOTENCY_CONFLICT');
+assert.equal(assetMetadata.records.length, 1, 'upload-id governance drift is writer-zero');
+const failedAssetContext = await identity.issueContext({ operation: 'asset.write', idempotencyKey: 'idem.asset.failed' });
+const badHash = await assets.upload(failedAssetContext.value, { ...assetInput, uploadId: 'upload.asset.bad', assetId: 'asset.test.bad', sha256: '0'.repeat(64) });
 assert.equal(badHash.error.code, 'INTEGRITY_MISMATCH');
+assert.equal(assetMetadata.idempotency['idem.asset.failed'], undefined, 'failed validation writes no idempotency result');
+const validRetry = await assets.upload(failedAssetContext.value, { ...assetInput, uploadId: 'upload.asset.retry', assetId: 'asset.test.retry' });
+assert.equal(validRetry.ok, true, 'same key may retry after writer-zero validation failure');
 
 // Runtime PublishPackage result retains all 11 exact bytes out of the serialized package.
 const renderer = { rendererId: 'test.real-png', render: () => ({ ok: true, output: { bytes: png, mimeType: 'image/png', width: 1, height: 1, colorSpace: 'srgb', fidelity: 'EXACT' } }) };
@@ -142,6 +165,46 @@ const registered = await registerPublishPackageArtifactsV1({
   copyrightDeclared: true, source: { sourceType: 'ORIGINAL' },
 });
 assert.equal(registered.ok, true); assert.equal(registered.value.assets.length, 11); assert.equal(registered.value.status, 'READY');
+assert.equal(registered.value.ownerRef, 'profile.local-demo.creator');
+const registeredReplay = await registerPublishPackageArtifactsV1({
+  result: packageResult, identity, assets: packageAssets, authority,
+  editorDocSha256: CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.editorDocRef.sha256,
+  copyrightDeclared: true, source: { sourceType: 'ORIGINAL' },
+});
+assert.equal(registeredReplay.ok, true); assert.equal(registeredReplay.changed, false);
+const beforeAuthorityConflict = structuredClone(packageAuthorityRaw);
+const beforeAssetConflict = structuredClone(packageAssetMetadata);
+const authorityConflict = await registerPublishPackageArtifactsV1({
+  result: packageResult, identity, assets: packageAssets, authority,
+  editorDocSha256: 'f'.repeat(64), copyrightDeclared: true, source: { sourceType: 'ORIGINAL' },
+});
+assert.equal(authorityConflict.error.code, 'IDEMPOTENCY_CONFLICT');
+assert.deepEqual(packageAuthorityRaw, beforeAuthorityConflict); assert.deepEqual(packageAssetMetadata, beforeAssetConflict);
+let rotatingContextCalls = 0;
+const rotatingIdentity = {
+  adapterKind: 'REMOTE',
+  async issueContext(request) {
+    rotatingContextCalls += 1;
+    return (rotatingContextCalls === 1 ? identity : createLocalPrototypeIdentityAccessPortV1({
+      actorRef: 'profile.rotated.creator', permissions: Object.values(BACKEND_PERMISSIONS_V1), now: () => now,
+    })).issueContext(request);
+  },
+};
+let rotatingAuthorityRaw = null; let rotatingAssetMetadata = null;
+const rotatingRegistration = await registerPublishPackageArtifactsV1({
+  result: packageResult, identity: rotatingIdentity,
+  assets: createLocalAssetUploadPortV1({
+    binary: createInMemoryAssetBinaryStorageV1(), sha256,
+    readMetadata: () => rotatingAssetMetadata, writeMetadata: (value) => { rotatingAssetMetadata = structuredClone(value); },
+  }),
+  authority: createLocalPublishPackageAuthorityPortV1({
+    storage: { read: () => rotatingAuthorityRaw, write: (value) => { rotatingAuthorityRaw = structuredClone(value); } },
+  }),
+  editorDocSha256: CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.editorDocRef.sha256,
+  copyrightDeclared: true, source: { sourceType: 'ORIGINAL' },
+});
+assert.equal(rotatingRegistration.error.reason, 'publish.identity_changed');
+assert.equal(rotatingAssetMetadata, null); assert.equal(rotatingAuthorityRaw, null);
 
 // Explicit bridge for the bundled non-numeric flat-assets-v1 revision.
 const resolver = createAssetReferenceResolverV1({
@@ -155,6 +218,18 @@ const resolver = createAssetReferenceResolverV1({
 const resolved = await resolver.resolve({ assetId: 'asset.flat-content.bundled.sticker.sparkle', revision: 'flat-assets-v1' });
 assert.equal(resolved.ok, true); assert.equal(resolved.value.revision, 1);
 assert.equal((await resolver.resolve({ assetId: 'asset.unknown', revision: 'flat-assets-v1' })).error.code, 'NOT_FOUND');
+const foreignResolver = createAssetReferenceResolverV1({
+  identity: createLocalPrototypeIdentityAccessPortV1({
+    actorRef: 'profile.foreign.resolver', permissions: ['asset.read'], now: () => now,
+  }),
+  assets: packageAssets,
+  aliases: [{
+    sourceAssetId: registered.value.assets[0].assetId, sourceRevision: 'alias-v1',
+    canonicalAssetId: registered.value.assets[0].assetId, canonicalRevision: 1,
+  }],
+});
+assert.equal((await foreignResolver.resolve({ assetId: registered.value.assets[0].assetId, revision: 'alias-v1' })).error.reason,
+  'asset.reference_owner_mismatch');
 
 // Versioned-use event persistence is async, permission-guarded and fail-closed.
 const versionedUse = createLocalVersionedUsePersistencePortV1();
@@ -187,6 +262,8 @@ function memoryPort(initial) {
   let value = structuredClone(initial);
   return {
     adapterKind: 'LOCAL_PROTOTYPE',
+    peek() { return structuredClone(value); },
+    set(next) { value = structuredClone(next); },
     async read() { return { ok: true, value: { value: structuredClone(value), etag: localEtagV1(value) }, changed: false }; },
     async replace(_context, next, expectedEtag) {
       if (expectedEtag !== localEtagV1(value)) return { ok: false, error: { schemaVersion: 1, code: 'CONFLICT', retryable: false, reason: 'repository.etag_mismatch' } };
@@ -204,8 +281,8 @@ const authorityMemory = {
   async read() { const value = { schemaVersion: 1, records: structuredClone(authorityRecords) }; return { ok: true, value: { value, etag: localEtagV1(value) }, changed: false }; },
   async replace() { throw new Error('not used'); },
 };
-let appId = 0;
-const appNextId = (scope) => `${scope}${++appId}`;
+let appId = 0; let domainIdCalls = 0; let applicationContextId = 0;
+const appNextId = (scope) => { domainIdCalls += 1; return `${scope}${++appId}`; };
 const app = createCreatorWorkspaceApplicationServiceV1({
   identity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
   authority: authorityMemory, assets: packageAssets, nextId: appNextId,
@@ -216,26 +293,157 @@ const draftId = workspace.value.draftId;
 workspace = await app.updateDraft(draftId, { title: 'Backend Authority Look', tags: ['authority'], visibility: 'UNLISTED', copyrightDeclared: true, sourceDeclared: true, step: 3 });
 assert.equal(workspace.ok, true);
 workspace = await app.submitReview(draftId); assert.equal(workspace.ok, true);
+const idsBeforeDuplicateReview = domainIdCalls;
+assert.equal((await app.submitReview(draftId)).ok, false); assert.equal(domainIdCalls, idsBeforeDuplicateReview,
+  'duplicate review preflight consumes no domain ids');
 const pendingReview = workspace.value.governance.publicationReviews[0];
-const operatorIdentity = createLocalPrototypeIdentityAccessPortV1({ actorRef: 'operator.1', permissions: ['governance.read', 'governance.write'], now: () => now, nextId: (prefix) => `${prefix}${++appId}` });
+const operatorIdentity = createLocalPrototypeIdentityAccessPortV1({ actorRef: 'operator.1', permissions: ['governance.read', 'governance.write'], now: () => now, nextId: (prefix) => `${prefix}${++applicationContextId}` });
 const governanceApp = createGovernanceApplicationServiceV1({ identity: operatorIdentity, governance: governanceMemory, nextId: appNextId });
 const cleared = await governanceApp.decidePublicationReview(pendingReview.reviewId, 'CLEARED'); assert.equal(cleared.ok, true);
+const idsBeforeDecidedReview = domainIdCalls;
+assert.equal((await governanceApp.decidePublicationReview(pendingReview.reviewId, 'REJECTED')).ok, false);
+assert.equal(domainIdCalls, idsBeforeDecidedReview, 'already-decided review consumes no audit id');
+const governanceBeforeInvalidTransition = governanceMemory.peek();
+governanceMemory.set({
+  ...governanceBeforeInvalidTransition,
+  cases: [{
+    schemaVersion: 1, caseId: 'case.invalid-transition', subjectType: 'PUBLISHED_LOOK', subjectId: 'look.pending',
+    status: 'REPORTED', reporterRef: 'profile.reporter', reasonCode: 'policy-report', objectVersion: 1,
+    createdAt: now, updatedAt: now,
+  }],
+});
+const idsBeforeInvalidTransition = domainIdCalls;
+assert.equal((await governanceApp.transitionCase('case.invalid-transition', 'HIDDEN')).ok, false);
+assert.equal(domainIdCalls, idsBeforeInvalidTransition, 'invalid governance transition consumes no audit id');
+governanceMemory.set(governanceBeforeInvalidTransition);
 workspace = await app.updateDraft(draftId, { visibility: 'PUBLIC' }); assert.equal(workspace.ok, true);
 workspace = await app.publishDraft(draftId); assert.equal(workspace.ok, true); assert.equal(workspace.value.publication.looks[0].visibility, 'PUBLIC');
+const otherIdentity = createLocalPrototypeIdentityAccessPortV1({
+  actorRef: 'profile.other.creator', permissions: Object.values(BACKEND_PERMISSIONS_V1), now: () => now,
+  nextId: (prefix) => `${prefix}other.${++applicationContextId}`,
+});
+const otherApp = createCreatorWorkspaceApplicationServiceV1({
+  identity: otherIdentity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
+  authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  token: { generate: () => 'raw-other-token', sha256: async (value) => createHash('sha256').update(value).digest('hex') },
+});
+const publicationBeforeCrossOwnerCreate = publicationMemory.peek();
+const crossOwnerCreate = await otherApp.createDraft(packageResult.package.designVersionId);
+assert.equal(crossOwnerCreate.error.code, 'FORBIDDEN'); assert.deepEqual(publicationMemory.peek(), publicationBeforeCrossOwnerCreate);
+const seededOtherDraft = createCreatorPublicationDraftV1({
+  store: publicationMemory.peek(), draftId: 'draft.other.seeded', creatorProfileId: 'profile.other.creator',
+  package: packageResult.package, now,
+});
+assert.equal(seededOtherDraft.ok, true);
+const seededPublication = seededOtherDraft.value;
+seededPublication.looks.push({ ...structuredClone(seededPublication.looks[0]), lookId: 'look.other.seeded', creatorProfileId: 'profile.other.creator' });
+publicationMemory.set(seededPublication);
+const ownerProjection = await app.load(); assert.equal(ownerProjection.ok, true);
+assert.equal(ownerProjection.value.publication.drafts.some((draft) => draft.creatorProfileId !== 'profile.local-demo.creator'), false);
+assert.equal(ownerProjection.value.publication.looks.some((look) => look.creatorProfileId !== 'profile.local-demo.creator'), false);
+const beforeOwnerAttacks = publicationMemory.peek();
+assert.equal((await app.updateDraft('draft.other.seeded', { title: 'hijack' })).error.code, 'FORBIDDEN');
+assert.equal((await app.submitReview('draft.other.seeded')).error.code, 'FORBIDDEN');
+assert.equal((await app.publishDraft('draft.other.seeded')).error.code, 'FORBIDDEN');
+assert.equal((await app.setLookHidden('look.other.seeded', true)).error.code, 'FORBIDDEN');
+assert.deepEqual(publicationMemory.peek(), beforeOwnerAttacks, 'cross-owner mutations are writer-zero');
 const shared = await app.createClientShare(packageResult.package.designVersionId); assert.equal(shared.ok, true);
+assert.equal((await otherApp.createClientShare(packageResult.package.designVersionId)).error.code, 'FORBIDDEN');
+let shareContextCalls = 0; let rotatingTokenCalls = 0;
+const rotatingShareIdentity = {
+  adapterKind: 'REMOTE',
+  async issueContext(request) {
+    shareContextCalls += 1;
+    return (shareContextCalls < 7 ? identity : otherIdentity).issueContext(request);
+  },
+};
+const approvalBeforeIdentityDrift = approvalMemory.peek();
+const rotatingShareApp = createCreatorWorkspaceApplicationServiceV1({
+  identity: rotatingShareIdentity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
+  authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  token: { generate: () => { rotatingTokenCalls += 1; return 'raw-rotating-token'; }, sha256: async (value) => createHash('sha256').update(value).digest('hex') },
+});
+const rotatingShare = await rotatingShareApp.createClientShare(packageResult.package.designVersionId);
+assert.equal(rotatingShare.error.reason, 'approval.identity_changed'); assert.equal(rotatingTokenCalls, 0);
+assert.deepEqual(approvalMemory.peek(), approvalBeforeIdentityDrift, 'share identity drift is writer-zero');
 const anonymousIdentity = createLocalPrototypeIdentityAccessPortV1({
-  actorRef: 'anonymous.share', permissions: ['approval.read', 'approval.write', 'package-reference.read'],
-  disclosure: 'ANONYMOUS_SHARE', now: () => now, nextId: (prefix) => `${prefix}${++appId}`,
+  actorRef: 'anonymous.share', permissions: ['approval.read', 'approval.write', 'package-reference.read', 'asset.read'],
+  disclosure: 'ANONYMOUS_SHARE', now: () => now, nextId: (prefix) => `${prefix}${++applicationContextId}`,
 });
 const clientApp = createClientApprovalApplicationServiceV1({
-  identity: anonymousIdentity, approvals: approvalMemory, authority: authorityMemory, nextId: appNextId,
+  identity: anonymousIdentity, approvals: approvalMemory, authority: authorityMemory, assets: packageAssets, nextId: appNextId,
   sha256: async (value) => createHash('sha256').update(value).digest('hex'),
 });
+const noAssetReadIdentity = createLocalPrototypeIdentityAccessPortV1({
+  actorRef: 'anonymous.no-assets', permissions: ['approval.read', 'approval.write', 'package-reference.read'],
+  disclosure: 'ANONYMOUS_SHARE', now: () => now,
+});
+const noAssetReadApp = createClientApprovalApplicationServiceV1({
+  identity: noAssetReadIdentity, approvals: approvalMemory, authority: authorityMemory, assets: packageAssets,
+  nextId: appNextId, sha256: async (value) => createHash('sha256').update(value).digest('hex'),
+});
+assert.equal((await noAssetReadApp.loadByRawToken(shared.value.rawToken)).error.code, 'FORBIDDEN');
+const missingBytesApp = createClientApprovalApplicationServiceV1({
+  identity: anonymousIdentity, approvals: approvalMemory, authority: authorityMemory,
+  assets: { ...packageAssets, async readBytes() { return { ok: false, error: { schemaVersion: 1, code: 'DATA_CORRUPTED', retryable: false, reason: 'asset.bytes_missing' } }; } },
+  nextId: appNextId, sha256: async (value) => createHash('sha256').update(value).digest('hex'),
+});
+assert.equal((await missingBytesApp.loadByRawToken(shared.value.rawToken)).error.code, 'DATA_CORRUPTED');
 let clientView = await clientApp.loadByRawToken(shared.value.rawToken); assert.equal(clientView.ok, true);
 clientView = await clientApp.decide(shared.value.rawToken, 'APPROVED', 'Looks good'); assert.equal(clientView.ok, true); assert.equal(clientView.value.existingDecision.decision, 'APPROVED');
+const approvalSnapshot = approvalMemory.peek();
+const tamperedApproval = structuredClone(approvalSnapshot);
+tamperedApproval.snapshots[0].rendererRevision = 'renderer.tampered';
+approvalMemory.set(tamperedApproval);
+assert.equal((await clientApp.loadByRawToken(shared.value.rawToken)).error.code, 'DATA_CORRUPTED');
+const changeRequestWithSnapshot = structuredClone(approvalSnapshot);
+changeRequestWithSnapshot.events[0].decision = 'CHANGE_REQUESTED';
+approvalMemory.set(changeRequestWithSnapshot);
+assert.equal((await clientApp.loadByRawToken(shared.value.rawToken)).error.code, 'DATA_CORRUPTED');
+approvalMemory.set(approvalSnapshot);
+const approvalEventsAfterFirst = approvalMemory.peek().events.length;
+const decisionIdsBeforeReplay = domainIdCalls;
+const approvalReplay = await clientApp.decide(shared.value.rawToken, 'APPROVED', '  Looks good  ');
+assert.equal(approvalReplay.ok, true); assert.equal(approvalReplay.changed, false);
+assert.equal(domainIdCalls, decisionIdsBeforeReplay, 'semantic decision replay consumes no event id');
+assert.equal(approvalMemory.peek().events.length, approvalEventsAfterFirst);
+const conflictingDecision = await clientApp.decide(shared.value.rawToken, 'CHANGE_REQUESTED', 'Needs changes');
+assert.equal(conflictingDecision.error.code, 'CONFLICT'); assert.equal(domainIdCalls, decisionIdsBeforeReplay);
+const conflictingNote = await clientApp.decide(shared.value.rawToken, 'APPROVED', 'Different note');
+assert.equal(conflictingNote.error.code, 'CONFLICT'); assert.equal(approvalMemory.peek().events.length, approvalEventsAfterFirst);
+authorityRecords = [];
+const missingAuthorityEvents = approvalMemory.peek().events.length;
+const missingAuthority = await clientApp.loadByRawToken(shared.value.rawToken);
+assert.equal(missingAuthority.error.code, 'PRECONDITION_FAILED'); assert.equal(approvalMemory.peek().events.length, missingAuthorityEvents);
+authorityRecords = [structuredClone(registered.value)];
 const newer = structuredClone(registered.value); newer.package.designVersionId = 'design-version.newer'; newer.package.version += 1;
 authorityRecords = [...authorityRecords, newer];
 const staleClient = await clientApp.loadByRawToken(shared.value.rawToken); assert.equal(staleClient.error.code, 'STALE', 'approval service compares against authority latest, not share version');
+
+// Creator slice failure is isolated from legacy/official Explore and emits a
+// non-sensitive diagnostic exactly once.
+const index = JSON.parse(await readFile(new URL('../public/community/content-index.json', import.meta.url), 'utf8'));
+const originalFetch = globalThis.fetch;
+globalThis.fetch = async () => ({ ok: true, json: async () => structuredClone(index) });
+const { loadLookReadModels } = await import('../src/community/data/look-repository.ts');
+const { creatorLookMatchesPackageAuthorityV1, isCreatorLookGovernanceVisibleV1 } = await import('../src/integration/community-studio/backend-runtime.ts');
+const ownPublishedLook = publicationMemory.peek().looks.find((look) => look.creatorProfileId === 'profile.local-demo.creator');
+assert.equal(creatorLookMatchesPackageAuthorityV1(ownPublishedLook, registered.value), true);
+const driftedPublishedLook = structuredClone(ownPublishedLook); driftedPublishedLook.coverPreview.sha256 = 'f'.repeat(64);
+assert.equal(creatorLookMatchesPackageAuthorityV1(driftedPublishedLook, registered.value), false);
+assert.equal(isCreatorLookGovernanceVisibleV1(ownPublishedLook.lookId, [{
+  schemaVersion: 1, caseId: 'case.hidden-look', subjectType: 'PUBLISHED_LOOK', subjectId: ownPublishedLook.lookId,
+  status: 'HIDDEN', reporterRef: 'profile.reporter', reasonCode: 'policy-report', objectVersion: 1,
+  createdAt: now, updatedAt: now,
+}]), false);
+const diagnostics = [];
+const resilientLooks = await loadLookReadModels({
+  loadCreator: async () => { throw new Error('private backend detail'); },
+  onDiagnostic: (diagnostic) => diagnostics.push(diagnostic),
+});
+assert.ok(resilientLooks.some((look) => look.contentId === 'cc_mercury_dew'));
+assert.deepEqual(diagnostics, [{ scope: 'creator-look-slice', code: 'UNAVAILABLE' }]);
+globalThis.fetch = originalFetch;
 
 const uiFiles = [
   'src/community/pages/CreatorWorkspacePage.tsx',

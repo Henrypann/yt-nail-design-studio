@@ -33,6 +33,10 @@ export interface VersionedImportDependenciesV2 {
   createTarget(input: { intentId: string; doc: EditorDocV7 }): Promise<
     { ok: true; created: boolean; doc: EditorDocV7 } | { ok: false; message: string }
   >;
+  /** Persist the success event before the intent is cleared. */
+  recordEvent(event: LookCustomizeEventV1): Promise<
+    { ok: true } | { ok: false; message: string; retryable: boolean }
+  >;
   nextId(scope: 'design'|'node'): string;
   now(): string;
 }
@@ -45,15 +49,12 @@ export type VersionedImportResultV2 =
 export function materializeVersionedRemixV2(
   source: EditorDocV7,
   intent: VersionedStudioImportIntentV2,
-  deps: Pick<VersionedImportDependenciesV2,'nextId'|'now'>,
+  deps: Pick<VersionedImportDependenciesV2,'nextId'>,
 ): { ok: true; doc: EditorDocV7 } | { ok: false; reason: 'id_collision'|'dependency' } {
-  let now: string;
-  try { now = deps.now(); }
-  catch { return { ok: false, reason: 'dependency' }; }
   const materialized = materializeIndependentEditorDocV7(source, {
     sourceRef: { domain: 'community', sourceId: intent.lookId, revision: intent.designVersionId },
     title: `${source.title} Remix`,
-    now,
+    now: intent.createdAt,
   }, { nextId: deps.nextId });
   if (materialized.ok) return materialized;
   return materialized.reason === 'id_collision'
@@ -122,9 +123,7 @@ export async function consumeVersionedStudioImportV2(intentId: string, mode: Ver
   if (!materialized.ok) return materialized.reason === 'id_collision'
     ? rejectFinal('id_collision', 'failed to create independent V7 document')
     : { ok: false, reason: 'dependency', retryable: true, message: 'failed to create independent V7 document' };
-  let occurredAt: string;
-  try { occurredAt = deps.now(); } catch { return { ok: false, reason: 'dependency', retryable: true, message: 'event time unavailable before create' }; }
-  if (!Number.isFinite(Date.parse(occurredAt))) return { ok: false, reason: 'dependency', retryable: true, message: 'event time invalid before create' };
+  const occurredAt = intent.createdAt;
   let written: Awaited<ReturnType<VersionedImportDependenciesV2['createTarget']>>;
   try { written = await deps.createTarget({ intentId, doc: materialized.doc }); }
   catch { return { ok: false, reason: 'write_failed', retryable: true, message: 'target writer failed' }; }
@@ -133,8 +132,16 @@ export async function consumeVersionedStudioImportV2(intentId: string, mode: Ver
   const expectedSource = persisted.ok && persisted.doc.sourceRefs.some((ref) => ref.domain === 'community'
     && ref.sourceId === intent.lookId && ref.revision === intent.designVersionId);
   if (!persisted.ok || !expectedSource) return { ok: false, reason: 'write_failed', retryable: true, message: 'target writer returned an invalid document' };
+  const event: LookCustomizeEventV1 = {
+    event: 'look_customize', eventId: intent.intentId, lookId: intent.lookId,
+    designVersionId: intent.designVersionId, targetDesignId: persisted.doc.designId, occurredAt,
+  };
+  let eventResult: Awaited<ReturnType<VersionedImportDependenciesV2['recordEvent']>>;
+  try { eventResult = await deps.recordEvent(event); }
+  catch { return { ok: false, reason: 'write_failed', retryable: true, message: 'event writer failed' }; }
+  if (!eventResult.ok) return { ok: false, reason: 'write_failed', retryable: eventResult.retryable, message: eventResult.message };
   try { deps.intents.clear(intentId); }
   catch { return { ok: false, reason: 'dependency', retryable: true, message: 'target created; intent cleanup failed' }; }
   return { ok: true, mode: 'new', created: true, doc: structuredClone(persisted.doc), returnTo: intent.returnTo,
-    event: { event: 'look_customize', eventId: intent.intentId, lookId: intent.lookId, designVersionId: intent.designVersionId, targetDesignId: persisted.doc.designId, occurredAt } };
+    event };
 }

@@ -21,6 +21,7 @@ import {
 } from './local-json-store';
 import {
   isServiceIdV1,
+  parseServiceCommandContextV1,
   requireServicePermissionV1,
   serviceErrorV1,
   type IdentityAccessPortV1,
@@ -156,17 +157,24 @@ export function createLocalPrototypeIdentityAccessPortV1(input: {
       }
       const required = request.operation;
       if (!permissions.includes(required)) return serviceErrorV1('FORBIDDEN', 'identity.operation_denied');
-      const context: ServiceCommandContextV1 = {
-        actor: {
-          actorRef: input.actorRef,
-          permissions,
-          disclosure: input.disclosure ?? 'LOCAL_PROTOTYPE',
-        },
-        idempotencyKey: request.idempotencyKey ?? nextId('idem.'),
-        correlationId: nextId('correlation.'),
-        now: now(),
-      };
-      return { ok: true, value: context, changed: false };
+      try {
+        const context: ServiceCommandContextV1 = {
+          actor: {
+            actorRef: input.actorRef,
+            permissions,
+            disclosure: input.disclosure ?? 'LOCAL_PROTOTYPE',
+          },
+          idempotencyKey: request.idempotencyKey ?? nextId('idem.'),
+          correlationId: nextId('correlation.'),
+          now: now(),
+        };
+        const parsed = parseServiceCommandContextV1(context);
+        return parsed
+          ? { ok: true, value: parsed, changed: false }
+          : serviceErrorV1('UNAVAILABLE', 'identity.provider_invalid_context', true);
+      } catch {
+        return serviceErrorV1('UNAVAILABLE', 'identity.provider_unavailable', true);
+      }
     },
   };
 }

@@ -2,6 +2,7 @@ import type { ImmutableAssetRevisionRefV1 } from '@/community/domain/v7_1/design
 import { readData, StorageKeys, writeEnvelope } from '@/lib/storage';
 import type { PublishPackageArtifactV1, PublishPackageV1 } from '@/studio/publishing';
 import { parsePublishPackageV1 } from '@/studio/publishing';
+import { canonicalJsonV1 } from '@/studio/versioning/design-release';
 import type { AssetUploadPortV1, AssetUploadRecordV1, ImmutableAssetObjectRefV1 } from './asset-contract';
 import { parseImmutableAssetObjectRefV1 } from './asset-contract';
 import {
@@ -19,6 +20,7 @@ import {
 
 export interface PublishPackageAuthorityRecordV1 {
   schemaVersion: 1;
+  ownerRef: string;
   package: PublishPackageV1;
   editorDocSha256: string;
   assets: ImmutableAssetObjectRefV1[];
@@ -45,7 +47,7 @@ export interface AssetRevisionAliasV1 {
 }
 
 export interface BundledAssetAliasV1 extends AssetRevisionAliasV1 {
-  /** Signed registry data; bytes remain in the bundled asset pipeline. */
+  /** Bundled registry authority for the local prototype; not cryptographically signed. */
   canonicalRef: ImmutableAssetRevisionRefV1;
 }
 
@@ -58,8 +60,9 @@ function expectedOutputs(pkg: PublishPackageV1) { return [pkg.cover, ...pkg.deta
 export function parsePublishPackageAuthorityRecordV1(value: unknown): PublishPackageAuthorityRecordV1 | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
-  if (Object.keys(raw).some((key) => !['schemaVersion', 'package', 'editorDocSha256', 'assets', 'status', 'createdAt'].includes(key))
+  if (Object.keys(raw).some((key) => !['schemaVersion', 'ownerRef', 'package', 'editorDocSha256', 'assets', 'status', 'createdAt'].includes(key))
     || raw.schemaVersion !== 1 || raw.status !== 'READY' || typeof raw.createdAt !== 'string'
+    || typeof raw.ownerRef !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(raw.ownerRef)
     || typeof raw.editorDocSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(raw.editorDocSha256)
     || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(raw.createdAt)
     || !Array.isArray(raw.assets)) return null;
@@ -85,11 +88,13 @@ function parseAuthorityStore(value: unknown): PublishPackageAuthorityStoreV1 | n
   if (Object.keys(raw).some((key) => !['schemaVersion', 'records'].includes(key))
     || raw.schemaVersion !== 1 || !Array.isArray(raw.records)) return null;
   const records: PublishPackageAuthorityRecordV1[] = [];
-  const packages = new Set<string>(); const versions = new Set<string>();
+  const packages = new Set<string>(); const versions = new Set<string>(); const designNumbers = new Set<string>();
   for (const item of raw.records) {
     const record = parsePublishPackageAuthorityRecordV1(item);
-    if (!record || packages.has(record.package.packageId) || versions.has(record.package.designVersionId)) return null;
-    packages.add(record.package.packageId); versions.add(record.package.designVersionId); records.push(record);
+    const designNumber = record ? `${record.ownerRef}#${record.package.designId}#${record.package.version}` : '';
+    if (!record || packages.has(record.package.packageId) || versions.has(record.package.designVersionId)
+      || designNumbers.has(designNumber)) return null;
+    packages.add(record.package.packageId); versions.add(record.package.designVersionId); designNumbers.add(designNumber); records.push(record);
   }
   return { schemaVersion: 1, records };
 }
@@ -141,11 +146,31 @@ export async function registerPublishPackageArtifactsV1(input: {
     || input.result.artifacts.some((artifact, index) => !sameOutput(artifact.output, outputs[index]))) {
     return serviceErrorV1('INTEGRITY_MISMATCH', 'publish.artifact_descriptor_mismatch');
   }
+  const readContext = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.packageReferenceRead });
+  if (!readContext.ok) return readContext;
+  const current = await input.authority.read(readContext.value);
+  if (!current.ok) return current;
+  const existing = current.value.value.records.find((record) => record.package.packageId === parsedPackage.value.packageId
+    || record.package.designVersionId === parsedPackage.value.designVersionId);
+  if (existing && (existing.package.packageId !== parsedPackage.value.packageId
+    || existing.ownerRef !== readContext.value.actor.actorRef
+    || existing.editorDocSha256 !== input.editorDocSha256
+    || canonicalJsonV1(existing.package) !== canonicalJsonV1(parsedPackage.value))) {
+    return serviceErrorV1('IDEMPOTENCY_CONFLICT', 'publish.authority_replay_mismatch', false, readContext.value.correlationId);
+  }
+  const duplicateVersion = current.value.value.records.find((record) => record.ownerRef === readContext.value.actor.actorRef
+    && record.package.designId === parsedPackage.value.designId && record.package.version === parsedPackage.value.version);
+  if (!existing && duplicateVersion) {
+    return serviceErrorV1('CONFLICT', 'publish.design_version_number_exists', false, readContext.value.correlationId);
+  }
   const assetContext = await input.identity.issueContext({
     operation: BACKEND_OPERATIONS_V1.assetWrite,
     idempotencyKey: `publish-assets.${parsedPackage.value.packageId}`,
   });
   if (!assetContext.ok) return assetContext;
+  if (assetContext.value.actor.actorRef !== readContext.value.actor.actorRef) {
+    return serviceErrorV1('FORBIDDEN', 'publish.identity_changed', false, assetContext.value.correlationId);
+  }
   const uploaded = await input.assets.uploadBatch(assetContext.value, input.result.artifacts.map((artifact, index) => ({
     uploadId: `upload.${parsedPackage.value.packageId}.${index + 1}`,
     assetId: artifact.output.assetId,
@@ -168,19 +193,15 @@ export async function registerPublishPackageArtifactsV1(input: {
   if (uploaded.value.some((record) => record.status !== 'READY')) {
     return serviceErrorV1('PRECONDITION_FAILED', 'publish.assets_not_ready', false, assetContext.value.correlationId);
   }
-  const readContext = await input.identity.issueContext({ operation: BACKEND_OPERATIONS_V1.packageReferenceRead });
-  if (!readContext.ok) return readContext;
-  const current = await input.authority.read(readContext.value);
-  if (!current.ok) return current;
-  const existing = current.value.value.records.find((record) => record.package.packageId === parsedPackage.value.packageId
-    || record.package.designVersionId === parsedPackage.value.designVersionId);
   if (existing) {
-    return existing.package.packageId === parsedPackage.value.packageId
+    const uploadedObjects = uploaded.value.map((record) => record.object);
+    return canonicalJsonV1(uploadedObjects) === canonicalJsonV1(existing.assets)
       ? { ok: true, value: existing, changed: false }
-      : serviceErrorV1('CONFLICT', 'publish.design_version_package_conflict', false, readContext.value.correlationId);
+      : serviceErrorV1('IDEMPOTENCY_CONFLICT', 'publish.authority_asset_replay_mismatch', false, readContext.value.correlationId);
   }
   const record: PublishPackageAuthorityRecordV1 = {
     schemaVersion: 1,
+    ownerRef: assetContext.value.actor.actorRef,
     package: structuredClone(parsedPackage.value),
     editorDocSha256: input.editorDocSha256,
     assets: uploaded.value.map((item: AssetUploadRecordV1) => structuredClone(item.object)),
@@ -194,6 +215,9 @@ export async function registerPublishPackageArtifactsV1(input: {
     idempotencyKey: `publish-authority.${parsedPackage.value.packageId}`,
   });
   if (!writeContext.ok) return writeContext;
+  if (writeContext.value.actor.actorRef !== assetContext.value.actor.actorRef) {
+    return serviceErrorV1('FORBIDDEN', 'publish.identity_changed', false, writeContext.value.correlationId);
+  }
   const saved = await input.authority.replace(writeContext.value, {
     schemaVersion: 1,
     records: [...current.value.value.records, parsedRecord],
@@ -229,6 +253,9 @@ export function createAssetReferenceResolverV1(input: {
       if (!context.ok) return context;
       const record = await input.assets.get(context.value, alias.canonicalAssetId, alias.canonicalRevision);
       if (!record.ok) return record;
+      if (record.value.ownerRef !== context.value.actor.actorRef) {
+        return serviceErrorV1('FORBIDDEN', 'asset.reference_owner_mismatch', false, context.value.correlationId);
+      }
       if (record.value.status !== 'READY' || (ref.sha256 && ref.sha256 !== record.value.object.sha256)
         || (ref.mimeType && ref.mimeType !== record.value.object.mimeType)) {
         return serviceErrorV1('INTEGRITY_MISMATCH', 'asset.reference_mismatch', false, context.value.correlationId);

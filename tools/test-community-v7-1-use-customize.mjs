@@ -56,6 +56,10 @@ unsupportedLook.lookId = 'look.public-without-release';
 unsupportedLook.designVersionId = 'design-version.missing-authority';
 const unsupported = runtime.createVersionedUseIntentForLookV1(unsupportedLook);
 assert.deepEqual(unsupported, { ok: false, reason: 'release_unavailable' });
+const forgedSameVersion = structuredClone(fixture.CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1);
+forgedSameVersion.lookId = 'look.public-forged-same-version';
+assert.deepEqual(runtime.createVersionedUseIntentForLookV1(forgedSameVersion), { ok: false, reason: 'release_unavailable' },
+  'local prototype binds the only materializable release to its exact authoritative Look');
 assert.equal(readData(StorageKeys.versionedStudioImportIntents), null, 'no handoff writer without release authority');
 assert.equal(readData(StorageKeys.editorDocs), null, 'no target writer without release authority');
 assert.equal((await readCustomizeEvents()).length, 0, 'no event writer without release authority');
@@ -125,6 +129,19 @@ if (!replay.ok || !replay.created) throw new Error(replay.message);
 assert.equal(replay.doc.designId, createdResult.doc.designId);
 assert.equal(Object.keys(readData(StorageKeys.editorDocs)).length, 1);
 assert.equal((await readCustomizeEvents()).length, 1);
+
+// Same deterministic design id and lineage must not turn different content
+// into a successful replay.
+const tamperedDocs = structuredClone(readData(StorageKeys.editorDocs));
+tamperedDocs[createdResult.doc.designId].title = 'Tampered target with matching lineage';
+writeEnvelope(StorageKeys.editorDocs, tamperedDocs);
+writeEnvelope(StorageKeys.versionedStudioImportIntents, { [intent.intentId]: intent });
+const tamperedBefore = JSON.stringify(readData(StorageKeys.editorDocs));
+const mismatchedReplay = await runtime.consumeVersionedUseIntentV2(intent.intentId, 'new');
+assert.equal(mismatchedReplay.ok, false);
+assert.match(mismatchedReplay.message, /target_replay_mismatch/);
+assert.equal(JSON.stringify(readData(StorageKeys.editorDocs)), tamperedBefore, 'mismatched replay is writer-zero');
+assert.equal((await readCustomizeEvents()).length, 1, 'mismatched replay emits no success event');
 
 // Expiry removes only the exact intent.
 localStorage.clear();

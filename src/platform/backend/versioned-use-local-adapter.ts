@@ -10,6 +10,7 @@ import type { EditorDocV7 } from '@/studio/editor/v7/model';
 import { createEditorDocV7InLocalStorage } from '@/studio/editor/v7/repository';
 import { parseEditorDocV7 } from '@/studio/editor/v7/schema';
 import { getDesign, removeEditorDoc, upsertDesign } from '@/studio/editor/lib/repo-v6';
+import { canonicalJsonV1 } from '@/studio/versioning/design-release';
 import type { LookCustomizeEventV1 } from '@/studio/versioning/versioned-import';
 import { BACKEND_PERMISSIONS_V1 } from './domain-ports';
 import {
@@ -101,6 +102,9 @@ export function createLocalVersionedUsePersistencePortV1(): VersionedUsePersiste
           const matches = existing.doc.sourceRefs.some((ref) => ref.domain === 'community'
             && ref.sourceId === command.sourceLookId && ref.revision === command.sourceDesignVersionId);
           if (!matches) return serviceErrorV1('CONFLICT', 'versioned_use.target_collision', false, context.correlationId);
+          if (canonicalJsonV1(existing.doc) !== canonicalJsonV1(parsed.doc)) {
+            return serviceErrorV1('IDEMPOTENCY_CONFLICT', 'versioned_use.target_replay_mismatch', false, context.correlationId);
+          }
           try { ensureEditableSummary(existing.doc); }
           catch { return serviceErrorV1('UNAVAILABLE', 'versioned_use.summary_recovery_failed', true, context.correlationId); }
           return { ok: true, value: { created: false, doc: existing.doc }, changed: false };

@@ -40,7 +40,8 @@ export type CreateVersionedUseIntentResultV1 =
   | { ok: false; reason: string };
 
 export function createVersionedUseIntentForLookV1(look: PublishedLookV1): CreateVersionedUseIntentResultV1 {
-  if (look.designVersionId !== CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId
+  if (look.lookId !== CANONICAL_USE_DEMO_LOOK_ID
+    || look.designVersionId !== CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId
     || look.status !== 'PUBLISHED' || look.visibility !== 'PUBLIC') {
     return { ok: false, reason: 'release_unavailable' };
   }
@@ -112,15 +113,21 @@ export async function consumeVersionedUseIntentV2(
         ? { ok: true as const, created: written.value.created, doc: written.value.doc }
         : { ok: false as const, message: written.error.reason };
     },
+    recordEvent: async (event) => {
+      const eventContext = await persistenceIdentity.issueContext({
+        operation: BACKEND_OPERATIONS_V1.versionedUseWrite,
+        idempotencyKey: event.eventId,
+      });
+      if (!eventContext.ok) return { ok: false as const, retryable: eventContext.error.retryable, message: eventContext.error.reason };
+      const saved = await persistence.recordEvent(eventContext.value, event);
+      return saved.ok
+        ? { ok: true as const }
+        : { ok: false as const, retryable: saved.error.retryable, message: saved.error.reason };
+    },
     nextId,
     now: () => new Date().toISOString(),
   });
   if (result.ok && result.mode === 'new') {
-    const eventContext = await persistenceIdentity.issueContext({
-      operation: BACKEND_OPERATIONS_V1.versionedUseWrite,
-      idempotencyKey: result.event.eventId,
-    });
-    if (eventContext.ok) await persistence.recordEvent(eventContext.value, result.event);
     if (typeof globalThis.dispatchEvent === 'function' && typeof globalThis.CustomEvent === 'function') {
       globalThis.dispatchEvent(new CustomEvent('community:look-customize', { detail: structuredClone(result.event) }));
     }

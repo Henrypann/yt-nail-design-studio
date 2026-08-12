@@ -15,14 +15,28 @@ import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-rea
 import { CANONICAL_USE_DEMO_READ_MODEL_V1 } from '@/integration/community-studio/canonical-use-demo';
 import { loadCreatorPublishedLookReadModelsV1 } from '@/integration/community-studio/backend-runtime';
 
-const runtimeMode = import.meta.env.MODE;
+const runtimeMode = import.meta.env?.MODE ?? 'integration';
 
-export async function loadLookReadModels(): Promise<PublishedLookReadModelV1[]> {
+export type CreatorLookLoadDiagnosticV1 = {
+  scope: 'creator-look-slice';
+  code: 'UNAVAILABLE';
+};
+
+function defaultCreatorDiagnostic(diagnostic: CreatorLookLoadDiagnosticV1): void {
+  console.warn('[community.looks]', diagnostic.scope, diagnostic.code);
+}
+
+export async function loadLookReadModels(input?: {
+  loadCreator?: () => Promise<PublishedLookReadModelV1[]>;
+  onDiagnostic?: (diagnostic: CreatorLookLoadDiagnosticV1) => void;
+}): Promise<PublishedLookReadModelV1[]> {
   const res = await fetch('/community/content-index.json');
   if (!res.ok) throw new Error('look index load failed');
   const index = (await res.json()) as CommunityContentIndexV1;
   const legacy = buildLookReadModels(index.contents, runtimeMode);
-  const creator = await loadCreatorPublishedLookReadModelsV1();
+  let creator: PublishedLookReadModelV1[] = [];
+  try { creator = await (input?.loadCreator ?? loadCreatorPublishedLookReadModelsV1)(); }
+  catch { (input?.onDiagnostic ?? defaultCreatorDiagnostic)({ scope: 'creator-look-slice', code: 'UNAVAILABLE' }); }
   return runtimeMode === 'development' || runtimeMode === 'integration'
     ? [CANONICAL_USE_DEMO_READ_MODEL_V1, ...creator, ...legacy]
     : [...creator, ...legacy];

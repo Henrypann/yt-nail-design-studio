@@ -57,15 +57,16 @@ function intentHarness(now=Date.parse('2026-08-11T07:02:00.000Z')) {
 }
 
 function importHarness() {
-  const ih=intentHarness(); let writerCalls=0; let createdDoc=null; let id=0; let allow=true; let assetOk=true; let writerOk=true;
-  const targetsByIntent=new Map();
+  const ih=intentHarness(); let writerCalls=0; let createdDoc=null; let id=0; let allow=true; let assetOk=true; let writerOk=true; let eventOk=true; let eventCalls=0;
+  const targetsByIntent=new Map(); const eventsById=new Map();
   const deps={
     intents:ih.port,getLook:async()=>structuredClone(look),getRelease:async()=>structuredClone(release),canReadLook:async()=>allow,
     sha256:digest,
     assetAvailable:async()=>assetOk,createTarget:async({intentId,doc})=>{writerCalls+=1;if(!writerOk)return{ok:false,message:'quota'};const prior=targetsByIntent.get(intentId);if(prior)return{ok:true,created:false,doc:structuredClone(prior)};createdDoc=structuredClone(doc);targetsByIntent.set(intentId,createdDoc);return{ok:true,created:true,doc:structuredClone(createdDoc)};},
+    recordEvent:async(event)=>{eventCalls+=1;if(!eventOk)return{ok:false,message:'event unavailable',retryable:true};const prior=eventsById.get(event.eventId);if(prior&&JSON.stringify(prior)!==JSON.stringify(event))return{ok:false,message:'event conflict',retryable:false};eventsById.set(event.eventId,structuredClone(event));return{ok:true};},
     nextId:(scope)=>`${scope}.fresh.${++id}`,now:()=> '2026-08-11T07:03:00.000Z',
   };
-  return {ih,deps,get writerCalls(){return writerCalls;},get createdDoc(){return createdDoc;},setAllow(v){allow=v;},setAsset(v){assetOk=v;},setWriter(v){writerOk=v;},get ids(){return id;}};
+  return {ih,deps,get writerCalls(){return writerCalls;},get eventCalls(){return eventCalls;},get createdDoc(){return createdDoc;},setAllow(v){allow=v;},setAsset(v){assetOk=v;},setWriter(v){writerOk=v;},setEvent(v){eventOk=v;},get ids(){return id;}};
 }
 
 for (const mode of ['current','cancel']) {
@@ -162,9 +163,22 @@ for (const mode of ['current','cancel']) {
   assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'write_failed');assert.ok(h.ih.port.peek(h.ih.created.intent.intentId));
 }
 {
-  const h=importHarness(); h.deps.now=()=>{throw new Error('clock')};
+  const h=importHarness(); h.deps.now=()=>{throw new Error('clock must not be called')};
   const r=await importApi.consumeVersionedStudioImportV2(h.ih.created.intent.intentId,'new',h.deps);
-  assert.equal(r.ok,false);if(!r.ok)assert.equal(r.reason,'dependency');assert.equal(h.writerCalls,0);
+  assert.equal(r.ok&&r.created,true,'intent.createdAt makes materialization independent of a mutable clock');assert.equal(h.writerCalls,1);
+}
+
+// Event durability is part of success: on failure, keep the intent so the
+// deterministic target can be replayed and the event committed exactly once.
+{
+  const h=importHarness(); const intentId=h.ih.created.intent.intentId; h.setEvent(false);
+  const first=await importApi.consumeVersionedStudioImportV2(intentId,'new',h.deps);
+  assert.equal(first.ok,false);if(!first.ok)assert.equal(first.reason,'write_failed');
+  assert.ok(h.ih.port.peek(intentId)); const targetId=h.createdDoc.designId;
+  h.setEvent(true);
+  const second=await importApi.consumeVersionedStudioImportV2(intentId,'new',h.deps);
+  assert.equal(second.ok&&second.created,true);if(!second.ok||!second.created)throw new Error(second.message);
+  assert.equal(second.doc.designId,targetId);assert.equal(h.writerCalls,2);assert.equal(h.eventCalls,2);assert.equal(h.ih.port.peek(intentId),null);
 }
 
 // If exact-intent cleanup fails after creation, retry resolves through the

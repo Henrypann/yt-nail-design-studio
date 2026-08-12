@@ -7,11 +7,13 @@ import {
   type AssetUploadRecordV1,
 } from './asset-contract';
 import { BACKEND_PERMISSIONS_V1 } from './domain-ports';
-import { requireServicePermissionV1, serviceErrorV1, type ServiceResultV1 } from './service-contract';
+import { localEtagV1 } from './local-json-store';
+import { isServiceIdV1, requireServicePermissionV1, serviceErrorV1, type ServiceResultV1 } from './service-contract';
 
 interface AssetRecordStoreV1 {
   schemaVersion: 1;
   records: AssetUploadRecordV1[];
+  idempotency: Record<string, { fingerprint: string; uploadIds: string[] }>;
 }
 
 export interface AssetBinaryStorageV1 {
@@ -23,10 +25,10 @@ export interface AssetBinaryStorageV1 {
 function binaryKey(assetId: string, revision: number): string { return `${assetId}#${revision}`; }
 
 function parseStore(value: unknown): AssetRecordStoreV1 | null {
-  if (value === null) return { schemaVersion: 1, records: [] };
+  if (value === null) return { schemaVersion: 1, records: [], idempotency: {} };
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
-  if (Object.keys(raw).some((key) => !['schemaVersion', 'records'].includes(key))
+  if (Object.keys(raw).some((key) => !['schemaVersion', 'records', 'idempotency'].includes(key))
     || raw.schemaVersion !== 1 || !Array.isArray(raw.records)) return null;
   const records: AssetUploadRecordV1[] = [];
   const uploadIds = new Set<string>();
@@ -38,16 +40,46 @@ function parseStore(value: unknown): AssetRecordStoreV1 | null {
     assets.add(binaryKey(record.object.assetId, record.object.revision));
     records.push(record);
   }
-  return { schemaVersion: 1, records };
+  const idempotency: AssetRecordStoreV1['idempotency'] = {};
+  if (raw.idempotency !== undefined) {
+    if (!raw.idempotency || typeof raw.idempotency !== 'object' || Array.isArray(raw.idempotency)) return null;
+    for (const [key, value] of Object.entries(raw.idempotency)) {
+      if (!isServiceIdV1(key) || !value || typeof value !== 'object' || Array.isArray(value)) return null;
+      const entry = value as Record<string, unknown>;
+      if (Object.keys(entry).some((field) => !['fingerprint', 'uploadIds'].includes(field))
+        || typeof entry.fingerprint !== 'string' || !/^fp\.v1\.[0-9a-f]{16}$/.test(entry.fingerprint)
+        || !Array.isArray(entry.uploadIds) || entry.uploadIds.length < 1
+        || !entry.uploadIds.every((id) => typeof id === 'string' && uploadIds.has(id))
+        || new Set(entry.uploadIds).size !== entry.uploadIds.length) return null;
+      idempotency[key] = { fingerprint: entry.fingerprint, uploadIds: [...entry.uploadIds] as string[] };
+    }
+  }
+  return { schemaVersion: 1, records, idempotency };
+}
+
+function commandFingerprint(
+  context: { actor: { actorRef: string } },
+  uploads: readonly AssetUploadInputV1[],
+): string {
+  return localEtagV1({
+    actorRef: context.actor.actorRef,
+    uploads: uploads.map(({ bytes: _bytes, ...upload }) => upload),
+  }).replace('etag.', 'fp.');
 }
 
 function sameUpload(existing: AssetUploadRecordV1, input: AssetUploadInputV1): boolean {
-  return existing.ownerRef === input.ownerRef && existing.purpose === input.purpose
+  return existing.uploadId === input.uploadId
+    && existing.ownerRef === input.ownerRef && existing.purpose === input.purpose
+    && existing.fileName === input.fileName
     && existing.object.assetId === input.assetId && existing.object.revision === 1
     && existing.object.sha256 === input.sha256 && existing.object.mimeType === input.mimeType
     && existing.object.byteLength === input.byteLength && existing.object.width === input.width
     && existing.object.height === input.height && existing.object.colorSpace === input.colorSpace
-    && existing.object.alphaMode === input.alphaMode;
+    && existing.object.alphaMode === input.alphaMode
+    && existing.source.sourceType === input.source.sourceType
+    && existing.source.attribution === input.source.attribution
+    && existing.copyrightDeclared === input.copyrightDeclared
+    && existing.moderationStatus === input.moderationStatus;
 }
 
 export function createInMemoryAssetBinaryStorageV1(): AssetBinaryStorageV1 {
@@ -128,6 +160,30 @@ export function createLocalAssetUploadPortV1(input: {
       }
       const store = readStore(context.correlationId);
       if (!store.ok) return store;
+      for (const upload of uploads) {
+        const validated = await validateAssetUploadInputV1(upload, input.sha256, context.correlationId);
+        if (!validated.ok) return validated;
+      }
+      const fingerprint = commandFingerprint(context, uploads);
+      const replay = store.value.idempotency[context.idempotencyKey];
+      if (replay) {
+        if (replay.fingerprint !== fingerprint) {
+          return serviceErrorV1('IDEMPOTENCY_CONFLICT', 'asset.idempotency_key_reused', false, context.correlationId);
+        }
+        const replayRecords: AssetUploadRecordV1[] = [];
+        for (const uploadId of replay.uploadIds) {
+          const record = store.value.records.find((candidate) => candidate.uploadId === uploadId);
+          if (!record) return serviceErrorV1('DATA_CORRUPTED', 'asset.idempotency_result_missing', false, context.correlationId);
+          try {
+            const bytes = await input.binary.get(binaryKey(record.object.assetId, record.object.revision));
+            if (!bytes || bytes.byteLength !== record.object.byteLength || await input.sha256(bytes) !== record.object.sha256) {
+              return serviceErrorV1('DATA_CORRUPTED', 'asset.replayed_bytes_missing', false, context.correlationId);
+            }
+          } catch { return serviceErrorV1('UNAVAILABLE', 'asset.local_read_failed', true, context.correlationId); }
+          replayRecords.push(structuredClone(record));
+        }
+        return { ok: true, value: replayRecords, changed: false };
+      }
       const batchUploadIds = new Set<string>();
       const batchAssets = new Set<string>();
       const records: AssetUploadRecordV1[] = [];
@@ -151,10 +207,13 @@ export function createLocalAssetUploadPortV1(input: {
             records.push(structuredClone(existingUpload));
             continue;
           }
-          return serviceErrorV1('CONFLICT', existingUpload ? 'asset.upload_id_reused' : 'asset.revision_exists', false, context.correlationId);
+          return serviceErrorV1(
+            existingUpload ? 'IDEMPOTENCY_CONFLICT' : 'CONFLICT',
+            existingUpload ? 'asset.upload_id_reused' : 'asset.revision_exists',
+            false,
+            context.correlationId,
+          );
         }
-        const validated = await validateAssetUploadInputV1(upload, input.sha256, context.correlationId);
-        if (!validated.ok) return validated;
         const record = parseAssetUploadRecordV1({
           schemaVersion: 1,
           uploadId: upload.uploadId,
@@ -188,7 +247,14 @@ export function createLocalAssetUploadPortV1(input: {
           const key = binaryKey(upload.assetId, 1);
           await input.binary.put(key, upload.bytes); written.push(key);
         }
-        writeMetadata({ schemaVersion: 1, records: [...store.value.records, ...fresh.map(({ record }) => record)] });
+        writeMetadata({
+          schemaVersion: 1,
+          records: [...store.value.records, ...fresh.map(({ record }) => record)],
+          idempotency: {
+            ...store.value.idempotency,
+            [context.idempotencyKey]: { fingerprint, uploadIds: uploads.map((upload) => upload.uploadId) },
+          },
+        });
       } catch {
         await Promise.all(written.map(async (key) => { try { await input.binary.remove(key); } catch { /* preserve primary failure */ } }));
         return serviceErrorV1('UNAVAILABLE', 'asset.local_write_failed', true, context.correlationId);

@@ -1,6 +1,8 @@
 /** Browser composition root for GEN-V7.1-04. No page imports localStorage repositories. */
 import { createClientId } from '@/lib/storage';
 import type { CommunityContentV1 } from '@/community/domain/types';
+import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
+import type { GovernanceCaseV1 } from '@/community/domain/v7_1/governance';
 import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
 import {
   BACKEND_PERMISSIONS_V1,
@@ -25,6 +27,7 @@ import {
   type PublishRenderRequestV1,
   type PublishRendererV1,
 } from '@/studio/publishing';
+import { canonicalJsonV1 } from '@/studio/versioning/design-release';
 import { CANONICAL_USE_DEMO_RELEASE_RECORD_V1 } from './canonical-use-demo';
 
 async function sha256Bytes(bytes: Uint8Array): Promise<string> {
@@ -92,7 +95,8 @@ const operatorIdentity = createLocalPrototypeIdentityAccessPortV1({
 });
 const anonymousIdentity = createLocalPrototypeIdentityAccessPortV1({
   actorRef: 'anonymous.client-share',
-  permissions: [BACKEND_PERMISSIONS_V1.approvalRead, BACKEND_PERMISSIONS_V1.approvalWrite, BACKEND_PERMISSIONS_V1.packageReferenceRead],
+  permissions: [BACKEND_PERMISSIONS_V1.approvalRead, BACKEND_PERMISSIONS_V1.approvalWrite,
+    BACKEND_PERMISSIONS_V1.packageReferenceRead, BACKEND_PERMISSIONS_V1.assetRead],
   disclosure: 'ANONYMOUS_SHARE',
 });
 
@@ -103,6 +107,34 @@ const assetPort = createLocalAssetUploadPortV1({ binary: createIndexedDbAssetBin
 const authorityPort = createLocalPublishPackageAuthorityPortV1();
 const nextId = (scope: string) => createClientId(scope);
 const previewUrls = new Map<string, string>();
+
+export function isCreatorLookGovernanceVisibleV1(lookId: string, cases: readonly GovernanceCaseV1[]): boolean {
+  return !cases.some((item) => item.subjectType === 'PUBLISHED_LOOK' && item.subjectId === lookId
+    && (item.status === 'HIDDEN' || item.status === 'REMOVED'));
+}
+
+export function creatorLookMatchesPackageAuthorityV1(
+  look: PublishedLookV1,
+  authority: PublishPackageAuthorityRecordV1,
+): boolean {
+  const packageDetails = authority.package.details.map((item) => ({
+    assetId: item.assetId, revision: item.revision, kind: 'DETAIL' as const, sha256: item.sha256,
+    mimeType: item.mimeType, width: item.width, height: item.height, fidelity: item.fidelity,
+  }));
+  const packageCover = authority.package.cover;
+  return look.designVersionId === authority.package.designVersionId
+    && look.creatorProfileId === authority.ownerRef
+    && look.coverPreview.assetId === packageCover.assetId
+    && look.coverPreview.revision === packageCover.revision
+    && look.coverPreview.sha256 === packageCover.sha256
+    && look.coverPreview.mimeType === packageCover.mimeType
+    && look.coverPreview.width === packageCover.width && look.coverPreview.height === packageCover.height
+    && look.coverPreview.fidelity === packageCover.fidelity
+    && canonicalJsonV1(look.detailPreviews) === canonicalJsonV1(packageDetails)
+    && canonicalJsonV1(look.summaries.shapeIds) === canonicalJsonV1(authority.package.shapeIds)
+    && canonicalJsonV1(look.summaries.lengthIds) === canonicalJsonV1(authority.package.lengthIds)
+    && canonicalJsonV1(look.summaries.palette) === canonicalJsonV1(authority.package.palette);
+}
 
 export const creatorWorkspaceServiceV1 = createCreatorWorkspaceApplicationServiceV1({
   identity: creatorIdentity,
@@ -126,16 +158,24 @@ export const governanceServiceV1 = createGovernanceApplicationServiceV1({
 });
 
 export const clientApprovalServiceV1 = createClientApprovalApplicationServiceV1({
-  identity: anonymousIdentity, approvals: approvalPort, authority: authorityPort, nextId, sha256: sha256Text,
+  identity: anonymousIdentity, approvals: approvalPort, authority: authorityPort, assets: assetPort, nextId, sha256: sha256Text,
 });
 
 export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceResultV1<PublishPackageAuthorityRecordV1>> {
   const designVersionId = CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId;
   const existing = await readAuthoritativePackageByVersionV1({ identity: creatorIdentity, authority: authorityPort, designVersionId });
   if (existing.ok) {
+    if (existing.value.ownerRef !== 'profile.local-demo.creator') {
+      return { ok: false, error: { schemaVersion: 1, code: 'FORBIDDEN', retryable: false, reason: 'publish.package_owner_mismatch' } };
+    }
     const readContext = await creatorIdentity.issueContext({ operation: BACKEND_PERMISSIONS_V1.assetRead });
     if (!readContext.ok) return readContext;
     for (const asset of existing.value.assets) {
+      const record = await assetPort.get(readContext.value, asset.assetId, asset.revision);
+      if (!record.ok) return record;
+      if (record.value.ownerRef !== existing.value.ownerRef) {
+        return { ok: false, error: { schemaVersion: 1, code: 'INTEGRITY_MISMATCH', retryable: false, reason: 'publish.asset_owner_mismatch' } };
+      }
       const bytes = await assetPort.readBytes(readContext.value, asset.assetId, asset.revision);
       if (!bytes.ok) return bytes;
     }
@@ -161,15 +201,25 @@ export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceRe
 }
 
 export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalPublishedLookReadModelV1[]> {
-  const workspace = await creatorWorkspaceServiceV1.load();
+  const [workspace, governance] = await Promise.all([creatorWorkspaceServiceV1.load(), governanceServiceV1.load()]);
   if (!workspace.ok) throw new Error(workspace.error.reason);
-  const publicLooks = workspace.value.publication.looks.filter((look) => look.status === 'PUBLISHED' && look.visibility === 'PUBLIC');
+  if (!governance.ok) throw new Error(governance.error.reason);
+  const publicLooks = workspace.value.publication.looks.filter((look) => look.status === 'PUBLISHED'
+    && look.visibility === 'PUBLIC' && isCreatorLookGovernanceVisibleV1(look.lookId, governance.value.cases));
   const output: CanonicalPublishedLookReadModelV1[] = [];
   for (const look of publicLooks) {
     const authority = await readAuthoritativePackageByVersionV1({ identity: creatorIdentity, authority: authorityPort, designVersionId: look.designVersionId });
     if (!authority.ok) continue;
+    if (authority.value.ownerRef !== look.creatorProfileId || authority.value.ownerRef !== 'profile.local-demo.creator') continue;
+    if (!creatorLookMatchesPackageAuthorityV1(look, authority.value)) continue;
     const readContext = await creatorIdentity.issueContext({ operation: BACKEND_PERMISSIONS_V1.assetRead });
     if (!readContext.ok) continue;
+    let ownedAssets = true;
+    for (const asset of authority.value.assets) {
+      const record = await assetPort.get(readContext.value, asset.assetId, asset.revision);
+      if (!record.ok || record.value.ownerRef !== authority.value.ownerRef) { ownedAssets = false; break; }
+    }
+    if (!ownedAssets) continue;
     const coverBytes = await assetPort.readBytes(readContext.value, authority.value.package.cover.assetId, authority.value.package.cover.revision);
     if (!coverBytes.ok) continue;
     const coverKey = `${authority.value.package.cover.assetId}#${authority.value.package.cover.revision}`;
@@ -184,7 +234,7 @@ export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalP
       cover: { url: coverUrl, kind: 'CANONICAL_RENDER' }, media: [], mainStyleId: 'st02', subStyleIds: [],
       occasionIds: [], subjectIds: [], moodIds: [], effectIds: [], primaryColorIds: [],
       recommendedShapes: [...look.summaries.shapeIds], supportedShapes: [...look.summaries.shapeIds], notRecommendedShapes: {},
-      supportedLengths: [...look.summaries.lengthIds], applicationLevel: 'STRUCTURED_EDITABLE', verificationLevel: 'RENDER_VERIFIED',
+      supportedLengths: [...look.summaries.lengthIds], applicationLevel: 'INSPIRATION_ONLY', verificationLevel: 'RENDER_VERIFIED',
       campaignTags: ['creator-public'], status: 'PUBLISHED', publishedAt: look.publishedAt ?? look.updatedAt,
     };
     output.push({
@@ -193,7 +243,7 @@ export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalP
       cover: structuredClone(sourceContent.cover), media: [], mainStyleId: sourceContent.mainStyleId, subStyleIds: [],
       occasionIds: [], subjectIds: [], moodIds: [], effectIds: [], primaryColorIds: [],
       recommendedShapes: [...look.summaries.shapeIds], supportedShapes: [...look.summaries.shapeIds], notRecommendedShapes: {},
-      supportedLengths: [...look.summaries.lengthIds], applicationLevel: 'STRUCTURED_EDITABLE', verificationLevel: 'RENDER_VERIFIED',
+      supportedLengths: [...look.summaries.lengthIds], applicationLevel: 'INSPIRATION_ONLY', verificationLevel: 'RENDER_VERIFIED',
       campaignTags: ['creator-public'], publishedAt: look.publishedAt ?? look.updatedAt,
       evidence: {
         immutableDesignVersion: { present: true, designVersionId: look.designVersionId, editorDocRef: { designId: authority.value.package.designId, schemaVersion: 7, revision: authority.value.package.revision, sha256: authority.value.editorDocSha256 } },
