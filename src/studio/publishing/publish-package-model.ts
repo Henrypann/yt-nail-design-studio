@@ -97,6 +97,15 @@ export interface PublishPackageOutputV1 {
   sourceRevision: number;
 }
 
+/**
+ * Ephemeral runtime artifact returned alongside a package. Bytes are required
+ * by AssetUploadPort, but are never serialized into PublishPackageV1.
+ */
+export interface PublishPackageArtifactV1 {
+  output: PublishPackageOutputV1;
+  bytes: Uint8Array;
+}
+
 /** Per-nail descriptor: finish type, its DETAIL asset and output fidelity. */
 export interface NailDetailDescriptorV1 {
   finger: FingerCode;
@@ -235,7 +244,7 @@ export type PublishPackageErrorCodeV1 =
   | 'output_contract_failed';
 
 export type PublishPackageResultV1 =
-  | { ok: true; package: PublishPackageV1; fallbackUsed: boolean }
+  | { ok: true; package: PublishPackageV1; artifacts: PublishPackageArtifactV1[]; fallbackUsed: boolean }
   | { ok: false; code: PublishPackageErrorCodeV1; message: string };
 
 /** Deterministic id provider: ids are pure functions of output/package content. */

@@ -101,8 +101,8 @@ function guardedPort<T>(
 
 export function createLocalCreatorPublicationPortV1(): CreatorPublicationPortV1 {
   return guardedPort(createVersionedJsonRepositoryV1({
-    storage: browserStorage(StorageKeys.creatorPublications),
-    ledger: browserStorage(StorageKeys.backendPublicationLedger),
+    storage: browserStorage(StorageKeys.backendPublicationRepository),
+    legacy: browserStorage(StorageKeys.creatorPublications),
     empty: createEmptyCreatorPublicationStoreV1,
     parse: parseCreatorPublicationStoreV1,
     invalidReason: 'publication.store_corrupted',
@@ -111,8 +111,8 @@ export function createLocalCreatorPublicationPortV1(): CreatorPublicationPortV1 
 
 export function createLocalGovernancePortV1(): GovernancePortV1 {
   return guardedPort(createVersionedJsonRepositoryV1({
-    storage: browserStorage(StorageKeys.governance),
-    ledger: browserStorage(StorageKeys.backendGovernanceLedger),
+    storage: browserStorage(StorageKeys.backendGovernanceRepository),
+    legacy: browserStorage(StorageKeys.governance),
     empty: emptyGovernanceStoreV1,
     parse: parseGovernanceStoreV1,
     invalidReason: 'governance.store_corrupted',
@@ -121,8 +121,8 @@ export function createLocalGovernancePortV1(): GovernancePortV1 {
 
 export function createLocalClientApprovalPortV1(): ClientApprovalPortV1 {
   return guardedPort(createVersionedJsonRepositoryV1({
-    storage: browserStorage(StorageKeys.clientApprovals),
-    ledger: browserStorage(StorageKeys.backendApprovalLedger),
+    storage: browserStorage(StorageKeys.backendApprovalRepository),
+    legacy: browserStorage(StorageKeys.clientApprovals),
     empty: emptyClientApprovalStoreV1,
     parse: parseClientApprovalStoreV1,
     invalidReason: 'approval.store_corrupted',

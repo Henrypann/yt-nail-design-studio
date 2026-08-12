@@ -30,6 +30,7 @@ export type {
   PublishOutputKindV1,
   PublishOutputMimeV1,
   PublishPackageDependenciesV1,
+  PublishPackageArtifactV1,
   PublishPackageErrorCodeV1,
   PublishPackageGeometryV1,
   PublishPackageManifestV1,

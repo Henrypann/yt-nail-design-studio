@@ -69,12 +69,13 @@ export const StorageKeys = {
   /** Operator governance queue and immutable audit trail. */
   governance: 'community.governance-v1',
   /** GEN-V7.1-04 local prototype idempotency ledgers (domain payload keys stay backward compatible). */
-  backendPublicationLedger: 'platform.backend.publication-ledger-v1',
-  backendGovernanceLedger: 'platform.backend.governance-ledger-v1',
-  backendApprovalLedger: 'platform.backend.approval-ledger-v1',
+  backendPublicationRepository: 'platform.backend.publication-repository-v1',
+  backendGovernanceRepository: 'platform.backend.governance-repository-v1',
+  backendApprovalRepository: 'platform.backend.approval-repository-v1',
   /** Local prototype asset metadata only. Binary payloads use IndexedDB. */
   backendAssetRecords: 'platform.backend.asset-records-v1',
-  backendAssetLedger: 'platform.backend.asset-ledger-v1',
+  /** Authoritative local prototype mapping: package/designVersion -> READY asset refs. */
+  backendPublishAuthority: 'platform.backend.publish-authority-v1',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

@@ -38,6 +38,7 @@ import {
   type GeometryResolutionV1,
   type NailDetailDescriptorV1,
   type PublishPackageDependenciesV1,
+  type PublishPackageArtifactV1,
   type PublishFallbackReasonV1,
   type PublishPackageGeometryV1,
   type PublishPackageOutputV1,
@@ -171,7 +172,7 @@ async function renderOutput(
   source: { designVersionId: string; version: number; revision: number; rendererRevision: string },
   assetIdOf: (kind: 'COVER' | 'DETAIL', finger: FingerCode | null, contentSha256: string) => string,
 ): Promise<
-  | { ok: true; output: PublishPackageOutputV1; fallbackUsed: boolean }
+  | { ok: true; output: PublishPackageOutputV1; artifact: PublishPackageArtifactV1; fallbackUsed: boolean }
   | { ok: false; code: 'dependency_unavailable' | 'renderer_failed'; message: string }
 > {
   const primary = await attemptRender(dependencies.renderer3d, request);
@@ -224,27 +225,29 @@ async function renderOutput(
     return { ok: false, code: 'dependency_unavailable', message: `asset id provider returned an invalid id "${assetId}"` };
   }
 
+  const descriptor: PublishPackageOutputV1 = {
+    kind: request.kind,
+    ...(request.finger !== undefined ? { finger: request.finger } : {}),
+    assetId,
+    revision: 1,
+    sha256,
+    mimeType: output.mimeType,
+    width: output.width,
+    height: output.height,
+    colorSpace: output.colorSpace,
+    fidelity: output.fidelity,
+    ...(fallbackReason !== undefined ? { fallbackReason } : {}),
+    rendererId: chosen.rendererId,
+    rendererRevision: source.rendererRevision,
+    sourceDesignVersionId: source.designVersionId,
+    sourceVersion: source.version,
+    sourceRevision: source.revision,
+  };
   return {
     ok: true,
     fallbackUsed: primary.failed,
-    output: {
-      kind: request.kind,
-      ...(request.finger !== undefined ? { finger: request.finger } : {}),
-      assetId,
-      revision: 1,
-      sha256,
-      mimeType: output.mimeType,
-      width: output.width,
-      height: output.height,
-      colorSpace: output.colorSpace,
-      fidelity: output.fidelity,
-      ...(fallbackReason !== undefined ? { fallbackReason } : {}),
-      rendererId: chosen.rendererId,
-      rendererRevision: source.rendererRevision,
-      sourceDesignVersionId: source.designVersionId,
-      sourceVersion: source.version,
-      sourceRevision: source.revision,
-    },
+    output: descriptor,
+    artifact: { output: structuredClone(descriptor), bytes: Uint8Array.from(output.bytes) },
   };
 }
 
@@ -320,6 +323,7 @@ export async function buildPublishPackageV1(
   if (!coverResult.ok) return coverResult;
 
   const details: PublishPackageOutputV1[] = [];
+  const artifacts: PublishPackageArtifactV1[] = [coverResult.artifact];
   const nailDescriptors: NailDetailDescriptorV1[] = [];
   let fallbackUsed = coverResult.fallbackUsed;
   for (const finger of FINGER_CODES) {
@@ -349,6 +353,7 @@ export async function buildPublishPackageV1(
     if (!detailResult.ok) return detailResult;
     fallbackUsed = fallbackUsed || detailResult.fallbackUsed;
     details.push(detailResult.output);
+    artifacts.push(detailResult.artifact);
     nailDescriptors.push({
       finger,
       finishType,
@@ -412,5 +417,10 @@ export async function buildPublishPackageV1(
     const issueSummary = parsed.issues.map((issue) => `${issue.path}:${issue.code}`).join(', ');
     return packageError('output_contract_failed', `generated package failed its own contract: ${parsed.reason}; ${issueSummary}`);
   }
-  return { ok: true, package: clonePublishPackageV1(pkg), fallbackUsed };
+  return {
+    ok: true,
+    package: clonePublishPackageV1(pkg),
+    artifacts: artifacts.map((artifact) => ({ output: clonePublishPackageV1(artifact.output), bytes: Uint8Array.from(artifact.bytes) })),
+    fallbackUsed,
+  };
 }

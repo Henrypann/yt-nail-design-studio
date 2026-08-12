@@ -117,75 +117,98 @@ export function createLocalAssetUploadPortV1(input: {
         : serviceErrorV1('DATA_CORRUPTED', 'asset.metadata_store_corrupted', false, correlationId);
     } catch { return serviceErrorV1('UNAVAILABLE', 'asset.metadata_read_failed', true, correlationId); }
   };
-  return {
-    adapterKind: 'LOCAL_PROTOTYPE',
-    async upload(context, upload) {
+  const uploadBatch: AssetUploadPortV1['uploadBatch'] = async (context, uploads) => {
       const allowed = requireServicePermissionV1(context, BACKEND_PERMISSIONS_V1.assetWrite);
       if (!allowed.ok) return allowed;
-      if (context.actor.actorRef !== upload.ownerRef) {
+      if (uploads.length < 1 || uploads.length > 64) {
+        return serviceErrorV1('INVALID', 'asset.invalid_batch', false, context.correlationId);
+      }
+      if (uploads.some((upload) => context.actor.actorRef !== upload.ownerRef)) {
         return serviceErrorV1('FORBIDDEN', 'asset.owner_mismatch', false, context.correlationId);
       }
       const store = readStore(context.correlationId);
       if (!store.ok) return store;
-      const existingUpload = store.value.records.find((record) => record.uploadId === upload.uploadId);
-      if (existingUpload) {
-        return sameUpload(existingUpload, upload)
-          ? { ok: true, value: existingUpload, changed: false }
-          : serviceErrorV1('CONFLICT', 'asset.upload_id_reused', false, context.correlationId);
+      const batchUploadIds = new Set<string>();
+      const batchAssets = new Set<string>();
+      const records: AssetUploadRecordV1[] = [];
+      const fresh: Array<{ upload: AssetUploadInputV1; record: AssetUploadRecordV1 }> = [];
+      for (const upload of uploads) {
+        const assetKey = binaryKey(upload.assetId, 1);
+        if (batchUploadIds.has(upload.uploadId) || batchAssets.has(assetKey)) {
+          return serviceErrorV1('CONFLICT', 'asset.duplicate_batch_identity', false, context.correlationId);
+        }
+        batchUploadIds.add(upload.uploadId); batchAssets.add(assetKey);
+        const existingUpload = store.value.records.find((record) => record.uploadId === upload.uploadId);
+        const existingAsset = store.value.records.find((record) => binaryKey(record.object.assetId, record.object.revision) === assetKey);
+        if (existingUpload || existingAsset) {
+          if (existingUpload && existingUpload === existingAsset && sameUpload(existingUpload, upload)) {
+            records.push(structuredClone(existingUpload));
+            continue;
+          }
+          return serviceErrorV1('CONFLICT', existingUpload ? 'asset.upload_id_reused' : 'asset.revision_exists', false, context.correlationId);
+        }
+        const validated = await validateAssetUploadInputV1(upload, input.sha256, context.correlationId);
+        if (!validated.ok) return validated;
+        const record = parseAssetUploadRecordV1({
+          schemaVersion: 1,
+          uploadId: upload.uploadId,
+          ownerRef: upload.ownerRef,
+          purpose: upload.purpose,
+          fileName: upload.fileName,
+          status: 'READY',
+          object: {
+            assetId: upload.assetId,
+            revision: 1,
+            sha256: upload.sha256,
+            mimeType: upload.mimeType,
+            byteLength: upload.byteLength,
+            width: upload.width,
+            height: upload.height,
+            colorSpace: upload.colorSpace,
+            alphaMode: upload.alphaMode,
+          },
+          source: structuredClone(upload.source),
+          copyrightDeclared: upload.copyrightDeclared,
+          moderationStatus: upload.moderationStatus,
+          createdAt: context.now,
+          updatedAt: context.now,
+        });
+        if (!record) return serviceErrorV1('INVALID', 'asset.record_contract_failed', false, context.correlationId);
+        records.push(record); fresh.push({ upload, record });
       }
-      if (store.value.records.some((record) => record.object.assetId === upload.assetId && record.object.revision === 1)) {
-        return serviceErrorV1('CONFLICT', 'asset.revision_exists', false, context.correlationId);
-      }
-      const validated = await validateAssetUploadInputV1(upload, input.sha256, context.correlationId);
-      if (!validated.ok) return validated;
-      const record: AssetUploadRecordV1 = {
-        schemaVersion: 1,
-        uploadId: upload.uploadId,
-        ownerRef: upload.ownerRef,
-        purpose: upload.purpose,
-        fileName: upload.fileName,
-        status: 'READY',
-        object: {
-          assetId: upload.assetId,
-          revision: 1,
-          sha256: upload.sha256,
-          mimeType: upload.mimeType,
-          byteLength: upload.byteLength,
-          width: upload.width,
-          height: upload.height,
-          colorSpace: upload.colorSpace,
-          alphaMode: upload.alphaMode,
-        },
-        source: structuredClone(upload.source),
-        copyrightDeclared: upload.copyrightDeclared,
-        moderationStatus: upload.moderationStatus,
-        createdAt: context.now,
-        updatedAt: context.now,
-      };
-      const parsed = parseAssetUploadRecordV1(record);
-      if (!parsed) return serviceErrorV1('INVALID', 'asset.record_contract_failed', false, context.correlationId);
-      const key = binaryKey(upload.assetId, 1);
+      const written: string[] = [];
       try {
-        await input.binary.put(key, upload.bytes);
-        writeMetadata({ schemaVersion: 1, records: [...store.value.records, parsed] });
+        for (const { upload } of fresh) {
+          const key = binaryKey(upload.assetId, 1);
+          await input.binary.put(key, upload.bytes); written.push(key);
+        }
+        writeMetadata({ schemaVersion: 1, records: [...store.value.records, ...fresh.map(({ record }) => record)] });
       } catch {
-        try { await input.binary.remove(key); } catch { /* preserve primary failure */ }
+        await Promise.all(written.map(async (key) => { try { await input.binary.remove(key); } catch { /* preserve primary failure */ } }));
         return serviceErrorV1('UNAVAILABLE', 'asset.local_write_failed', true, context.correlationId);
       }
-      return { ok: true, value: parsed, changed: true };
+      return { ok: true, value: records, changed: fresh.length > 0 };
+  };
+  const getRecord: AssetUploadPortV1['get'] = async (context, assetId, revision) => {
+    const allowed = requireServicePermissionV1(context, BACKEND_PERMISSIONS_V1.assetRead);
+    if (!allowed.ok) return allowed;
+    const store = readStore(context.correlationId);
+    if (!store.ok) return store;
+    const record = store.value.records.find((candidate) => candidate.object.assetId === assetId && candidate.object.revision === revision);
+    return record
+      ? { ok: true, value: structuredClone(record), changed: false }
+      : serviceErrorV1('NOT_FOUND', 'asset.not_found', false, context.correlationId);
+  };
+  return {
+    adapterKind: 'LOCAL_PROTOTYPE',
+    async upload(context, upload) {
+      const result = await uploadBatch(context, [upload]);
+      return result.ok ? { ok: true, value: result.value[0], changed: result.changed } : result;
     },
-    async get(context, assetId, revision) {
-      const allowed = requireServicePermissionV1(context, BACKEND_PERMISSIONS_V1.assetRead);
-      if (!allowed.ok) return allowed;
-      const store = readStore(context.correlationId);
-      if (!store.ok) return store;
-      const record = store.value.records.find((candidate) => candidate.object.assetId === assetId && candidate.object.revision === revision);
-      return record
-        ? { ok: true, value: structuredClone(record), changed: false }
-        : serviceErrorV1('NOT_FOUND', 'asset.not_found', false, context.correlationId);
-    },
+    uploadBatch,
+    get: getRecord,
     async readBytes(context, assetId, revision) {
-      const record = await this.get(context, assetId, revision);
+      const record = await getRecord(context, assetId, revision);
       if (!record.ok) return record;
       try {
         const bytes = await input.binary.get(binaryKey(assetId, revision));

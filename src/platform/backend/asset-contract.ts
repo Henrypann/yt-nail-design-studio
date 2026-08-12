@@ -64,6 +64,8 @@ export interface AssetUploadInputV1 {
 export interface AssetUploadPortV1 {
   readonly adapterKind: 'LOCAL_PROTOTYPE' | 'REMOTE';
   upload(context: ServiceCommandContextV1, input: AssetUploadInputV1): Promise<ServiceResultV1<AssetUploadRecordV1>>;
+  /** All inputs become READY together, or no new metadata is committed. */
+  uploadBatch(context: ServiceCommandContextV1, inputs: readonly AssetUploadInputV1[]): Promise<ServiceResultV1<AssetUploadRecordV1[]>>;
   get(context: ServiceCommandContextV1, assetId: string, revision: number): Promise<ServiceResultV1<AssetUploadRecordV1>>;
   readBytes(context: ServiceCommandContextV1, assetId: string, revision: number): Promise<ServiceResultV1<Uint8Array>>;
 }
@@ -115,10 +117,20 @@ export function parseAssetUploadRecordV1(value: unknown): AssetUploadRecordV1 | 
 
 function pngDimensions(bytes: Uint8Array): { width: number; height: number } | null {
   const sig = [137, 80, 78, 71, 13, 10, 26, 10];
-  if (bytes.length < 24 || !sig.every((byte, index) => bytes[index] === byte)
-    || String.fromCharCode(...bytes.slice(12, 16)) !== 'IHDR') return null;
+  if (bytes.length < 45 || !sig.every((byte, index) => bytes[index] === byte)) return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  return { width: view.getUint32(16), height: view.getUint32(20) };
+  let offset = 8; let width = 0; let height = 0; let hasData = false; let ended = false;
+  while (offset + 12 <= bytes.length) {
+    const length = view.getUint32(offset);
+    if (offset + 12 + length > bytes.length) return null;
+    const type = String.fromCharCode(...bytes.slice(offset + 4, offset + 8));
+    if (offset === 8 && (type !== 'IHDR' || length !== 13)) return null;
+    if (type === 'IHDR') { width = view.getUint32(offset + 8); height = view.getUint32(offset + 12); }
+    if (type === 'IDAT' && length > 0) hasData = true;
+    if (type === 'IEND') { ended = length === 0; break; }
+    offset += 12 + length;
+  }
+  return width > 0 && height > 0 && hasData && ended ? { width, height } : null;
 }
 
 function jpegDimensions(bytes: Uint8Array): { width: number; height: number } | null {
