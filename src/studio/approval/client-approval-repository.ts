@@ -1,0 +1,4 @@
+import { readData, StorageKeys, writeEnvelope } from '@/lib/storage';
+import { emptyClientApprovalStoreV1, parseClientApprovalStoreV1, type ClientApprovalResultV1, type ClientApprovalStoreV1 } from './client-approval';
+export function readClientApprovalStoreV1(){const raw=readData<unknown>(StorageKeys.clientApprovals);if(raw===null)return{store:emptyClientApprovalStoreV1(),corrupted:false};const parsed=parseClientApprovalStoreV1(raw);return parsed?{store:parsed,corrupted:false}:{store:emptyClientApprovalStoreV1(),corrupted:true};}
+export function persistClientApprovalStoreV1(store:ClientApprovalStoreV1):ClientApprovalResultV1<ClientApprovalStoreV1>{const parsed=parseClientApprovalStoreV1(store);if(!parsed)return{ok:false,code:'invalid',message:'approval store contract failed'};try{writeEnvelope(StorageKeys.clientApprovals,parsed);return{ok:true,value:parsed};}catch{return{ok:false,code:'persist_failed',message:'approval storage unavailable'};}}

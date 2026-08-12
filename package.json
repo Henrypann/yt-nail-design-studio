@@ -22,6 +22,7 @@
     "test:studio-v7-1-design-release": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-design-release.mjs",
     "test:studio-v7-1-versioned-import": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-versioned-import.mjs",
     "test:studio-v7-1-publish-package": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-publish-package.mjs",
+    "test:studio-v7-1-client-approval": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-v7-1-client-approval.mjs",
     "test:community-v7-1-use-customize": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-use-customize.mjs",
     "test:community-v7-1-publish-creator": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-publish-creator.mjs",
     "test:community-v7-1-trust-contracts": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-trust-contracts.mjs",

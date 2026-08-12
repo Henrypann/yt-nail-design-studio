@@ -64,6 +64,8 @@ export const StorageKeys = {
   lookCustomizeEvents: 'community.look-customize-events-v1',
   /** Creator local prototype: PublishPackage → PublishedLook workflow. */
   creatorPublications: 'community.creator-publications-v1',
+  /** Fixed-version client share links, snapshots and approval events. */
+  clientApprovals: 'studio.client-approvals-v1',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];
