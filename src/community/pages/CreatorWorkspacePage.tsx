@@ -3,6 +3,9 @@ import { Archive, Eye, EyeOff, FilePlus2, LockKeyhole, Send, Sparkles } from 'lu
 import { Button, Input, Tabs, useToast } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
 import { CANONICAL_USE_DEMO_RELEASE_RECORD_V1 } from '@/integration/community-studio/canonical-use-demo';
+import { Routes } from '@/app/routes';
+import { createClientShareV1 } from '@/studio/approval';
+import { persistClientApprovalStoreV1, readClientApprovalStoreV1 } from '@/studio/approval';
 import { buildPublishPackageV1, createDeterministicPublishIdFactoryV1, type PublishPackageV1 } from '@/studio/publishing';
 import { createBrowserSha256V1 } from '@/studio/versioning';
 import {
@@ -80,6 +83,16 @@ export default function CreatorWorkspacePage() {
     const result = setCreatorLookHiddenV1(store, lookId, hidden, new Date().toISOString());
     if (result.ok) save(result.value, hidden ? text('作品已隐藏', 'Look hidden') : text('作品已恢复', 'Look restored'));
   };
+  const shareLook = async (designVersionId:string) => {
+    const publication=store.looks.find(look=>look.designVersionId===designVersionId);if(!publication)return;
+    const rawToken=[...crypto.getRandomValues(new Uint8Array(24))].map(v=>v.toString(16).padStart(2,'0')).join('');
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(rawToken));const tokenHash=[...new Uint8Array(digest)].map(v=>v.toString(16).padStart(2,'0')).join('');
+    const approvals=readClientApprovalStoreV1();if(approvals.corrupted){toast.error(text('分享仓储损坏','Share store corrupted'));return;}
+    const pkg=await createDemoPackage();if(pkg.designVersionId!==publication.designVersionId){toast.error(text('固定版本发布包不可用','Fixed-version package unavailable'));return;}const now=new Date(),expires=new Date(now.getTime()+7*24*60*60*1000);
+    const created=createClientShareV1({store:approvals.store,shareLinkId:`share.${crypto.randomUUID()}`,tokenHash,editorDocSha256:CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.editorDocRef.sha256,package:pkg,now:now.toISOString(),expiresAt:expires.toISOString()});
+    if(!created.ok||!persistClientApprovalStoreV1(created.value).ok){toast.error(text('创建分享失败','Could not create share'));return;}
+    const url=new URL(Routes.communityClientShare(rawToken),window.location.origin).toString();await navigator.clipboard?.writeText(url);toast.success(text('顾客确认链接已复制（7 天有效）','Client approval link copied (7 days)'));
+  };
 
   const visibleLooks = store.looks.filter((look) => tab === 'hidden' ? look.status === 'HIDDEN' : look.status === 'PUBLISHED');
   return (
@@ -95,7 +108,7 @@ export default function CreatorWorkspacePage() {
           {store.drafts.map((draft) => <button key={draft.draftId} onClick={()=>setActiveId(draft.draftId)} className="min-h-32 rounded-card border border-gray-200 bg-white p-4 text-left hover:border-primary/40"><span className="rounded-full bg-primary-soft px-2 py-1 text-nano font-semibold text-primary">Step {draft.step}/3 · {draft.visibility}</span><h2 className="mt-3 font-semibold text-ink">{draft.title || text('未命名发布草稿','Untitled publication')}</h2><p className="mt-1 text-xs text-mute">{draft.package.designVersionId}</p></button>)}
         </CardGrid>
       ) : <CardGrid empty={tab==='hidden'?text('没有已隐藏作品','No hidden looks'):text('还没有已发布作品','No published looks')}>
-        {visibleLooks.map((look)=><article key={look.lookId} className="rounded-card border border-gray-200 bg-white p-4"><div className="flex items-start justify-between gap-3"><div><span className="rounded-full bg-gray-100 px-2 py-1 text-nano font-semibold text-gray-600">{look.visibility}</span><h2 className="mt-3 font-semibold text-ink">{look.title}</h2><p className="mt-1 text-xs text-mute">{look.designVersionId}</p></div>{look.status==='HIDDEN'?<Button variant="secondary" onClick={()=>toggleHidden(look.lookId,false)}><Eye size={14}/>{text('恢复','Restore')}</Button>:<Button variant="secondary" onClick={()=>toggleHidden(look.lookId,true)}><EyeOff size={14}/>{text('隐藏','Hide')}</Button>}</div></article>)}
+        {visibleLooks.map((look)=><article key={look.lookId} className="rounded-card border border-gray-200 bg-white p-4"><div className="flex items-start justify-between gap-3"><div><span className="rounded-full bg-gray-100 px-2 py-1 text-nano font-semibold text-gray-600">{look.visibility}</span><h2 className="mt-3 font-semibold text-ink">{look.title}</h2><p className="mt-1 text-xs text-mute">{look.designVersionId}</p></div><div className="flex flex-wrap gap-2">{look.status==='PUBLISHED'&&<Button variant="secondary" onClick={()=>void shareLook(look.designVersionId)}><Send size={14}/>{text('分享确认','Share')}</Button>}{look.status==='HIDDEN'?<Button variant="secondary" onClick={()=>toggleHidden(look.lookId,false)}><Eye size={14}/>{text('恢复','Restore')}</Button>:<Button variant="secondary" onClick={()=>toggleHidden(look.lookId,true)}><EyeOff size={14}/>{text('隐藏','Hide')}</Button>}</div></div></article>)}
       </CardGrid>}
     </div>
   );

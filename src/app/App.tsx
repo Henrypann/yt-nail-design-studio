@@ -36,6 +36,7 @@ import CommunitySearchPage from '@/community/pages/CommunitySearchPage';
 import CommunityOfficialPage from '@/community/pages/CommunityOfficialPage';
 import CommunityCreatorsPage from '@/community/pages/CommunityCreatorsPage';
 import CreatorWorkspacePage from '@/community/pages/CreatorWorkspacePage';
+import ClientSharePage from '@/community/pages/ClientSharePage';
 import CommunityLookPage from '@/community/pages/CommunityLookPage';
 import CommunityLegacyContentRedirect from '@/community/pages/CommunityLegacyContentRedirect';
 import CommunityProfilePage from '@/community/pages/CommunityProfilePage';
@@ -87,6 +88,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.communityOfficial} element={<CommunityOfficialPage />} />
       <Route path={Routes.communityCreators} element={<CommunityCreatorsPage />} />
       <Route path={Routes.communityCreatorWorkspace} element={<CreatorWorkspacePage />} />
+      <Route path={Routes.communityClientSharePath} element={<ClientSharePage />} />
       <Route path={Routes.communityLookPath} element={<CommunityLookPage />} />
       {/* Nail Board（COMM-V7.1-03）：owner 管理 + token 只读分享（同一 Community 壳） */}
       <Route path={Routes.communityBoards} element={<CommunityBoardsPage />} />

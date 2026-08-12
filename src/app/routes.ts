@@ -32,6 +32,8 @@ export const Routes = {
   communityOfficial: '/official',
   communityCreators: '/creators',
   communityCreatorWorkspace: '/creator',
+  communityClientShare: (token: string) => `/share/${token}`,
+  communityClientSharePath: '/share/:token',
   /**
    * @deprecated 兼容旧链（COMM-V7.1-01）：/community/content/:contentId 由
    * CommunityLegacyContentRedirect 以 replace 重定向到 canonical look 路由，
