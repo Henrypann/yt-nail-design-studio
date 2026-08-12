@@ -9,12 +9,33 @@
     @apply antialiased;
   }
   body {
-    @apply bg-canvas font-sans text-gray-900;
+    @apply bg-canvas font-sans text-ink;
     font-feature-settings: 'tnum' 0;
   }
   /* 数字/参数统一等宽数字 */
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+  .dev-debug-text {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .nail-grid {
+    container-type: inline-size;
+  }
+
+  .nail-grid__items {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(8px, 1vw, 20px);
+  }
+
+  @container (max-width: 459px) {
+    .nail-grid__items {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
   *:focus-visible {
     outline: 2px solid var(--color-focus-ring);

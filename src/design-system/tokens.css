@@ -3,49 +3,87 @@
  * Tailwind theme 通过 CSS 变量引用本文件，改 token 只改这里。
  */
 :root {
-  /* ── 中性灰阶（11 级） ─────────────────────────────── */
-  --gray-50: #fafafa;
-  --gray-100: #f4f4f5; /* 画布区浅灰底 */
-  --gray-200: #e4e4e7;
-  --gray-300: #d4d4d8;
-  --gray-400: #a1a1aa;
-  --gray-500: #71717a;
-  --gray-600: #52525b;
-  --gray-700: #3f3f46;
-  --gray-800: #27272a;
-  --gray-900: #18181b;
-  --gray-950: #0a0a0a;
+  /* ── 暖灰阶：兼容既有 gray-* utility 的语义映射 ────── */
+  --gray-50: #fcfaf6;
+  --gray-100: #f3ede3;
+  --gray-200: #ede6da;
+  --gray-300: #ddd3c6;
+  --gray-400: #bdb1a2;
+  --gray-500: #948677;
+  --gray-600: #6f6257;
+  --gray-700: #4f443a;
+  --gray-800: #3d332c;
+  --gray-900: #2e2620;
+  --gray-950: #211a16;
 
   /* ── 单一品牌主色（暖调玫瑰/浆果） ─────────────────── */
-  --color-primary: #c2497a;
-  --color-primary-hover: #ad3f6b;
-  --color-primary-active: #96355c;
-  --color-primary-soft: rgba(194, 73, 122, 0.08); /* 选中态 8% 填充 */
+  --color-primary: #f04e7e;
+  --color-primary-hover: #db3a6a;
+  --color-primary-active: #c23062;
+  --color-primary-soft: #fde4ee;
+  --color-primary-border: #f7a8c6;
   --color-primary-foreground: #ffffff;
+  --color-brand-deep: #c23062;
+  --color-dark-surface: #362229;
+
+  /* ── 甲油色盘：只用于标签、分类和小面积状态点缀 ────── */
+  --color-coral: #ff7e67;
+  --color-coral-soft: #ffe9e4;
+  --color-lilac: #b58ce8;
+  --color-lilac-soft: #f1e7fc;
+  --color-mint: #45cea2;
+  --color-mint-soft: #dff7ee;
+  --color-butter: #f5c445;
+  --color-butter-soft: #fdf3da;
+  --color-aqua: #4fb8c9;
+  --color-aqua-soft: #e0f5f8;
 
   /* ── 语义色（Toast / 状态徽标） ────────────────────── */
-  --color-success: #277a58;
-  --color-success-soft: rgba(39, 122, 88, 0.1);
-  --color-warning: #9a5a12;
-  --color-warning-soft: rgba(154, 90, 18, 0.1);
-  --color-error: #b42318;
-  --color-error-soft: rgba(180, 35, 24, 0.1);
-  --color-info: #3f6678;
-  --color-info-soft: rgba(63, 102, 120, 0.1);
+  --color-success: #2fa36b;
+  --color-success-soft: #dff3e8;
+  --color-warning: #e8920b;
+  --color-warning-soft: #fcf0da;
+  --color-error: #e04a38;
+  --color-error-soft: #fbe5e1;
+  --color-info: #4b85c9;
+  --color-info-soft: #e5effa;
 
   /* ── 表面 ─────────────────────────────────────────── */
-  --color-canvas-bg: var(--gray-100); /* 画布区浅灰底 */
-  --color-panel-bg: #ffffff; /* 面板白底 */
-  --color-focus-ring: rgba(194, 73, 122, 0.35);
+  --color-ink: #2e2620;
+  --color-body: #4f443a;
+  --color-mute: #948677;
+  --color-faint: #bdb1a2;
+  --color-hairline: #ede6da;
+  --color-hairline-soft: #f3ede3;
+  --color-canvas: #faf6ef;
+  --color-workspace: #f3ede3;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fcfaf6;
+  --color-canvas-bg: var(--color-canvas); /* legacy alias */
+  --color-panel-bg: var(--color-surface); /* legacy alias */
+  --color-focus-ring: rgba(240, 78, 126, 0.35);
 
   /* ── 圆角 ─────────────────────────────────────────── */
-  --radius-button: 6px;
+  --radius-button: 8px;
   --radius-panel: 8px;
   --radius-card: 12px;
 
   /* ── 阴影（仅两级） ───────────────────────────────── */
-  --shadow-float: 0 2px 8px rgba(0, 0, 0, 0.08); /* 悬浮面板 */
-  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.12); /* 模态 */
+  --shadow-float: 0 4px 16px rgba(96, 60, 48, 0.08);
+  --shadow-modal: 0 16px 48px rgba(96, 60, 48, 0.14);
+
+  /* ── 4px spacing 体系 ─────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-control: var(--space-2);
+  --space-panel: var(--space-4);
+  --space-section: var(--space-6);
+  --space-community-section: var(--space-12);
 
   /* ── 动效时长 ─────────────────────────────────────── */
   --duration-fast: 150ms; /* 淡出 */

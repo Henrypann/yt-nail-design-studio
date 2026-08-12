@@ -25,14 +25,28 @@ export default {
           active: 'var(--color-primary-active)',
           soft: 'var(--color-primary-soft)', // 8% 主色填充（选中态背景）
           foreground: 'var(--color-primary-foreground)',
+          border: 'var(--color-primary-border)',
         },
+        coral: { DEFAULT: 'var(--color-coral)', soft: 'var(--color-coral-soft)' },
+        lilac: { DEFAULT: 'var(--color-lilac)', soft: 'var(--color-lilac-soft)' },
+        mint: { DEFAULT: 'var(--color-mint)', soft: 'var(--color-mint-soft)' },
+        butter: { DEFAULT: 'var(--color-butter)', soft: 'var(--color-butter-soft)' },
+        aqua: { DEFAULT: 'var(--color-aqua)', soft: 'var(--color-aqua-soft)' },
         // 语义色（Toast / 状态徽标四型）
         success: { DEFAULT: 'var(--color-success)', soft: 'var(--color-success-soft)' },
         warning: { DEFAULT: 'var(--color-warning)', soft: 'var(--color-warning-soft)' },
         error: { DEFAULT: 'var(--color-error)', soft: 'var(--color-error-soft)' },
         info: { DEFAULT: 'var(--color-info)', soft: 'var(--color-info-soft)' },
         // 画布底色
-        canvas: 'var(--color-canvas-bg)',
+        canvas: 'var(--color-canvas)',
+        workspace: 'var(--color-workspace)',
+        surface: 'var(--color-surface)',
+        'surface-soft': 'var(--color-surface-soft)',
+        ink: 'var(--color-ink)',
+        body: 'var(--color-body)',
+        mute: 'var(--color-mute)',
+        faint: 'var(--color-faint)',
+        hairline: 'var(--color-hairline)',
       },
       borderRadius: {
         button: 'var(--radius-button)', // 6px
@@ -58,6 +72,22 @@ export default {
           'Segoe UI',
           'sans-serif',
         ],
+      },
+      fontSize: {
+        nano: ['11px', { lineHeight: '1.3', letterSpacing: '0.3px' }],
+        caption: ['12px', { lineHeight: '1.4' }],
+        body: ['14px', { lineHeight: '1.5' }],
+        h3: ['16px', { lineHeight: '1.4' }],
+        h2: ['20px', { lineHeight: '1.35' }],
+        h1: ['24px', { lineHeight: '1.3' }],
+        display: ['32px', { lineHeight: '1.2', letterSpacing: '-0.4px' }],
+        hero: ['40px', { lineHeight: '1.15', letterSpacing: '-0.5px' }],
+      },
+      spacing: {
+        control: 'var(--space-control)',
+        panel: 'var(--space-panel)',
+        section: 'var(--space-section)',
+        'community-section': 'var(--space-community-section)',
       },
       keyframes: {
         'skeleton-pulse': {
