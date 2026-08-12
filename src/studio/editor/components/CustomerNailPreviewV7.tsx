@@ -5,8 +5,15 @@ import {
   representativeBackgroundColorV7,
   resolveBackgroundSilhouetteV7,
 } from '../v7/background';
+import {
+  dimensionalDecorationFidelityV7,
+  dimensionalDecorationPathToCanvasV7,
+  dimensionalDecorationShadowOffsetV7,
+} from '../v7/dimensional-decoration';
+import { surfaceFinishPreviewAppearanceV7 } from '../v7/finish';
 import type {
   BackgroundPayloadV7,
+  DimensionalDecorationV7,
   FlatDesignElementV7,
   NailDesignV7,
   NailPointV7,
@@ -17,6 +24,12 @@ import type {
 } from '../v7/model';
 import { parseNailPathDataV7, resolveFlatElementMaskScopeV7 } from '../v7/flat-vector';
 import type { CustomerNailPreviewReadModelV7 } from '../v7/customer-preview';
+import {
+  createSurfaceEffectParticlesV7,
+  normalizeSurfaceEffectDirectionV7,
+  rgbaCssV7,
+  surfaceEffectMaskPathToCanvasV7,
+} from '../v7/surface-effect';
 import { FlatContentArtworkV7 } from './FlatContentArtworkV7';
 
 const CANVAS_WIDTH = 100;
@@ -123,9 +136,43 @@ function BackgroundArtwork({ background, override, rawId }: { background: Backgr
 }
 
 function FinishOverlay({ finishType, rawId }: { finishType: CustomerNailPreviewReadModelV7['finishType']; rawId: string }) {
-  if (finishType === 'gloss') return <rect width="100" height="160" fill={`url(#${rawId}-gloss)`} opacity="0.72" />;
-  if (finishType === 'matte') return <rect width="100" height="160" fill="rgb(255 248 246 / 0.16)" />;
-  return <rect width="100" height="160" fill={`url(#${rawId}-frosted)`} opacity="0.34" />;
+  const appearance = surfaceFinishPreviewAppearanceV7(finishType);
+  if (finishType === 'gloss') return <rect width="100" height="160" fill={`url(#${rawId}-gloss)`} opacity={appearance.sheenOpacity} />;
+  if (finishType === 'matte') return <rect width="100" height="160" fill="rgb(255 248 246)" opacity={appearance.veilOpacity} />;
+  return <><rect width="100" height="160" fill="rgb(255 248 246)" opacity={appearance.veilOpacity} /><rect width="100" height="160" fill={`url(#${rawId}-frosted)`} opacity={appearance.grainOpacity} /></>;
+}
+
+function renderSurfaceEffect(step: Extract<ProcessStepV7, { kind: 'surface_effect' }>, rawId: string): ReactNode {
+  const maskPath = surfaceEffectMaskPathToCanvasV7(step.mask.pathData);
+  if (!maskPath) return null;
+  if (step.effect.previewFidelity === 'unavailable') return <path d={maskPath} fill="none" stroke="#8f6877" strokeWidth="1.2" strokeDasharray="4 3" />;
+  const maskId = `${rawId}-mask`;
+  const gradientId = `${rawId}-gradient`;
+  const effect = step.effect;
+  const particles = effect.effectType === 'glitter'
+    ? createSurfaceEffectParticlesV7(effect.seed, effect.density, 3)
+    : effect.effectType === 'ink_bloom'
+      ? createSurfaceEffectParticlesV7(effect.seed, effect.spread, effect.colors.length)
+      : [];
+  const artwork = effect.effectType === 'cat_eye'
+    ? <rect x="-20" width="140" height="160" fill={`url(#${gradientId})`} transform={`rotate(${normalizeSurfaceEffectDirectionV7(effect.directionDeg)} 50 80)`} opacity={effect.intensity} />
+    : effect.effectType === 'mirror'
+      ? <rect width="100" height="160" fill={`url(#${gradientId})`} opacity={effect.reflectance} />
+      : effect.effectType === 'glitter'
+        ? particles.map((particle, index) => <circle key={index} cx={particle.u * 100} cy={particle.v * 160} r={particle.radius} fill={index % 2 ? '#f4d9ff' : '#ffffff'} fillOpacity={particle.opacity} />)
+        : particles.map((particle, index) => <circle key={index} cx={particle.u * 100} cy={particle.v * 160} r={5 + particle.radius * 4} fill={rgbaCssV7(effect.colors[particle.colorIndex % effect.colors.length], particle.opacity * 0.5)} />);
+  return <Fragment><defs><mask id={maskId}><rect width="100" height="160" fill={step.mask.inverted ? 'white' : 'black'} /><path d={maskPath} fill={step.mask.inverted ? 'black' : 'white'} fillRule={step.mask.fillRule} /></mask>{effect.effectType === 'cat_eye' && <linearGradient id={gradientId}><stop stopColor="#fff" stopOpacity="0" /><stop offset=".5" stopColor="#fff" stopOpacity=".95" /><stop offset="1" stopColor="#fff" stopOpacity="0" /></linearGradient>}{effect.effectType === 'mirror' && <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#233" stopOpacity=".35" /><stop offset=".28" stopColor="#fff" /><stop offset=".55" stopColor={rgbaCssV7(effect.tint)} /><stop offset=".75" stopColor="#fff" /><stop offset="1" stopColor="#344" stopOpacity=".35" /></linearGradient>}</defs><g mask={`url(#${maskId})`}>{artwork}</g></Fragment>;
+}
+
+function renderDecoration(decoration: DimensionalDecorationV7): ReactNode {
+  if (!decoration.visible) return null;
+  const path = decoration.kind === 'relief_2_5d'
+    ? dimensionalDecorationPathToCanvasV7(decoration.outline.pathData)
+    : 'M28 75 C40 58 60 58 72 75 C61 78 58 91 50 103 C42 91 39 78 28 75 Z';
+  if (!path) return null;
+  const unavailable = dimensionalDecorationFidelityV7(decoration) === 'unavailable';
+  const shadow = dimensionalDecorationShadowOffsetV7(decoration.heightMm);
+  return transformedElement(decoration, <><path d={path} transform={`translate(${shadow} ${shadow})`} fill="#34232d" fillOpacity=".16" /><path d={path} fill={decoration.kind === 'attachment_3d' ? '#dbc79f' : '#e9bad0'} fillOpacity={unavailable ? 0.2 : 0.85} stroke="#fff" strokeWidth="1" strokeDasharray={unavailable ? '4 3' : undefined} /></>);
 }
 
 export function CustomerNailPreviewV7({
@@ -133,11 +180,13 @@ export function CustomerNailPreviewV7({
   readModel,
   selected = false,
   size = 'overview',
+  presentation = '2d',
 }: {
   nail: NailDesignV7;
   readModel: CustomerNailPreviewReadModelV7;
   selected?: boolean;
   size?: 'overview' | 'focus';
+  presentation?: '2d' | 'composite';
 }) {
   const rawId = useId().replace(/:/g, '');
   const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
@@ -145,6 +194,8 @@ export function CustomerNailPreviewV7({
   const backgroundStep = nail.steps[0];
   if (backgroundStep.kind !== 'background') return null;
   const flatSteps = nail.steps.filter((step): step is FlatStepV7 => step.kind === 'flat_design' && step.visible && !step.skipped);
+  const activeMiddle = nail.steps.slice(1, -1).filter((step) => step.visible && !step.skipped);
+  const flatStepIndex = new Map(flatSteps.map((step, index) => [step.id, index]));
 
   const renderStepElements = (step: FlatStepV7, stepIndex: number) => {
     const stepMaskId = `${rawId}-step-${stepIndex}`;
@@ -163,9 +214,9 @@ export function CustomerNailPreviewV7({
   };
 
   return (
-    <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity}>
-      <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')}>
-        <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={`${nail.finger} 顾客 2D 预览`}>
+    <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity} data-presentation={presentation}>
+      <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', presentation === 'composite' && 'shadow-[0_24px_60px_rgba(77,53,67,0.2)]', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')} style={presentation === 'composite' ? { transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)' } : undefined}>
+        <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={`${nail.finger} 顾客${presentation === 'composite' ? '模拟 3D 组合' : ' 2D'}预览`}>
           <defs>
             <clipPath id={`${rawId}-geometry`} clipPathUnits="userSpaceOnUse"><path d={silhouette.pathD} transform={silhouetteTransform} /></clipPath>
             <BackgroundDefs background={backgroundStep.background} rawId={rawId} />
@@ -188,7 +239,15 @@ export function CustomerNailPreviewV7({
           <g clipPath={`url(#${rawId}-geometry)`}>
             <rect width="100" height="160" fill="#f5f5f6" />
             {backgroundStep.visible && <BackgroundArtwork background={backgroundStep.background} override={readModel.backgroundColorOverride} rawId={rawId} />}
-            {flatSteps.map((step, index) => <g key={step.id}>{renderStepElements(step, index)}</g>)}
+            {presentation === '2d'
+              ? flatSteps.map((step, index) => <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, index)}</g>)
+              : activeMiddle.map((step, index) => step.kind === 'flat_design'
+                ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, flatStepIndex.get(step.id) ?? 0)}</g>
+                : step.kind === 'surface_effect'
+                  ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderSurfaceEffect(step, `${rawId}-effect-${index}`)}</g>
+                  : step.kind === 'dimensional_decoration'
+                    ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{step.decorations.map((decoration) => <Fragment key={decoration.id}>{renderDecoration(decoration)}</Fragment>)}</g>
+                    : null)}
             <FinishOverlay finishType={readModel.finishType} rawId={rawId} />
           </g>
           <g transform={silhouetteTransform} pointerEvents="none"><path d={silhouette.pathD} fill="none" stroke="#6f625f" strokeWidth="1" vectorEffect="non-scaling-stroke" /></g>

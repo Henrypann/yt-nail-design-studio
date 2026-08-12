@@ -37,7 +37,7 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   console.log('[v7-customer-preview] ephemeral scenario immutability: PASS');
 }
 
-// Ten-finger read model includes the whole set and explicitly reports deferred content.
+// Ten-finger read model includes active delivered layers and their aggregate fidelity.
 {
   const doc = createFullEditorDocV7Fixture();
   const scenario = setCustomerPreviewFinishV7(createCustomerPreviewScenarioV7(), 'frosted');
@@ -50,14 +50,19 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   assert.equal(l1.flatStepCount, 1);
   assert.ok(l1.flatElementCount > 0);
   assert.equal(l1.unsupportedFlatElementCount, 0);
-  assert.ok(l1.deferredSurfaceEffectCount > 0);
-  assert.ok(l1.deferredDecorationCount > 0);
+  assert.equal(l1.activeSurfaceEffectCount, 3);
+  assert.equal(l1.activeDecorationCount, 2);
+  assert.equal(l1.fidelityByLayer.geometry, 'exact');
+  assert.equal(l1.fidelityByLayer.flat, 'approximate');
+  assert.equal(l1.fidelityByLayer.surfaceEffect, 'unavailable');
+  assert.equal(l1.fidelityByLayer.dimensionalDecoration, 'unavailable');
+  assert.equal(l1.fidelityByLayer.finish, 'approximate');
   assert.equal(l1.fidelity, 'unavailable');
   assert.ok(l1.warnings.some((warning) => warning.includes('本机导入素材')));
-  assert.ok(l1.warnings.some((warning) => warning.includes('V7-12')));
-  assert.ok(l1.warnings.some((warning) => warning.includes('V7-13')));
+  assert.ok(l1.warnings.some((warning) => warning.includes('表面效果不可表达')));
+  assert.ok(l1.warnings.some((warning) => warning.includes('立体装饰 Mesh 不可用')));
   assert.equal(models[1].fidelity, 'approximate');
-  console.log('[v7-customer-preview] ten-finger fidelity/deferred boundary: PASS');
+  console.log('[v7-customer-preview] ten-finger delivered layer fidelity: PASS');
 }
 
 // Hidden/skipped middle steps remain in the document but are not falsely rendered as active preview content.
@@ -71,8 +76,10 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   const model = deriveCustomerNailPreviewV7(nail, createCustomerPreviewScenarioV7());
   assert.equal(model.flatStepCount, 0);
   assert.equal(model.flatElementCount, 0);
-  assert.equal(model.deferredSurfaceEffectCount, 0);
-  assert.equal(model.deferredDecorationCount, 0);
+  assert.equal(model.activeSurfaceEffectCount, 0);
+  assert.equal(model.activeDecorationCount, 0);
+  assert.equal(model.fidelityByLayer.surfaceEffect, 'exact');
+  assert.equal(model.fidelityByLayer.dimensionalDecoration, 'exact');
   assert.equal(model.fidelity, 'approximate');
   console.log('[v7-customer-preview] hidden/skipped preview semantics: PASS');
 }
@@ -123,6 +130,7 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   const shellSource = await readFile(new URL('../src/studio/editor/components/EditorShellV7.tsx', import.meta.url), 'utf8');
   const pageSource = await readFile(new URL('../src/app/pages/design/CustomerPreviewPageV7.tsx', import.meta.url), 'utf8');
   const previewShellSource = await readFile(new URL('../src/studio/editor/components/CustomerPreviewShellV7.tsx', import.meta.url), 'utf8');
+  const nailPreviewSource = await readFile(new URL('../src/studio/editor/components/CustomerNailPreviewV7.tsx', import.meta.url), 'utf8');
   assert.match(appSource, /Routes\.designCustomerPreview/);
   assert.match(shellSource, /captureCustomerPreviewSessionV7/);
   assert.match(shellSource, /saveState === 'saved'/);
@@ -131,6 +139,17 @@ const color = { colorSpace: 'srgb', r: 12, g: 34, b: 56, a: 1 };
   assert.match(previewShellSource, /initialFinger/);
   assert.match(previewShellSource, /data-selected-finger/);
   assert.match(previewShellSource, /aria-current=/);
+  assert.match(previewShellSource, /STUDIO-04/);
+  assert.match(previewShellSource, /data-customer-confirmation-ready/);
+  assert.match(previewShellSource, /createCustomerPreviewScenarioV7\(\)/);
+  assert.match(previewShellSource, /presentation/);
+  assert.match(previewShellSource, /模拟 3D/);
+  assert.match(nailPreviewSource, /activeMiddle\.map/);
+  assert.match(nailPreviewSource, /step\.kind === 'flat_design'/);
+  assert.match(nailPreviewSource, /data-preview-step-kind/);
+  assert.match(nailPreviewSource, /normalizeSurfaceEffectDirectionV7/);
+  assert.doesNotMatch(previewShellSource, /V7-12|V7-13|V7-14 开放|3D · 后续|V7-09/);
+  assert.doesNotMatch(source, /deferredSurfaceEffectCount|deferredDecorationCount/);
   console.log('[v7-customer-preview] writer-zero source boundary and route entry: PASS');
 }
 

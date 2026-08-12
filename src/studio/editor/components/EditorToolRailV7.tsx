@@ -104,7 +104,7 @@ export function EditorToolRailV7({
         const Icon = meta.icon;
         const reasonId = `v7-tool-reason-${orientation}-${tool.id}`;
         const active = tool.id === 'select'
-          ? selectedStep !== null && ['flat_design', 'surface_effect', 'dimensional_decoration'].includes(selectedStep.kind) && activeFlatTool === 'select'
+          ? selectedStep?.kind === 'flat_design' && activeFlatTool === 'select'
           : tool.id === 'background'
           ? selectedStep?.kind === 'background'
           : tool.id === 'effects'
@@ -125,6 +125,8 @@ export function EditorToolRailV7({
             data-tool={tool.id}
             data-tool-id={tool.id}
             data-tool-status={tool.status}
+            data-step-kind={tool.requiredStepKind}
+            data-target-step-id={tool.targetStepId ?? undefined}
             title={tool.enabled ? meta.label : tool.reason}
             onClick={(event) => {
               if (tool.enabled) onActivateTool(tool, event.currentTarget);

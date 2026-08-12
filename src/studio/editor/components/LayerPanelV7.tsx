@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -41,6 +41,14 @@ const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   surface_finish: '表面完成层',
 };
 
+const SELECTED_STEP_TONE: Record<ProcessStepV7['kind'], string> = {
+  background: 'border-sky-400/60 bg-sky-50/45 ring-sky-200/60',
+  flat_design: 'border-violet-400/60 bg-violet-50/45 ring-violet-200/60',
+  surface_effect: 'border-fuchsia-400/60 bg-fuchsia-50/45 ring-fuchsia-200/60',
+  dimensional_decoration: 'border-amber-400/60 bg-amber-50/45 ring-amber-200/60',
+  surface_finish: 'border-emerald-400/60 bg-emerald-50/45 ring-emerald-200/60',
+};
+
 function stepSummary(step: ProcessStepV7): string {
   if (step.kind === 'background') return step.background.mode;
   if (step.kind === 'flat_design') return `${step.elements.length} 个 2D 元素`;
@@ -73,6 +81,10 @@ function ProcessTreeV7() {
   const duplicateStep = useEditorV7Store((state) => state.duplicateStep);
   const setStepFlag = useEditorV7Store((state) => state.setStepFlag);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const selectedStepRef = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    selectedStepRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [selectedStepId]);
   if (!nail) return null;
 
   const toggleCollapsed = (stepId: string) => {
@@ -110,7 +122,7 @@ function ProcessTreeV7() {
           const isCollapsed = collapsed.has(step.id);
           const canMutate = !readOnly && !switching && !step.locked;
           return (
-            <li key={step.id} className={cx('rounded-2xl border bg-white shadow-sm transition-colors', selected ? 'border-primary/45 ring-1 ring-primary/10' : 'border-gray-200', step.skipped && 'border-dashed bg-gray-50')} data-step-kind={step.kind} data-step-position={index}>
+            <li ref={selected ? selectedStepRef : undefined} key={step.id} className={cx('rounded-2xl border bg-white shadow-sm transition-colors', selected ? `ring-2 ${SELECTED_STEP_TONE[step.kind]}` : 'border-gray-200', step.skipped && 'border-dashed bg-gray-50')} data-step-kind={step.kind} data-step-position={index} data-step-selected={String(selected)} data-step-visible={String(step.visible)} data-step-skipped={String(step.skipped)} data-step-locked={String(step.locked)}>
               <div className="flex items-stretch gap-1 p-2">
                 <button type="button" onClick={() => selectedStepId !== step.id && selectStep(step.id)} aria-current={selected ? 'step' : undefined} className="min-w-0 flex-1 rounded-xl px-2 py-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   <span className="flex items-center gap-2">

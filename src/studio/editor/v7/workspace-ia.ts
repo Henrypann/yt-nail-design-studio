@@ -35,6 +35,7 @@ export type EditorWorkspaceStepLaneStateV7 = 'configured' | 'attention' | 'empty
 export interface EditorWorkspaceStepLaneV7 {
   id: EditorWorkspaceStepLaneIdV7;
   kind: (typeof PERSONAL_STEP_KINDS)[number];
+  toolId: 'brush' | 'effects' | 'decorations';
   label: string;
   state: EditorWorkspaceStepLaneStateV7;
   active: boolean;
@@ -43,10 +44,10 @@ export interface EditorWorkspaceStepLaneV7 {
   targetStepId: string | null;
 }
 
-const LANE_META: ReadonlyArray<Pick<EditorWorkspaceStepLaneV7, 'id' | 'kind' | 'label'>> = [
-  { id: 'flat', kind: 'flat_design', label: '平面' },
-  { id: 'effects', kind: 'surface_effect', label: '效果' },
-  { id: 'decorations', kind: 'dimensional_decoration', label: '立体' },
+const LANE_META: ReadonlyArray<Pick<EditorWorkspaceStepLaneV7, 'id' | 'kind' | 'toolId' | 'label'>> = [
+  { id: 'flat', kind: 'flat_design', toolId: 'brush', label: '平面' },
+  { id: 'effects', kind: 'surface_effect', toolId: 'effects', label: '效果' },
+  { id: 'decorations', kind: 'dimensional_decoration', toolId: 'decorations', label: '立体' },
 ];
 
 function preferredStepForKindV7(

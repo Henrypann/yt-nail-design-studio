@@ -1,4 +1,5 @@
 import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
 import {
   createFullEditorDocV7Fixture,
   createMinimalEditorDocV7Fixture,
@@ -208,6 +209,24 @@ for (const testCase of cases) {
   assert.equal(store.getState().setStepFlag('L1', flat.id, 'locked', false).reason, 'not_allowed');
   assertInvariant(store.getState(), unlocked);
   console.log('[v7-guided-start] stale recovery confirmation is writer-zero: PASS');
+}
+
+// The blank-canvas UI exposes the same lane -> tool -> step mapping as the pure read model.
+{
+  const files = [
+    'src/studio/editor/components/EditorGuidedStartV7.tsx',
+    'src/studio/editor/components/EditorStageBarV7.tsx',
+    'src/studio/editor/components/EditorToolRailV7.tsx',
+    'src/studio/editor/components/EditorWorkspaceIntentNoticeV7.tsx',
+    'src/studio/editor/components/LayerPanelV7.tsx',
+  ];
+  const source = (await Promise.all(files.map((file) => readFile(new URL(`../${file}`, import.meta.url), 'utf8')))).join('\n');
+  assert.match(source, /v7-guided-flow/);
+  assert.match(source, /data-lane-tool/);
+  assert.match(source, /data-target-step-id/);
+  assert.match(source, /data-step-selected/);
+  assert.match(source, /恢复后同步高亮/);
+  console.log('[v7-guided-start] UI lane/tool/layer mapping contract: PASS');
 }
 
 console.log('[v7-guided-start] all checks passed');

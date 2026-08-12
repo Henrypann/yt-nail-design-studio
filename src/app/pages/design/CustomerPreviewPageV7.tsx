@@ -19,12 +19,13 @@ export default function CustomerPreviewPageV7() {
   const navigate = useNavigate();
   const designId = params.get('design');
   const requestedFinger = params.get('finger');
+  const returnStepId = params.get('step');
   const initialFinger: FingerCode = FINGER_CODES.includes(requestedFinger as FingerCode)
     ? requestedFinger as FingerCode
     : 'L1';
   const result = useMemo(() => loadPreview(designId), [designId]);
 
-  if (result.status === 'ready') return <CustomerPreviewShellV7 doc={result.doc} loadWarnings={result.warnings} initialFinger={initialFinger} />;
+  if (result.status === 'ready') return <CustomerPreviewShellV7 doc={result.doc} loadWarnings={result.warnings} initialFinger={initialFinger} returnStepId={returnStepId} />;
 
   return (
     <main className="flex min-h-[100dvh] items-center justify-center bg-[#f5f1ef] p-4">

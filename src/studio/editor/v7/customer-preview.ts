@@ -10,8 +10,10 @@ import type {
   RgbaColorV7,
   SurfaceFinishTypeV7,
 } from './model';
+import { dimensionalDecorationFidelityV7 } from './dimensional-decoration';
 import { flatContentAssetStatusV7 } from './flat-content-assets';
-import { combineGeometryPreviewFidelityV7, resolveEditorGeometryV7 } from './geometry-registry';
+import { resolveEditorGeometryV7 } from './geometry-registry';
+import { surfaceEffectFidelityV7 } from './surface-effect';
 
 export interface CustomerPreviewScenarioV7 {
   backgroundColors: Partial<Record<FingerCode, RgbaColorV7>>;
@@ -29,8 +31,16 @@ export interface CustomerNailPreviewReadModelV7 {
   flatStepCount: number;
   flatElementCount: number;
   unsupportedFlatElementCount: number;
-  deferredSurfaceEffectCount: number;
-  deferredDecorationCount: number;
+  activeSurfaceEffectCount: number;
+  activeDecorationCount: number;
+  fidelityByLayer: {
+    geometry: PreviewFidelityV7;
+    background: PreviewFidelityV7;
+    flat: PreviewFidelityV7;
+    surfaceEffect: PreviewFidelityV7;
+    dimensionalDecoration: PreviewFidelityV7;
+    finish: PreviewFidelityV7;
+  };
   fidelity: PreviewFidelityV7;
   warnings: string[];
 }
@@ -63,6 +73,10 @@ function maxFidelity(a: PreviewFidelityV7, b: PreviewFidelityV7): PreviewFidelit
   return rank[a] >= rank[b] ? a : b;
 }
 
+function aggregateFidelity(values: readonly PreviewFidelityV7[], fallback: PreviewFidelityV7 = 'exact'): PreviewFidelityV7 {
+  return values.reduce(maxFidelity, fallback);
+}
+
 export function deriveCustomerNailPreviewV7(
   nail: NailDesignV7,
   scenario: CustomerPreviewScenarioV7,
@@ -90,16 +104,29 @@ export function deriveCustomerNailPreviewV7(
   const backgroundPreview = resolveBackgroundPreviewModelV7(background.background, background.visible);
   const geometry = resolveEditorGeometryV7(nail.geometryRef, nail.finger);
   const warnings: string[] = [];
-  let fidelity: PreviewFidelityV7 = combineGeometryPreviewFidelityV7(
-    geometry.fidelity,
-    backgroundOverride ? 'exact' : backgroundPreview.fidelity,
-  );
+  const flatMaskCount = flatSteps.reduce((count, step) => count
+    + (step.mask ? 1 : 0)
+    + step.elements.filter((element) => element.kind === 'eraser_mask' || element.kind === 'region_mask').length, 0);
+  let flatFidelity: PreviewFidelityV7 = runtimeImportedAssets.length > 0 || flatMaskCount > 0 ? 'approximate' : 'exact';
+  if (unsupportedFlatElements.length > 0) flatFidelity = 'unavailable';
+  const surfaceEffectFidelity = aggregateFidelity(surfaceEffects.map((step) => (
+    step.kind === 'surface_effect' ? surfaceEffectFidelityV7(step.effect) : 'unavailable'
+  )));
+  const decorationFidelity = aggregateFidelity(decorations.map(dimensionalDecorationFidelityV7));
+  const fidelityByLayer: CustomerNailPreviewReadModelV7['fidelityByLayer'] = {
+    geometry: geometry.fidelity,
+    background: backgroundOverride ? 'exact' : backgroundPreview.fidelity,
+    flat: flatFidelity,
+    surfaceEffect: surfaceEffectFidelity,
+    dimensionalDecoration: decorationFidelity,
+    // The finish is a deterministic SVG viewing aid, not measured material appearance.
+    finish: 'approximate',
+  };
+  let fidelity = Object.values(fidelityByLayer).reduce(maxFidelity, 'exact');
 
   if (geometry.fidelity === 'approximate') warnings.push('甲型使用尚未签收的生成轮廓，整体预览降级为近似');
   if (geometry.fidelity === 'unavailable') warnings.push('甲型轮廓不可用，整体预览使用通用边界且不可视为设计定稿');
 
-  // Finish is represented as a deterministic 2D viewing aid until V7-14 final 3D.
-  fidelity = maxFidelity(fidelity, 'approximate');
   if (!background.visible) warnings.push('背景步骤已隐藏');
   if (unsupportedFlatElements.length > 0) {
     warnings.push(`${unsupportedFlatElements.length} 个素材引用无效，预览中显示恢复占位`);
@@ -107,15 +134,19 @@ export function deriveCustomerNailPreviewV7(
   }
   if (runtimeImportedAssets.length > 0) {
     warnings.push(`${runtimeImportedAssets.length} 个本机导入素材将在运行时校验；缺失时显示恢复占位`);
-    fidelity = maxFidelity(fidelity, 'approximate');
   }
-  if (surfaceEffects.length > 0) {
-    warnings.push(`${surfaceEffects.length} 个表面效果仅保留数据，V7-12 提供 2D 预览`);
-    fidelity = 'unavailable';
+  if (flatMaskCount > 0) {
+    warnings.push(`${flatMaskCount} 个平面遮罩以确定性 SVG 近似参与预览`);
   }
-  if (decorations.length > 0) {
-    warnings.push(`${decorations.length} 个立体装饰仅保留数据，V7-13 提供 2D/2.5D 预览`);
-    fidelity = 'unavailable';
+  const unavailableSurfaceEffects = surfaceEffects.filter((step) => (
+    step.kind === 'surface_effect' && surfaceEffectFidelityV7(step.effect) === 'unavailable'
+  )).length;
+  if (unavailableSurfaceEffects > 0) {
+    warnings.push(`${unavailableSurfaceEffects} 个表面效果不可表达，组合视图显示遮罩边界 fallback`);
+  }
+  const unavailableDecorations = decorations.filter((decoration) => dimensionalDecorationFidelityV7(decoration) === 'unavailable').length;
+  if (unavailableDecorations > 0) {
+    warnings.push(`${unavailableDecorations} 个立体装饰 Mesh 不可用，组合视图保留 2D fallback`);
   }
 
   return {
@@ -129,8 +160,9 @@ export function deriveCustomerNailPreviewV7(
     flatStepCount: flatSteps.length,
     flatElementCount: flatElements.length,
     unsupportedFlatElementCount: unsupportedFlatElements.length,
-    deferredSurfaceEffectCount: surfaceEffects.length,
-    deferredDecorationCount: decorations.length,
+    activeSurfaceEffectCount: surfaceEffects.length,
+    activeDecorationCount: decorations.length,
+    fidelityByLayer,
     fidelity,
     warnings,
   };

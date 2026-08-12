@@ -39,6 +39,11 @@ const clone = (value) => structuredClone(value);
     'effects',
     'decorations',
   ]);
+  assert.deepEqual(stages.find((stage) => stage.id === 'personalize').lanes.map(({ id, kind, toolId }) => ({ id, kind, toolId })), [
+    { id: 'flat', kind: 'flat_design', toolId: 'brush' },
+    { id: 'effects', kind: 'surface_effect', toolId: 'effects' },
+    { id: 'decorations', kind: 'dimensional_decoration', toolId: 'decorations' },
+  ]);
   console.log('[v7-workspace-ia] deterministic five-stage read model: PASS');
 }
 
@@ -96,10 +101,10 @@ const clone = (value) => structuredClone(value);
     assert.ok(tool.reason);
     assert.equal(tool.requiredStepKind, id === 'effects' ? 'surface_effect' : id === 'decorations' ? 'dimensional_decoration' : 'flat_design');
   }
-  assert.deepEqual(personal.lanes.map(({ id, state, count }) => ({ id, state, count })), [
-    { id: 'flat', state: 'empty', count: 0 },
-    { id: 'effects', state: 'empty', count: 0 },
-    { id: 'decorations', state: 'empty', count: 0 },
+  assert.deepEqual(personal.lanes.map(({ id, toolId, state, count }) => ({ id, toolId, state, count })), [
+    { id: 'flat', toolId: 'brush', state: 'empty', count: 0 },
+    { id: 'effects', toolId: 'effects', state: 'empty', count: 0 },
+    { id: 'decorations', toolId: 'decorations', state: 'empty', count: 0 },
   ]);
   assert.deepEqual(doc, before);
   console.log('[v7-workspace-ia] empty stage/tool gates do not create canonical content: PASS');

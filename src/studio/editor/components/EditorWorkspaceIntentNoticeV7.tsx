@@ -26,6 +26,14 @@ const STATUS_ICON = {
   ready: Eye,
 } as const;
 
+const TOOL_LABEL = {
+  select: '选择', background: '背景', brush: '画笔', eraser: '橡皮', shape: '图形', text: '文字', assets: '素材', effects: '效果', decorations: '立体',
+} as const;
+
+const STEP_LABEL = {
+  background: '背景层', flat_design: '平面设计层', surface_effect: '表面效果层', dimensional_decoration: '立体装饰层', surface_finish: '表面完成层',
+} as const;
+
 function actionLabel(intent: EditorWorkspaceToolAvailabilityV7): string | null {
   if (intent.status === 'missing_step') {
     const meta = intent.requiredStepKind === 'flat_design'
@@ -75,6 +83,11 @@ export function EditorWorkspaceIntentNoticeV7({
       <span className="flex min-w-0 flex-1 items-start gap-2">
         <Icon size={15} className="mt-0.5 shrink-0" />
         <span><strong className="block font-semibold">{STATUS_LABEL[intent.status]}</strong><span className="mt-0.5 block leading-5">{intent.reason ?? '当前工具尚不可用。'}</span></span>
+      </span>
+      <span className="flex flex-wrap gap-1 text-[10px]" aria-label="工具与层级目标">
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">工具 · {TOOL_LABEL[intent.id]}</span>
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">步骤 · {STEP_LABEL[intent.requiredStepKind]}</span>
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">恢复后同步高亮</span>
       </span>
       {action && <Button ref={actionRef} size="sm" className="min-h-11" onClick={onResolve}>{action}</Button>}
       <button ref={dismissRef} type="button" aria-label="关闭工具提示" onClick={onDismiss} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>

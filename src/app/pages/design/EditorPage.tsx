@@ -34,7 +34,7 @@ import {
   shapeName,
   TIER_ONE_EDITOR_SHAPES,
 } from '@/studio/editor/lib/material';
-import type { NailLength, NailShape } from '@/lib/types';
+import { FINGER_CODES, type FingerCode, type NailLength, type NailShape } from '@/lib/types';
 
 type PageState =
   | { kind: 'loading' }
@@ -82,6 +82,15 @@ export default function EditorPage() {
       const readOnly = route === 'v7-readonly' || summary?.status !== 'draft';
       const result = await editorV7Store.getState().load(designId, { readOnly });
       if (result === 'ok' || result === 'ok_with_warnings') {
+        const requestedFinger = params.get('finger');
+        const finger: FingerCode | null = FINGER_CODES.includes(requestedFinger as FingerCode)
+          ? requestedFinger as FingerCode
+          : null;
+        if (finger) editorV7Store.getState().setCurrentFinger(finger);
+        const requestedStep = params.get('step');
+        const currentState = editorV7Store.getState();
+        const currentNail = currentState.doc?.nails[currentState.currentFinger];
+        if (requestedStep && currentNail?.steps.some((step) => step.id === requestedStep)) currentState.selectStep(requestedStep);
         return { kind: 'ready', writer: 'v7', internalEnabled: v7Enabled };
       }
       if (result === 'missing') return { kind: 'missing' };

@@ -17,6 +17,7 @@ import { captureCustomerPreviewSessionV7 } from '../v7/customer-preview-session'
 import { TenFingerBarV7 } from './TenFingerBarV7';
 import {
   deriveEditorWorkspaceToolsV7,
+  type EditorWorkspaceStepLaneV7,
   type EditorWorkspaceToolAvailabilityV7,
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
@@ -342,7 +343,8 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     setStageContext(null);
     stageContextTriggerRef.current = null;
     captureCustomerPreviewSessionV7(doc);
-    navigate(`${Routes.designCustomerPreview}?design=${encodeURIComponent(doc.designId)}&finger=${encodeURIComponent(currentFinger)}`);
+    const stepQuery = selectedStep ? `&step=${encodeURIComponent(selectedStep.id)}` : '';
+    navigate(`${Routes.designCustomerPreview}?design=${encodeURIComponent(doc.designId)}&finger=${encodeURIComponent(currentFinger)}${stepQuery}`);
   };
 
   const selectStageStep = (stepId: string) => {
@@ -463,6 +465,10 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     const tool = resolveWorkspaceTool(toolId);
     if (tool) requestWorkspaceTool(tool, trigger);
   };
+  const activatePersonalLane = (lane: EditorWorkspaceStepLaneV7, trigger: HTMLButtonElement) => {
+    const tool = resolveWorkspaceTool(lane.toolId);
+    if (tool) requestWorkspaceTool(tool, trigger);
+  };
   const showPersonalizationGuide = () => {
     if (guidedStartRef.current) {
       guidedStartRef.current.focus();
@@ -555,7 +561,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
           <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
             <Redo2 size={14} />
           </Button>
-          <Button size="sm" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} onClick={() => void saveNow()}>
+          <Button size="sm" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} aria-label={saveState === 'error' ? '重试保存' : '保存'} onClick={() => void saveNow()}>
             <Save size={14} /><span className="hidden sm:inline">{saveState === 'error' ? '重试保存' : '保存'}</span>
           </Button>
           <Button
@@ -598,6 +604,7 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         onSelectStep={selectStageStep}
         onOpenGeometry={openGeometryContext}
         onRequestPersonalization={showPersonalizationGuide}
+        onActivatePersonalLane={activatePersonalLane}
         onOpenCustomerPreview={openCustomerPreview}
         customerPreviewEnabled={customerPreviewAvailability.enabled}
         customerPreviewReason={customerPreviewAvailability.description}
