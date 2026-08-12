@@ -10,7 +10,7 @@ import react from '@vitejs/plugin-react';
  * 静态资产服务（Wizard 十指渲染器消费）：
  * 将仓库根的 material-library/ 与 assets/ 以同源 URL（/material-library/*、/assets/*）暴露。
  * - dev：中间件流式返回（SVG/JSON/PNG），含路径穿越防护；
- * - build：closeBundle 时拷贝进 dist/（assets/ 与 Vite 产物目录合并，子目录无冲突）。
+ * - build：writeBundle 时复制到当前 outDir（assets/ 与 Vite 产物目录合并，子目录无冲突）。
  * 前端一律 fetch 清单 JSON，不硬编码素材路径（DEV-PLAN §2.3-8）。
  */
 function serveStaticAssets(): Plugin {
@@ -33,6 +33,7 @@ function serveStaticAssets(): Plugin {
     if (rootPrefix === '/assets/' && (normalized.startsWith('golden-fixtures/') || normalized.startsWith('shape-calibration/'))) return false;
     return true;
   };
+  let buildOutDir = fileURLToPath(new URL('./dist', import.meta.url));
   return {
     name: 'nail-studio-static-assets',
     configureServer(server) {
@@ -62,10 +63,12 @@ function serveStaticAssets(): Plugin {
         next();
       });
     },
-    closeBundle() {
-      const dist = fileURLToPath(new URL('./dist', import.meta.url));
+    configResolved(config) {
+      buildOutDir = path.resolve(config.root, config.build.outDir);
+    },
+    writeBundle() {
       for (const [prefix, dir] of Object.entries(roots)) {
-        fs.cpSync(dir, path.join(dist, prefix.replace(/^\/|\/$/g, '')), {
+        fs.cpSync(dir, path.join(buildOutDir, prefix.replace(/^\/|\/$/g, '')), {
           recursive: true,
           filter: (source) => isRuntimeAsset(prefix, path.relative(dir, source)),
         });
@@ -74,14 +77,21 @@ function serveStaticAssets(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), serveStaticAssets()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+export default defineConfig(({ mode }) => {
+  const integrationOutDir = process.env.NEXTGEN_INTEGRATION_OUT_DIR?.trim();
+  return {
+    plugins: [react(), serveStaticAssets()],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
-  server: {
-    host: true,
-  },
+    server: {
+      host: true,
+    },
+    build:
+      mode === 'integration' && integrationOutDir
+        ? { outDir: path.resolve(integrationOutDir), emptyOutDir: true }
+        : undefined,
+  };
 });
