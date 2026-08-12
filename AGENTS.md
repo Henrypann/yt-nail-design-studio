@@ -23,6 +23,8 @@
 5. `V7_端到端开发计划_Studio至硬件联调.md`
 6. `V7_版本治理与迁移矩阵.md`
 
+视觉与交互实现还必须阅读仓库根目录 `DESIGN.md`。权威顺序为：人工签收的 ADR/Schema/Golden Fixture 决定数据与业务合同；V7/V7.1 权威文档决定产品流程和领域边界；`DESIGN.md` 决定 Wizard、Editor、Community 的视觉、布局、响应式和 UI 交互；当前任务 Prompt 优先于通用规范。`DESIGN.md` 不得用于改写制造证据、设备参数或既有 EditorDoc 数据。
+
 发生冲突时：人工签收的 ADR/Schema/Golden Fixture > V7 权威文档 > 当前分支已验证代码事实 > V3.1/V3 历史文档 > 非正式设备草案。必须区分“目标合同”和“当前实现”，不得把规划写成已交付。
 
 V7 是架构基线，不等于所有协议都改为 7：EditorDoc 目标是 schema 7；Scan、Manufacturing、Device Message、Artifact Manifest 和 Vendor Protocol 各自独立版本化。
