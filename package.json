@@ -80,6 +80,7 @@
     "test:editor-v7-inspiration-geometry:e2e": "node tools/walkthrough-editor-v7-inspiration-geometry.mjs",
     "test:wizard-v7-flow": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-wizard-v7-flow.mjs",
     "test:product-surfaces": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-product-surface-boundaries.mjs",
+    "test:design-v1-1-ui": "node tools/test-design-v1-1-ui-contract.mjs",
     "test:product-surfaces:e2e": "node tools/test-product-surfaces-e2e.mjs",
     "test:editor-v6-migrate": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v6-migrate.mjs",
     "test:store-v6": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-store-v6.mjs",
