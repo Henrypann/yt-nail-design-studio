@@ -8,7 +8,7 @@
  * 单击 = 选中该指（同步右栏详情/参数）；双击 = 进入单指细节视图。
  */
 
-import { useId, useMemo } from 'react';
+import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button, Spinner, cx } from '@/design-system';
 import { FINGER_CODES, type FingerCode, type FingerOverrides, type Finish, type NailLength, type NailShape } from '@/lib/types';
@@ -18,6 +18,7 @@ import { useNailDesignAssets } from './use-nail-design-assets';
 import { FingerNailContent } from '@/studio/render';
 import { FINGER_LABEL } from './TenFingerPreview';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import { NailGrid } from './NailGrid';
 
 /* ── 单格渲染器（平铺格 / 搭配条共用） ───────────────────── */
 
@@ -42,7 +43,7 @@ export interface NailCellViewProps {
   /** 有逐指例外（换色/换装饰）时显示粉点 */
   hasOverride: boolean;
   /** 每 0.1mm 设计单位对应的渲染 px（描边宽度换算） */
-  strokeScale: number;
+  strokeScale?: number;
   readOnly?: boolean;
   onClick?: (finger: FingerCode) => void;
   onDoubleClick?: (finger: FingerCode) => void;
@@ -77,11 +78,28 @@ export function NailCellView({
   const clipId = `cellclip-${rawId}-${finger}`;
   const displayScale = fingerDisplayScale(finger);
   const displayRatio = fingerDisplayRatio(finger);
-  const baseWidth = size === 'md' ? 120 : 48;
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [measuredWidth, setMeasuredWidth] = useState(0);
   const viewBoxParts = viewBox.split(/\s+/).map(Number);
   const viewBoxWidth = viewBoxParts[2] || 120;
   const viewBoxHeight = viewBoxParts[3] || 220;
-  const stageHeight = baseWidth * (viewBoxHeight / viewBoxWidth);
+  const fixedWidth = size === 'sm' ? 48 : null;
+  const effectiveStrokeScale = strokeScale && Number.isFinite(strokeScale) && strokeScale > 0
+    ? strokeScale
+    : Math.max(measuredWidth, fixedWidth ?? 120) / viewBoxWidth;
+
+  useLayoutEffect(() => {
+    if (size !== 'md' || !svgRef.current) return;
+    const svg = svgRef.current;
+    const update = () => {
+      const width = svg.getBoundingClientRect().width;
+      if (Number.isFinite(width) && width > 0) setMeasuredWidth(width);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, [size]);
   return (
     <button
       type="button"
@@ -93,33 +111,34 @@ export function NailCellView({
       data-finger-display-scale={displayScale}
       className={cx(
         'group relative flex flex-col items-center gap-1 rounded-card border bg-white transition-all duration-fast',
-        size === 'md' ? 'min-w-[120px] p-2' : 'min-w-[48px] p-1',
+        size === 'md' ? 'min-w-0 w-full p-2' : 'min-w-[48px] p-1',
         selected
           ? 'border-primary shadow-float'
           : 'border-gray-200 hover:border-gray-300 hover:shadow-float',
       )}
     >
       {failed && (
-        <span className="absolute left-1 top-1 z-10 text-[12px] leading-none" title="该指渲染失败（MOCK）">
+        <span className="absolute left-1 top-1 z-10 text-caption leading-none" title="该指渲染失败（MOCK）">
           ⚠️
         </span>
       )}
       {hasOverride && !failed && (
         <span
           className="absolute right-1.5 top-1.5 z-10 h-2 w-2 rounded-full"
-          style={{ backgroundColor: '#C2497A' }}
+          style={{ backgroundColor: 'var(--color-primary)' }}
           title="该指有单独定制"
         />
       )}
       <span
-        className="flex shrink-0 items-center justify-center"
-        style={{ width: `${baseWidth}px`, height: `${stageHeight}px` }}
+        className={cx('flex shrink-0 items-center justify-center', size === 'md' ? 'w-full max-w-[130px]' : 'w-12')}
+        style={{ aspectRatio: `${viewBoxWidth} / ${viewBoxHeight}` }}
         aria-hidden="true"
       >
         <svg
+          ref={svgRef}
           viewBox={viewBox}
-          className="h-auto select-none"
-          style={{ width: `${baseWidth * displayRatio}px` }}
+          className="h-auto max-h-full select-none"
+          style={{ width: `${Math.min(displayRatio, 1) * 100}%` }}
           data-finger-nail
         >
           <defs>
@@ -143,13 +162,13 @@ export function NailCellView({
             patternVisible={patternVisible}
             patternFadeMs={patternFadeMs}
             decoration={decoration}
-            strokeScale={strokeScale}
+            strokeScale={effectiveStrokeScale}
             readOnly
             fingerLabel={FINGER_LABEL[finger]}
           />
         </svg>
       </span>
-      <span className={cx('flex items-center gap-1 text-gray-500', size === 'md' ? 'text-[10px]' : 'text-[9px]')}>
+      <span className={cx('flex items-center gap-1 text-gray-500', size === 'md' ? 'text-nano' : 'text-nano')}>
         <span className="font-medium tnum">{finger}</span>
         {size === 'md' && <span>{FINGER_LABEL[finger]}</span>}
       </span>
@@ -210,12 +229,6 @@ export function TiledNailsPreview({
     return map;
   }, [assets.decorations]);
 
-  /** 描边换算：格子 120px / 剪影 viewBox 宽（0.1mm 单位） */
-  const strokeScale = useMemo(() => {
-    const w = Number(silhouette?.viewBox.split(/\s+/)[2] ?? 120);
-    return 120 / w;
-  }, [silhouette]);
-
   if (status === 'error') {
     return (
       <div className={cx('flex flex-col items-center justify-center gap-3 rounded-card border border-gray-200 bg-white py-16', className)}>
@@ -247,8 +260,12 @@ export function TiledNailsPreview({
           </Button>
         </div>
       )}
-      <div className="grid grid-cols-5 gap-3" data-debug-id="studio.preview.tiled">
-        {FINGER_CODES.map((finger) => {
+      <NailGrid
+        fingers={FINGER_CODES}
+        density="preview"
+        ariaLabel="十指平铺预览"
+        className="max-w-5xl"
+        renderFinger={(finger) => {
           const override = fingerOverrides?.[finger];
           return (
             <NailCellView
@@ -269,14 +286,13 @@ export function TiledNailsPreview({
               failed={failedFingers.has(finger)}
               selected={selectedFinger === finger}
               hasOverride={!failedFingers.has(finger) && !!(override?.baseColor || override?.decorationId)}
-              strokeScale={strokeScale}
               readOnly={readOnly}
               onClick={onFingerClick}
               onDoubleClick={onOpenSingle}
             />
           );
-        })}
-      </div>
+        }}
+      />
     </div>
   );
 }
