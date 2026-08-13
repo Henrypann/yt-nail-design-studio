@@ -1,0 +1,37 @@
+{
+  "contract": "geometry-kernel-parity-v1",
+  "currentKernel": "three-bvh-csg/0.0.18",
+  "candidateKernel": "manifold-3d/3.5.1",
+  "fixture": "closed-overlap box/sphere; mm; identical indexed inputs",
+  "operations": {
+    "union": {
+      "decision": "equivalent",
+      "current": { "boundaryEdges": 0, "components": 1, "volumeMm3": 594.07511, "triangles": 968 },
+      "candidate": { "boundaryEdges": 0, "components": 1, "volumeMm3": 594.07511, "triangles": 872 },
+      "relativeVolumeDelta": 0,
+      "boundsDeltaMm": 0
+    },
+    "subtract": {
+      "decision": "equivalent",
+      "current": { "boundaryEdges": 0, "components": 1, "volumeMm3": 458.53661, "triangles": 1048 },
+      "candidate": { "boundaryEdges": 0, "components": 1, "volumeMm3": 458.53661, "triangles": 952 },
+      "relativeVolumeDelta": 0,
+      "boundsDeltaMm": 0
+    },
+    "intersect": {
+      "decision": "candidate_preferred",
+      "current": { "boundaryEdges": 58, "components": 1, "volumeMm3": 73.83489, "triangles": 972 },
+      "candidate": { "boundaryEdges": 0, "components": 1, "volumeMm3": 81.46339, "triangles": 932 },
+      "relativeVolumeDelta": 0.09364329179033677,
+      "boundsDeltaMm": 0
+    }
+  },
+  "attributes": {
+    "uv": "degraded",
+    "materialGroup": "degraded",
+    "faceProvenance": "unavailable",
+    "conclusion": "equivalent_degraded"
+  },
+  "decision": "Use Manifold as the v0.7.2 candidate kernel for the next geometry implementation slice. Keep three-bvh-csg limited to the operations already proven closed by this fixture.",
+  "evidence": "algorithm-comparison-only; not manufacturing validation"
+}
