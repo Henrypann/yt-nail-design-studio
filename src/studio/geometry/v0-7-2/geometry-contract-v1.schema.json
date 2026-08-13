@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextgen.beauty/schema/geometry/v0.7.2/geometry-contract-v1.schema.json",
+  "title": "NextGen Beauty v0.7.2 Geometry Contract Envelope",
+  "oneOf": [
+    { "$ref": "#/$defs/nailSurfaceDefinition" },
+    { "$ref": "#/$defs/canonicalGeometrySnapshot" },
+    { "$ref": "#/$defs/operationGraph" },
+    { "$ref": "#/$defs/evaluationRecord" }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "id": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{2,127}$" },
+    "versionedRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "revision", "sha256"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" }, "sha256": { "$ref": "#/$defs/sha256" } }
+    },
+    "coordinateFrame": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract", "unit", "handedness", "origin", "xAxis", "yAxis", "zAxis"],
+      "properties": {
+        "contract": { "const": "nail-surface-mm-rh-root-center-v1" }, "unit": { "const": "mm" }, "handedness": { "const": "right" },
+        "origin": { "const": "nail_root_center" }, "xAxis": { "const": "right" }, "yAxis": { "const": "root_to_tip_negative" }, "zAxis": { "const": "outward" }
+      }
+    },
+    "topology": {
+      "type": "object", "additionalProperties": false,
+      "required": ["vertexCount", "triangleCount", "componentCount", "boundaryEdgeCount", "nonManifoldEdgeCount", "degenerateTriangleCount", "windingErrorCount", "watertight"],
+      "properties": {
+        "vertexCount": { "type": "integer", "minimum": 0 }, "triangleCount": { "type": "integer", "minimum": 0 }, "componentCount": { "type": "integer", "minimum": 0 },
+        "boundaryEdgeCount": { "type": "integer", "minimum": 0 }, "nonManifoldEdgeCount": { "type": "integer", "minimum": 0 }, "degenerateTriangleCount": { "type": "integer", "minimum": 0 },
+        "windingErrorCount": { "type": "integer", "minimum": 0 }, "watertight": { "type": "boolean" }
+      }
+    },
+    "attributes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["normal", "uv", "tangent", "materialGroup", "faceProvenance"],
+      "properties": {
+        "normal": { "$ref": "#/$defs/attributeState" }, "uv": { "$ref": "#/$defs/attributeState" }, "tangent": { "$ref": "#/$defs/attributeState" },
+        "materialGroup": { "$ref": "#/$defs/attributeState" }, "faceProvenance": { "$ref": "#/$defs/attributeState" }
+      }
+    },
+    "attributeState": { "enum": ["preserved", "degraded", "unavailable"] },
+    "nailSurfaceDefinition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "surfaceDefinitionId", "revision", "sha256", "sourceType", "sourceRefs", "coordinateFrame", "planform", "surfaceFrames", "shapeDefinition", "evidence"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "surfaceDefinitionId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" }, "sha256": { "$ref": "#/$defs/sha256" },
+        "sourceType": { "enum": ["designed", "generated", "scanned", "fitted"] }, "sourceRefs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/versionedRef" } }, "coordinateFrame": { "$ref": "#/$defs/coordinateFrame" },
+        "planform": { "type": "object", "additionalProperties": false, "required": ["silhouetteRef", "widthMm", "lengthMm", "landmarks"], "properties": { "silhouetteRef": { "$ref": "#/$defs/versionedRef" }, "widthMm": { "type": "number", "exclusiveMinimum": 0 }, "lengthMm": { "type": "number", "exclusiveMinimum": 0 }, "landmarks": { "type": "array", "minItems": 5, "items": { "$ref": "#/$defs/landmark" } } } },
+        "surfaceFrames": { "type": "object", "additionalProperties": false, "required": ["classes", "uvContract", "seam", "tangentPolicy"], "properties": { "classes": { "const": ["outer", "inner", "rim"] }, "uvContract": { "const": "nail-local-u-left-right-v-tip-root-v1" }, "seam": { "const": "root_center" }, "tangentPolicy": { "const": "right_handed_tangent_frame" } } },
+        "shapeDefinition": { "type": "object", "additionalProperties": false, "required": ["cCurveStations", "longitudinalStations", "cavityDepthMm", "thickness"], "properties": { "cCurveStations": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/cCurve" } }, "longitudinalStations": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/longitudinal" } }, "cavityDepthMm": { "type": "number", "exclusiveMinimum": 0 }, "thickness": { "$ref": "#/$defs/thickness" } } },
+        "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "manufacturingValidated", "limitations", "validationRefs"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "validationRefs": { "type": "array", "items": { "$ref": "#/$defs/versionedRef" } } } }
+      }
+    },
+    "landmark": { "type": "object", "additionalProperties": false, "required": ["id", "xMm", "yMm", "zMm"], "properties": { "id": { "enum": ["tip", "root_center", "left_side", "right_side", "apex"] }, "xMm": { "type": "number" }, "yMm": { "type": "number" }, "zMm": { "type": "number" } } },
+    "cCurve": { "type": "object", "additionalProperties": false, "required": ["v", "widthMm", "crownRiseMm", "radiusMm"], "properties": { "v": { "type": "number", "minimum": 0, "maximum": 1 }, "widthMm": { "type": "number", "exclusiveMinimum": 0 }, "crownRiseMm": { "type": "number", "minimum": 0 }, "radiusMm": { "type": "number", "exclusiveMinimum": 0 } } },
+    "longitudinal": { "type": "object", "additionalProperties": false, "required": ["v", "outerZMm", "innerZMm"], "properties": { "v": { "type": "number", "minimum": 0, "maximum": 1 }, "outerZMm": { "type": "number" }, "innerZMm": { "type": "number" } } },
+    "thickness": { "type": "object", "additionalProperties": false, "required": ["mode", "stations"], "properties": { "mode": { "enum": ["normal", "vertical_preview_thickness"] }, "stations": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["v", "thicknessMm"], "properties": { "v": { "type": "number", "minimum": 0, "maximum": 1 }, "thicknessMm": { "type": "number", "exclusiveMinimum": 0 } } } } } },
+    "canonicalGeometrySnapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "geometrySnapshotId", "revision", "geometryHash", "sourceDefinitions", "coordinateFrame", "topology", "boundsMm", "volumeMm3", "surfaceAreaMm2", "regions", "attributes", "toolchain", "evidence"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "geometrySnapshotId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" }, "geometryHash": { "$ref": "#/$defs/sha256" }, "sourceDefinitions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/versionedRef" } }, "coordinateFrame": { "$ref": "#/$defs/coordinateFrame" }, "topology": { "$ref": "#/$defs/topology" },
+        "boundsMm": { "type": "object", "additionalProperties": false, "required": ["min", "max"], "properties": { "min": { "$ref": "#/$defs/vec3" }, "max": { "$ref": "#/$defs/vec3" } } }, "volumeMm3": { "type": "number", "exclusiveMinimum": 0 }, "surfaceAreaMm2": { "type": "number", "exclusiveMinimum": 0 },
+        "regions": { "type": "array", "minItems": 3, "items": { "type": "object", "additionalProperties": false, "required": ["regionId", "faceCount"], "properties": { "regionId": { "$ref": "#/$defs/id" }, "faceCount": { "type": "integer", "minimum": 1 } } } }, "attributes": { "$ref": "#/$defs/attributes" },
+        "toolchain": { "type": "object", "additionalProperties": false, "required": ["evaluatorId", "evaluatorRevision", "buildSha256"], "properties": { "evaluatorId": { "$ref": "#/$defs/id" }, "evaluatorRevision": { "$ref": "#/$defs/id" }, "buildSha256": { "$ref": "#/$defs/sha256" } } },
+        "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "manufacturingValidated", "limitations"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string" } } } }
+      }
+    },
+    "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "operationGraph": {
+      "type": "object", "additionalProperties": false, "required": ["schemaVersion", "graphId", "revision", "sha256", "nodes", "outputRef"],
+      "properties": { "schemaVersion": { "const": "1.0.0" }, "graphId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" }, "sha256": { "$ref": "#/$defs/sha256" }, "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/operationNode" } }, "outputRef": { "$ref": "#/$defs/id" } }
+    },
+    "operationNode": {
+      "type": "object", "additionalProperties": false, "required": ["nodeId", "operation", "inputRefs", "outputRef", "transform", "toleranceMm", "componentPolicy", "attributePolicy", "evidenceExpectation"],
+      "properties": { "nodeId": { "$ref": "#/$defs/id" }, "operation": { "enum": ["shell_from_surface", "project_or_conform", "relief_from_outline", "place_attachment", "union", "subtract", "intersect", "validate"] }, "inputRefs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }, "outputRef": { "$ref": "#/$defs/id" }, "transform": { "$ref": "#/$defs/transform" }, "toleranceMm": { "type": "number", "minimum": 0.000001, "maximum": 0.5 }, "componentPolicy": { "$ref": "#/$defs/componentPolicy" }, "attributePolicy": { "$ref": "#/$defs/attributePolicy" }, "evidenceExpectation": { "enum": ["exact", "approximate", "unavailable"] } }
+    },
+    "transform": { "type": "object", "additionalProperties": false, "required": ["translationMm", "rotationDeg", "scale"], "properties": { "translationMm": { "$ref": "#/$defs/vec3" }, "rotationDeg": { "$ref": "#/$defs/vec3" }, "scale": { "$ref": "#/$defs/vec3" } } },
+    "componentPolicy": { "type": "object", "additionalProperties": false, "required": ["empty", "minComponents", "maxComponents", "primaryComponentRequired"], "properties": { "empty": { "enum": ["allow", "reject"] }, "minComponents": { "type": "integer", "minimum": 0 }, "maxComponents": { "type": "integer", "minimum": 0 }, "primaryComponentRequired": { "type": "boolean" } } },
+    "attributePolicy": { "type": "object", "additionalProperties": false, "required": ["uv", "materialGroup", "faceProvenance"], "properties": { "uv": { "enum": ["preserve", "allow_degraded", "ignore"] }, "materialGroup": { "enum": ["preserve", "allow_degraded", "ignore"] }, "faceProvenance": { "enum": ["preserve", "allow_degraded", "ignore"] } } },
+    "evaluationRecord": {
+      "type": "object", "additionalProperties": false, "required": ["schemaVersion", "evaluationId", "graphRef", "inputGeometryHashes", "kernel", "toleranceMm", "status", "attributes", "warnings", "performance", "evidence"],
+      "properties": { "schemaVersion": { "const": "1.0.0" }, "evaluationId": { "$ref": "#/$defs/id" }, "graphRef": { "$ref": "#/$defs/versionedRef" }, "inputGeometryHashes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sha256" } }, "kernel": { "type": "object", "additionalProperties": false, "required": ["adapterId", "adapterRevision", "buildSha256"], "properties": { "adapterId": { "$ref": "#/$defs/id" }, "adapterRevision": { "$ref": "#/$defs/id" }, "buildSha256": { "$ref": "#/$defs/sha256" } } }, "toleranceMm": { "type": "number", "minimum": 0.000001, "maximum": 0.5 }, "status": { "enum": ["succeeded", "degraded", "failed", "cancelled"] }, "outputGeometryHash": { "$ref": "#/$defs/sha256" }, "outputMetrics": { "$ref": "#/$defs/outputMetrics" }, "attributes": { "$ref": "#/$defs/attributes" }, "warnings": { "type": "array", "items": { "$ref": "#/$defs/issue" } }, "error": { "$ref": "#/$defs/error" }, "performance": { "type": "object", "additionalProperties": false, "required": ["elapsedMs", "peakMemoryBytes"], "properties": { "elapsedMs": { "type": "number", "minimum": 0 }, "peakMemoryBytes": { "type": "integer", "minimum": 0 } } }, "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "manufacturingValidated"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "manufacturingValidated": { "const": false } } } }
+    },
+    "outputMetrics": { "type": "object", "additionalProperties": false, "required": ["vertexCount", "triangleCount", "componentCount", "boundaryEdgeCount", "nonManifoldEdgeCount", "degenerateTriangleCount", "windingErrorCount", "watertight", "volumeMm3", "surfaceAreaMm2"], "properties": { "vertexCount": { "type": "integer", "minimum": 0 }, "triangleCount": { "type": "integer", "minimum": 0 }, "componentCount": { "type": "integer", "minimum": 0 }, "boundaryEdgeCount": { "type": "integer", "minimum": 0 }, "nonManifoldEdgeCount": { "type": "integer", "minimum": 0 }, "degenerateTriangleCount": { "type": "integer", "minimum": 0 }, "windingErrorCount": { "type": "integer", "minimum": 0 }, "watertight": { "type": "boolean" }, "volumeMm3": { "type": "number", "minimum": 0 }, "surfaceAreaMm2": { "type": "number", "minimum": 0 } } },
+    "issue": { "type": "object", "additionalProperties": false, "required": ["path", "code", "message"], "properties": { "path": { "type": "string" }, "code": { "enum": ["invalid_contract", "revision_mismatch", "hash_mismatch", "coordinate_mismatch", "invalid_operation_graph", "invalid_topology", "component_policy_failed", "attribute_policy_failed", "kernel_unavailable", "cancelled", "timeout", "resource_limit"] }, "message": { "type": "string" } } },
+    "error": { "type": "object", "additionalProperties": false, "required": ["code", "issues"], "properties": { "code": { "enum": ["invalid_contract", "revision_mismatch", "hash_mismatch", "coordinate_mismatch", "invalid_operation_graph", "invalid_topology", "component_policy_failed", "attribute_policy_failed", "kernel_unavailable", "cancelled", "timeout", "resource_limit"] }, "issues": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/issue" } } } }
+  }
+}
