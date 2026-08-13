@@ -1,0 +1,15 @@
+{
+  "designId": "design_320e8174-abd5-488a-8326-3cd654153566",
+  "states": {
+    "tenFingerComposite": "v7-svg-composite",
+    "singleFingerPbr": "ready",
+    "singleFinger2d": "v7-svg-composite",
+    "webglFallback": "single-nail-svg-2.5d"
+  },
+  "writerZero": true,
+  "selectedFingerPreservedOnFallback": true,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "fallbackConsoleErrors": [],
+  "fallbackPageErrors": []
+}

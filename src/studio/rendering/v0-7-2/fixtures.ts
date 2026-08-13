@@ -19,7 +19,7 @@ export const GOLDEN_PREVIEW_APPEARANCE_PROFILE_V1: PreviewAppearanceProfileV1 = 
     { id: 'surface', positionMm: [0, -5, 45], targetMm: [0, -8, 0], up: [0, 1, 0], verticalFovDeg: 32 },
     { id: 'oblique_left', positionMm: [-25, -14, 32], targetMm: [0, -8, 0], up: [0, 0, 1], verticalFovDeg: 32 },
     { id: 'oblique_right', positionMm: [25, -14, 32], targetMm: [0, -8, 0], up: [0, 0, 1], verticalFovDeg: 32 },
-    { id: 'side_profile', positionMm: [38, -8, 5], targetMm: [0, -8, 0], up: [0, 0, 1], verticalFovDeg: 28 },
+    { id: 'side_profile', positionMm: [34, -20, 16], targetMm: [0, -8, 1], up: [0, 0, 1], verticalFovDeg: 30 },
     { id: 'tip_grazing', positionMm: [0, -40, 12], targetMm: [0, -8, 0], up: [0, 0, 1], verticalFovDeg: 30 },
   ],
   evidence: {

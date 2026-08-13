@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Eye, Grid3X3, Info, RotateCcw, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { Button, cx } from '@/design-system';
@@ -16,6 +16,8 @@ import { CustomerNailPreviewV7 } from './CustomerNailPreviewV7';
 import { EDITOR_FINGER_IDENTITY_V7, fingerDisplayNameV7 } from '../v7/finger-identity';
 import { FINGER_CODES } from '@/lib/types';
 import { NailGrid } from '@/studio/preview/NailGrid';
+
+const SingleNailPbrPreviewV072 = lazy(() => import('@/studio/rendering/v0-7-2/SingleNailPbrPreviewV072'));
 
 const COLOR_SCENARIOS: Array<{ id: string; name: string; color: RgbaColorV7 }> = [
   { id: 'rose', name: '柔雾玫瑰', color: { colorSpace: 'srgb', r: 210, g: 112, b: 142, a: 1 } },
@@ -130,7 +132,7 @@ export function CustomerPreviewShellV7({
   };
 
   return (
-    <section className="flex h-[100dvh] min-h-[560px] min-w-0 flex-col overflow-hidden bg-workspace" data-testid="customer-preview-v7" data-preview-mode={mode} data-preview-presentation={presentation} data-selected-finger={selectedFinger} data-editor-schema="7" data-preview-readonly="true" data-customer-confirmation-ready={String(confirmationReady)}>
+    <section className="flex h-[100dvh] min-h-[560px] min-w-0 flex-col overflow-hidden bg-workspace" data-testid="customer-preview-v7" data-preview-mode={mode} data-preview-presentation={presentation} data-preview-runtime={mode === 'single' && presentation === 'composite' ? 'v0.7.2-single-nail-pbr' : 'v7-svg-composite'} data-selected-finger={selectedFinger} data-editor-schema="7" data-preview-readonly="true" data-customer-confirmation-ready={String(confirmationReady)}>
       <header className="flex min-h-[58px] flex-wrap items-center gap-2 border-b border-white/80 bg-white/95 px-3 py-2 backdrop-blur sm:px-5">
         <Button size="sm" variant="ghost" className="min-h-11" onClick={returnToEditor}><ArrowLeft size={15} />返回设计</Button>
         <div className="min-w-0 flex-1">
@@ -147,7 +149,7 @@ export function CustomerPreviewShellV7({
           <button type="button" aria-pressed={mode === 'set'} onClick={() => setMode('set')} className={cx('min-h-11 rounded-lg px-3 text-xs font-medium', mode === 'set' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}><Grid3X3 size={14} className="mr-1.5 inline" />十指总览</button>
           <button type="button" aria-pressed={mode === 'single'} onClick={() => setMode('single')} className={cx('min-h-11 rounded-lg px-3 text-xs font-medium', mode === 'single' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}><Eye size={14} className="mr-1.5 inline" />单指聚焦</button>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5 text-nano text-gray-500"><div className="flex rounded-xl border border-gray-200 bg-white p-1" role="group" aria-label="呈现证据"><button type="button" aria-pressed={presentation === '2d'} onClick={() => setPresentation('2d')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === '2d' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>2D 设计</button><button type="button" aria-pressed={presentation === 'composite'} onClick={() => setPresentation('composite')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === 'composite' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>模拟 3D</button></div><button ref={scenarioToggleRef} type="button" data-testid="customer-scenario-toggle" onClick={scenarioPanelOpen ? closeScenarioPanel : openScenarioPanel} aria-expanded={scenarioPanelOpen} className="min-h-11 rounded-xl border border-violet-200 bg-violet-50 px-3 font-medium text-violet-700"><Sparkles size={13} className="mr-1 inline" />{scenarioPanelOpen ? '收起比较' : '方案比较'}{scenarioCount > 0 ? ` · ${scenarioCount}` : ''}</button><button type="button" onClick={resetScenario} disabled={scenarioCount === 0} className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 font-medium text-gray-600 disabled:opacity-35"><RotateCcw size={13} className="mr-1 inline" />重置比较</button><span className={cx('rounded-full border px-2 py-1 font-semibold', presentation === '2d' ? 'border-success/20 bg-success-soft text-success' : 'border-warning/25 bg-warning-soft text-warning')}>{presentation === '2d' ? '结构化 2D' : 'SVG 2.5D · 模拟'}</span></div>
+        <div className="flex flex-wrap items-center justify-end gap-1.5 text-nano text-gray-500"><div className="flex rounded-xl border border-gray-200 bg-white p-1" role="group" aria-label="呈现证据"><button type="button" aria-pressed={presentation === '2d'} onClick={() => setPresentation('2d')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === '2d' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>2D 设计</button><button type="button" aria-pressed={presentation === 'composite'} onClick={() => setPresentation('composite')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === 'composite' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>模拟 3D</button></div><button ref={scenarioToggleRef} type="button" data-testid="customer-scenario-toggle" onClick={scenarioPanelOpen ? closeScenarioPanel : openScenarioPanel} aria-expanded={scenarioPanelOpen} className="min-h-11 rounded-xl border border-violet-200 bg-violet-50 px-3 font-medium text-violet-700"><Sparkles size={13} className="mr-1 inline" />{scenarioPanelOpen ? '收起比较' : '方案比较'}{scenarioCount > 0 ? ` · ${scenarioCount}` : ''}</button><button type="button" onClick={resetScenario} disabled={scenarioCount === 0} className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 font-medium text-gray-600 disabled:opacity-35"><RotateCcw size={13} className="mr-1 inline" />重置比较</button><span className={cx('rounded-full border px-2 py-1 font-semibold', presentation === '2d' ? 'border-success/20 bg-success-soft text-success' : 'border-warning/25 bg-warning-soft text-warning')}>{presentation === '2d' ? '结构化 2D' : mode === 'single' ? 'PBR 单指 · 模拟' : 'SVG 2.5D · 模拟'}</span></div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
@@ -174,11 +176,20 @@ export function CustomerPreviewShellV7({
             </div>
           ) : (
             <div className="mx-auto grid min-h-full max-w-5xl items-center gap-5 lg:grid-cols-[minmax(280px,0.9fr)_minmax(300px,1.1fr)]">
-              <CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation={presentation} />
+              {presentation === 'composite' ? (
+                <Suspense fallback={<div className="flex min-h-[420px] items-center justify-center rounded-[28px] border border-white bg-white/70 text-xs text-gray-500" role="status">正在载入单指模拟 3D…</div>}>
+                  <SingleNailPbrPreviewV072
+                    nail={selectedNail}
+                    readModel={selectedModel}
+                    fallback={<CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation="composite" />}
+                  />
+                </Suspense>
+              ) : <CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation="2d" />}
               <div className="rounded-[24px] border border-white bg-white/75 p-4 shadow-[0_18px_55px_rgba(77,53,67,0.08)] sm:p-5" aria-live="polite" aria-atomic="true">
                 <p className="text-nano font-semibold uppercase tracking-[0.14em] text-primary">{fingerDisplayNameV7(selectedFinger)} · {selectedFinger} · Read-only detail</p>
                 <h1 className="mt-1 text-xl font-semibold text-gray-900">顾客沟通视图</h1>
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-nano"><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.backgroundMode}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">封层比较</dt><dd className="mt-1 font-semibold text-gray-800">{FINISH_LABEL[selectedModel.finishType]}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">平面 / 效果 / 立体</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.flatElementCount} / {selectedModel.activeSurfaceEffectCount} / {selectedModel.activeDecorationCount}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">预览等级</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.fidelity}</dd></div></dl>
+                {presentation === 'composite' && <p className="mt-3 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-nano leading-4 text-violet-700">当前为 v0.7.2 3D 能力入口：只读单指 PBR 模拟。十指整体模拟 3D 仍使用既有 SVG 2.5D 组合路径。</p>}
                 <p className={cx('mt-3 rounded-xl border px-3 py-2 text-nano leading-4', confirmationReady ? 'border-success/20 bg-success-soft text-success' : 'border-warning/20 bg-warning-soft text-warning')}>{confirmationReady ? '预览证据已就绪；STUDIO-04 可接管不可变 Approval / Snapshot。' : scenarioCount > 0 ? '当前含临时比较；重置后才能进入正式确认。' : '存在 unavailable 预览内容；修复或明确接受降级后，再由 STUDIO-04 接管确认。'}</p>
                 {selectedModel.warnings.length > 0 && <ul className="mt-3 space-y-1 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{selectedModel.warnings.map((warning) => <li key={warning}>· {warning}</li>)}</ul>}
               </div>
