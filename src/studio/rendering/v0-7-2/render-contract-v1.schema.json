@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nextgen.beauty/render-contract-v1.schema.json",
+  "title": "NextGen Beauty v0.7.2 Render Contracts",
+  "oneOf": [
+    { "$ref": "#/$defs/appearanceProfile" },
+    { "$ref": "#/$defs/renderScene" }
+  ],
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "ref": {
+      "type": "object", "additionalProperties": false, "required": ["id", "revision", "sha256"],
+      "properties": { "id": { "type": "string", "minLength": 1 }, "revision": { "type": "string", "minLength": 1 }, "sha256": { "$ref": "#/$defs/sha" } }
+    },
+    "camera": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "positionMm", "targetMm", "up", "verticalFovDeg"],
+      "properties": {
+        "id": { "enum": ["surface", "oblique_left", "oblique_right", "side_profile", "tip_grazing"] },
+        "positionMm": { "$ref": "#/$defs/vec3" }, "targetMm": { "$ref": "#/$defs/vec3" }, "up": { "$ref": "#/$defs/vec3" },
+        "verticalFovDeg": { "type": "number", "minimum": 15, "maximum": 70 }
+      }
+    },
+    "finish": {
+      "type": "object", "additionalProperties": false,
+      "required": ["baseRoughness", "clearcoat", "clearcoatRoughness", "transmission"],
+      "properties": {
+        "baseRoughness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "clearcoat": { "type": "number", "minimum": 0, "maximum": 1 },
+        "clearcoatRoughness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "transmission": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "appearanceProfile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "profileId", "revision", "sha256", "purpose", "colorManagement", "environment", "finishes", "cameraPresets", "evidence"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "profileId": { "type": "string", "minLength": 1 }, "revision": { "type": "string", "minLength": 1 }, "sha256": { "$ref": "#/$defs/sha" },
+        "purpose": { "const": "single_nail_customer_preview" },
+        "colorManagement": { "type": "object", "additionalProperties": false, "required": ["workingSpace", "outputSpace", "toneMapping", "exposure"], "properties": { "workingSpace": { "const": "linear-srgb" }, "outputSpace": { "const": "srgb" }, "toneMapping": { "const": "aces-filmic" }, "exposure": { "type": "number", "minimum": 0.25, "maximum": 4 } } },
+        "environment": { "type": "object", "additionalProperties": false, "required": ["environmentId", "intensity", "background"], "properties": { "environmentId": { "const": "neutral-studio-v1" }, "intensity": { "type": "number", "minimum": 0, "maximum": 4 }, "background": { "const": "warm-workspace" } } },
+        "finishes": { "type": "object", "additionalProperties": false, "required": ["gloss", "matte", "frosted"], "properties": { "gloss": { "$ref": "#/$defs/finish" }, "matte": { "$ref": "#/$defs/finish" }, "frosted": { "$ref": "#/$defs/finish" } } },
+        "cameraPresets": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/camera" } },
+        "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "manufacturingValidated", "limitations"], "properties": { "fidelity": { "const": "approximate" }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } }
+      }
+    },
+    "renderScene": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "sceneId", "profileRef", "geometryRef", "designRef", "presentation", "quality", "finish", "layerRefs", "cameraPresetId", "evidence"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "sceneId": { "type": "string", "minLength": 1 }, "profileRef": { "$ref": "#/$defs/ref" },
+        "geometryRef": { "type": "object", "additionalProperties": false, "required": ["snapshotId", "revision", "geometryHash", "fidelity"], "properties": { "snapshotId": { "type": "string", "minLength": 1 }, "revision": { "type": "string", "minLength": 1 }, "geometryHash": { "$ref": "#/$defs/sha" }, "fidelity": { "enum": ["exact", "approximate", "unavailable"] } } },
+        "designRef": { "type": "object", "additionalProperties": false, "required": ["designId", "revision", "finger"], "properties": { "designId": { "type": "string", "minLength": 1 }, "revision": { "type": "integer", "minimum": 0 }, "finger": { "enum": ["L1", "L2", "L3", "L4", "L5", "R1", "R2", "R3", "R4", "R5"] } } },
+        "presentation": { "const": "single_nail_focus_simulated_3d" }, "quality": { "enum": ["interactive", "high_quality"] }, "finish": { "enum": ["gloss", "matte", "frosted"] },
+        "layerRefs": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["stepId", "kind", "fidelity"], "properties": { "stepId": { "type": "string", "minLength": 1 }, "kind": { "enum": ["background", "flat_design", "surface_effect", "dimensional_decoration", "surface_finish"] }, "fidelity": { "enum": ["exact", "approximate", "unavailable"] } } } },
+        "cameraPresetId": { "enum": ["surface", "oblique_left", "oblique_right", "side_profile", "tip_grazing"] },
+        "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "writerZero", "manufacturingValidated", "limitations"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "writerZero": { "const": true }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } }
+      }
+    }
+  }
+}

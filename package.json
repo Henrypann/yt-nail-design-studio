@@ -31,6 +31,7 @@
     "test:gen-v7-1-backend-ports": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-gen-v7-1-04-backend-ports.mjs",
     "test:geometry-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-contract-v0-7-2.mjs",
     "test:geometry-v0-7-2-parity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-kernel-parity-v0-7-2.mjs",
+    "test:render-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-render-contract-v0-7-2.mjs",
     "test:community-content-states": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-content-states.mjs",
     "test:community-content-states:e2e": "node tools/e2e-community-content-states.mjs",
     "test:community-intent": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-intent.mjs",
