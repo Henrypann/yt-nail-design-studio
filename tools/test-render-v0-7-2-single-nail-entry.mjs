@@ -56,7 +56,11 @@ assert.match(runtime, /ACESFilmicToneMapping/);
 assert.match(runtime, /MeshPhysicalMaterial/);
 assert.match(runtime, /CanvasTexture/);
 assert.match(runtime, /SRGBColorSpace/);
-assert.match(runtime, /setAttribute\('uv'/);
+assert.match(runtime, /loadPromotedGeometryV2/);
+assert.match(runtime, /resolvePromotedGeometryV2/);
+assert.match(runtime, /data-geometry-registry-entry/);
+assert.doesNotMatch(runtime, /createSingleNailPreviewSurfaceV1|3\.2 \+ decoration\.heightMm/,
+  'promoted runtime must not reuse the procedural slab or fixed-Z decoration placement');
 assert.match(runtime, /single-nail-pbr-fallback/);
 assert.match(runtime, /renderer\?\.dispose\(\)/);
 assert.doesNotMatch(runtime, /localStorage|sessionStorage|editorV7Store|setEditor|saveEditor|repository/);
@@ -65,7 +69,9 @@ assert.doesNotMatch(runtime, /setAnimationLoop|requestAnimationFrame/);
 let distFiles = [];
 try { distFiles = await readdir(new URL('../dist/assets/', import.meta.url)); } catch {}
 assert.ok(distFiles.some((file) => /SingleNailPbrPreviewV072/.test(file)), 'single-nail PBR must be a lazy production chunk');
-assert.equal(distFiles.some((file) => /manifold|parity-worker|three-bvh-csg/i.test(file)), false,
-  'experimental kernels must remain absent from product bundles');
+const singleNailChunk = distFiles.find((file) => /SingleNailPbrPreviewV072/.test(file));
+const singleNailChunkSource = await readFile(new URL(`../dist/assets/${singleNailChunk}`, import.meta.url), 'utf8');
+assert.doesNotMatch(singleNailChunkSource, /manifold|parity-worker|three-bvh-csg/i,
+  'single-nail PBR lazy chunk must not import experimental boolean kernels');
 
 console.log('test-render-v0-7-2-single-nail-entry: PASS (curved preview surface, lazy four-state boundary, PBR, fallback, writer-zero)');

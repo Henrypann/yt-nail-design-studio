@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "2.0.0",
+  "registryId": "nextgen-beauty.geometry-registry-v2",
+  "revision": "registry-v2-2026-08-14-almond-medium-v3",
+  "geometryContractVersion": "1.0.0",
+  "entries": [
+    {
+      "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+      "revision": "promotion-2026-08-14.1",
+      "shape": "almond",
+      "length": "medium",
+      "promotionState": "promoted_simulated_preview",
+      "promotionClass": "simulated_preview_geometry_kernel",
+      "bundleRef": {
+        "id": "nail-surface-bundle.almond.medium.visual-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "89ba2f673e5c4a102d563d2f6e1b975790cbb55ac56756bb51292d4729f540e0",
+        "path": "assets/geometry/representations/almond-medium-v3/canonical-bundle.json"
+      },
+      "surfaceDefinitionRef": {
+        "id": "surface.almond.medium.visual-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "63e60b670282bf9ab8922e7bec773157421c23b6b0dd1438a1c92daa40dbf24f"
+      },
+      "geometrySnapshotRef": {
+        "id": "geometry.almond.medium.visual-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc"
+      },
+      "representationSetRef": {
+        "id": "representation-set.almond.medium.visual-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "444b413af2f8e9188c2fe5949acc91441972b03d0894fcb251a4cb28537d42c5"
+      },
+      "browserDelivery": {
+        "representationId": "representation.almond.medium.visual-v3.glb",
+        "revision": "3.0.0-simulated-candidate",
+        "runtimeUrl": "/geometry-v0-7-2/almond-medium-v3/shell.web.glb",
+        "mimeType": "model/gltf-binary",
+        "sha256": "8055bcd115c13fa6a25d5e3e942966ef09ca3a652760579df02a0bc02305e016",
+        "byteLength": 471664,
+        "triangleCount": 16788
+      },
+      "policy": {
+        "fidelity": "approximate",
+        "allowedConsumers": [
+          "single_nail_pbr",
+          "geometry_kernel_preview"
+        ],
+        "forbiddenConsumers": [
+          "manufacturing_compiler",
+          "device_job",
+          "production_export"
+        ],
+        "writerEffect": "none"
+      },
+      "evidence": {
+        "productVisualSignoff": "PRODUCT_VISUAL_SIGNED_OFF",
+        "representationParityVerified": true,
+        "bundleIntegrityVerified": true,
+        "manufacturingValidated": false,
+        "promotedAt": "2026-08-14T00:00:00.000Z",
+        "validationRefs": [
+          "assets/glb/shells/almond/medium-candidate-v3/SIGNOFF.md",
+          "evidence/pr-geo-v0-7-2-01-nail-surface-representation/VALIDATION.md"
+        ],
+        "limitations": [
+          "promotion authorizes simulated single-nail PBR and geometry-kernel preview only",
+          "vertical preview thickness is not normal-offset engineering wall thickness",
+          "not fitted to scan, not physically validated, not manufacturable or device-ready",
+          "STL remains internal and is never served or exported"
+        ]
+      }
+    }
+  ]
+}

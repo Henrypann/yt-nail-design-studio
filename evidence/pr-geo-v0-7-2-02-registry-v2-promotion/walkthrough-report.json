@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-08-14T03:08:30.533Z",
+  "reports": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "state": {
+        "registryEntry": "geometry-registry.almond.medium.visual-v3",
+        "representation": "representation.almond.medium.visual-v3.glb",
+        "surfaceHash": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+        "evidence": "simulated-not-manufacturing",
+        "width": 451.796875
+      },
+      "glbResponses": [
+        {
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        }
+      ],
+      "writerZero": true,
+      "pageWidth": {
+        "scroll": 1440,
+        "client": 1440
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "state": {
+        "registryEntry": "geometry-registry.almond.medium.visual-v3",
+        "representation": "representation.almond.medium.visual-v3.glb",
+        "surfaceHash": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+        "evidence": "simulated-not-manufacturing",
+        "width": 366
+      },
+      "glbResponses": [
+        {
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        }
+      ],
+      "writerZero": true,
+      "pageWidth": {
+        "scroll": 390,
+        "client": 390
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    }
+  ]
+}

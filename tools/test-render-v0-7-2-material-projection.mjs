@@ -111,7 +111,7 @@ const runtime = await readFile(new URL('../src/studio/rendering/v0-7-2/SingleNai
 assert.match(runtime, /new THREE\.CanvasTexture/);
 assert.match(runtime, /texture\.colorSpace = THREE\.SRGBColorSpace/);
 assert.match(runtime, /texture\.flipY = false/);
-assert.match(runtime, /geometry\.setAttribute\('uv'/);
+assert.match(runtime, /loadPromotedGeometryV2/);
 assert.match(runtime, /map: texture/);
 assert.match(runtime, /data-material-projection/);
 assert.doesNotMatch(runtime, /localStorage|sessionStorage|editorV7Store|saveEditor|repository/);
