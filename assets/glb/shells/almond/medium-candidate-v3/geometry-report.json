@@ -91,14 +91,110 @@
   "revision": "3.0.0-simulated-candidate",
   "schemaVersion": 1,
   "shapeMetrics": {
+    "cCurveStations": [
+      {
+        "crownRiseMm": 0.15096946971756903,
+        "radiusMm": 4.7707233644826115,
+        "v": 0.05,
+        "widthMm": 2.381323474224793
+      },
+      {
+        "crownRiseMm": 1.0903656553198617,
+        "radiusMm": 6.491056481410235,
+        "v": 0.25,
+        "widthMm": 7.201764463196808
+      },
+      {
+        "crownRiseMm": 1.65,
+        "radiusMm": 8.895942795947965,
+        "v": 0.5,
+        "widthMm": 10.321649330727775
+      },
+      {
+        "crownRiseMm": 1.0903656553198622,
+        "radiusMm": 14.342020176444434,
+        "v": 0.75,
+        "widthMm": 10.970359190892143
+      },
+      {
+        "crownRiseMm": 0.1509694697175692,
+        "radiusMm": 58.98754786007511,
+        "v": 0.95,
+        "widthMm": 8.435127944486377
+      }
+    ],
     "cuticleSeatYmm": 1.1,
     "envelopeLengthMm": 19.1,
+    "landmarks": [
+      {
+        "id": "tip",
+        "xMm": 0.0,
+        "yMm": -18.0,
+        "zMm": 0.6012048125267029
+      },
+      {
+        "id": "root_center",
+        "xMm": 0.0,
+        "yMm": 1.100000023841858,
+        "zMm": 0.7812048196792603
+      },
+      {
+        "id": "left_side",
+        "xMm": -5.499972343444824,
+        "yMm": -4.179441452026367,
+        "zMm": 1.2802408933639526
+      },
+      {
+        "id": "right_side",
+        "xMm": 5.499972343444824,
+        "yMm": -4.179441452026367,
+        "zMm": 1.2802408933639526
+      },
+      {
+        "id": "apex",
+        "xMm": 0.0,
+        "yMm": -8.295642852783203,
+        "zMm": 3.1616532802581787
+      }
+    ],
     "longitudinalInnerRiseMm": 2.091661230360443,
     "longitudinalOuterRiseMm": 2.380448436372343,
+    "longitudinalStations": [
+      {
+        "innerZMm": 0.20694064256114864,
+        "outerZMm": 0.8024382112743057,
+        "v": 0.05
+      },
+      {
+        "innerZMm": 1.6144268686452756,
+        "outerZMm": 2.225137487690028,
+        "v": 0.25
+      },
+      {
+        "innerZMm": 2.415973937948994,
+        "outerZMm": 3.1612048356864015,
+        "v": 0.5
+      },
+      {
+        "innerZMm": 1.7127865763121948,
+        "outerZMm": 2.3151374876900284,
+        "v": 0.75
+      },
+      {
+        "innerZMm": 0.4926376107492192,
+        "outerZMm": 0.964438211274306,
+        "v": 0.95
+      }
+    ],
     "maxWidthMm": 11.0,
     "maxWidthPositionFromRootRatio": 0.2751611145887079,
     "maxWidthYmm": -4.155577288644322,
     "nominalLengthMm": 18.0,
+    "regionFaceCounts": {
+      "inner": 8024,
+      "outer": 8024,
+      "rim": 740
+    },
     "rootCapSectionVertexCounts": [
       5,
       3,
@@ -110,6 +206,28 @@
       "midbodySide": 0.584009204802816,
       "tipCentre": 0.6012048356864016
     },
+    "thicknessStations": [
+      {
+        "thicknessMm": 0.5954975687131571,
+        "v": 0.05
+      },
+      {
+        "thicknessMm": 0.6107106190447524,
+        "v": 0.25
+      },
+      {
+        "thicknessMm": 0.7452308977374072,
+        "v": 0.5
+      },
+      {
+        "thicknessMm": 0.6023509113778336,
+        "v": 0.75
+      },
+      {
+        "thicknessMm": 0.47180060052508677,
+        "v": 0.95
+      }
+    ],
     "tipCapSectionVertexCounts": [
       1,
       3,
@@ -124,7 +242,7 @@
     "generator": {
       "contract": "spike-almond-shell-generator-v3",
       "path": "tools/generate-spike-almond-shell.py",
-      "sha256": "21e08a35767f3b488d4b7b0182e25516a54acf4d0a77025e7955128d299e0e1c"
+      "sha256": "de72a08469b184c23e844e908ab25d622051faaca0b8f0cf7ca044891ba9fe2d"
     },
     "productVisualCandidate": {
       "evidence": "PRODUCT_VISUAL_SIGNED_OFF_NOT_PROMOTED",

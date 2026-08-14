@@ -92,6 +92,8 @@
     "test:render-v0-7-2-texture-assets:e2e": "node tools/walkthrough-render-v0-7-2-texture-assets.mjs",
     "generate:spike-almond-shell": "python3 tools/generate-spike-almond-shell.py",
     "test:spike-almond-shell": "python3 tools/test-spike-almond-shell.py",
+    "generate:geo-v0-7-2-almond-representation": "node tools/generate-geo-v0-7-2-almond-representation.mjs",
+    "test:geo-v0-7-2-almond-representation": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geo-v0-7-2-almond-representation.mjs",
     "test:editor-v7-finish-composite": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-finish-composite.mjs",
     "test:editor-v7-creation-cutover": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-creation-cutover.mjs",
     "test:editor-v7-inspiration-geometry": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-inspiration-geometry.mjs",

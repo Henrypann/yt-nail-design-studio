@@ -1,0 +1,383 @@
+{
+  "schemaVersion": "1.0.0",
+  "bundleId": "nail-surface-bundle.almond.medium.visual-v3",
+  "revision": "3.0.0-simulated-candidate",
+  "surfaceDefinition": {
+    "schemaVersion": "1.0.0",
+    "surfaceDefinitionId": "surface.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-candidate",
+    "sourceType": "generated",
+    "sourceRefs": [
+      {
+        "id": "almond-medium-elegant-v1",
+        "revision": "visual-signoff-2026-08-14",
+        "sha256": "fa2bbc15c2f2edca46bf4fb9af4384b8cbca4a85a3da768d077ac2ce742eca99"
+      },
+      {
+        "id": "silhouette.almond.medium",
+        "revision": "shape-params-v3",
+        "sha256": "db061eeab1439c5b471885eed5ffb64d5cf6d610a0c7d0a3bf53655a2cafccbc"
+      },
+      {
+        "id": "spike-almond-shell-generator-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "de72a08469b184c23e844e908ab25d622051faaca0b8f0cf7ca044891ba9fe2d"
+      }
+    ],
+    "coordinateFrame": {
+      "contract": "nail-surface-mm-rh-root-center-v1",
+      "unit": "mm",
+      "handedness": "right",
+      "origin": "nail_root_center",
+      "xAxis": "right",
+      "yAxis": "root_to_tip_negative",
+      "zAxis": "outward"
+    },
+    "planform": {
+      "silhouetteRef": {
+        "id": "almond-medium-elegant-v1",
+        "revision": "visual-signoff-2026-08-14",
+        "sha256": "fa2bbc15c2f2edca46bf4fb9af4384b8cbca4a85a3da768d077ac2ce742eca99"
+      },
+      "widthMm": 11,
+      "lengthMm": 19.1,
+      "landmarks": [
+        {
+          "id": "tip",
+          "xMm": 0,
+          "yMm": -18,
+          "zMm": 0.6012048125267029
+        },
+        {
+          "id": "root_center",
+          "xMm": 0,
+          "yMm": 1.100000023841858,
+          "zMm": 0.7812048196792603
+        },
+        {
+          "id": "left_side",
+          "xMm": -5.499972343444824,
+          "yMm": -4.179441452026367,
+          "zMm": 1.2802408933639526
+        },
+        {
+          "id": "right_side",
+          "xMm": 5.499972343444824,
+          "yMm": -4.179441452026367,
+          "zMm": 1.2802408933639526
+        },
+        {
+          "id": "apex",
+          "xMm": 0,
+          "yMm": -8.295642852783203,
+          "zMm": 3.1616532802581787
+        }
+      ]
+    },
+    "surfaceFrames": {
+      "classes": [
+        "outer",
+        "inner",
+        "rim"
+      ],
+      "uvContract": "nail-local-u-left-right-v-tip-root-v1",
+      "seam": "root_center",
+      "tangentPolicy": "right_handed_tangent_frame"
+    },
+    "shapeDefinition": {
+      "cCurveStations": [
+        {
+          "crownRiseMm": 0.15096946971756903,
+          "radiusMm": 4.7707233644826115,
+          "v": 0.05,
+          "widthMm": 2.381323474224793
+        },
+        {
+          "crownRiseMm": 1.0903656553198617,
+          "radiusMm": 6.491056481410235,
+          "v": 0.25,
+          "widthMm": 7.201764463196808
+        },
+        {
+          "crownRiseMm": 1.65,
+          "radiusMm": 8.895942795947965,
+          "v": 0.5,
+          "widthMm": 10.321649330727775
+        },
+        {
+          "crownRiseMm": 1.0903656553198622,
+          "radiusMm": 14.342020176444434,
+          "v": 0.75,
+          "widthMm": 10.970359190892143
+        },
+        {
+          "crownRiseMm": 0.1509694697175692,
+          "radiusMm": 58.98754786007511,
+          "v": 0.95,
+          "widthMm": 8.435127944486377
+        }
+      ],
+      "longitudinalStations": [
+        {
+          "innerZMm": 0.20694064256114864,
+          "outerZMm": 0.8024382112743057,
+          "v": 0.05
+        },
+        {
+          "innerZMm": 1.6144268686452756,
+          "outerZMm": 2.225137487690028,
+          "v": 0.25
+        },
+        {
+          "innerZMm": 2.415973937948994,
+          "outerZMm": 3.1612048356864015,
+          "v": 0.5
+        },
+        {
+          "innerZMm": 1.7127865763121948,
+          "outerZMm": 2.3151374876900284,
+          "v": 0.75
+        },
+        {
+          "innerZMm": 0.4926376107492192,
+          "outerZMm": 0.964438211274306,
+          "v": 0.95
+        }
+      ],
+      "cavityDepthMm": 1.4796958703662548,
+      "thickness": {
+        "mode": "vertical_preview_thickness",
+        "stations": [
+          {
+            "thicknessMm": 0.5954975687131571,
+            "v": 0.05
+          },
+          {
+            "thicknessMm": 0.6107106190447524,
+            "v": 0.25
+          },
+          {
+            "thicknessMm": 0.7452308977374072,
+            "v": 0.5
+          },
+          {
+            "thicknessMm": 0.6023509113778336,
+            "v": 0.75
+          },
+          {
+            "thicknessMm": 0.47180060052508677,
+            "v": 0.95
+          }
+        ]
+      }
+    },
+    "evidence": {
+      "fidelity": "approximate",
+      "manufacturingValidated": false,
+      "limitations": [
+        "not fitted to a scanned nail bed",
+        "not a normal-offset engineering shell",
+        "product visual candidate has not replaced or promoted the signed 2D silhouette",
+        "not validated for material, strength, printing, post-processing, wear or device compatibility"
+      ],
+      "validationRefs": [
+        {
+          "id": "geometry-report.almond.medium.v3",
+          "revision": "3.0.0-simulated-candidate",
+          "sha256": "8581b0c324129335af8b7a83c9aa9df2ea1acadd3cc8cb729566815b09b8e14d"
+        }
+      ]
+    },
+    "sha256": "63e60b670282bf9ab8922e7bec773157421c23b6b0dd1438a1c92daa40dbf24f"
+  },
+  "canonicalGeometry": {
+    "schemaVersion": "1.0.0",
+    "geometrySnapshotId": "geometry.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-candidate",
+    "geometryHash": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+    "sourceDefinitions": [
+      {
+        "id": "surface.almond.medium.visual-v3",
+        "revision": "3.0.0-simulated-candidate",
+        "sha256": "63e60b670282bf9ab8922e7bec773157421c23b6b0dd1438a1c92daa40dbf24f"
+      }
+    ],
+    "coordinateFrame": {
+      "contract": "nail-surface-mm-rh-root-center-v1",
+      "unit": "mm",
+      "handedness": "right",
+      "origin": "nail_root_center",
+      "xAxis": "right",
+      "yAxis": "root_to_tip_negative",
+      "zAxis": "outward"
+    },
+    "topology": {
+      "vertexCount": 8396,
+      "triangleCount": 16788,
+      "componentCount": 1,
+      "boundaryEdgeCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "degenerateTriangleCount": 0,
+      "windingErrorCount": 0,
+      "watertight": true
+    },
+    "boundsMm": {
+      "max": [
+        5.499972343444824,
+        1.100000023841858,
+        3.1616532802581787
+      ],
+      "min": [
+        -5.499972343444824,
+        -18,
+        0
+      ]
+    },
+    "volumeMm3": 93.59525388741667,
+    "surfaceAreaMm2": 362.96989132605495,
+    "regions": [
+      {
+        "regionId": "inner",
+        "faceCount": 8024
+      },
+      {
+        "regionId": "outer",
+        "faceCount": 8024
+      },
+      {
+        "regionId": "rim",
+        "faceCount": 740
+      }
+    ],
+    "attributes": {
+      "normal": "preserved",
+      "uv": "preserved",
+      "tangent": "unavailable",
+      "materialGroup": "preserved",
+      "faceProvenance": "unavailable"
+    },
+    "toolchain": {
+      "evaluatorId": "spike-almond-shell-generator-v3",
+      "evaluatorRevision": "3.0.0-simulated-candidate",
+      "buildSha256": "de72a08469b184c23e844e908ab25d622051faaca0b8f0cf7ca044891ba9fe2d"
+    },
+    "evidence": {
+      "fidelity": "approximate",
+      "manufacturingValidated": false,
+      "limitations": [
+        "not fitted to a scanned nail bed",
+        "not a normal-offset engineering shell",
+        "product visual candidate has not replaced or promoted the signed 2D silhouette",
+        "not validated for material, strength, printing, post-processing, wear or device compatibility"
+      ]
+    }
+  },
+  "representationSet": {
+    "schemaVersion": "1.0.0",
+    "representationSetId": "representation-set.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-candidate",
+    "geometrySnapshotRef": {
+      "id": "geometry.almond.medium.visual-v3",
+      "revision": "3.0.0-simulated-candidate",
+      "sha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc"
+    },
+    "representations": [
+      {
+        "schemaVersion": "1.0.0",
+        "representationId": "representation.almond.medium.visual-v3.glb",
+        "revision": "3.0.0-simulated-candidate",
+        "format": "glb",
+        "role": "browser_preview",
+        "geometrySnapshotRef": {
+          "id": "geometry.almond.medium.visual-v3",
+          "revision": "3.0.0-simulated-candidate",
+          "sha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc"
+        },
+        "coordinateFrame": {
+          "contract": "nail-surface-mm-rh-root-center-v1",
+          "unit": "mm",
+          "handedness": "right",
+          "origin": "nail_root_center",
+          "xAxis": "right",
+          "yAxis": "root_to_tip_negative",
+          "zAxis": "outward"
+        },
+        "canonicalTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+        "artifact": {
+          "path": "assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+          "runtimeUrl": "/assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+          "mimeType": "model/gltf-binary",
+          "sha256": "8055bcd115c13fa6a25d5e3e942966ef09ca3a652760579df02a0bc02305e016",
+          "byteLength": 471664,
+          "visibility": "DEV_REVIEW_ONLY"
+        },
+        "attributes": {
+          "normal": "preserved",
+          "uv": "preserved",
+          "materialGroup": "preserved"
+        },
+        "evidence": {
+          "fidelity": "approximate",
+          "productVisualSignoff": true,
+          "manufacturingValidated": false,
+          "limitations": [
+            "not fitted to a scanned nail bed",
+            "not a normal-offset engineering shell",
+            "product visual candidate has not replaced or promoted the signed 2D silhouette",
+            "not validated for material, strength, printing, post-processing, wear or device compatibility"
+          ]
+        }
+      },
+      {
+        "schemaVersion": "1.0.0",
+        "representationId": "representation.almond.medium.visual-v3.stl",
+        "revision": "3.0.0-simulated-candidate",
+        "format": "stl",
+        "role": "internal_geometry_interchange",
+        "geometrySnapshotRef": {
+          "id": "geometry.almond.medium.visual-v3",
+          "revision": "3.0.0-simulated-candidate",
+          "sha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc"
+        },
+        "coordinateFrame": {
+          "contract": "nail-surface-mm-rh-root-center-v1",
+          "unit": "mm",
+          "handedness": "right",
+          "origin": "nail_root_center",
+          "xAxis": "right",
+          "yAxis": "root_to_tip_negative",
+          "zAxis": "outward"
+        },
+        "canonicalTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+        "artifact": {
+          "path": "assets/stl/spike/almond-medium-shell-v3.simulated.stl",
+          "mimeType": "model/stl",
+          "sha256": "01a4e4f655c674ecdb7489b9cdac06d9e926b122e3313a3d7385546175a8bf53",
+          "byteLength": 839484,
+          "visibility": "INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED"
+        },
+        "attributes": {
+          "normal": "degraded",
+          "uv": "unavailable",
+          "materialGroup": "unavailable"
+        },
+        "evidence": {
+          "fidelity": "approximate",
+          "productVisualSignoff": true,
+          "manufacturingValidated": false,
+          "limitations": [
+            "not fitted to a scanned nail bed",
+            "not a normal-offset engineering shell",
+            "product visual candidate has not replaced or promoted the signed 2D silhouette",
+            "not validated for material, strength, printing, post-processing, wear or device compatibility"
+          ]
+        }
+      }
+    ],
+    "parity": {
+      "canonicalTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+      "sameCanonicalTriangles": true,
+      "boundsToleranceMm": 0.01
+    }
+  }
+}

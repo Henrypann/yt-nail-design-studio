@@ -51,7 +51,7 @@
     "generator": {
       "contract": "spike-almond-shell-generator-v3",
       "path": "tools/generate-spike-almond-shell.py",
-      "sha256": "21e08a35767f3b488d4b7b0182e25516a54acf4d0a77025e7955128d299e0e1c"
+      "sha256": "de72a08469b184c23e844e908ab25d622051faaca0b8f0cf7ca044891ba9fe2d"
     },
     "productVisualCandidate": {
       "evidence": "PRODUCT_VISUAL_SIGNED_OFF_NOT_PROMOTED",

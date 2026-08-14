@@ -128,6 +128,67 @@ export interface CanonicalGeometrySnapshotV1 {
   evidence: { fidelity: GeometryFidelityV1; manufacturingValidated: false; limitations: string[] };
 }
 
+export type GeometryRepresentationFormatV1 = 'glb' | 'stl';
+export type GeometryRepresentationRoleV1 = 'browser_preview' | 'internal_geometry_interchange';
+
+export interface GeometryRepresentationArtifactV1 {
+  path: string;
+  runtimeUrl?: string;
+  mimeType: 'model/gltf-binary' | 'model/stl';
+  sha256: string;
+  byteLength: number;
+  visibility: 'DEV_REVIEW_ONLY' | 'BROWSER_PREVIEW' | 'INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED';
+}
+
+/**
+ * Immutable encoding of one CanonicalGeometrySnapshot. Promotion is deliberately
+ * absent: Registry V2 owns lifecycle, while this record only proves artifact identity.
+ */
+export interface GeometryRepresentationV1 {
+  schemaVersion: typeof GEOMETRY_CONTRACT_VERSION_V072;
+  representationId: string;
+  revision: string;
+  format: GeometryRepresentationFormatV1;
+  role: GeometryRepresentationRoleV1;
+  geometrySnapshotRef: GeometryVersionedRefV1;
+  coordinateFrame: NailSurfaceCoordinateFrameV1;
+  canonicalTriangleSha256: string;
+  artifact: GeometryRepresentationArtifactV1;
+  attributes: {
+    normal: GeometryAttributeStateV1;
+    uv: GeometryAttributeStateV1;
+    materialGroup: GeometryAttributeStateV1;
+  };
+  evidence: {
+    fidelity: GeometryFidelityV1;
+    productVisualSignoff: boolean;
+    manufacturingValidated: false;
+    limitations: string[];
+  };
+}
+
+export interface GeometryRepresentationSetV1 {
+  schemaVersion: typeof GEOMETRY_CONTRACT_VERSION_V072;
+  representationSetId: string;
+  revision: string;
+  geometrySnapshotRef: GeometryVersionedRefV1;
+  representations: GeometryRepresentationV1[];
+  parity: {
+    canonicalTriangleSha256: string;
+    sameCanonicalTriangles: boolean;
+    boundsToleranceMm: number;
+  };
+}
+
+export interface NailSurfaceGeometryBundleV1 {
+  schemaVersion: typeof GEOMETRY_CONTRACT_VERSION_V072;
+  bundleId: string;
+  revision: string;
+  surfaceDefinition: NailSurfaceDefinitionV1;
+  canonicalGeometry: CanonicalGeometrySnapshotV1;
+  representationSet: GeometryRepresentationSetV1;
+}
+
 export type GeometryOperationTypeV1 =
   | 'shell_from_surface'
   | 'project_or_conform'

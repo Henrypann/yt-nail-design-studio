@@ -5,6 +5,9 @@
   "oneOf": [
     { "$ref": "#/$defs/nailSurfaceDefinition" },
     { "$ref": "#/$defs/canonicalGeometrySnapshot" },
+    { "$ref": "#/$defs/geometryRepresentation" },
+    { "$ref": "#/$defs/geometryRepresentationSet" },
+    { "$ref": "#/$defs/nailSurfaceGeometryBundle" },
     { "$ref": "#/$defs/operationGraph" },
     { "$ref": "#/$defs/evaluationRecord" }
   ],
@@ -67,6 +70,46 @@
         "regions": { "type": "array", "minItems": 3, "items": { "type": "object", "additionalProperties": false, "required": ["regionId", "faceCount"], "properties": { "regionId": { "$ref": "#/$defs/id" }, "faceCount": { "type": "integer", "minimum": 1 } } } }, "attributes": { "$ref": "#/$defs/attributes" },
         "toolchain": { "type": "object", "additionalProperties": false, "required": ["evaluatorId", "evaluatorRevision", "buildSha256"], "properties": { "evaluatorId": { "$ref": "#/$defs/id" }, "evaluatorRevision": { "$ref": "#/$defs/id" }, "buildSha256": { "$ref": "#/$defs/sha256" } } },
         "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "manufacturingValidated", "limitations"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string" } } } }
+      }
+    },
+    "representationArtifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "mimeType", "sha256", "byteLength", "visibility"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 }, "runtimeUrl": { "type": "string", "minLength": 1 },
+        "mimeType": { "enum": ["model/gltf-binary", "model/stl"] }, "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "visibility": { "enum": ["DEV_REVIEW_ONLY", "BROWSER_PREVIEW", "INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED"] }
+      }
+    },
+    "geometryRepresentation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "representationId", "revision", "format", "role", "geometrySnapshotRef", "coordinateFrame", "canonicalTriangleSha256", "artifact", "attributes", "evidence"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "representationId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" },
+        "format": { "enum": ["glb", "stl"] }, "role": { "enum": ["browser_preview", "internal_geometry_interchange"] },
+        "geometrySnapshotRef": { "$ref": "#/$defs/versionedRef" }, "coordinateFrame": { "$ref": "#/$defs/coordinateFrame" },
+        "canonicalTriangleSha256": { "$ref": "#/$defs/sha256" }, "artifact": { "$ref": "#/$defs/representationArtifact" },
+        "attributes": { "type": "object", "additionalProperties": false, "required": ["normal", "uv", "materialGroup"], "properties": { "normal": { "$ref": "#/$defs/attributeState" }, "uv": { "$ref": "#/$defs/attributeState" }, "materialGroup": { "$ref": "#/$defs/attributeState" } } },
+        "evidence": { "type": "object", "additionalProperties": false, "required": ["fidelity", "productVisualSignoff", "manufacturingValidated", "limitations"], "properties": { "fidelity": { "enum": ["exact", "approximate", "unavailable"] }, "productVisualSignoff": { "type": "boolean" }, "manufacturingValidated": { "const": false }, "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } }
+      }
+    },
+    "geometryRepresentationSet": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "representationSetId", "revision", "geometrySnapshotRef", "representations", "parity"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "representationSetId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" },
+        "geometrySnapshotRef": { "$ref": "#/$defs/versionedRef" }, "representations": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/geometryRepresentation" } },
+        "parity": { "type": "object", "additionalProperties": false, "required": ["canonicalTriangleSha256", "sameCanonicalTriangles", "boundsToleranceMm"], "properties": { "canonicalTriangleSha256": { "$ref": "#/$defs/sha256" }, "sameCanonicalTriangles": { "const": true }, "boundsToleranceMm": { "type": "number", "minimum": 0, "maximum": 0.1 } } }
+      }
+    },
+    "nailSurfaceGeometryBundle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "bundleId", "revision", "surfaceDefinition", "canonicalGeometry", "representationSet"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" }, "bundleId": { "$ref": "#/$defs/id" }, "revision": { "$ref": "#/$defs/id" },
+        "surfaceDefinition": { "$ref": "#/$defs/nailSurfaceDefinition" }, "canonicalGeometry": { "$ref": "#/$defs/canonicalGeometrySnapshot" },
+        "representationSet": { "$ref": "#/$defs/geometryRepresentationSet" }
       }
     },
     "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },

@@ -5,7 +5,10 @@ import {
   type GeometryEvaluationRecordV1,
   type GeometryIssueV1,
   type GeometryOperationGraphV1,
+  type GeometryRepresentationSetV1,
+  type GeometryRepresentationV1,
   type NailSurfaceDefinitionV1,
+  type NailSurfaceGeometryBundleV1,
 } from './model';
 
 export type GeometryParseResultV1<T> = { ok: true; value: T } | { ok: false; issues: GeometryIssueV1[] };
@@ -183,6 +186,116 @@ export function parseCanonicalGeometrySnapshotV1(input: unknown): GeometryParseR
     attributes(obj.attributes, '$.attributes', c);
     const toolchain = objectAt(obj.toolchain, '$.toolchain', c); if (toolchain) { exactKeys(toolchain, ['evaluatorId', 'evaluatorRevision', 'buildSha256'], ['evaluatorId', 'evaluatorRevision', 'buildSha256'], '$.toolchain', c); stringAt(toolchain.evaluatorId, '$.toolchain.evaluatorId', c, ID); stringAt(toolchain.evaluatorRevision, '$.toolchain.evaluatorRevision', c, ID); stringAt(toolchain.buildSha256, '$.toolchain.buildSha256', c, SHA256); }
     const evidence = objectAt(obj.evidence, '$.evidence', c); if (evidence) { exactKeys(evidence, ['fidelity', 'manufacturingValidated', 'limitations'], ['fidelity', 'manufacturingValidated', 'limitations'], '$.evidence', c); enumAt(evidence.fidelity, ['exact', 'approximate', 'unavailable'], '$.evidence.fidelity', c); if (evidence.manufacturingValidated !== false) issue(c, '$.evidence.manufacturingValidated', 'must remain false'); arrayAt(evidence.limitations, '$.evidence.limitations', c, 1)?.forEach((v, i) => stringAt(v, `$.evidence.limitations[${i}]`, c)); }
+  });
+}
+
+function representation(value: unknown, path: string, c: Collector): void {
+  const obj = objectAt(value, path, c);
+  if (!obj) return;
+  const keys = ['schemaVersion', 'representationId', 'revision', 'format', 'role', 'geometrySnapshotRef', 'coordinateFrame', 'canonicalTriangleSha256', 'artifact', 'attributes', 'evidence'];
+  exactKeys(obj, keys, keys, path, c);
+  version(obj, path, c);
+  stringAt(obj.representationId, `${path}.representationId`, c, ID);
+  stringAt(obj.revision, `${path}.revision`, c, ID);
+  const formatOk = enumAt(obj.format, ['glb', 'stl'], `${path}.format`, c);
+  const roleOk = enumAt(obj.role, ['browser_preview', 'internal_geometry_interchange'], `${path}.role`, c);
+  versionedRef(obj.geometrySnapshotRef, `${path}.geometrySnapshotRef`, c);
+  coordinate(obj.coordinateFrame, `${path}.coordinateFrame`, c);
+  stringAt(obj.canonicalTriangleSha256, `${path}.canonicalTriangleSha256`, c, SHA256);
+  if (objectAt(obj.geometrySnapshotRef, `${path}.geometrySnapshotRef`, c)?.sha256 !== obj.canonicalTriangleSha256) {
+    issue(c, `${path}.canonicalTriangleSha256`, 'must equal geometrySnapshotRef.sha256');
+  }
+  const artifact = objectAt(obj.artifact, `${path}.artifact`, c);
+  if (artifact) {
+    exactKeys(artifact, ['path', 'runtimeUrl', 'mimeType', 'sha256', 'byteLength', 'visibility'], ['path', 'mimeType', 'sha256', 'byteLength', 'visibility'], `${path}.artifact`, c);
+    stringAt(artifact.path, `${path}.artifact.path`, c);
+    if (artifact.runtimeUrl !== undefined) stringAt(artifact.runtimeUrl, `${path}.artifact.runtimeUrl`, c);
+    enumAt(artifact.mimeType, ['model/gltf-binary', 'model/stl'], `${path}.artifact.mimeType`, c);
+    stringAt(artifact.sha256, `${path}.artifact.sha256`, c, SHA256);
+    intAt(artifact.byteLength, `${path}.artifact.byteLength`, c, 1);
+    enumAt(artifact.visibility, ['DEV_REVIEW_ONLY', 'BROWSER_PREVIEW', 'INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED'], `${path}.artifact.visibility`, c);
+    if (formatOk && obj.format === 'glb' && (obj.role !== 'browser_preview' || artifact.mimeType !== 'model/gltf-binary' || !['DEV_REVIEW_ONLY', 'BROWSER_PREVIEW'].includes(String(artifact.visibility)) || typeof artifact.runtimeUrl !== 'string')) issue(c, `${path}.artifact`, 'GLB preview representation contract mismatch');
+    if (formatOk && obj.format === 'stl' && (obj.role !== 'internal_geometry_interchange' || artifact.mimeType !== 'model/stl' || artifact.visibility !== 'INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED' || artifact.runtimeUrl !== undefined)) issue(c, `${path}.artifact`, 'STL internal representation contract mismatch');
+    if (roleOk && obj.role === 'browser_preview' && obj.format !== 'glb') issue(c, `${path}.role`, 'browser preview must use GLB');
+  }
+  const attrs = objectAt(obj.attributes, `${path}.attributes`, c);
+  if (attrs) {
+    const attrKeys = ['normal', 'uv', 'materialGroup'];
+    exactKeys(attrs, attrKeys, attrKeys, `${path}.attributes`, c);
+    attrKeys.forEach((key) => enumAt(attrs[key], ['preserved', 'degraded', 'unavailable'], `${path}.attributes.${key}`, c));
+  }
+  const evidence = objectAt(obj.evidence, `${path}.evidence`, c);
+  if (evidence) {
+    const evidenceKeys = ['fidelity', 'productVisualSignoff', 'manufacturingValidated', 'limitations'];
+    exactKeys(evidence, evidenceKeys, evidenceKeys, `${path}.evidence`, c);
+    enumAt(evidence.fidelity, ['exact', 'approximate', 'unavailable'], `${path}.evidence.fidelity`, c);
+    if (typeof evidence.productVisualSignoff !== 'boolean') issue(c, `${path}.evidence.productVisualSignoff`, 'must be boolean');
+    if (evidence.manufacturingValidated !== false) issue(c, `${path}.evidence.manufacturingValidated`, 'must remain false');
+    arrayAt(evidence.limitations, `${path}.evidence.limitations`, c, 1)?.forEach((entry, index) => stringAt(entry, `${path}.evidence.limitations[${index}]`, c));
+  }
+}
+
+export function parseGeometryRepresentationV1(input: unknown): GeometryParseResultV1<GeometryRepresentationV1> {
+  return parse(input, (obj, c) => representation(obj, '$', c));
+}
+
+export function parseGeometryRepresentationSetV1(input: unknown): GeometryParseResultV1<GeometryRepresentationSetV1> {
+  return parse(input, (obj, c) => {
+    const keys = ['schemaVersion', 'representationSetId', 'revision', 'geometrySnapshotRef', 'representations', 'parity'];
+    exactKeys(obj, keys, keys, '$', c);
+    version(obj, '$', c);
+    stringAt(obj.representationSetId, '$.representationSetId', c, ID);
+    stringAt(obj.revision, '$.revision', c, ID);
+    versionedRef(obj.geometrySnapshotRef, '$.geometrySnapshotRef', c);
+    const rootRef = objectAt(obj.geometrySnapshotRef, '$.geometrySnapshotRef', c);
+    const formats = new Set<string>();
+    arrayAt(obj.representations, '$.representations', c, 2)?.forEach((entry, index) => {
+      representation(entry, `$.representations[${index}]`, c);
+      const item = objectAt(entry, `$.representations[${index}]`, c);
+      if (!item) return;
+      if (typeof item.format === 'string') {
+        if (formats.has(item.format)) issue(c, `$.representations[${index}].format`, 'duplicate representation format');
+        formats.add(item.format);
+      }
+      const ref = objectAt(item.geometrySnapshotRef, `$.representations[${index}].geometrySnapshotRef`, c);
+      if (rootRef && ref && (ref.id !== rootRef.id || ref.revision !== rootRef.revision || ref.sha256 !== rootRef.sha256)) issue(c, `$.representations[${index}].geometrySnapshotRef`, 'must equal set geometrySnapshotRef');
+    });
+    if (!formats.has('glb') || !formats.has('stl')) issue(c, '$.representations', 'GLB and STL representations are both required');
+    const parity = objectAt(obj.parity, '$.parity', c);
+    if (parity) {
+      const parityKeys = ['canonicalTriangleSha256', 'sameCanonicalTriangles', 'boundsToleranceMm'];
+      exactKeys(parity, parityKeys, parityKeys, '$.parity', c);
+      stringAt(parity.canonicalTriangleSha256, '$.parity.canonicalTriangleSha256', c, SHA256);
+      if (parity.sameCanonicalTriangles !== true) issue(c, '$.parity.sameCanonicalTriangles', 'must be true');
+      finiteAt(parity.boundsToleranceMm, '$.parity.boundsToleranceMm', c, 0, 0.1);
+      if (rootRef && parity.canonicalTriangleSha256 !== rootRef.sha256) issue(c, '$.parity.canonicalTriangleSha256', 'must equal geometrySnapshotRef.sha256');
+    }
+  });
+}
+
+export function parseNailSurfaceGeometryBundleV1(input: unknown): GeometryParseResultV1<NailSurfaceGeometryBundleV1> {
+  return parse(input, (obj, c) => {
+    const keys = ['schemaVersion', 'bundleId', 'revision', 'surfaceDefinition', 'canonicalGeometry', 'representationSet'];
+    exactKeys(obj, keys, keys, '$', c);
+    version(obj, '$', c);
+    stringAt(obj.bundleId, '$.bundleId', c, ID);
+    stringAt(obj.revision, '$.revision', c, ID);
+    const surfaceResult = parseNailSurfaceDefinitionV1(obj.surfaceDefinition);
+    if (!surfaceResult.ok) surfaceResult.issues.forEach((entry) => issue(c, `$.surfaceDefinition${entry.path.slice(1)}`, entry.message));
+    const snapshotResult = parseCanonicalGeometrySnapshotV1(obj.canonicalGeometry);
+    if (!snapshotResult.ok) snapshotResult.issues.forEach((entry) => issue(c, `$.canonicalGeometry${entry.path.slice(1)}`, entry.message));
+    const representationResult = parseGeometryRepresentationSetV1(obj.representationSet);
+    if (!representationResult.ok) representationResult.issues.forEach((entry) => issue(c, `$.representationSet${entry.path.slice(1)}`, entry.message));
+    if (surfaceResult.ok && snapshotResult.ok) {
+      const expected = snapshotResult.value.sourceDefinitions[0];
+      const surface = surfaceResult.value;
+      if (!expected || expected.id !== surface.surfaceDefinitionId || expected.revision !== surface.revision || expected.sha256 !== surface.sha256) issue(c, '$.canonicalGeometry.sourceDefinitions[0]', 'must reference the bundled surface definition');
+    }
+    if (snapshotResult.ok && representationResult.ok) {
+      const expected = representationResult.value.geometrySnapshotRef;
+      const snapshot = snapshotResult.value;
+      if (expected.id !== snapshot.geometrySnapshotId || expected.revision !== snapshot.revision || expected.sha256 !== snapshot.geometryHash) issue(c, '$.representationSet.geometrySnapshotRef', 'must reference the bundled canonical geometry');
+    }
   });
 }
 

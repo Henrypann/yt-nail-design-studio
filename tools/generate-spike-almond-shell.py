@@ -449,6 +449,10 @@ def create_shell_mesh(outline: np.ndarray) -> tuple[trimesh.Trimesh, np.ndarray,
         faces.append([outer_a, inner_a, inner_b])
         faces.append([outer_a, inner_b, outer_b])
 
+    outer_face_count = len(outer_surface_faces)
+    inner_face_count = outer_face_count
+    rim_face_count = len(faces) - outer_face_count - inner_face_count
+
     faces_array = np.asarray(faces, dtype=np.int64)
     mesh = trimesh.Trimesh(vertices=vertices, faces=faces_array, process=False, validate=False)
     if mesh.volume < 0:
@@ -500,6 +504,40 @@ def create_shell_mesh(outline: np.ndarray) -> tuple[trimesh.Trimesh, np.ndarray,
     sampled_widths = np.asarray([2.0 * half_width_at_y(outline, float(y)) for y in sampled_y])
     max_width_index = int(np.argmax(sampled_widths))
     max_width_y = float(sampled_y[max_width_index])
+    station_values = [0.05, 0.25, 0.5, 0.75, 0.95]
+    c_curve_stations: list[dict[str, float]] = []
+    longitudinal_stations: list[dict[str, float]] = []
+    thickness_stations: list[dict[str, float]] = []
+    for station_v in station_values:
+        station_y = tip_y + station_v * span_y
+        station_half_width = half_width_at_y(outline, station_y)
+        station_outer, station_inner, station_thickness = shell_heights(station_v, 0.0)
+        station_side_outer, _, _ = shell_heights(station_v, 1.0)
+        station_sag = station_outer - station_side_outer
+        equivalent_radius = (station_half_width * station_half_width + station_sag * station_sag) / (2.0 * station_sag)
+        c_curve_stations.append({
+            "v": station_v,
+            "widthMm": station_half_width * 2.0,
+            "crownRiseMm": station_sag,
+            "radiusMm": equivalent_radius,
+        })
+        longitudinal_stations.append({"v": station_v, "outerZMm": station_outer + z_shift, "innerZMm": station_inner + z_shift})
+        thickness_stations.append({"v": station_v, "thicknessMm": station_thickness})
+
+    outer_points = np.asarray(mesh.vertices[:len(outer_vertices)], dtype=np.float64)
+    tip_index = min(np.flatnonzero(np.isclose(outer_points[:, 1], outer_points[:, 1].min(), atol=1e-6)), key=lambda index: abs(float(outer_points[index, 0])))
+    root_index = min(np.flatnonzero(np.isclose(outer_points[:, 1], outer_points[:, 1].max(), atol=1e-6)), key=lambda index: abs(float(outer_points[index, 0])))
+    left_index = int(np.argmin(outer_points[:, 0]))
+    right_index = int(np.argmax(outer_points[:, 0]))
+    apex_index = int(np.argmax(outer_points[:, 2]))
+    landmarks = [
+        {"id": "tip", "xMm": float(outer_points[tip_index, 0]), "yMm": float(outer_points[tip_index, 1]), "zMm": float(outer_points[tip_index, 2])},
+        {"id": "root_center", "xMm": float(outer_points[root_index, 0]), "yMm": float(outer_points[root_index, 1]), "zMm": float(outer_points[root_index, 2])},
+        {"id": "left_side", "xMm": float(outer_points[left_index, 0]), "yMm": float(outer_points[left_index, 1]), "zMm": float(outer_points[left_index, 2])},
+        {"id": "right_side", "xMm": float(outer_points[right_index, 0]), "yMm": float(outer_points[right_index, 1]), "zMm": float(outer_points[right_index, 2])},
+        {"id": "apex", "xMm": float(outer_points[apex_index, 0]), "yMm": float(outer_points[apex_index, 1]), "zMm": float(outer_points[apex_index, 2])},
+    ]
+
     metrics = {
         "tipYmm": tip_y,
         "cuticleSeatYmm": root_y,
@@ -510,6 +548,11 @@ def create_shell_mesh(outline: np.ndarray) -> tuple[trimesh.Trimesh, np.ndarray,
         "maxWidthPositionFromRootRatio": (root_y - max_width_y) / span_y,
         "tipCapSectionVertexCounts": [1, 3, 5],
         "rootCapSectionVertexCounts": [5, 3, 1],
+        "regionFaceCounts": {"outer": outer_face_count, "inner": inner_face_count, "rim": rim_face_count},
+        "landmarks": landmarks,
+        "cCurveStations": c_curve_stations,
+        "longitudinalStations": longitudinal_stations,
+        "thicknessStations": thickness_stations,
         "transverseOuterCrownMm": middle_outer_center - middle_outer_side,
         "undersideCavityDepthMm": middle_inner_center - middle_inner_side,
         "longitudinalOuterRiseMm": max(centreline_outer) - max(centreline_outer[0], centreline_outer[-1]),
