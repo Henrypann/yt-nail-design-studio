@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "look-asset-pack-v0.7.2-v1",
+  "architectureBaseline": "v0.7.2",
+  "lookId": "leopard-gilded-nude",
+  "revision": "1.0.0-simulated",
+  "title": "Leopard Gilded Nude",
+  "titleZh": "鎏金豹纹裸粉",
+  "status": "SIMULATED_LOOK_ASSET_PACK",
+  "visualSignoff": "candidate_pending_designer_trial",
+  "manufacturingValidated": false,
+  "sourceReference": {
+    "id": "reference-01-layer-breakdown",
+    "role": "layer_and_material_language_only",
+    "redistributed": false
+  },
+  "designTruth": "structured_finger_allocation_and_layer_contract",
+  "previewGeometryRef": {
+    "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-preview",
+    "promotionState": "promoted_simulated_preview"
+  },
+  "geometryPolicy": {
+    "nailLocalReflowable": true,
+    "exactShapeClaim": false,
+    "compatibleShapes": [
+      "almond",
+      "oval",
+      "squoval"
+    ]
+  },
+  "layerContract": [
+    {
+      "kind": "background",
+      "cardinality": "exactly_one",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    },
+    {
+      "kind": "flat_design",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ]
+    },
+    {
+      "kind": "surface_effect",
+      "cardinality": "zero_or_more",
+      "fingers": []
+    },
+    {
+      "kind": "dimensional_decoration",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "R4"
+      ]
+    },
+    {
+      "kind": "surface_finish",
+      "cardinality": "exactly_one_last",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    }
+  ],
+  "fingerAllocation": {
+    "L1": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory",
+        "leopard_local",
+        "gilded_crystal_cluster"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L2": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L3": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "leopard_local"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L4": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "gold_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L5": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R1": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "leopard_local"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R2": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R3": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R4": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory",
+        "leopard_local",
+        "gilded_crystal_cluster"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R5": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "gold_microbead"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    }
+  },
+  "assets": {
+    "highFidelityCover": {
+      "assetId": "look.leopard-gilded-nude.cover",
+      "revision": "1",
+      "path": "look-cover-16x9-v1.png",
+      "widthPx": 1672,
+      "heightPx": 941,
+      "mimeType": "image/png",
+      "sha256": "842f50ee687a1bbc9ef2c5df21559a18d077629677574105e2fe482caf8cc92e",
+      "byteLength": 1294696,
+      "evidence": "AI_GENERATED_HIGH_FIDELITY_CONCEPT"
+    },
+    "flatVector": {
+      "assetId": "look.leopard-gilded-nude.flat-reference",
+      "revision": "1",
+      "path": "flat/design-reference.svg",
+      "mimeType": "image/svg+xml",
+      "sha256": "a3e8bdafbff42875e7f41b45e70fc73548faaa658b9bd6e195157951a8b47c9e",
+      "byteLength": 423,
+      "evidence": "DETERMINISTIC_2D_REFERENCE"
+    },
+    "textureMaps": {
+      "decal": {
+        "assetId": "look.leopard-gilded-nude.map.decal",
+        "revision": "1",
+        "path": "maps/leopard-gilded-nude-decal.png",
+        "runtimeUrl": "/assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-decal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "2c159c78de038c7d8f9c85af572dc67d5f8428fcaa4d3a0d1c726fafb0ad49dc",
+        "byteLength": 69406,
+        "colorSpace": "srgb",
+        "role": "decal"
+      },
+      "normal": {
+        "assetId": "look.leopard-gilded-nude.map.normal",
+        "revision": "1",
+        "path": "maps/leopard-gilded-nude-normal.png",
+        "runtimeUrl": "/assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-normal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "9cf149709dfb65ec6bdc6025757548f25556ccb630820702ed3ddffa0bab384b",
+        "byteLength": 23405,
+        "colorSpace": "linear",
+        "role": "normal"
+      },
+      "roughness": {
+        "assetId": "look.leopard-gilded-nude.map.roughness",
+        "revision": "1",
+        "path": "maps/leopard-gilded-nude-roughness.png",
+        "runtimeUrl": "/assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-roughness.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "c570a3dc44683ad8bd2d91de8413505d4ee57923e2a797e8eb25851437ec4b99",
+        "byteLength": 9565,
+        "colorSpace": "linear",
+        "role": "roughness"
+      },
+      "height": {
+        "assetId": "look.leopard-gilded-nude.map.height",
+        "revision": "1",
+        "path": "maps/leopard-gilded-nude-height.png",
+        "runtimeUrl": "/assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-height.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "c7c23fa5758563cc103342a2d1e9627f22ace61d19d029934e22da4ca5c6062e",
+        "byteLength": 10185,
+        "colorSpace": "linear",
+        "role": "visual_bump_not_geometry"
+      }
+    },
+    "dimensionalAssets": [
+      {
+        "assetId": "look.leopard-gilded-nude.decoration.gilded-crystal-cluster",
+        "revision": "1.0.0-simulated",
+        "path": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/gilded-crystal-cluster/gilded-crystal-cluster.web.glb",
+        "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/gilded-crystal-cluster/gilded-crystal-cluster.web.glb",
+        "mimeType": "model/gltf-binary",
+        "sha256": "0c402f97e9b4d6770a890e31fdfe818865eba24d590b12e8276b3be4c33ee87e",
+        "byteLength": 40900,
+        "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+        "manufacturingValidated": false
+      }
+    ],
+    "dimensionalKit": {
+      "assetId": "look.leopard-gilded-nude.dimensional-kit",
+      "revision": "1.0.0-simulated",
+      "path": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/dimensional-kit.web.glb",
+      "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/dimensional-kit.web.glb",
+      "mimeType": "model/gltf-binary",
+      "sha256": "0c402f97e9b4d6770a890e31fdfe818865eba24d590b12e8276b3be4c33ee87e",
+      "byteLength": 40900,
+      "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+      "manufacturingValidated": false
+    }
+  },
+  "generators": {
+    "rasterAndManifest": {
+      "path": "tools/generate-v0-7-2-four-look-assets.mjs",
+      "sha256": "f2d114cc888a408d2a49433b8379f35533b48a07b8453a59855a6adf7de60749"
+    },
+    "glb": {
+      "path": "tools/generate-v0-7-2-four-look-glb.py",
+      "sha256": "f6d496c60410f2c5937e17ced55fae2c96c9b3f21ea029a258f3b98e2219cd97",
+      "toolchain": "CPython + trimesh preview primitives"
+    }
+  },
+  "limitations": [
+    "High-fidelity cover is concept imagery, not an exact canonical renderer output.",
+    "GLB and texture maps are simulated preview assets only and are not manufacturing geometry.",
+    "No fit, adhesion, material, curing, strength, print, device, or manufacturability validation.",
+    "STL is intentionally absent; Look decoration content does not own CanonicalGeometry manufacturing representations."
+  ]
+}

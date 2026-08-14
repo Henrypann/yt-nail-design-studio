@@ -16,6 +16,7 @@
 | Sunset Aura Glaze | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Latina glam） |
 | Liquid Chrome Statement | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Black glam Statement） |
 | Butter Glaze Quiet | Asset Spec、16:9 Wizard + Editorial 封面、Manifest（Clean Girl Squoval） |
+| v0.7.2 Four Look Sets | 4 套完整十指分配、4 张 16:9 高保真封面、16 张材质贴图、6 个组件 GLB、4 个 dimensional-kit GLB |
 
 ## 重要边界
 
@@ -35,5 +36,6 @@
 - [Sunset Aura Glaze](./sunset-aura-glaze/ASSET_SPEC.md)
 - [Liquid Chrome Statement](./liquid-chrome-statement/ASSET_SPEC.md)
 - [Butter Glaze Quiet](./butter-glaze-quiet/ASSET_SPEC.md)
+- [v0.7.2 四套十指 Look](./v0-7-2-four-look-sets-ASSET_SPEC.md)
+- [v0.7.2 四套 Prompt](./v0-7-2-four-look-sets-PROMPTS.md)
 - [生成提示词](./PROMPTS.md)
-

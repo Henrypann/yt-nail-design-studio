@@ -1,0 +1,347 @@
+{
+  "schemaVersion": "look-asset-pack-v0.7.2-v1",
+  "architectureBaseline": "v0.7.2",
+  "lookId": "crimson-reliquary",
+  "revision": "1.0.0-simulated",
+  "title": "Crimson Reliquary",
+  "titleZh": "绯红圣物",
+  "status": "SIMULATED_LOOK_ASSET_PACK",
+  "visualSignoff": "candidate_pending_designer_trial",
+  "manufacturingValidated": false,
+  "sourceReference": {
+    "id": "reference-02-layer-breakdown",
+    "role": "layer_and_material_language_only",
+    "redistributed": false
+  },
+  "designTruth": "structured_finger_allocation_and_layer_contract",
+  "previewGeometryRef": {
+    "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-preview",
+    "promotionState": "promoted_simulated_preview"
+  },
+  "geometryPolicy": {
+    "nailLocalReflowable": true,
+    "exactShapeClaim": false,
+    "compatibleShapes": [
+      "almond",
+      "oval",
+      "squoval"
+    ]
+  },
+  "layerContract": [
+    {
+      "kind": "background",
+      "cardinality": "exactly_one",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    },
+    {
+      "kind": "flat_design",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "R1",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    },
+    {
+      "kind": "surface_effect",
+      "cardinality": "zero_or_more",
+      "fingers": []
+    },
+    {
+      "kind": "dimensional_decoration",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "L3",
+        "R3",
+        "R4"
+      ]
+    },
+    {
+      "kind": "surface_finish",
+      "cardinality": "exactly_one_last",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    }
+  ],
+  "fingerAllocation": {
+    "L1": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve",
+        "gold_cross_chain"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L2": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L3": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve",
+        "gold_chain_arc"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L4": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "curve_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L5": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "gold_microbead"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R1": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R2": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "gold_microbead"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R3": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve",
+        "gold_cross_chain"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R4": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "abstract_curve",
+        "gold_chain_arc"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R5": {
+      "background": {
+        "type": "solid",
+        "color": "#980F2D",
+        "opacity": 1
+      },
+      "middle": [
+        "curve_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    }
+  },
+  "assets": {
+    "highFidelityCover": {
+      "assetId": "look.crimson-reliquary.cover",
+      "revision": "1",
+      "path": "look-cover-16x9-v1.png",
+      "widthPx": 1672,
+      "heightPx": 941,
+      "mimeType": "image/png",
+      "sha256": "3dd8ab248a5917b69387bf50d0eac866c27a5fdd1b6d5625092fade338f9c8d0",
+      "byteLength": 1659416,
+      "evidence": "AI_GENERATED_HIGH_FIDELITY_CONCEPT"
+    },
+    "flatVector": {
+      "assetId": "look.crimson-reliquary.flat-reference",
+      "revision": "1",
+      "path": "flat/design-reference.svg",
+      "mimeType": "image/svg+xml",
+      "sha256": "6b76689433221e2f355bdf3d6e19fdae879772b97ad5675ac41d19d797429551",
+      "byteLength": 394,
+      "evidence": "DETERMINISTIC_2D_REFERENCE"
+    },
+    "textureMaps": {
+      "decal": {
+        "assetId": "look.crimson-reliquary.map.decal",
+        "revision": "1",
+        "path": "maps/crimson-reliquary-decal.png",
+        "runtimeUrl": "/assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-decal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "4983c8ae61bfc76ce9b66160afa07ec6cdf3dc7afb9e4f46f1e2808b36604ad7",
+        "byteLength": 55973,
+        "colorSpace": "srgb",
+        "role": "decal"
+      },
+      "normal": {
+        "assetId": "look.crimson-reliquary.map.normal",
+        "revision": "1",
+        "path": "maps/crimson-reliquary-normal.png",
+        "runtimeUrl": "/assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-normal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "bf3a206125d75faf1ba7cf332afb4997942c5250cdb2a5c31ac1544f60714be1",
+        "byteLength": 19807,
+        "colorSpace": "linear",
+        "role": "normal"
+      },
+      "roughness": {
+        "assetId": "look.crimson-reliquary.map.roughness",
+        "revision": "1",
+        "path": "maps/crimson-reliquary-roughness.png",
+        "runtimeUrl": "/assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-roughness.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "1f77c414a11408125051f3d19a46eff82a229d948feafa520c3acb32750f0eb6",
+        "byteLength": 13655,
+        "colorSpace": "linear",
+        "role": "roughness"
+      },
+      "height": {
+        "assetId": "look.crimson-reliquary.map.height",
+        "revision": "1",
+        "path": "maps/crimson-reliquary-height.png",
+        "runtimeUrl": "/assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-height.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "fc85039e7080909b58d084059288df3fb0d89778a0833f7a49ace735b3df6b49",
+        "byteLength": 11452,
+        "colorSpace": "linear",
+        "role": "visual_bump_not_geometry"
+      }
+    },
+    "dimensionalAssets": [
+      {
+        "assetId": "look.crimson-reliquary.decoration.gold-cross-chain",
+        "revision": "1.0.0-simulated",
+        "path": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/gold-cross-chain/gold-cross-chain.web.glb",
+        "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/crimson-reliquary/gold-cross-chain/gold-cross-chain.web.glb",
+        "mimeType": "model/gltf-binary",
+        "sha256": "53ea27212ff54dd7f290cb442147c1582966d9917ce9342d05f3d1f47389ea77",
+        "byteLength": 170276,
+        "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+        "manufacturingValidated": false
+      }
+    ],
+    "dimensionalKit": {
+      "assetId": "look.crimson-reliquary.dimensional-kit",
+      "revision": "1.0.0-simulated",
+      "path": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/dimensional-kit.web.glb",
+      "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/crimson-reliquary/dimensional-kit.web.glb",
+      "mimeType": "model/gltf-binary",
+      "sha256": "53ea27212ff54dd7f290cb442147c1582966d9917ce9342d05f3d1f47389ea77",
+      "byteLength": 170276,
+      "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+      "manufacturingValidated": false
+    }
+  },
+  "generators": {
+    "rasterAndManifest": {
+      "path": "tools/generate-v0-7-2-four-look-assets.mjs",
+      "sha256": "f2d114cc888a408d2a49433b8379f35533b48a07b8453a59855a6adf7de60749"
+    },
+    "glb": {
+      "path": "tools/generate-v0-7-2-four-look-glb.py",
+      "sha256": "f6d496c60410f2c5937e17ced55fae2c96c9b3f21ea029a258f3b98e2219cd97",
+      "toolchain": "CPython + trimesh preview primitives"
+    }
+  },
+  "limitations": [
+    "High-fidelity cover is concept imagery, not an exact canonical renderer output.",
+    "GLB and texture maps are simulated preview assets only and are not manufacturing geometry.",
+    "No fit, adhesion, material, curing, strength, print, device, or manufacturability validation.",
+    "STL is intentionally absent; Look decoration content does not own CanonicalGeometry manufacturing representations."
+  ]
+}

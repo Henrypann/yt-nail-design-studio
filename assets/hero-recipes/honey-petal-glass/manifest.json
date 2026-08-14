@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "look-asset-pack-v0.7.2-v1",
+  "architectureBaseline": "v0.7.2",
+  "lookId": "honey-petal-glass",
+  "revision": "1.0.0-simulated",
+  "title": "Honey Petal Glass",
+  "titleZh": "蜂蜜玻璃花瓣",
+  "status": "SIMULATED_LOOK_ASSET_PACK",
+  "visualSignoff": "candidate_pending_designer_trial",
+  "manufacturingValidated": false,
+  "sourceReference": {
+    "id": "reference-04-layer-breakdown",
+    "role": "layer_and_material_language_only",
+    "redistributed": false
+  },
+  "designTruth": "structured_finger_allocation_and_layer_contract",
+  "previewGeometryRef": {
+    "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-preview",
+    "promotionState": "promoted_simulated_preview"
+  },
+  "geometryPolicy": {
+    "nailLocalReflowable": true,
+    "exactShapeClaim": false,
+    "compatibleShapes": [
+      "almond",
+      "oval",
+      "squoval"
+    ]
+  },
+  "layerContract": [
+    {
+      "kind": "background",
+      "cardinality": "exactly_one",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    },
+    {
+      "kind": "flat_design",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L2",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R4"
+      ]
+    },
+    {
+      "kind": "surface_effect",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "L3",
+        "R3",
+        "R5"
+      ]
+    },
+    {
+      "kind": "dimensional_decoration",
+      "cardinality": "zero_or_more",
+      "fingers": [
+        "L1",
+        "L4",
+        "R3",
+        "R4"
+      ]
+    },
+    {
+      "kind": "surface_finish",
+      "cardinality": "exactly_one_last",
+      "fingers": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    }
+  ],
+  "fingerAllocation": {
+    "L1": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "glass_flower_pearl",
+        "honey_jelly_center"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L2": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_asymmetric_french"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L3": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "honey_jelly_center"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L4": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_asymmetric_french",
+        "pearl_accent"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L5": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R1": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_asymmetric_french"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R2": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R3": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "glass_flower_pearl",
+        "honey_jelly_center"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R4": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "white_asymmetric_french",
+        "pearl_accent"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R5": {
+      "background": {
+        "type": "translucent",
+        "color": "#EBC9BD",
+        "opacity": 0.8
+      },
+      "middle": [
+        "honey_jelly_center"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    }
+  },
+  "assets": {
+    "highFidelityCover": {
+      "assetId": "look.honey-petal-glass.cover",
+      "revision": "1",
+      "path": "look-cover-16x9-v1.png",
+      "widthPx": 1672,
+      "heightPx": 941,
+      "mimeType": "image/png",
+      "sha256": "c813689b8e825bfcdb323415621fb33e427d78f009a27eb62173ad81f95b8813",
+      "byteLength": 1394414,
+      "evidence": "AI_GENERATED_HIGH_FIDELITY_CONCEPT"
+    },
+    "flatVector": {
+      "assetId": "look.honey-petal-glass.flat-reference",
+      "revision": "1",
+      "path": "flat/design-reference.svg",
+      "mimeType": "image/svg+xml",
+      "sha256": "376bc65f28da9e084f7eac7a211187b83173de53586d56b0c25b144e241f0811",
+      "byteLength": 388,
+      "evidence": "DETERMINISTIC_2D_REFERENCE"
+    },
+    "textureMaps": {
+      "decal": {
+        "assetId": "look.honey-petal-glass.map.decal",
+        "revision": "1",
+        "path": "maps/honey-petal-glass-decal.png",
+        "runtimeUrl": "/assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-decal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "064fba280bb9042314cab33d831694cd1c69a73047d025b1bcd547f96657b450",
+        "byteLength": 22341,
+        "colorSpace": "srgb",
+        "role": "decal"
+      },
+      "normal": {
+        "assetId": "look.honey-petal-glass.map.normal",
+        "revision": "1",
+        "path": "maps/honey-petal-glass-normal.png",
+        "runtimeUrl": "/assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-normal.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "ad500fc45f04c62929e9119d5233bc3f74b5f6695bac0ac0651ab62fcc2a0c7a",
+        "byteLength": 13292,
+        "colorSpace": "linear",
+        "role": "normal"
+      },
+      "roughness": {
+        "assetId": "look.honey-petal-glass.map.roughness",
+        "revision": "1",
+        "path": "maps/honey-petal-glass-roughness.png",
+        "runtimeUrl": "/assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-roughness.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "b2667a3184ebe2525efca754183ab8ea5f49e1b380972fe383c061ba1cc30396",
+        "byteLength": 5620,
+        "colorSpace": "linear",
+        "role": "roughness"
+      },
+      "height": {
+        "assetId": "look.honey-petal-glass.map.height",
+        "revision": "1",
+        "path": "maps/honey-petal-glass-height.png",
+        "runtimeUrl": "/assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-height.png",
+        "mimeType": "image/png",
+        "widthPx": 384,
+        "heightPx": 640,
+        "sha256": "15222615f6be76b56165a41c0ccac697aac2f9c55a18298d668ffa72fe31c6a3",
+        "byteLength": 8124,
+        "colorSpace": "linear",
+        "role": "visual_bump_not_geometry"
+      }
+    },
+    "dimensionalAssets": [
+      {
+        "assetId": "look.honey-petal-glass.decoration.glass-flower-pearl",
+        "revision": "1.0.0-simulated",
+        "path": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/glass-flower-pearl/glass-flower-pearl.web.glb",
+        "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/honey-petal-glass/glass-flower-pearl/glass-flower-pearl.web.glb",
+        "mimeType": "model/gltf-binary",
+        "sha256": "853327fcf4327750bc8a2dd7245d2d10f77675351bf79f0b56a88ae5fecea908",
+        "byteLength": 36668,
+        "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+        "manufacturingValidated": false
+      }
+    ],
+    "dimensionalKit": {
+      "assetId": "look.honey-petal-glass.dimensional-kit",
+      "revision": "1.0.0-simulated",
+      "path": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/dimensional-kit.web.glb",
+      "runtimeUrl": "/assets/glb/components/v0-7-2-four-looks/honey-petal-glass/dimensional-kit.web.glb",
+      "mimeType": "model/gltf-binary",
+      "sha256": "853327fcf4327750bc8a2dd7245d2d10f77675351bf79f0b56a88ae5fecea908",
+      "byteLength": 36668,
+      "evidence": "SIMULATED_PREVIEW_REPRESENTATION",
+      "manufacturingValidated": false
+    }
+  },
+  "generators": {
+    "rasterAndManifest": {
+      "path": "tools/generate-v0-7-2-four-look-assets.mjs",
+      "sha256": "f2d114cc888a408d2a49433b8379f35533b48a07b8453a59855a6adf7de60749"
+    },
+    "glb": {
+      "path": "tools/generate-v0-7-2-four-look-glb.py",
+      "sha256": "f6d496c60410f2c5937e17ced55fae2c96c9b3f21ea029a258f3b98e2219cd97",
+      "toolchain": "CPython + trimesh preview primitives"
+    }
+  },
+  "limitations": [
+    "High-fidelity cover is concept imagery, not an exact canonical renderer output.",
+    "GLB and texture maps are simulated preview assets only and are not manufacturing geometry.",
+    "No fit, adhesion, material, curing, strength, print, device, or manufacturability validation.",
+    "STL is intentionally absent; Look decoration content does not own CanonicalGeometry manufacturing representations."
+  ]
+}

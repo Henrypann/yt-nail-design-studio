@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "look-set-definition-v0.7.2-v1",
+  "architectureBaseline": "v0.7.2",
+  "lookRef": {
+    "id": "leopard-gilded-nude",
+    "revision": "1.0.0-simulated"
+  },
+  "previewGeometryRef": {
+    "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+    "revision": "3.0.0-simulated-preview",
+    "promotionState": "promoted_simulated_preview"
+  },
+  "coordinateSpace": "nail-local-v1-u-left-to-right-v-tip-to-root",
+  "fingerOrder": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+  ],
+  "fingers": {
+    "L1": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory",
+        "leopard_local",
+        "gilded_crystal_cluster"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L2": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L3": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "leopard_local"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L4": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "gold_hairline"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "L5": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R1": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "leopard_local"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R2": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R3": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R4": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "diagonal_ivory",
+        "leopard_local",
+        "gilded_crystal_cluster"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    },
+    "R5": {
+      "background": {
+        "type": "translucent",
+        "color": "#F0CFC6",
+        "opacity": 0.82
+      },
+      "middle": [
+        "gold_microbead"
+      ],
+      "surfaceFinish": {
+        "type": "gloss"
+      }
+    }
+  },
+  "finish": {
+    "type": "gloss",
+    "fingers": [
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+    ]
+  },
+  "evidence": "SIMULATED",
+  "manufacturing": {
+    "status": "blocked",
+    "validated": false
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "look-asset-pack-index-v1",
+  "architectureBaseline": "v0.7.2",
+  "entries": [
+    {
+      "lookId": "leopard-gilded-nude",
+      "revision": "1.0.0-simulated",
+      "manifest": "assets/hero-recipes/leopard-gilded-nude/manifest.json",
+      "cover": "assets/hero-recipes/leopard-gilded-nude/look-cover-16x9-v1.png",
+      "dimensionalKit": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/dimensional-kit.web.glb"
+    },
+    {
+      "lookId": "crimson-reliquary",
+      "revision": "1.0.0-simulated",
+      "manifest": "assets/hero-recipes/crimson-reliquary/manifest.json",
+      "cover": "assets/hero-recipes/crimson-reliquary/look-cover-16x9-v1.png",
+      "dimensionalKit": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/dimensional-kit.web.glb"
+    },
+    {
+      "lookId": "ivory-lace-crystal",
+      "revision": "1.0.0-simulated",
+      "manifest": "assets/hero-recipes/ivory-lace-crystal/manifest.json",
+      "cover": "assets/hero-recipes/ivory-lace-crystal/look-cover-16x9-v1.png",
+      "dimensionalKit": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/dimensional-kit.web.glb"
+    },
+    {
+      "lookId": "honey-petal-glass",
+      "revision": "1.0.0-simulated",
+      "manifest": "assets/hero-recipes/honey-petal-glass/manifest.json",
+      "cover": "assets/hero-recipes/honey-petal-glass/look-cover-16x9-v1.png",
+      "dimensionalKit": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/dimensional-kit.web.glb"
+    }
+  ]
+}
