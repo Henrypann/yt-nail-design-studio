@@ -1,11 +1,11 @@
 {
-  "baseURL": "http://127.0.0.1:5238",
+  "baseURL": "http://127.0.0.1:5240",
   "report": [
     {
       "lookId": "look.v0-7-2.leopard-gilded-nude",
       "viewport": "390x844",
       "canonical": {
-        "designId": "design.remix.intent.v2.ce036a4a-6c16-458b-a347-157f00b9ebbc",
+        "designId": "design.remix.intent.v2.dd1e6097-3c73-4cf6-84dd-32a7408a77a5",
         "title": "Leopard Gilded Nude Remix",
         "sourceRefs": [
           {
@@ -18,15 +18,331 @@
         "flat": 10,
         "effect": 0,
         "dimensional": 3,
-        "finish": 10
+        "finish": 10,
+        "perFinger": {
+          "L1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L5": {
+            "stepKinds": [
+              "background",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background"
+            ],
+            "visibleDecorations": 0
+          },
+          "R1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R5": {
+            "stepKinds": [
+              "background",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background"
+            ],
+            "visibleDecorations": 1
+          }
+        }
       },
+      "pbrFingers": [
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L1",
+          "materialHash": "a6b2861424bde424",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L2",
+          "materialHash": "a6b2861424bde424",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L3",
+          "materialHash": "9bcddfb02b8b4278",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L4",
+          "materialHash": "187309fe8e629e26",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L5",
+          "materialHash": "9bcddfb02b8b4278",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R1",
+          "materialHash": "9bcddfb02b8b4278",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R2",
+          "materialHash": "a6b2861424bde424",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R3",
+          "materialHash": "a6b2861424bde424",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R4",
+          "materialHash": "a6b2861424bde424",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R5",
+          "materialHash": "9bcddfb02b8b4278",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        }
+      ],
       "errors": []
     },
     {
       "lookId": "look.v0-7-2.crimson-reliquary",
       "viewport": "1280x800",
       "canonical": {
-        "designId": "design.remix.intent.v2.f67fc9c6-dbb4-41fc-bea8-49b30c2c6cae",
+        "designId": "design.remix.intent.v2.a34b6f78-e5a1-46f3-9ed8-9877af505488",
         "title": "Crimson Reliquary Remix",
         "sourceRefs": [
           {
@@ -39,15 +355,333 @@
         "flat": 8,
         "effect": 0,
         "dimensional": 6,
-        "finish": 10
+        "finish": 10,
+        "perFinger": {
+          "L1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L5": {
+            "stepKinds": [
+              "background",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background"
+            ],
+            "visibleDecorations": 1
+          },
+          "R1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R2": {
+            "stepKinds": [
+              "background",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background"
+            ],
+            "visibleDecorations": 1
+          },
+          "R3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R5": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          }
+        }
       },
+      "pbrFingers": [
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L1",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L2",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L3",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L4",
+          "materialHash": "5d72b68b72f03973",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L5",
+          "materialHash": "c90eb36a9b17da06",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R1",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R2",
+          "materialHash": "c90eb36a9b17da06",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R3",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R4",
+          "materialHash": "efbcd268eebb2d94",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R5",
+          "materialHash": "5d72b68b72f03973",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        }
+      ],
       "errors": []
     },
     {
       "lookId": "look.v0-7-2.ivory-lace-crystal",
       "viewport": "1440x900",
       "canonical": {
-        "designId": "design.remix.intent.v2.e5ee7eae-8baf-49fc-bd83-fbab4b2f573a",
+        "designId": "design.remix.intent.v2.1bf9f782-b32c-430b-9a3e-2cab68abd778",
         "title": "Ivory Lace Crystal Remix",
         "sourceRefs": [
           {
@@ -60,15 +694,345 @@
         "flat": 10,
         "effect": 0,
         "dimensional": 8,
-        "finish": 10
+        "finish": 10,
+        "perFinger": {
+          "L1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L5": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R3": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R5": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          }
+        }
       },
+      "pbrFingers": [
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L1",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L2",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L3",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L4",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L5",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R1",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R2",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R3",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R4",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R5",
+          "materialHash": "09aa531d7f4650a5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        }
+      ],
       "errors": []
     },
     {
       "lookId": "look.v0-7-2.honey-petal-glass",
       "viewport": "1024x768",
       "canonical": {
-        "designId": "design.remix.intent.v2.756d800f-928a-4464-a8f7-fcac37d5770b",
+        "designId": "design.remix.intent.v2.139c8ef1-cd66-47e8-a49b-4fcffe1132c1",
         "title": "Honey Petal Glass Remix",
         "sourceRefs": [
           {
@@ -81,8 +1045,330 @@
         "flat": 6,
         "effect": 4,
         "dimensional": 4,
-        "finish": 10
+        "finish": 10,
+        "perFinger": {
+          "L1": {
+            "stepKinds": [
+              "background",
+              "dimensional_decoration",
+              "surface_effect",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "surface_effect"
+            ],
+            "visibleDecorations": 1
+          },
+          "L2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "L3": {
+            "stepKinds": [
+              "background",
+              "surface_effect",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "surface_effect"
+            ],
+            "visibleDecorations": 0
+          },
+          "L4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "L5": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R1": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R2": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 0
+          },
+          "R3": {
+            "stepKinds": [
+              "background",
+              "dimensional_decoration",
+              "surface_effect",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "surface_effect"
+            ],
+            "visibleDecorations": 1
+          },
+          "R4": {
+            "stepKinds": [
+              "background",
+              "flat_design",
+              "dimensional_decoration",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "flat_design"
+            ],
+            "visibleDecorations": 1
+          },
+          "R5": {
+            "stepKinds": [
+              "background",
+              "surface_effect",
+              "surface_finish"
+            ],
+            "projectedLayerKinds": [
+              "background",
+              "surface_effect"
+            ],
+            "visibleDecorations": 0
+          }
+        }
       },
+      "pbrFingers": [
+        {
+          "stepKinds": [
+            "background",
+            "dimensional_decoration",
+            "surface_effect",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "surface_effect"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L1",
+          "materialHash": "abf8bdf2b723767a",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L2",
+          "materialHash": "4fa3806b2fc1091f",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "surface_effect",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "surface_effect"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L3",
+          "materialHash": "595b7f29b2158eb5",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "L4",
+          "materialHash": "4fa3806b2fc1091f",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "L5",
+          "materialHash": "451a731a0067ddc2",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R1",
+          "materialHash": "4fa3806b2fc1091f",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R2",
+          "materialHash": "451a731a0067ddc2",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "dimensional_decoration",
+            "surface_effect",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "surface_effect"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R3",
+          "materialHash": "b9f4c8dc48dc66a4",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "flat_design",
+            "dimensional_decoration",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "flat_design"
+          ],
+          "visibleDecorations": 1,
+          "finger": "R4",
+          "materialHash": "4fa3806b2fc1091f",
+          "textureAssetSet": "none",
+          "renderedDecorations": 1,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        },
+        {
+          "stepKinds": [
+            "background",
+            "surface_effect",
+            "surface_finish"
+          ],
+          "projectedLayerKinds": [
+            "background",
+            "surface_effect"
+          ],
+          "visibleDecorations": 0,
+          "finger": "R5",
+          "materialHash": "dcc1389ebe5b980a",
+          "textureAssetSet": "none",
+          "renderedDecorations": 0,
+          "fallbackDecorations": 0,
+          "renderBounds": "nail-and-visible-decorations",
+          "cameraFramingSafe": true
+        }
+      ],
       "errors": []
     }
   ]

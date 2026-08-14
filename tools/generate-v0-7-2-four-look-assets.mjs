@@ -190,6 +190,7 @@ for (const [lookId, spec] of Object.entries(lookSpecs)) {
       revision: '1', path: `maps/${fileName}`, runtimeUrl: `/assets/hero-recipes/${lookId}/maps/${fileName}`,
       mimeType: 'image/png', widthPx: width, heightPx: height, sha256: sha(bytes), byteLength: bytes.length,
       colorSpace: kind === 'decal' ? 'srgb' : 'linear', role: kind === 'height' ? 'visual_bump_not_geometry' : kind,
+      runtimeUse: 'reference_only_not_shared_across_fingers',
     };
   }
   const svgBytes = Buffer.from(spec.svg);
@@ -233,6 +234,7 @@ for (const [lookId, spec] of Object.entries(lookSpecs)) {
     generators: { rasterAndManifest: { path: 'tools/generate-v0-7-2-four-look-assets.mjs', sha256: generatorSha }, glb: { path: 'tools/generate-v0-7-2-four-look-glb.py', sha256: glbGeneratorSha, toolchain: 'CPython + trimesh preview primitives' } },
     limitations: [
       'High-fidelity cover is concept imagery, not an exact canonical renderer output.',
+      'Look-level texture maps are reference-only and must not be projected across fingers; runtime design color and artwork come from each canonical NailDesignV7 projection.',
       'GLB and texture maps are simulated preview assets only and are not manufacturing geometry.',
       'No fit, adhesion, material, curing, strength, print, device, or manufacturability validation.',
       'STL is intentionally absent; Look decoration content does not own CanonicalGeometry manufacturing representations.',

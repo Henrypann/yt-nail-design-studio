@@ -7,9 +7,8 @@ import type { CustomerNailPreviewReadModelV7 } from '@/studio/editor/v7/customer
 import { resolveEditorGeometryV7 } from '@/studio/editor/v7/geometry-registry';
 import { resolvePromotedGeometryV2 } from '@/studio/geometry/v0-7-2/registry-v2';
 import { resolveNailSurfaceFrameV1, surfaceFrameMatrixV1 } from '@/studio/geometry/v0-7-2/surface-frame';
-import { dimensionalMeshAssetV7 } from '@/studio/editor/v7/dimensional-decoration';
-import { selectLod } from '@/studio/preview/asset-manifest';
 import { GOLDEN_PREVIEW_APPEARANCE_PROFILE_V1 } from './fixtures';
+import { resolveDimensionalGlbSourceV072 } from './dimensional-glb';
 import { createSingleNailMaterialProjectionV1, type SingleNailMaterialProjectionV1 } from './material-projection';
 import { loadPromotedGeometryV2 } from './promoted-geometry-loader';
 import {
@@ -28,6 +27,12 @@ interface SingleNailPbrRuntimeV072 {
   camera: THREE.PerspectiveCamera;
   bounds: THREE.Box3;
   host: HTMLDivElement;
+}
+
+interface DimensionalRenderResultV072 {
+  root: THREE.Group;
+  renderedCount: number;
+  fallbackAssetIds: string[];
 }
 
 async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
@@ -105,34 +110,36 @@ async function createVerifiedLinearTexture(ref: RenderTextureMapRefV1): Promise<
 
 const glbBufferCache = new Map<string, ArrayBuffer>();
 
-async function fetchVerifiedGlbBytes(url: string, expectedSha256?: string, signal?: AbortSignal): Promise<ArrayBuffer> {
-  const cached = glbBufferCache.get(url);
+async function fetchVerifiedGlbBytes(url: string, expectedSha256: string, signal?: AbortSignal): Promise<ArrayBuffer> {
+  const cacheKey = `${url}#${expectedSha256}`;
+  const cached = glbBufferCache.get(cacheKey);
   if (cached) return cached;
   const response = await fetch(url, { cache: 'no-store', signal });
   if (!response.ok) throw new Error(`render_glb_fetch_failed:${url}`);
   const bytes = await response.arrayBuffer();
-  if (expectedSha256) {
-    const hash = await sha256Hex(bytes);
-    if (hash !== expectedSha256) {
-      throw new Error(`render_glb_integrity_failed:${url}`);
-    }
+  const hash = await sha256Hex(bytes);
+  if (hash !== expectedSha256) {
+    throw new Error(`render_glb_integrity_failed:${url}`);
   }
-  glbBufferCache.set(url, bytes);
+  glbBufferCache.set(cacheKey, bytes);
   return bytes;
 }
 
 async function renderDimensionalDecorationsV072(
   nail: NailDesignV7,
   geometry: THREE.BufferGeometry,
-  scene: THREE.Scene,
   signal?: AbortSignal,
-): Promise<void> {
+): Promise<DimensionalRenderResultV072> {
   const dimensionalSteps = nail.steps.filter(
     (step): step is Extract<ProcessStepV7, { kind: 'dimensional_decoration' }> =>
       step.kind === 'dimensional_decoration' && step.visible && !step.skipped,
   );
 
   const gltfLoader = new GLTFLoader();
+  const root = new THREE.Group();
+  root.name = `decorations.${nail.finger}`;
+  let renderedCount = 0;
+  const fallbackAssetIds: string[] = [];
 
   for (const step of dimensionalSteps) {
     for (const decoration of step.decorations) {
@@ -144,27 +151,16 @@ async function renderDimensionalDecorationsV072(
         const frame = resolveNailSurfaceFrameV1(geometry, anchorU, anchorV);
         if (!frame) continue;
 
-        let glbUrl: string | null = null;
-        let expectedSha256: string | undefined = decoration.asset.sha256;
-        const manifestEntry = dimensionalMeshAssetV7(decoration.asset.assetId);
-        if (manifestEntry) {
-          const lod = selectLod(manifestEntry, Number.MAX_SAFE_INTEGER);
-          if (lod) {
-            glbUrl = lod.path;
-            expectedSha256 = lod.sha256;
-          }
+        const source = resolveDimensionalGlbSourceV072(decoration.asset);
+        if (!source.ok) {
+          fallbackAssetIds.push(`${decoration.asset.assetId}:${source.reason}`);
+          continue;
         }
-        if (!glbUrl && decoration.asset.assetId.startsWith('look.')) {
-          const parts = decoration.asset.assetId.split('.');
-          const lookId = parts[1];
-          const token = parts[3];
-          glbUrl = `/assets/glb/components/v0-7-2-four-looks/${lookId}/${token}/${token}.web.glb`;
-        }
-        if (!glbUrl) continue;
 
         try {
-          const bytes = await fetchVerifiedGlbBytes(glbUrl, expectedSha256, signal);
+          const bytes = await fetchVerifiedGlbBytes(source.url, source.sha256, signal);
           const gltf = await gltfLoader.parseAsync(bytes.slice(0), '');
+          signal?.throwIfAborted();
           const container = new THREE.Group();
           const placement = surfaceFrameMatrixV1(frame, 0.02);
           container.applyMatrix4(placement);
@@ -178,8 +174,11 @@ async function renderDimensionalDecorationsV072(
           model.rotation.z = rotRad;
           model.scale.set(scaleX, scaleY, scaleZ);
           container.add(model);
-          scene.add(container);
+          root.add(container);
+          renderedCount += 1;
         } catch (error) {
+          if (signal?.aborted) throw error;
+          fallbackAssetIds.push(`${decoration.asset.assetId}:load_failed`);
           console.warn('Failed to load attachment_3d:', decoration.asset.assetId, error);
         }
       } else if (decoration.kind === 'relief_2_5d') {
@@ -212,10 +211,12 @@ async function renderDimensionalDecorationsV072(
         beadMesh.rotation.z = THREE.MathUtils.degToRad(decoration.transform.rotationDeg || 0);
 
         container.add(beadMesh);
-        scene.add(container);
+        root.add(container);
+        renderedCount += 1;
       }
     }
   }
+  return { root, renderedCount, fallbackAssetIds };
 }
 
 function cameraPreset(id: CameraId) {
@@ -282,6 +283,7 @@ export default function SingleNailPbrPreviewV072({
   const [cameraId, setCameraId] = useState<CameraId>('oblique_left');
   const [status, setStatus] = useState<'loading' | 'ready' | 'fallback'>('loading');
   const [surfaceHash, setSurfaceHash] = useState('pending');
+  const [dimensionalResult, setDimensionalResult] = useState({ renderedCount: 0, fallbackAssetIds: [] as string[] });
   const resolution = useMemo(() => resolveEditorGeometryV7(nail.geometryRef, nail.finger), [nail.finger, nail.geometryRef]);
   const promotion = useMemo(() => resolution.status === 'resolved'
     ? resolvePromotedGeometryV2({ shape: resolution.shape, length: resolution.length, consumer: 'single_nail_pbr' })
@@ -297,6 +299,7 @@ export default function SingleNailPbrPreviewV072({
     const host = hostRef.current;
     if (!host || resolution.status !== 'resolved' || promotion.status !== 'promoted') { setStatus('fallback'); return; }
     setStatus('loading');
+    setDimensionalResult({ renderedCount: 0, fallbackAssetIds: [] });
     const probe = document.createElement('canvas');
     const context = probe.getContext('webgl2') ?? probe.getContext('webgl');
     if (!context) { setStatus('fallback'); return; }
@@ -358,7 +361,10 @@ export default function SingleNailPbrPreviewV072({
       pendingTextures.length = 0;
       const mesh = new THREE.Mesh(geometry, material);
       pendingGeometry = null;
-      scene.add(mesh);
+      const renderRoot = new THREE.Group();
+      renderRoot.name = `single-nail.${nail.finger}`;
+      renderRoot.add(mesh);
+      scene.add(renderRoot);
       scene.add(new THREE.HemisphereLight(0xfff8f5, 0x5e5260, 1.6));
       const key = new THREE.DirectionalLight(0xffffff, 2.35);
       key.position.set(-12, -5, 28);
@@ -367,13 +373,15 @@ export default function SingleNailPbrPreviewV072({
       rim.position.set(18, -2, 10);
       scene.add(rim);
 
-      // Render 3D dimensional decorations
-      await renderDimensionalDecorationsV072(nail, geometry, scene, controller.signal);
-
-      geometry.computeBoundingBox();
-      const bounds = geometry.boundingBox?.clone();
+      const decorations = await renderDimensionalDecorationsV072(nail, geometry, controller.signal);
+      controller.signal.throwIfAborted();
+      if (disposed) return;
+      renderRoot.add(decorations.root);
+      renderRoot.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(renderRoot);
       if (!bounds || bounds.isEmpty()) throw new Error('promoted_geometry_bounds_unavailable');
       runtimeRef.current = { renderer, scene, camera, bounds, host };
+      setDimensionalResult({ renderedCount: decorations.renderedCount, fallbackAssetIds: decorations.fallbackAssetIds });
       const resize = () => {
         const runtime = runtimeRef.current;
         if (!runtime) return;
@@ -423,12 +431,13 @@ export default function SingleNailPbrPreviewV072({
   }
 
   return (
-    <figure className="mx-auto w-full max-w-[520px]" data-testid="single-nail-pbr-v0-7-2" data-finger={nail.finger} data-runtime-status={status} data-camera-id={cameraId} data-surface-hash={surfaceHash} data-geometry-registry-entry={promotion.status === 'promoted' ? promotion.entry.registryEntryId : 'unavailable'} data-geometry-representation={promotion.status === 'promoted' ? promotion.delivery.representationId : 'unavailable'} data-material-projection={projection.schemaVersion} data-material-hash={projection.projectionHash} data-material-mode={projection.backgroundMode} data-material-fidelity={projection.fidelity} data-texture-asset-set={textureAssetSet?.assetSetId ?? 'none'} data-texture-asset-revision={textureAssetSet?.revision ?? 'none'} data-uv-contract="nail-local-v1-tip-to-root" data-evidence="simulated-not-manufacturing">
+    <figure className="mx-auto w-full max-w-[520px]" data-testid="single-nail-pbr-v0-7-2" data-finger={nail.finger} data-runtime-status={status} data-camera-id={cameraId} data-surface-hash={surfaceHash} data-geometry-registry-entry={promotion.status === 'promoted' ? promotion.entry.registryEntryId : 'unavailable'} data-geometry-representation={promotion.status === 'promoted' ? promotion.delivery.representationId : 'unavailable'} data-material-projection={projection.schemaVersion} data-material-hash={projection.projectionHash} data-material-mode={projection.backgroundMode} data-material-fidelity={projection.fidelity} data-projected-layer-kinds={projection.projectedLayerKinds.join(',')} data-texture-asset-set={textureAssetSet?.assetSetId ?? 'none'} data-texture-asset-revision={textureAssetSet?.revision ?? 'none'} data-decoration-rendered-count={dimensionalResult.renderedCount} data-decoration-fallback-count={dimensionalResult.fallbackAssetIds.length} data-render-bounds="nail-and-visible-decorations" data-uv-contract="nail-local-v1-tip-to-root" data-evidence="simulated-not-manufacturing">
       <div ref={hostRef} className="h-[min(58dvh,560px)] min-h-[360px] w-full overflow-hidden rounded-[28px] border border-white bg-[radial-gradient(circle_at_50%_30%,#fff_0%,#f5eee7_72%)] shadow-[0_24px_70px_rgba(77,53,67,0.16)]" data-testid="single-nail-pbr-canvas-host" />
       <div className="mt-3 flex flex-wrap justify-center gap-1.5" role="group" aria-label="单指模拟 3D 观察角度">
         {(Object.keys(CAMERA_LABEL) as CameraId[]).map((id) => <button key={id} type="button" aria-pressed={cameraId === id} onClick={() => setCameraId(id)} className={cx('min-h-11 rounded-xl border px-3 text-nano font-medium', cameraId === id ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600')}>{CAMERA_LABEL[id]}</button>)}
       </div>
       <figcaption className="mt-2 text-center text-nano leading-4 text-gray-500">SIMULATED PBR · Registry V2 · Almond medium v3 · {projection.schemaVersion} · {projection.fidelity} · {textureAssetSet ? 'decal + normal + roughness + visual height' : 'canonical color projection'}。甲面 GLB 已绑定 CanonicalGeometry，但 C 弧与 vertical preview thickness 仍为算法假设；立体装饰 Boolean 尚未接入，不证明贴合、工程壁厚、真实材质、固化、打印或制造。</figcaption>
+      {dimensionalResult.fallbackAssetIds.length > 0 && <p className="mt-2 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-center text-nano text-warning" role="status" data-testid="single-nail-decoration-fallback">{dimensionalResult.fallbackAssetIds.length} 个立体装饰未通过不可变 revision / SHA 校验，已保留当前甲面并降级；设计未被修改。</p>}
       {projection.warnings.length > 0 && <p className="mt-2 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-center text-nano text-warning">{projection.warnings.join('；')}</p>}
     </figure>
   );

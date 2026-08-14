@@ -65,6 +65,12 @@ assert.match(runtime, /data-geometry-registry-entry/);
 assert.match(runtime, /fitCameraToPromotedNailV072/);
 assert.match(runtime, /data-testid="single-nail-pbr-canvas-host"/);
 assert.match(runtime, /cameraFramingSafe/);
+assert.match(runtime, /new THREE\.Box3\(\)\.setFromObject\(renderRoot\)/,
+  'camera framing must include the nail and every visible decoration');
+assert.match(runtime, /data-render-bounds="nail-and-visible-decorations"/);
+assert.match(runtime, /single-nail-decoration-fallback/);
+assert.match(runtime, /cacheKey = `\$\{url\}#\$\{expectedSha256\}`/,
+  'GLB cache identity must include the immutable EditorDoc SHA');
 assert.match(runtime, /Math\.min\(verticalFov, horizontalFov\)/);
 assert.doesNotMatch(runtime, /createSingleNailPreviewSurfaceV1|3\.2 \+ decoration\.heightMm/,
   'promoted runtime must not reuse the procedural slab or fixed-Z decoration placement');

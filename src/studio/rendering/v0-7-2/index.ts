@@ -6,3 +6,4 @@ export * from './material-projection';
 export * from './material-projection-fixtures';
 export * from './texture-map-assets';
 export * from './promoted-geometry-loader';
+export * from './dimensional-glb';

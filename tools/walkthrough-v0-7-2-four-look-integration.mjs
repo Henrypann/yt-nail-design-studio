@@ -7,7 +7,11 @@ import { chromium } from 'playwright';
 const baseURL = process.env.FOUR_LOOK_BASE_URL ?? 'http://127.0.0.1:5238';
 const evidenceRoot = path.resolve(process.env.FOUR_LOOK_E2E_OUTPUT ?? 'evidence/pr-look-v0-7-2-four-sets-integration');
 const screenshotRoot = path.join(evidenceRoot, 'screenshots');
+const fortyFingerRoot = path.join(screenshotRoot, '40-finger');
 await fs.mkdir(screenshotRoot, { recursive: true });
+await fs.mkdir(fortyFingerRoot, { recursive: true });
+
+const fingerCodes = ['L1', 'L2', 'L3', 'L4', 'L5', 'R1', 'R2', 'R3', 'R4', 'R5'];
 
 const cases = [
   { id: 'leopard-gilded-nude', title: 'Leopard Gilded Nude', width: 390, height: 844, touch: true, flat: 10, effect: 0, dimensional: 3 },
@@ -39,6 +43,8 @@ for (const testCase of cases) {
   await page.goto(`${baseURL}/look/${lookId}`, { waitUntil: 'networkidle' });
   await page.getByTestId('community-use-versioned').waitFor();
   assert.match(await page.getByTestId('community-look-evidence').textContent() ?? '', /Canonical PublishedLookV1/);
+  assert.match(await page.locator('body').textContent() ?? '', /概念效果/);
+  assert.match(await page.getByTestId('community-look-evidence-missing').textContent() ?? '', /否（CONCEPT）/);
   assert.equal(await page.locator(`img[src="/assets/hero-recipes/${testCase.id}/look-cover-16x9-v1.png"]`).count(), 1);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true);
   await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-community.png`), fullPage: true });
@@ -61,8 +67,23 @@ for (const testCase of cases) {
     const doc = Object.values(docs).find((candidate) => candidate?.schemaVersion === 7);
     if (!doc) return null;
     const count = (kind) => Object.values(doc.nails).reduce((total, nail) => total + nail.steps.filter((step) => step.kind === kind).length, 0);
+    const perFinger = Object.fromEntries(Object.entries(doc.nails).map(([finger, nail]) => {
+      const activeMiddle = nail.steps.slice(1, -1).filter((step) => step.visible && !step.skipped);
+      const projectedLayerKinds = ['background'];
+      if (activeMiddle.some((step) => step.kind === 'flat_design')) projectedLayerKinds.push('flat_design');
+      if (activeMiddle.some((step) => step.kind === 'surface_effect')) projectedLayerKinds.push('surface_effect');
+      const visibleDecorations = activeMiddle
+        .filter((step) => step.kind === 'dimensional_decoration')
+        .flatMap((step) => step.decorations)
+        .filter((decoration) => decoration.visible).length;
+      return [finger, {
+        stepKinds: nail.steps.map((step) => step.kind),
+        projectedLayerKinds,
+        visibleDecorations,
+      }];
+    }));
     return { designId: doc.designId, title: doc.title, sourceRefs: doc.sourceRefs, nailCount: Object.keys(doc.nails).length,
-      flat: count('flat_design'), effect: count('surface_effect'), dimensional: count('dimensional_decoration'), finish: count('surface_finish') };
+      flat: count('flat_design'), effect: count('surface_effect'), dimensional: count('dimensional_decoration'), finish: count('surface_finish'), perFinger };
   });
   assert.ok(stored);
   assert.equal(stored.title, `${testCase.title} Remix`);
@@ -93,47 +114,60 @@ for (const testCase of cases) {
   await pbr.waitFor();
 
   const switcher = page.locator('[data-testid="customer-single-finger-switcher"]');
-  if (await switcher.count()) {
-    // Switch to L1 and verify PBR rendering
-    await switcher.locator('button[data-finger="L1"]').click();
-    await page.waitForFunction(() => {
+  assert.equal(await switcher.locator('button[data-finger]').count(), 10, `${testCase.id} exposes all ten canonical fingers`);
+  const pbrFingers = [];
+  for (const finger of fingerCodes) {
+    await switcher.locator(`button[data-finger="${finger}"]`).click();
+    await page.waitForFunction((requestedFinger) => {
       const root = document.querySelector('[data-testid="customer-preview-v7"]');
       const runtime = document.querySelector('[data-testid="single-nail-pbr-v0-7-2"]');
       const host = document.querySelector('[data-testid="single-nail-pbr-canvas-host"]');
       const canvas = host?.querySelector('canvas');
-      return root?.getAttribute('data-selected-finger') === 'L1'
+      const finger = runtime?.getAttribute('data-finger');
+      return finger === requestedFinger
+        && root?.getAttribute('data-selected-finger') === requestedFinger
         && runtime?.getAttribute('data-runtime-status') === 'ready'
         && host?.getAttribute('data-camera-framing-safe') === 'true'
-        && Boolean(canvas && canvas.getAttribute('aria-label')?.startsWith('L1 ')
+        && runtime?.getAttribute('data-render-bounds') === 'nail-and-visible-decorations'
+        && Boolean(finger && canvas && canvas.getAttribute('aria-label')?.startsWith(`${finger} `)
           && canvas.getBoundingClientRect().width > 0 && canvas.getBoundingClientRect().height > 0);
-    });
-    await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-pbr-3d-L1.png`), fullPage: true });
+    }, finger);
+    const metrics = await pbr.evaluate((runtime) => ({
+      finger: runtime.getAttribute('data-finger'),
+      materialHash: runtime.getAttribute('data-material-hash'),
+      projectedLayerKinds: (runtime.getAttribute('data-projected-layer-kinds') ?? '').split(',').filter(Boolean),
+      textureAssetSet: runtime.getAttribute('data-texture-asset-set'),
+      renderedDecorations: Number(runtime.getAttribute('data-decoration-rendered-count')),
+      fallbackDecorations: Number(runtime.getAttribute('data-decoration-fallback-count')),
+      renderBounds: runtime.getAttribute('data-render-bounds'),
+    }));
+    assert.equal(metrics.finger, finger);
+    assert.equal(metrics.textureAssetSet, 'none', `${testCase.id}/${finger} must use its canonical per-finger projection`);
+    assert.deepEqual(metrics.projectedLayerKinds, stored.perFinger[finger].projectedLayerKinds,
+      `${testCase.id}/${finger} projected layers preserve the signed allocation`);
+    assert.equal(metrics.renderedDecorations, stored.perFinger[finger].visibleDecorations,
+      `${testCase.id}/${finger} renders every visible dimensional decoration`);
+    assert.equal(metrics.fallbackDecorations, 0, `${testCase.id}/${finger} immutable mesh references resolve without degradation`);
+    assert.equal(metrics.renderBounds, 'nail-and-visible-decorations');
+    assert.ok(metrics.materialHash, `${testCase.id}/${finger} exposes a deterministic projection hash`);
+    await pbr.screenshot({ path: path.join(fortyFingerRoot, `${testCase.id}-${testCase.width}-${finger}.png`) });
+    pbrFingers.push({ ...stored.perFinger[finger], ...metrics, cameraFramingSafe: true });
 
-    // Switch to accent finger (R3 for crimson-reliquary, R4 for other looks) and verify 3D accessories
     const targetFinger = testCase.id === 'crimson-reliquary' ? 'R3' : 'R4';
-    await switcher.locator(`button[data-finger="${targetFinger}"]`).click();
-    await page.waitForFunction((finger) => {
-      const root = document.querySelector('[data-testid="customer-preview-v7"]');
-      const runtime = document.querySelector('[data-testid="single-nail-pbr-v0-7-2"]');
-      const host = document.querySelector('[data-testid="single-nail-pbr-canvas-host"]');
-      const canvas = host?.querySelector('canvas');
-      return root?.getAttribute('data-selected-finger') === finger
-        && runtime?.getAttribute('data-runtime-status') === 'ready'
-        && host?.getAttribute('data-camera-framing-safe') === 'true'
-        && Boolean(canvas && canvas.getAttribute('aria-label')?.startsWith(`${finger} `)
-          && canvas.getBoundingClientRect().width > 0 && canvas.getBoundingClientRect().height > 0);
-    }, targetFinger);
-    await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-pbr-3d-${targetFinger}.png`), fullPage: true });
+    if (finger === 'L1' || finger === targetFinger) {
+      await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-pbr-3d-${finger}.png`), fullPage: true });
+    }
   }
 
   assert.deepEqual(errors, []);
-  report.push({ lookId, viewport: `${testCase.width}x${testCase.height}`, canonical: stored, errors });
+  report.push({ lookId, viewport: `${testCase.width}x${testCase.height}`, canonical: stored, pbrFingers, errors });
   await fs.writeFile(path.join(evidenceRoot, 'walkthrough-report.json'), `${JSON.stringify({ baseURL, report }, null, 2)}\n`);
   console.log(`[four-look-integration] PASS ${testCase.id} @ ${testCase.width}x${testCase.height}`);
   await context.close();
 }
 
 await fs.writeFile(path.join(evidenceRoot, 'walkthrough-report.json'), `${JSON.stringify({ baseURL, report }, null, 2)}\n`);
+assert.equal(report.flatMap((entry) => entry.pbrFingers).length, 40, 'all four complete ten-finger allocations are verified');
 console.log('[walkthrough:look-v0-7-2-four-sets-integration] PASS');
 await Promise.race([
   browser.close(),

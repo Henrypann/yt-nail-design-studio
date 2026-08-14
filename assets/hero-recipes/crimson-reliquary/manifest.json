@@ -262,7 +262,8 @@
         "sha256": "4983c8ae61bfc76ce9b66160afa07ec6cdf3dc7afb9e4f46f1e2808b36604ad7",
         "byteLength": 55973,
         "colorSpace": "srgb",
-        "role": "decal"
+        "role": "decal",
+        "runtimeUse": "reference_only_not_shared_across_fingers"
       },
       "normal": {
         "assetId": "look.crimson-reliquary.map.normal",
@@ -275,7 +276,8 @@
         "sha256": "bf3a206125d75faf1ba7cf332afb4997942c5250cdb2a5c31ac1544f60714be1",
         "byteLength": 19807,
         "colorSpace": "linear",
-        "role": "normal"
+        "role": "normal",
+        "runtimeUse": "reference_only_not_shared_across_fingers"
       },
       "roughness": {
         "assetId": "look.crimson-reliquary.map.roughness",
@@ -288,7 +290,8 @@
         "sha256": "1f77c414a11408125051f3d19a46eff82a229d948feafa520c3acb32750f0eb6",
         "byteLength": 13655,
         "colorSpace": "linear",
-        "role": "roughness"
+        "role": "roughness",
+        "runtimeUse": "reference_only_not_shared_across_fingers"
       },
       "height": {
         "assetId": "look.crimson-reliquary.map.height",
@@ -301,7 +304,8 @@
         "sha256": "fc85039e7080909b58d084059288df3fb0d89778a0833f7a49ace735b3df6b49",
         "byteLength": 11452,
         "colorSpace": "linear",
-        "role": "visual_bump_not_geometry"
+        "role": "visual_bump_not_geometry",
+        "runtimeUse": "reference_only_not_shared_across_fingers"
       }
     },
     "dimensionalAssets": [
@@ -332,7 +336,7 @@
   "generators": {
     "rasterAndManifest": {
       "path": "tools/generate-v0-7-2-four-look-assets.mjs",
-      "sha256": "27813fec97a71cefbfc13ee1102eb0ed0f7a022fb7278fcfff7452e6c8513c15"
+      "sha256": "7148808b89c6fa13f424dd4248f17499a2c213716ce6bd7acdbb62c734d28228"
     },
     "glb": {
       "path": "tools/generate-v0-7-2-four-look-glb.py",
@@ -342,6 +346,7 @@
   },
   "limitations": [
     "High-fidelity cover is concept imagery, not an exact canonical renderer output.",
+    "Look-level texture maps are reference-only and must not be projected across fingers; runtime design color and artwork come from each canonical NailDesignV7 projection.",
     "GLB and texture maps are simulated preview assets only and are not manufacturing geometry.",
     "No fit, adhesion, material, curing, strength, print, device, or manufacturability validation.",
     "STL is intentionally absent; Look decoration content does not own CanonicalGeometry manufacturing representations."

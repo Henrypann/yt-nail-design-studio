@@ -1,52 +1,100 @@
-# PR｜四套 v0.7.2 Look 的 Community → Editor V7 接入验收
+# PR｜四套 v0.7.2 Look 集成修复验收
 
-## Git 与范围
+## 范围与结论
 
-- Branch: `codex/look-v0-7-2-four-sets-integration`
-- Base: `307608a3f302fe13980fddee4436d1efa10c2faf`
-- 架构基线：`v0.7.2`
-- 文档合同：`EditorDoc schemaVersion: 7`
-- 范围：把四套已生成 Look 资产注册为 Community PublishedLook/DesignRelease，并通过 Versioned Intent 新建独立 EditorDocV7 Remix。
+- Branch：`codex/look-v0-7-2-four-sets-integration`
+- Baseline：local `main` / merge-base `4d38821b4de419c9638c92baf85946e6b96fb5bb`
+- Reviewed parent：`899b97331219bd7cb8cb5ffbd660762d8656e6c6`
+- Contract：`EditorDoc schemaVersion: 7`
+- 结果：五项 merge blocker 已修复；4 套 × 10 指 = 40/40 逐项 E2E 通过；建议完整 fast-forward，不单独 cherry-pick。
 
-## 端到端结果
+## 五项修复的验证
 
-| Look | 视口 | 十指 | 平面 | 表面效果 | 立体 | 封层 |
-|---|---:|---:|---:|---:|---:|---:|
-| 鎏金豹纹裸粉 | 390×844 | 10 | 10 | 0 | 3 | 10 |
-| 绯红圣物 | 1280×800 | 10 | 8 | 0 | 6 | 10 |
-| 象牙蕾丝晶露 | 1440×900 | 10 | 10 | 0 | 8 | 10 |
-| 蜂蜜玻璃花瓣 | 1024×768 | 10 | 6 | 4 | 4 | 10 |
+| 风险 | 修复 | 验证 |
+|---|---|---|
+| 共享 decal 覆盖逐指设计 | 四套 look-level maps 标记 reference-only；运行时仅保留真正共享的 Aurora 中性材质集 | 40/40 `textureAssetSet=none`；每指 `projectedLayerKinds` 与 canonical steps 一致 |
+| EditorDoc 资产被当前 manifest 静默替换 | 严格匹配 asset id / revision / SHA / MIME；cache key 为 `URL#SHA` | 精确引用成功；错 revision/SHA 返回 `immutable_asset_mismatch`；E2E 0 降级 |
+| `RENDER_VERIFIED` 与概念证据冲突 | Community 改为 `CONCEPT`、`previewVerified=false` | 单测同时断言 `CONCEPT + APPROXIMATE + false` |
+| 相机忽略装饰 | `Box3.setFromObject(renderRoot)` 覆盖甲面与已加载可见装饰 | 40/40 `renderBounds=nail-and-visible-decorations` 且 framing safe |
+| 每套只抽两指 | E2E 遍历全部 L1–R5 | 40 张单指截图、40 条逐指结构与运行指标 |
 
-每个用例均验证：Community 详情页、真实新标签 Studio handoff、Versioned Intent、选择“新建设计”、Editor V7 打开、十指 canonical 数据、Community source provenance、立体工具与元素标签。`walkthrough-report.json` 中四条 `errors` 均为空。
+## 四套完整 40 指分配表
+
+缩写：`B` background，`F` flat_design，`E` surface_effect，`D` dimensional_decoration，`S` surface_finish。`装饰`是实际渲染数；所有行均为 `fallback=0`、`textureSet=none`、联合 bounds framing safe。
+
+| Look | 指位 | Canonical steps | PBR 投影 | 装饰 |
+|---|---|---|---|---:|
+| Leopard | L1 | B→F→F→D→S | B+F | 1 |
+| Leopard | L2 | B→F→S | B+F | 0 |
+| Leopard | L3 | B→F→S | B+F | 0 |
+| Leopard | L4 | B→F→S | B+F | 0 |
+| Leopard | L5 | B→S | B | 0 |
+| Leopard | R1 | B→F→S | B+F | 0 |
+| Leopard | R2 | B→F→S | B+F | 0 |
+| Leopard | R3 | B→F→S | B+F | 0 |
+| Leopard | R4 | B→F→F→D→S | B+F | 1 |
+| Leopard | R5 | B→D→S | B | 1 |
+| Crimson | L1 | B→F→D→S | B+F | 1 |
+| Crimson | L2 | B→F→S | B+F | 0 |
+| Crimson | L3 | B→F→D→S | B+F | 1 |
+| Crimson | L4 | B→F→S | B+F | 0 |
+| Crimson | L5 | B→D→S | B | 1 |
+| Crimson | R1 | B→F→S | B+F | 0 |
+| Crimson | R2 | B→D→S | B | 1 |
+| Crimson | R3 | B→F→D→S | B+F | 1 |
+| Crimson | R4 | B→F→D→S | B+F | 1 |
+| Crimson | R5 | B→F→S | B+F | 0 |
+| Ivory | L1 | B→F→D→S | B+F | 1 |
+| Ivory | L2 | B→F→D→S | B+F | 1 |
+| Ivory | L3 | B→F→D→S | B+F | 1 |
+| Ivory | L4 | B→F→D→S | B+F | 1 |
+| Ivory | L5 | B→F→S | B+F | 0 |
+| Ivory | R1 | B→F→S | B+F | 0 |
+| Ivory | R2 | B→F→D→S | B+F | 1 |
+| Ivory | R3 | B→F→D→S | B+F | 1 |
+| Ivory | R4 | B→F→D→S | B+F | 1 |
+| Ivory | R5 | B→F→D→S | B+F | 1 |
+| Honey | L1 | B→D→E→S | B+E | 1 |
+| Honey | L2 | B→F→S | B+F | 0 |
+| Honey | L3 | B→E→S | B+E | 0 |
+| Honey | L4 | B→F→D→S | B+F | 1 |
+| Honey | L5 | B→F→S | B+F | 0 |
+| Honey | R1 | B→F→S | B+F | 0 |
+| Honey | R2 | B→F→S | B+F | 0 |
+| Honey | R3 | B→D→E→S | B+E | 1 |
+| Honey | R4 | B→F→D→S | B+F | 1 |
+| Honey | R5 | B→E→S | B+E | 0 |
 
 ## 自动门禁
 
 - `npm run typecheck`：PASS
+- `npm run build`：PASS；仅既有大 chunk warning
 - `npm run build:integration`：PASS；仅既有大 chunk warning
+- `npm run generate:look-v0-7-2-four-sets`：PASS
 - `npm run test:look-v0-7-2-four-sets`：PASS；生成器 byte-identical
 - `npm run test:look-v0-7-2-four-sets-integration`：PASS
+- `npm run test:render-v0-7-2-single-nail`：PASS
+- `npm run test:render-v0-7-2-material-projection`：PASS
+- `npm run test:render-v0-7-2-texture-assets`：PASS
 - `npm run test:community-content`：PASS
 - `npm run test:community-domain`：PASS
 - `npm run test:community-v7-1-use-customize`：PASS
 - `npm run test:editor-v7-dimensional-decoration`：PASS
 - `npm run test:editor-v7-runtime`：PASS
-- `npm run validate-assets`：PASS
-- `npm run test:render-v0-7-2-texture-assets`：PASS
 - `npm run test:geo-v0-7-2-registry-v2`：PASS
 - `npm run test:geo-v0-7-2-surface-boolean`：PASS
 - `npm run test:geo-v0-7-2-surface-boolean-bundle`：PASS
+- `npm run validate-assets`：PASS
+- `FOUR_LOOK_BASE_URL=http://127.0.0.1:5240 node tools/walkthrough-v0-7-2-four-look-integration.mjs`：PASS，40/40
 - `git diff --check`：PASS
-- `npm run walkthrough:look-v0-7-2-four-sets-integration`：PASS
+
+## 人工视觉检查
+
+检查了每套无装饰/有装饰、平面设计/表面效果的代表截图。确认共享 Look 图没有覆盖逐指差异；无设计的 Leopard L5 保持中性，Leopard R4、Crimson R3、Ivory R4、Honey R4 的当前装饰保持可见且未被裁切。自动化保存全部 40 指截图，便于逐张复核。
 
 ## 证据边界
 
-- Community 封面：AI 生成的高保真视觉候选，用于 Look 识别和设计师试用。
-- Editor：结构化、可编辑、可持久化的 EditorDocV7；不是把封面图当作设计真源。
-- GLB 与 2.5D：`SIMULATED_PREVIEW_REPRESENTATION` / `APPROXIMATE`，只证明浏览器预览和图层映射。
-- 当前不证明真实材质、佩戴贴合、制造工艺、设备协议或可生产性。
-- STL 不进入四套 Look 的 Community/Editor 交付，也没有制造或下载入口。
-
-## 人工走查证据
-
-- 报告：`walkthrough-report.json`
-- 截图：`screenshots/`，每套包含 Community 详情、Editor 背景/平面入口与立体装饰入口。
+- Community cover：AI 高保真概念图，`APPROXIMATE / CONCEPT`。
+- EditorDoc：结构化十指设计真源。
+- GLB/PBR/2.5D：模拟浏览器预览，不是制造证据。
+- 未验证真实材料、贴合、固化、强度、打印、设备或量产。

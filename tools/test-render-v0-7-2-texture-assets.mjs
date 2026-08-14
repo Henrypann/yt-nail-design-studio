@@ -62,9 +62,13 @@ assert.equal(resolveRenderTextureAssetSetV1(inactive), null, 'skipped material s
 
 const { FOUR_LOOK_SET_AUTHORITIES_V0_7_2 } = await import('../src/integration/community-studio/v0-7-2-four-look-sets.ts');
 for (const authority of FOUR_LOOK_SET_AUTHORITIES_V0_7_2) {
-  const resolvedLook = resolveRenderTextureAssetSetV1(authority.doc.nails.L1);
-  assert.ok(resolvedLook, `${authority.definition.id} must resolve texture asset set`);
-  assert.equal(resolvedLook.assetSetId, `render.texture-set.${authority.definition.id}.v1`);
+  for (const nail of Object.values(authority.doc.nails)) {
+    assert.equal(
+      resolveRenderTextureAssetSetV1(nail),
+      null,
+      `${authority.definition.id}/${nail.finger} must use its canonical per-finger projection, not a shared Look decal`,
+    );
+  }
 }
 
 const runtime = await readFile(new URL('../src/studio/rendering/v0-7-2/SingleNailPbrPreviewV072.tsx', import.meta.url), 'utf8');
@@ -76,4 +80,4 @@ assert.match(runtime, /bumpScale:/);
 assert.match(runtime, /data-texture-asset-set/);
 assert.doesNotMatch(runtime, /displacementMap|localStorage|sessionStorage|saveEditor|repository/);
 
-console.log('test-render-v0-7-2-texture-assets: PASS (decal/image, normal, roughness, visual height, deterministic hashes, materialRef gate, writer-zero)');
+console.log('test-render-v0-7-2-texture-assets: PASS (Aurora maps gated; four Looks use canonical per-finger projection; writer-zero)');

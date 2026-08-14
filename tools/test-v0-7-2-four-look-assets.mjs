@@ -86,6 +86,7 @@ for (const entry of index.entries) {
     assert.equal(sha(bytes), mapRef.sha256);
     assert.equal(bytes.length, mapRef.byteLength);
     assert.deepEqual(pngSize(bytes), { width: 384, height: 640, colorType: 6 });
+    assert.equal(mapRef.runtimeUse, 'reference_only_not_shared_across_fingers');
     if (kind === 'height') assert.equal(mapRef.role, 'visual_bump_not_geometry');
   }
 
@@ -132,4 +133,4 @@ execFileSync('python3', ['tools/generate-v0-7-2-four-look-glb.py'], {
 });
 execFileSync(process.execPath, ['tools/generate-v0-7-2-four-look-assets.mjs'], { cwd: root, stdio: 'pipe' });
 for (const [path, expected] of before) assert.equal(sha(await readFile(resolve(root, path))), expected, `${path} must regenerate byte-identically`);
-console.log('PASS: four v0.7.2 ten-finger Look asset packs, 16 material maps, 6 component GLBs and 4 dimensional kits validated');
+console.log('PASS: four v0.7.2 ten-finger Look asset packs, 16 reference-only material maps, 6 component GLBs and 4 dimensional kits validated');

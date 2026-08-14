@@ -3,11 +3,12 @@ import { createHash } from 'node:crypto';
 import { FINGER_CODES } from '../src/lib/types.ts';
 import { parsePublishedLookV1 } from '../src/community/domain/v7_1/design-content-parse.ts';
 import { resolveStudioUseAvailabilityV1 } from '../src/community/domain/studio-use-availability.ts';
-import { resolveDimensionalMeshFidelityV7 } from '../src/studio/editor/v7/dimensional-decoration.ts';
+import { dimensionalMeshAssetRefV7, resolveDimensionalMeshFidelityV7 } from '../src/studio/editor/v7/dimensional-decoration.ts';
 import { FOUR_LOOK_SET_DEFINITIONS_V0_7_2 } from '../src/studio/editor/v7/four-look-sets.ts';
 import { parseEditorDocV7 } from '../src/studio/editor/v7/schema.ts';
 import { canonicalJsonV1, parseDesignReleaseStoreV1 } from '../src/studio/versioning/design-release.ts';
 import { FOUR_LOOK_SET_AUTHORITIES_V0_7_2 } from '../src/integration/community-studio/v0-7-2-four-look-sets.ts';
+import { resolveDimensionalGlbSourceV072 } from '../src/studio/rendering/v0-7-2/dimensional-glb.ts';
 
 assert.equal(FOUR_LOOK_SET_AUTHORITIES_V0_7_2.length, 4);
 assert.equal(new Set(FOUR_LOOK_SET_AUTHORITIES_V0_7_2.map((authority) => authority.publishedLook.lookId)).size, 4);
@@ -22,6 +23,10 @@ for (const authority of FOUR_LOOK_SET_AUTHORITIES_V0_7_2) {
   assert.equal(digest, release.designVersion.editorDocRef.sha256, `${definition.id} immutable snapshot digest`);
   assert.deepEqual(release.designVersion.assetRevisionRefs, release.manifest.assetRevisionRefs);
   assert.deepEqual(resolveStudioUseAvailabilityV1(readModel), { enabled: true, state: 'VERSIONED_READY' });
+  assert.equal(readModel.verificationLevel, 'CONCEPT');
+  assert.equal(readModel.sourceContent.verificationLevel, 'CONCEPT');
+  assert.equal(readModel.evidence.previewEvidence.fidelity, 'APPROXIMATE');
+  assert.equal(readModel.evidence.status.previewVerified, false);
   assert.equal(readModel.evidence.status.manufacturable, false);
   assert.equal(readModel.evidence.status.productionDispatched, false);
   assert.equal(readModel.cover.url, `/assets/hero-recipes/${definition.id}/look-cover-16x9-v1.png`);
@@ -49,6 +54,20 @@ for (const authority of FOUR_LOOK_SET_AUTHORITIES_V0_7_2) {
   }
   assert.equal(new Set(ids).size, ids.length, `${definition.id} node ids are globally unique`);
 }
+
+const immutableAsset = dimensionalMeshAssetRefV7('look.leopard-gilded-nude.decoration.gilded-crystal-cluster');
+assert.ok(immutableAsset);
+assert.equal(resolveDimensionalGlbSourceV072(immutableAsset).ok, true, 'exact EditorDoc mesh revision/SHA resolves');
+assert.deepEqual(
+  resolveDimensionalGlbSourceV072({ ...immutableAsset, revision: `${immutableAsset.revision}.stale` }),
+  { ok: false, reason: 'immutable_asset_mismatch' },
+  'stale EditorDoc revision must visibly degrade instead of silently upgrading',
+);
+assert.deepEqual(
+  resolveDimensionalGlbSourceV072({ ...immutableAsset, sha256: '0'.repeat(64) }),
+  { ok: false, reason: 'immutable_asset_mismatch' },
+  'wrong EditorDoc SHA must visibly degrade instead of reusing a URL-only cache entry',
+);
 
 assert.deepEqual(
   FOUR_LOOK_SET_AUTHORITIES_V0_7_2.map((authority) => authority.definition.id),

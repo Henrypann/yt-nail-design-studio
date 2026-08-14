@@ -90,7 +90,7 @@ function content(definition: FourLookSetDefinitionV0_7_2): CommunityContentV1 {
     mainStyleId, subStyleIds: [], occasionIds: ['daily'], subjectIds: [], moodIds: ['elegant'],
     effectIds: ['gloss', 'relief'], primaryColorIds: ['nude'], recommendedShapes: ['almond'],
     supportedShapes: ['almond'], notRecommendedShapes: { stiletto: '立体装饰的侧壁安全区尚未验证' },
-    supportedLengths: ['medium'], applicationLevel: 'STRUCTURED_EDITABLE', verificationLevel: 'RENDER_VERIFIED',
+    supportedLengths: ['medium'], applicationLevel: 'STRUCTURED_EDITABLE', verificationLevel: 'CONCEPT',
     assetRef: { templateId: `t_${definition.id.replace(/-/g, '_')}_simulated`, renderTemplateId: `t_${definition.id.replace(/-/g, '_')}_simulated`, recipeId: definition.id, assetVersion: '1.0.0-simulated', manifestUrl: `/assets/hero-recipes/${definition.id}/manifest.json` },
     campaignTags: ['v0.7.2', 'structured-v7', 'simulated-assets'], status: 'PUBLISHED', publishedAt: definition.publishedAt,
   };
@@ -129,12 +129,12 @@ function buildAuthority(definition: FourLookSetDefinitionV0_7_2) {
     mainStyleId: sourceContent.mainStyleId, subStyleIds: [], occasionIds: [...sourceContent.occasionIds], subjectIds: [], moodIds: [...sourceContent.moodIds],
     effectIds: [...sourceContent.effectIds], primaryColorIds: [...sourceContent.primaryColorIds], recommendedShapes: ['almond'], supportedShapes: ['almond'],
     notRecommendedShapes: structuredClone(sourceContent.notRecommendedShapes), supportedLengths: ['medium'], applicationLevel: 'STRUCTURED_EDITABLE',
-    verificationLevel: 'RENDER_VERIFIED', assetRef: structuredClone(sourceContent.assetRef), campaignTags: [...sourceContent.campaignTags], publishedAt: definition.publishedAt,
+    verificationLevel: 'CONCEPT', assetRef: structuredClone(sourceContent.assetRef), campaignTags: [...sourceContent.campaignTags], publishedAt: definition.publishedAt,
     evidence: {
       immutableDesignVersion: { present: true, designVersionId: versionId, editorDocRef: structuredClone(release.designVersion.editorDocRef) },
       previewEvidence: { present: true, previewRevision: 1, previewSha256: COVER_SHA256[definition.id], fidelity: 'APPROXIMATE' },
       publicationGate: { present: true, copyrightDeclared: true, sourceDeclared: true, moderationCleared: true },
-      status: { sourceStatus: 'PUBLISHED', viewable: true, previewVerified: true, manufacturable: false, productionDispatched: false },
+      status: { sourceStatus: 'PUBLISHED', viewable: true, previewVerified: false, manufacturable: false, productionDispatched: false },
     },
     designVersionId: versionId, creatorProfileId: CREATOR_PROFILE_ID, visibility: 'PUBLIC', publicationGateVerified: true,
     sourceLook: structuredClone(publishedLook), sourceContent,
