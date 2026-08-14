@@ -1,0 +1,30 @@
+{
+  "designId": "design_6b45f36b-373f-4147-bf2f-15e2d1a18126",
+  "authoredRevision": 12,
+  "assetSet": {
+    "id": "render.v0.7.2.aurora-almond-materials",
+    "revision": "1"
+  },
+  "materialState": {
+    "projection": "material-projection-v1",
+    "hash": "9f0795add754ad4d",
+    "mode": "gradient",
+    "fidelity": "approximate",
+    "uv": "nail-local-v1-tip-to-root",
+    "evidence": "simulated-not-manufacturing",
+    "surfaceHash": "62fd40109fc426e50644d0db02405f8cd3ac181cf63eefcdf333d8a820cff821"
+  },
+  "projectedContent": [
+    "gradient background",
+    "brush stroke",
+    "vector shape",
+    "french edge",
+    "masked ink bloom"
+  ],
+  "writerZero": true,
+  "fallbackWriterZero": true,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "fallbackConsoleErrors": [],
+  "fallbackPageErrors": []
+}

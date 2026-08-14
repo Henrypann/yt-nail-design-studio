@@ -12,7 +12,15 @@ assert.equal(await hashPreviewSurfaceMeshV1(first), await hashPreviewSurfaceMesh
 assert.ok(first.metrics.transverseCrownRiseMm >= 1.5, 'visual surface must visibly express a C-curve');
 assert.ok(first.metrics.longitudinalArchRiseMm >= 0.8, 'visual surface must visibly express longitudinal arch');
 assert.equal(first.metrics.visualThicknessMm, 0.55, 'preview thickness must remain an explicit visual assumption');
+assert.equal(first.metrics.tipRadiusMm, 1.15, 'preview planform must use the accepted medium Almond tip radius');
+assert.ok(first.metrics.tipCapDepthMm > 0.54 && first.metrics.tipCapDepthMm < 0.56,
+  'accepted cubic tip region must close the almond without a needle apex');
+assert.equal(first.metrics.tipCrownRiseMm, 0.72, 'terminal C-curve must relax into the rounded cap');
+assert.equal(first.metrics.tipCapExponent, 2, 'free edge must use an elliptical rounded-cap profile');
+assert.equal(first.metrics.tipCapBlendStartRatio, 0.85, 'tip boundary must continue the accepted cubic sidewall');
 assert.ok(first.positions.every(Number.isFinite));
+assert.equal(first.uvs.length, (first.positions.length / 3) * 2);
+assert.ok(first.uvs.every((value) => Number.isFinite(value) && value >= 0 && value <= 1));
 assert.ok(first.indices.every(Number.isSafeInteger));
 assert.equal(first.indices.length % 3, 0);
 
@@ -46,8 +54,11 @@ assert.match(shell, /mode === 'single' && presentation === 'composite'/);
 assert.match(shell, /v7-svg-composite/);
 assert.match(runtime, /ACESFilmicToneMapping/);
 assert.match(runtime, /MeshPhysicalMaterial/);
+assert.match(runtime, /CanvasTexture/);
+assert.match(runtime, /SRGBColorSpace/);
+assert.match(runtime, /setAttribute\('uv'/);
 assert.match(runtime, /single-nail-pbr-fallback/);
-assert.match(runtime, /renderer\.dispose\(\)/);
+assert.match(runtime, /renderer\?\.dispose\(\)/);
 assert.doesNotMatch(runtime, /localStorage|sessionStorage|editorV7Store|setEditor|saveEditor|repository/);
 assert.doesNotMatch(runtime, /setAnimationLoop|requestAnimationFrame/);
 

@@ -33,6 +33,8 @@
     "test:geometry-v0-7-2-parity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-kernel-parity-v0-7-2.mjs",
     "test:render-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-render-contract-v0-7-2.mjs",
     "test:render-v0-7-2-single-nail": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-render-v0-7-2-single-nail-entry.mjs",
+    "test:render-v0-7-2-material-projection": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-render-v0-7-2-material-projection.mjs",
+    "test:render-v0-7-2-material-projection:e2e": "node tools/walkthrough-render-v0-7-2-material-projection.mjs",
     "test:render-v0-7-2-single-nail:e2e": "node tools/walkthrough-render-v0-7-2-single-nail.mjs",
     "test:community-content-states": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-content-states.mjs",
     "test:community-content-states:e2e": "node tools/e2e-community-content-states.mjs",
