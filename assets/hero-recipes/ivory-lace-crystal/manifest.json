@@ -372,7 +372,7 @@
   "generators": {
     "rasterAndManifest": {
       "path": "tools/generate-v0-7-2-four-look-assets.mjs",
-      "sha256": "f2d114cc888a408d2a49433b8379f35533b48a07b8453a59855a6adf7de60749"
+      "sha256": "27813fec97a71cefbfc13ee1102eb0ed0f7a022fb7278fcfff7452e6c8513c15"
     },
     "glb": {
       "path": "tools/generate-v0-7-2-four-look-glb.py",

@@ -103,6 +103,8 @@
     "generate:look-v0-7-2-four-sets:glb": "python3 tools/generate-v0-7-2-four-look-glb.py",
     "generate:look-v0-7-2-four-sets": "npm run generate:look-v0-7-2-four-sets:glb && node tools/generate-v0-7-2-four-look-assets.mjs",
     "test:look-v0-7-2-four-sets": "node tools/test-v0-7-2-four-look-assets.mjs",
+    "test:look-v0-7-2-four-sets-integration": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-v0-7-2-four-look-integration.mjs",
+    "walkthrough:look-v0-7-2-four-sets-integration": "node tools/walkthrough-v0-7-2-four-look-integration.mjs",
     "test:editor-v7-finish-composite": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-finish-composite.mjs",
     "test:editor-v7-creation-cutover": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-creation-cutover.mjs",
     "test:editor-v7-inspiration-geometry": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-inspiration-geometry.mjs",

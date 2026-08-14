@@ -13,6 +13,7 @@ import type { CommunityContentIndexV1 } from '../domain/types';
 import { buildLookReadModels } from '../domain/v7_1/published-look-adapter';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
 import { CANONICAL_USE_DEMO_READ_MODEL_V1 } from '@/integration/community-studio/canonical-use-demo';
+import { FOUR_LOOK_SET_READ_MODELS_V0_7_2 } from '@/integration/community-studio/v0-7-2-four-look-sets';
 import { loadCreatorPublishedLookReadModelsV1 } from '@/integration/community-studio/backend-runtime';
 
 const runtimeMode = import.meta.env?.MODE ?? 'integration';
@@ -38,8 +39,8 @@ export async function loadLookReadModels(input?: {
   try { creator = await (input?.loadCreator ?? loadCreatorPublishedLookReadModelsV1)(); }
   catch { (input?.onDiagnostic ?? defaultCreatorDiagnostic)({ scope: 'creator-look-slice', code: 'UNAVAILABLE' }); }
   return runtimeMode === 'development' || runtimeMode === 'integration'
-    ? [CANONICAL_USE_DEMO_READ_MODEL_V1, ...creator, ...legacy]
-    : [...creator, ...legacy];
+    ? [CANONICAL_USE_DEMO_READ_MODEL_V1, ...FOUR_LOOK_SET_READ_MODELS_V0_7_2, ...creator, ...legacy]
+    : [...FOUR_LOOK_SET_READ_MODELS_V0_7_2, ...creator, ...legacy];
 }
 
 export async function getLookReadModelById(

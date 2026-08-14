@@ -7,8 +7,8 @@ import {
   DIMENSIONAL_DECORATION_LABELS_V7,
   DIMENSIONAL_FIDELITY_LABELS_V7,
   createDimensionalDecorationV7,
-  dimensionalDecorationArchetypeV7,
   dimensionalDecorationFidelityV7,
+  dimensionalDecorationLabelV7,
   type DimensionalDecorationArchetypeV7,
 } from '../v7/dimensional-decoration';
 import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store, type EditorV7ActionResult } from '../store-v7';
@@ -75,7 +75,7 @@ export function DimensionalDecorationPanelV7() {
       </div>
       {!selected && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-3 py-4 text-center text-nano text-gray-500">添加或选择一个装饰后编辑高度、锚点和投影。</p>}
       {selected && <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-3">
-        <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-semibold text-gray-800">{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(selected)]}</p><p className="mt-0.5 max-w-[180px] truncate text-nano text-gray-400">{selected.kind === 'attachment_3d' ? selected.asset.assetId : selected.materialRef?.materialId}</p></div><div className="flex gap-1"><button type="button" aria-label={selected.locked ? '解锁装饰' : '锁定装饰'} disabled={!canMutateStep} onClick={() => report(setElementFlag(currentFinger, step.id, selected.id, 'locked', !selected.locked))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200">{selected.locked ? <Lock size={14} /> : <Unlock size={14} />}</button><button type="button" aria-label="删除装饰" disabled={!canEditSelected} onClick={() => report(removeElement(currentFinger, step.id, selected.id))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200 text-error disabled:opacity-35"><Trash2 size={14} /></button></div></div>
+        <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-semibold text-gray-800">{dimensionalDecorationLabelV7(selected)}</p><p className="mt-0.5 max-w-[180px] truncate text-nano text-gray-400">{selected.kind === 'attachment_3d' ? selected.asset.assetId : selected.materialRef?.materialId}</p></div><div className="flex gap-1"><button type="button" aria-label={selected.locked ? '解锁装饰' : '锁定装饰'} disabled={!canMutateStep} onClick={() => report(setElementFlag(currentFinger, step.id, selected.id, 'locked', !selected.locked))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200">{selected.locked ? <Lock size={14} /> : <Unlock size={14} />}</button><button type="button" aria-label="删除装饰" disabled={!canEditSelected} onClick={() => report(removeElement(currentFinger, step.id, selected.id))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200 text-error disabled:opacity-35"><Trash2 size={14} /></button></div></div>
         <CommitRange label="高度" value={selected.heightMm} min={0.05} max={10} step={0.01} unit=" mm" disabled={!canEditSelected} onCommit={(heightMm) => replace({ ...selected, heightMm })} />
         <CommitRange label="锚点 X" value={selected.transform.position.u} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(u) => setTransform({ position: { ...selected.transform.position, u } })} />
         <CommitRange label="锚点 Y" value={selected.transform.position.v} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(v) => setTransform({ position: { ...selected.transform.position, v } })} />

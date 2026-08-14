@@ -143,6 +143,23 @@ export function dimensionalDecorationArchetypeV7(decoration: DimensionalDecorati
   return 'relief';
 }
 
+const FOUR_LOOK_ATTACHMENT_LABELS_V0_7_2: Readonly<Record<string, string>> = {
+  'look.leopard-gilded-nude.decoration.gilded-crystal-cluster': '鎏金水钻簇',
+  'look.crimson-reliquary.decoration.gold-cross-chain': '十字金属链',
+  'look.ivory-lace-crystal.decoration.teardrop-pearl-cluster': '水滴珍珠簇',
+  'look.ivory-lace-crystal.decoration.ivory-relief-flower': '象牙浮雕花',
+  'look.ivory-lace-crystal.decoration.ivory-lace-applique': '象牙蕾丝贴饰',
+  'look.honey-petal-glass.decoration.glass-flower-pearl': '透明浮雕花与珍珠',
+};
+
+export function dimensionalDecorationLabelV7(decoration: DimensionalDecorationV7): string {
+  if (decoration.kind === 'attachment_3d') {
+    const label = FOUR_LOOK_ATTACHMENT_LABELS_V0_7_2[decoration.asset.assetId];
+    if (label) return label;
+  }
+  return DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(decoration)];
+}
+
 export function dimensionalDecorationFidelityV7(decoration: DimensionalDecorationV7): PreviewFidelityV7 {
   if (decoration.previewFidelity === 'unavailable') return 'unavailable';
   if (decoration.kind === 'attachment_3d') return resolveDimensionalMeshFidelityV7(decoration.asset);

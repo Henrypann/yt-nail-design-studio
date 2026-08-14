@@ -1,0 +1,89 @@
+{
+  "baseURL": "http://127.0.0.1:5238",
+  "report": [
+    {
+      "lookId": "look.v0-7-2.leopard-gilded-nude",
+      "viewport": "390x844",
+      "canonical": {
+        "designId": "design.remix.intent.v2.99096dda-c511-45bb-82cc-fea250669092",
+        "title": "Leopard Gilded Nude Remix",
+        "sourceRefs": [
+          {
+            "domain": "community",
+            "sourceId": "look.v0-7-2.leopard-gilded-nude",
+            "revision": "dv.v0-7-2.leopard-gilded-nude.1"
+          }
+        ],
+        "nailCount": 10,
+        "flat": 10,
+        "effect": 0,
+        "dimensional": 3,
+        "finish": 10
+      },
+      "errors": []
+    },
+    {
+      "lookId": "look.v0-7-2.crimson-reliquary",
+      "viewport": "1280x800",
+      "canonical": {
+        "designId": "design.remix.intent.v2.251ebe12-5006-4338-b83b-890c32414010",
+        "title": "Crimson Reliquary Remix",
+        "sourceRefs": [
+          {
+            "domain": "community",
+            "sourceId": "look.v0-7-2.crimson-reliquary",
+            "revision": "dv.v0-7-2.crimson-reliquary.1"
+          }
+        ],
+        "nailCount": 10,
+        "flat": 8,
+        "effect": 0,
+        "dimensional": 6,
+        "finish": 10
+      },
+      "errors": []
+    },
+    {
+      "lookId": "look.v0-7-2.ivory-lace-crystal",
+      "viewport": "1440x900",
+      "canonical": {
+        "designId": "design.remix.intent.v2.cc650bdc-961d-449c-aecf-909f8e57c955",
+        "title": "Ivory Lace Crystal Remix",
+        "sourceRefs": [
+          {
+            "domain": "community",
+            "sourceId": "look.v0-7-2.ivory-lace-crystal",
+            "revision": "dv.v0-7-2.ivory-lace-crystal.1"
+          }
+        ],
+        "nailCount": 10,
+        "flat": 10,
+        "effect": 0,
+        "dimensional": 8,
+        "finish": 10
+      },
+      "errors": []
+    },
+    {
+      "lookId": "look.v0-7-2.honey-petal-glass",
+      "viewport": "1024x768",
+      "canonical": {
+        "designId": "design.remix.intent.v2.9d950773-dc07-48a1-b71b-31eb1315e4fb",
+        "title": "Honey Petal Glass Remix",
+        "sourceRefs": [
+          {
+            "domain": "community",
+            "sourceId": "look.v0-7-2.honey-petal-glass",
+            "revision": "dv.v0-7-2.honey-petal-glass.1"
+          }
+        ],
+        "nailCount": 10,
+        "flat": 6,
+        "effect": 4,
+        "dimensional": 4,
+        "finish": 10
+      },
+      "errors": []
+    }
+  ]
+}

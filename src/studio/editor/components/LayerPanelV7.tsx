@@ -22,7 +22,7 @@ import { selectCurrentGeometryExactV7, selectCurrentNailV7, selectCurrentStepV7,
 import { FlatVectorPanelV7 } from './FlatVectorPanelV7';
 import { FlatContentInspectorV7 } from './FlatContentInspectorV7';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
-import { DIMENSIONAL_DECORATION_LABELS_V7, dimensionalDecorationArchetypeV7 } from '../v7/dimensional-decoration';
+import { dimensionalDecorationLabelV7 } from '../v7/dimensional-decoration';
 
 const STEP_LABEL: Record<ProcessStepV7['kind'], string> = {
   background: '背景层',
@@ -140,7 +140,7 @@ function ProcessTreeV7() {
                   <p className="mb-1.5 text-nano font-semibold text-amber-700">装饰 · {step.decorations.length}</p>
                   <div className="max-h-40 space-y-1 overflow-y-auto" aria-label="立体装饰列表">
                     {step.decorations.length === 0 && <p className="rounded-lg border border-dashed border-amber-200 px-2 py-2 text-center text-nano text-gray-400">从左侧立体工具添加素材。</p>}
-                    {step.decorations.map((decoration, decorationIndex) => <button key={decoration.id} type="button" aria-current={selectedElementId === decoration.id ? 'true' : undefined} onClick={() => selectElement(decoration.id)} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-nano', selectedElementId === decoration.id ? 'bg-amber-100 font-semibold text-amber-900' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{decorationIndex + 1}</span><span className="min-w-0 flex-1 truncate">{DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(decoration)]}</span>{decoration.locked && <Lock size={10} className="text-gray-400" />}</button>)}
+                    {step.decorations.map((decoration, decorationIndex) => <button key={decoration.id} type="button" aria-current={selectedElementId === decoration.id ? 'true' : undefined} onClick={() => selectElement(decoration.id)} className={cx('flex min-h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-nano', selectedElementId === decoration.id ? 'bg-amber-100 font-semibold text-amber-900' : 'text-gray-600 hover:bg-white')}><span className="w-5 tabular-nums text-gray-400">{decorationIndex + 1}</span><span className="min-w-0 flex-1 truncate">{dimensionalDecorationLabelV7(decoration)}</span>{decoration.locked && <Lock size={10} className="text-gray-400" />}</button>)}
                   </div>
                 </div>}
               </div>}
@@ -176,7 +176,7 @@ function InspectorV7() {
       : selectedStep.kind === 'dimensional_decoration'
         ? [
             { label: '装饰数量', value: String(selectedStep.decorations.length) },
-            { label: '当前对象', value: selectedDecoration ? DIMENSIONAL_DECORATION_LABELS_V7[dimensionalDecorationArchetypeV7(selectedDecoration)] : '尚未选择' },
+            { label: '当前对象', value: selectedDecoration ? dimensionalDecorationLabelV7(selectedDecoration) : '尚未选择' },
             { label: '编辑位置', value: '左侧立体素材与参数' },
           ]
         : selectedStep.kind === 'surface_finish'

@@ -27,6 +27,10 @@ import {
   CANONICAL_USE_DEMO_RELEASE_RECORD_V1,
 } from './canonical-use-demo';
 import { creatorWorkspaceServiceV1 } from './backend-runtime';
+import {
+  getFourLookSetAuthorityByLookIdV0_7_2,
+  getFourLookSetAuthorityByVersionIdV0_7_2,
+} from './v0-7-2-four-look-sets';
 
 const persistence = createLocalVersionedUsePersistencePortV1();
 const persistenceIdentity = createLocalPrototypeIdentityAccessPortV1({
@@ -40,13 +44,16 @@ export type CreateVersionedUseIntentResultV1 =
   | { ok: false; reason: string };
 
 export function createVersionedUseIntentForLookV1(look: PublishedLookV1): CreateVersionedUseIntentResultV1 {
-  if (look.lookId !== CANONICAL_USE_DEMO_LOOK_ID
-    || look.designVersionId !== CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId
+  const fourLookAuthority = getFourLookSetAuthorityByLookIdV0_7_2(look.lookId);
+  const release = fourLookAuthority?.release ?? (look.lookId === CANONICAL_USE_DEMO_LOOK_ID
+    ? CANONICAL_USE_DEMO_RELEASE_RECORD_V1
+    : null);
+  if (!release || look.designVersionId !== release.designVersion.designVersionId
     || look.status !== 'PUBLISHED' || look.visibility !== 'PUBLIC') {
     return { ok: false, reason: 'release_unavailable' };
   }
   const result = createVersionedStudioImportIntentV2(
-    { look, designVersion: CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion, returnTo: Routes.communityLook(look.lookId) },
+    { look, designVersion: release.designVersion, returnTo: Routes.communityLook(look.lookId) },
     {
       storage: localTrustedGestureIntentHandoffV2.storage,
       nextId: localTrustedGestureIntentHandoffV2.nextIntentId,
@@ -81,20 +88,31 @@ export async function consumeVersionedUseIntentV2(
     intents: versionedIntentPortV2,
     getLook: async (lookId) => {
       if (lookId === CANONICAL_USE_DEMO_LOOK_ID) return structuredClone(CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1);
+      const fourLookAuthority = getFourLookSetAuthorityByLookIdV0_7_2(lookId);
+      if (fourLookAuthority) return structuredClone(fourLookAuthority.publishedLook);
       const workspace = await creatorWorkspaceServiceV1.load();
       return workspace.ok
         ? structuredClone(workspace.value.publication.looks.find((look) => look.lookId === lookId && look.status === 'PUBLISHED' && look.visibility === 'PUBLIC') ?? null)
         : null;
     },
-    getRelease: async (versionId) => versionId === CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId
-      ? structuredClone(CANONICAL_USE_DEMO_RELEASE_RECORD_V1)
-      : null,
+    getRelease: async (versionId) => {
+      if (versionId === CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.designVersionId) {
+        return structuredClone(CANONICAL_USE_DEMO_RELEASE_RECORD_V1);
+      }
+      return structuredClone(getFourLookSetAuthorityByVersionIdV0_7_2(versionId)?.release ?? null);
+    },
     sha256,
     canReadLook: async (look) => look.visibility === 'PUBLIC' && look.status === 'PUBLISHED',
-    assetAvailable: async (asset) => CANONICAL_USE_DEMO_RELEASE_RECORD_V1.designVersion.assetRevisionRefs.some((candidate) => (
-      candidate.assetId === asset.assetId && candidate.revision === asset.revision
-      && candidate.sha256 === asset.sha256 && candidate.mimeType === asset.mimeType
-    )),
+    assetAvailable: async (asset) => {
+      const authorities = [
+        CANONICAL_USE_DEMO_RELEASE_RECORD_V1,
+        getFourLookSetAuthorityByVersionIdV0_7_2(versionedIntentPortV2.peek(intentId)?.designVersionId ?? '')?.release,
+      ].filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate));
+      return authorities.some((authority) => authority.designVersion.assetRevisionRefs.some((candidate) => (
+        candidate.assetId === asset.assetId && candidate.revision === asset.revision
+        && candidate.sha256 === asset.sha256 && candidate.mimeType === asset.mimeType
+      )));
+    },
     createTarget: async ({ intentId: exactIntentId, doc }) => {
       const writeContext = await persistenceIdentity.issueContext({
         operation: BACKEND_OPERATIONS_V1.versionedUseWrite,

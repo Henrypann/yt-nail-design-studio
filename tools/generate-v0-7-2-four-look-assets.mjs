@@ -210,7 +210,7 @@ for (const [lookId, spec] of Object.entries(lookSpecs)) {
     { kind: 'background', cardinality: 'exactly_one', fingers: allFingers },
     { kind: 'flat_design', cardinality: 'zero_or_more', fingers: fingers.filter((finger) => spec.allocations[finger].some((entry) => /diagonal|leopard|curve|french|hairline|gradient/.test(entry))) },
     { kind: 'surface_effect', cardinality: 'zero_or_more', fingers: fingers.filter((finger) => spec.allocations[finger].some((entry) => /honey_jelly/.test(entry))) },
-    { kind: 'dimensional_decoration', cardinality: 'zero_or_more', fingers: fingers.filter((finger) => spec.allocations[finger].some((entry) => /cluster|chain|flower|lace|pearl/.test(entry))) },
+    { kind: 'dimensional_decoration', cardinality: 'zero_or_more', fingers: fingers.filter((finger) => spec.allocations[finger].some((entry) => /cluster|chain|flower|lace|pearl|bead/.test(entry))) },
     { kind: 'surface_finish', cardinality: 'exactly_one_last', fingers: allFingers },
   ];
   const manifest = {
