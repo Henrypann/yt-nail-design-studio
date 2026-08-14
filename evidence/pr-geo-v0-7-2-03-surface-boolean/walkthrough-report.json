@@ -1,0 +1,451 @@
+{
+  "generatedAt": "2026-08-14T03:34:58.953Z",
+  "reports": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence": {
+        "contract": "nail-surface-boolean-v1",
+        "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+        "placement": {
+          "method": "uv_barycentric_surface_frame",
+          "embedDepthMm": 0.32,
+          "matrix": [
+            0.9724623469070245,
+            0.005427263928375751,
+            -0.232996842584473,
+            0,
+            0.05909874981854518,
+            0.9613103571413284,
+            0.26905340552146295,
+            0,
+            0.22544250180027486,
+            -0.27541412828513995,
+            0.9345173814985838,
+            0,
+            1.5457477020978174,
+            -11.799867898666742,
+            2.1539728535082823,
+            1
+          ],
+          "fixedZUsed": false
+        },
+        "frame": {
+          "contract": "nail-surface-frame-v1",
+          "source": "uv_barycentric_outer_surface",
+          "uv": [
+            0.69,
+            0.68
+          ],
+          "triangleIndex": 2304,
+          "barycentric": [
+            0.060000433921504975,
+            0.8494461862798538,
+            0.09055337979864123
+          ],
+          "positionMm": [
+            1.6178893026739054,
+            -11.888000419717986,
+            2.453018415587829
+          ],
+          "normal": [
+            0.22544250180027486,
+            -0.27541412828513995,
+            0.9345173814985838
+          ],
+          "tangentU": [
+            0.9724623469070245,
+            0.005427263928375751,
+            -0.232996842584473
+          ],
+          "tangentV": [
+            0.05909874981854518,
+            0.9613103571413284,
+            0.26905340552146295
+          ]
+        },
+        "operation": "union",
+        "view": "after",
+        "camera": "oblique",
+        "topology": {
+          "union": {
+            "vertexCount": 9012,
+            "triangleCount": 18020,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                -5.49997,
+                -18,
+                0
+              ],
+              "max": [
+                5.49997,
+                1.1,
+                4.13726
+              ]
+            },
+            "signedVolumeMm3": 98.04061,
+            "surfaceAreaMm2": 372.66117,
+            "geometryHash": "7b6e62fc869fe1c54eaf110dbc98c2a6158abc5c99e78fbedadc926c52ac8a05"
+          },
+          "subtract": {
+            "vertexCount": 8588,
+            "triangleCount": 17172,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                -5.49997,
+                -18,
+                0
+              ],
+              "max": [
+                5.49997,
+                1.1,
+                3.16165
+              ]
+            },
+            "signedVolumeMm3": 93.23329,
+            "surfaceAreaMm2": 363.32915,
+            "geometryHash": "648e1d44d78c36ab36edf47528fdb2e1b0cd885be61aeeafc33d859f7375f2de"
+          },
+          "intersect": {
+            "vertexCount": 302,
+            "triangleCount": 600,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                0.86729,
+                -12.63489,
+                2.03972
+              ],
+              "max": [
+                2.35322,
+                -11.13397,
+                2.69932
+              ]
+            },
+            "signedVolumeMm3": 0.36196,
+            "surfaceAreaMm2": 4.09713,
+            "geometryHash": "9501e60128ea850dbaa7cbe7025a627670c4881895ba12cd7a0adef0ef3e9693"
+          }
+        },
+        "deterministic": {
+          "union": true,
+          "subtract": true,
+          "intersect": true
+        },
+        "manufacturingValidated": false
+      },
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:5251/assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb",
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        },
+        {
+          "url": "http://127.0.0.1:5251/geometry-v0-7-2/almond-medium-v3/shell.web.glb",
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        }
+      ],
+      "writerZero": true,
+      "geometry": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "canvas": {
+          "x": 285,
+          "y": 148,
+          "width": 850,
+          "height": 739,
+          "top": 148,
+          "right": 1135,
+          "bottom": 887,
+          "left": 285
+        },
+        "buttons": [
+          {
+            "label": "union",
+            "width": 64.75,
+            "height": 38
+          },
+          {
+            "label": "subtract",
+            "width": 82.125,
+            "height": 38
+          },
+          {
+            "label": "intersect",
+            "width": 84.046875,
+            "height": 38
+          },
+          {
+            "label": "before",
+            "width": 69.703125,
+            "height": 38
+          },
+          {
+            "label": "after",
+            "width": 58.25,
+            "height": 38
+          },
+          {
+            "label": "surface",
+            "width": 77.734375,
+            "height": 38
+          },
+          {
+            "label": "oblique",
+            "width": 77.078125,
+            "height": 38
+          },
+          {
+            "label": "side",
+            "width": 55.109375,
+            "height": 38
+          },
+          {
+            "label": "underside",
+            "width": 94.21875,
+            "height": 38
+          }
+        ]
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence": {
+        "contract": "nail-surface-boolean-v1",
+        "registryEntryId": "geometry-registry.almond.medium.visual-v3",
+        "placement": {
+          "method": "uv_barycentric_surface_frame",
+          "embedDepthMm": 0.32,
+          "matrix": [
+            0.9724623469070245,
+            0.005427263928375751,
+            -0.232996842584473,
+            0,
+            0.05909874981854518,
+            0.9613103571413284,
+            0.26905340552146295,
+            0,
+            0.22544250180027486,
+            -0.27541412828513995,
+            0.9345173814985838,
+            0,
+            1.5457477020978174,
+            -11.799867898666742,
+            2.1539728535082823,
+            1
+          ],
+          "fixedZUsed": false
+        },
+        "frame": {
+          "contract": "nail-surface-frame-v1",
+          "source": "uv_barycentric_outer_surface",
+          "uv": [
+            0.69,
+            0.68
+          ],
+          "triangleIndex": 2304,
+          "barycentric": [
+            0.060000433921504975,
+            0.8494461862798538,
+            0.09055337979864123
+          ],
+          "positionMm": [
+            1.6178893026739054,
+            -11.888000419717986,
+            2.453018415587829
+          ],
+          "normal": [
+            0.22544250180027486,
+            -0.27541412828513995,
+            0.9345173814985838
+          ],
+          "tangentU": [
+            0.9724623469070245,
+            0.005427263928375751,
+            -0.232996842584473
+          ],
+          "tangentV": [
+            0.05909874981854518,
+            0.9613103571413284,
+            0.26905340552146295
+          ]
+        },
+        "operation": "union",
+        "view": "after",
+        "camera": "oblique",
+        "topology": {
+          "union": {
+            "vertexCount": 9012,
+            "triangleCount": 18020,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                -5.49997,
+                -18,
+                0
+              ],
+              "max": [
+                5.49997,
+                1.1,
+                4.13726
+              ]
+            },
+            "signedVolumeMm3": 98.04061,
+            "surfaceAreaMm2": 372.66117,
+            "geometryHash": "7b6e62fc869fe1c54eaf110dbc98c2a6158abc5c99e78fbedadc926c52ac8a05"
+          },
+          "subtract": {
+            "vertexCount": 8588,
+            "triangleCount": 17172,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                -5.49997,
+                -18,
+                0
+              ],
+              "max": [
+                5.49997,
+                1.1,
+                3.16165
+              ]
+            },
+            "signedVolumeMm3": 93.23329,
+            "surfaceAreaMm2": 363.32915,
+            "geometryHash": "648e1d44d78c36ab36edf47528fdb2e1b0cd885be61aeeafc33d859f7375f2de"
+          },
+          "intersect": {
+            "vertexCount": 302,
+            "triangleCount": 600,
+            "componentCount": 1,
+            "boundaryEdgeCount": 0,
+            "nonManifoldEdgeCount": 0,
+            "degenerateTriangleCount": 0,
+            "boundsMm": {
+              "min": [
+                0.86729,
+                -12.63489,
+                2.03972
+              ],
+              "max": [
+                2.35322,
+                -11.13397,
+                2.69932
+              ]
+            },
+            "signedVolumeMm3": 0.36196,
+            "surfaceAreaMm2": 4.09713,
+            "geometryHash": "9501e60128ea850dbaa7cbe7025a627670c4881895ba12cd7a0adef0ef3e9693"
+          }
+        },
+        "deterministic": {
+          "union": true,
+          "subtract": true,
+          "intersect": true
+        },
+        "manufacturingValidated": false
+      },
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:5251/geometry-v0-7-2/almond-medium-v3/shell.web.glb",
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        },
+        {
+          "url": "http://127.0.0.1:5251/assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb",
+          "status": 200,
+          "contentType": "model/gltf-binary"
+        }
+      ],
+      "writerZero": true,
+      "geometry": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "canvas": {
+          "x": 9,
+          "y": 268.53125,
+          "width": 372,
+          "height": 523.265625,
+          "top": 268.53125,
+          "right": 381,
+          "bottom": 791.796875,
+          "left": 9
+        },
+        "buttons": [
+          {
+            "label": "union",
+            "width": 113.328125,
+            "height": 44
+          },
+          {
+            "label": "subtract",
+            "width": 113.328125,
+            "height": 44
+          },
+          {
+            "label": "intersect",
+            "width": 113.34375,
+            "height": 44
+          },
+          {
+            "label": "before",
+            "width": 172,
+            "height": 44
+          },
+          {
+            "label": "after",
+            "width": 172,
+            "height": 44
+          },
+          {
+            "label": "surface",
+            "width": 84,
+            "height": 44
+          },
+          {
+            "label": "oblique",
+            "width": 84,
+            "height": 44
+          },
+          {
+            "label": "side",
+            "width": 84,
+            "height": 44
+          },
+          {
+            "label": "underside",
+            "width": 84,
+            "height": 44
+          }
+        ]
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    }
+  ]
+}

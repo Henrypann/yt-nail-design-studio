@@ -100,12 +100,13 @@ await assert.rejects(access(new URL('../public/geometry-v0-7-2/almond-medium-v3/
   'STL must never be copied into the public delivery tree');
 const runtime = await readFile(new URL('../src/studio/rendering/v0-7-2/SingleNailPbrPreviewV072.tsx', import.meta.url), 'utf8');
 const loader = await readFile(new URL('../src/studio/rendering/v0-7-2/promoted-geometry-loader.ts', import.meta.url), 'utf8');
+const parser = await readFile(new URL('../src/studio/geometry/v0-7-2/promoted-geometry-parser.ts', import.meta.url), 'utf8');
 assert.match(runtime, /resolvePromotedGeometryV2/);
 assert.match(runtime, /loadPromotedGeometryV2/);
 assert.doesNotMatch(runtime, /createSingleNailPreviewSurfaceV1|3\.2 \+ decoration\.heightMm/);
-assert.match(loader, /promoted_geometry_integrity_failed/);
-assert.match(loader, /getAttribute\('normal'\).*getAttribute\('uv'\)/s);
-assert.doesNotMatch(`${runtime}\n${loader}`, /STLLoader|\.stl|manufacturing_compiler|device_job/);
+assert.match(parser, /promoted_geometry_integrity_failed/);
+assert.match(parser, /getAttribute\('normal'\).*getAttribute\('uv'\)/s);
+assert.doesNotMatch(`${runtime}\n${loader}\n${parser}`, /STLLoader|\.stl|manufacturing_compiler|device_job/);
 
 execFileSync(process.execPath, [generatorPath], { cwd: root, stdio: 'ignore' });
 assert.equal(sha256(await readFile(registryUrl)), sha256(registryBytes), 'registry generation must be byte deterministic');

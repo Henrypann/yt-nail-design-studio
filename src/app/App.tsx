@@ -49,10 +49,14 @@ import { HardwareRegistrationGate } from './guards/HardwareRegistrationGate';
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
   : null;
+const SurfaceBooleanDevPage = import.meta.env.DEV
+  ? lazy(() => import('@/studio/geometry/v0-7-2/SurfaceBooleanDevPage'))
+  : null;
 
 function RouterChrome() {
   const location = useLocation();
-  const internalFixture = location.pathname === '/internal/petal-veil-fixture';
+  const internalFixture = location.pathname === '/internal/petal-veil-fixture'
+    || location.pathname === '/internal/surface-boolean-v072';
   const immersiveEditor = location.pathname === Routes.designCanvas || location.pathname === Routes.designCustomerPreview;
   return (
     <>
@@ -82,6 +86,9 @@ const router = createBrowserRouter(createRoutesFromElements(
     {/* 手机端辅助配网：跨设备独立页，不带侧栏 */}
     <Route path={Routes.deviceBindMobilePath} element={<MobileBindPage />} />
     <Route path="/internal/petal-veil-fixture" element={<PetalVeilFixturePage />} />
+    {SurfaceBooleanDevPage && (
+      <Route path="/internal/surface-boolean-v072" element={<Suspense fallback={null}><SurfaceBooleanDevPage /></Suspense>} />
+    )}
     {/* Nail Lover Community：全局默认产品与首页，无 Studio 侧栏。 */}
     <Route element={<CommunityLayout />}>
       <Route path={Routes.community} element={<CommunityDiscoverPage />} />
