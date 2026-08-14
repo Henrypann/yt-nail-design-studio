@@ -1,0 +1,94 @@
+{
+  "artifacts": {
+    "glb": {
+      "bytes": 471664,
+      "mime": "model/gltf-binary",
+      "path": "assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+      "runtimeUrl": "/assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+      "sha256": "8055bcd115c13fa6a25d5e3e942966ef09ca3a652760579df02a0bc02305e016",
+      "visibility": "DEV_REVIEW_ONLY"
+    },
+    "stl": {
+      "bytes": 839484,
+      "mime": "model/stl",
+      "path": "assets/stl/spike/almond-medium-shell-v3.simulated.stl",
+      "sha256": "01a4e4f655c674ecdb7489b9cdac06d9e926b122e3313a3d7385546175a8bf53",
+      "visibility": "INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED"
+    }
+  },
+  "assetId": "spike-almond-medium-shell-candidate-v3",
+  "boundsMm": {
+    "max": [
+      5.499972343444824,
+      1.100000023841858,
+      3.1616532802581787
+    ],
+    "min": [
+      -5.499972343444824,
+      -18.0,
+      0.0
+    ]
+  },
+  "canonicalTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+  "coordinateSystem": {
+    "axes": {
+      "x": "left_to_right",
+      "y": "tip_negative_to_root_positive",
+      "z": "surface_outward_positive"
+    },
+    "handedness": "RIGHT_HANDED",
+    "origin": "NAIL_ROOT_CENTER_PLANFORM; Z shifted so lowest inner point is 0",
+    "units": "mm",
+    "uv": {
+      "u": "left_to_right_0_to_1",
+      "v": "tip_to_root_0_to_1"
+    }
+  },
+  "manufacturingValidated": false,
+  "revision": "3.0.0-simulated-candidate",
+  "schemaVersion": 1,
+  "source": {
+    "generator": {
+      "contract": "spike-almond-shell-generator-v3",
+      "path": "tools/generate-spike-almond-shell.py",
+      "sha256": "21e08a35767f3b488d4b7b0182e25516a54acf4d0a77025e7955128d299e0e1c"
+    },
+    "productVisualCandidate": {
+      "evidence": "PRODUCT_VISUAL_SIGNED_OFF_NOT_PROMOTED",
+      "path": "assets/shape-calibration/candidates/almond-medium-elegant-v1.json",
+      "profileId": "almond-medium-elegant-v1",
+      "referenceHausdorffMm": 0.3251984889559467,
+      "sha256": "fa2bbc15c2f2edca46bf4fb9af4384b8cbca4a85a3da768d077ac2ce742eca99"
+    },
+    "shapeParams": {
+      "path": "material-library/shapes/shape-params.json",
+      "sha256": "311b338158a24c5aecea04cf9414a854a897c1dc9be24d2b1930c7a446befb72",
+      "version": 3
+    },
+    "signed2dSilhouette": {
+      "evidence": "SIGNED_OFF_2D_SILHOUETTE",
+      "path": "material-library/shapes/silhouettes/almond_medium.svg",
+      "sha256": "db061eeab1439c5b471885eed5ffb64d5cf6d610a0c7d0a3bf53655a2cafccbc"
+    },
+    "toolchain": {
+      "numpyVersion": "2.0.2",
+      "pythonImplementation": "CPython",
+      "pythonVersion": "3.9.6",
+      "requirementsPath": "tools/requirements-spike-almond-shell.txt",
+      "requirementsSha256": "5a9b0674e2499c252bdbf975bd3dfe4c09471dcebaf194e423191f3aeb4a070a",
+      "trimeshVersion": "4.12.2"
+    }
+  },
+  "status": "SIMULATED_CANDIDATE_NOT_PROMOTED",
+  "topology": {
+    "boundaryEdges": 0,
+    "connectedComponents": 1,
+    "degenerateTriangles": 0,
+    "duplicateTriangles": 0,
+    "eulerNumber": 2,
+    "inconsistentWindingEdges": 0,
+    "nonManifoldEdges": 0,
+    "triangles": 16788,
+    "vertices": 8396
+  }
+}

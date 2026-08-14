@@ -1,0 +1,156 @@
+{
+  "artifactParity": {
+    "boundsToleranceMm": 0.01,
+    "glbTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+    "sameCanonicalTriangles": true,
+    "sourceTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+    "stlTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc"
+  },
+  "artifacts": {
+    "glb": {
+      "bytes": 471664,
+      "mime": "model/gltf-binary",
+      "path": "assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+      "runtimeUrl": "/assets/glb/shells/almond/medium-candidate-v3/shell.web.glb",
+      "sha256": "8055bcd115c13fa6a25d5e3e942966ef09ca3a652760579df02a0bc02305e016",
+      "visibility": "DEV_REVIEW_ONLY"
+    },
+    "stl": {
+      "bytes": 839484,
+      "mime": "model/stl",
+      "path": "assets/stl/spike/almond-medium-shell-v3.simulated.stl",
+      "sha256": "01a4e4f655c674ecdb7489b9cdac06d9e926b122e3313a3d7385546175a8bf53",
+      "visibility": "INTERNAL_ONLY_NOT_SERVED_NOT_EXPORTED"
+    }
+  },
+  "assetId": "spike-almond-medium-shell-candidate-v3",
+  "assumptions": {
+    "evidence": "SIMULATED_3D_SOLID",
+    "limitations": [
+      "not fitted to a scanned nail bed",
+      "not a normal-offset engineering shell",
+      "product visual candidate has not replaced or promoted the signed 2D silhouette",
+      "not validated for material, strength, printing, post-processing, wear or device compatibility"
+    ],
+    "longitudinalProfile": "finite-slope polynomial endpoint blend with local multi-vertex tip/root cap strips",
+    "manufacturingValidated": false,
+    "thickness": "vertical preview thickness; about 0.45mm cuticle, 0.60mm tip, 0.75mm apex and 0.50-0.58mm sides",
+    "transverseProfile": "parabolic C-curve, tapered to candidate review rim"
+  },
+  "classification": "SIMULATED_ALMOND_SHELL_CANDIDATE",
+  "coordinateSystem": {
+    "axes": {
+      "x": "left_to_right",
+      "y": "tip_negative_to_root_positive",
+      "z": "surface_outward_positive"
+    },
+    "handedness": "RIGHT_HANDED",
+    "origin": "NAIL_ROOT_CENTER_PLANFORM; Z shifted so lowest inner point is 0",
+    "units": "mm",
+    "uv": {
+      "u": "left_to_right_0_to_1",
+      "v": "tip_to_root_0_to_1"
+    }
+  },
+  "disclosure": "STL/GLB 由同一参数化网格生成；仅验证数字几何与浏览器加载，未验证佩戴贴合、壁厚、强度、材料、打印、后处理或设备兼容性。",
+  "generatedAt": "2026-08-14T00:00:00+08:00",
+  "mesh": {
+    "boundaryEdges": 0,
+    "boundsMm": {
+      "max": [
+        5.499972343444824,
+        1.100000023841858,
+        3.1616532802581787
+      ],
+      "min": [
+        -5.499972343444824,
+        -18.0,
+        0.0
+      ]
+    },
+    "canonicalTriangleSha256": "05d14797db2369e4864173bc4cee0f830e5fcd2370fab3aa85850d78beae26dc",
+    "connectedComponents": 1,
+    "degenerateTriangles": 0,
+    "duplicateTriangles": 0,
+    "edges": 25182,
+    "eulerNumber": 2,
+    "inconsistentWindingEdges": 0,
+    "maxTriangleAspectRatio": 19.63751393465422,
+    "minTriangleAngleDeg": 2.9231551888888676,
+    "nonManifoldEdges": 0,
+    "planformHausdorffMm": 0.012009517530978345,
+    "quantizationMm": 1e-05,
+    "selfIntersectionRationale": "CONSTRUCTIVE_STRUCTURED_OUTER_INNER_WITH_POSITIVE_VERTICAL_SEPARATION; NOT_A_GENERAL_TRIANGLE_INTERSECTION_TEST",
+    "surfaceAreaMm2": 362.96989132605495,
+    "triangles": 16788,
+    "vertices": 8396,
+    "volumeMm3": 93.59525388741667,
+    "watertight": true,
+    "windingConsistent": true
+  },
+  "revision": "3.0.0-simulated-candidate",
+  "schemaVersion": 1,
+  "shapeMetrics": {
+    "cuticleSeatYmm": 1.1,
+    "envelopeLengthMm": 19.1,
+    "longitudinalInnerRiseMm": 2.091661230360443,
+    "longitudinalOuterRiseMm": 2.380448436372343,
+    "maxWidthMm": 11.0,
+    "maxWidthPositionFromRootRatio": 0.2751611145887079,
+    "maxWidthYmm": -4.155577288644322,
+    "nominalLengthMm": 18.0,
+    "rootCapSectionVertexCounts": [
+      5,
+      3,
+      1
+    ],
+    "thicknessMm": {
+      "cuticleCentre": 0.45683771976881654,
+      "midbodyCentre": 0.7487297497472001,
+      "midbodySide": 0.584009204802816,
+      "tipCentre": 0.6012048356864016
+    },
+    "tipCapSectionVertexCounts": [
+      1,
+      3,
+      5
+    ],
+    "tipYmm": -18.0,
+    "transverseOuterCrownMm": 1.644416415310639,
+    "undersideCavityDepthMm": 1.4796958703662548,
+    "zShiftMm": 0.2212048356864016
+  },
+  "source": {
+    "generator": {
+      "contract": "spike-almond-shell-generator-v3",
+      "path": "tools/generate-spike-almond-shell.py",
+      "sha256": "21e08a35767f3b488d4b7b0182e25516a54acf4d0a77025e7955128d299e0e1c"
+    },
+    "productVisualCandidate": {
+      "evidence": "PRODUCT_VISUAL_SIGNED_OFF_NOT_PROMOTED",
+      "path": "assets/shape-calibration/candidates/almond-medium-elegant-v1.json",
+      "profileId": "almond-medium-elegant-v1",
+      "referenceHausdorffMm": 0.3251984889559467,
+      "sha256": "fa2bbc15c2f2edca46bf4fb9af4384b8cbca4a85a3da768d077ac2ce742eca99"
+    },
+    "shapeParams": {
+      "path": "material-library/shapes/shape-params.json",
+      "sha256": "311b338158a24c5aecea04cf9414a854a897c1dc9be24d2b1930c7a446befb72",
+      "version": 3
+    },
+    "signed2dSilhouette": {
+      "evidence": "SIGNED_OFF_2D_SILHOUETTE",
+      "path": "material-library/shapes/silhouettes/almond_medium.svg",
+      "sha256": "db061eeab1439c5b471885eed5ffb64d5cf6d610a0c7d0a3bf53655a2cafccbc"
+    },
+    "toolchain": {
+      "numpyVersion": "2.0.2",
+      "pythonImplementation": "CPython",
+      "pythonVersion": "3.9.6",
+      "requirementsPath": "tools/requirements-spike-almond-shell.txt",
+      "requirementsSha256": "5a9b0674e2499c252bdbf975bd3dfe4c09471dcebaf194e423191f3aeb4a070a",
+      "trimeshVersion": "4.12.2"
+    }
+  },
+  "truthLabel": "SIMULATED ALMOND SHELL · 预览/算法验证资产 · 非制造就绪"
+}

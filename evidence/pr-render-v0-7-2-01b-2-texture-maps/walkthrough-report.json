@@ -1,0 +1,36 @@
+{
+  "designId": "design_51ea9598-7d63-48d1-bf86-11f82ca0451b",
+  "authoredRevision": 12,
+  "assetSet": {
+    "id": "render.v0.7.2.aurora-almond-materials",
+    "revision": "1"
+  },
+  "materialState": {
+    "projection": "material-projection-v1",
+    "hash": "9f0795add754ad4d",
+    "mode": "gradient",
+    "fidelity": "approximate",
+    "uv": "nail-local-v1-tip-to-root",
+    "evidence": "simulated-not-manufacturing",
+    "surfaceHash": "62fd40109fc426e50644d0db02405f8cd3ac181cf63eefcdf333d8a820cff821",
+    "textureAssetSet": "render.texture-set.aurora-almond-v2",
+    "textureAssetRevision": "1.0.0-simulated"
+  },
+  "projectedContent": [
+    "gradient background",
+    "brush stroke",
+    "vector shape",
+    "french edge",
+    "masked ink bloom",
+    "decal image",
+    "normal map",
+    "roughness map",
+    "visual height map"
+  ],
+  "writerZero": true,
+  "fallbackWriterZero": true,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "fallbackConsoleErrors": [],
+  "fallbackPageErrors": []
+}

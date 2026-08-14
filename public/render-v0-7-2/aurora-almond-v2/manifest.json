@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "render-texture-asset-set-v1",
+  "assetSetId": "render.texture-set.aurora-almond-v2",
+  "revision": "1.0.0-simulated",
+  "status": "SIMULATED_RENDER_ASSET_NOT_MATERIAL_VALIDATED",
+  "materialRef": {
+    "materialId": "material.magnetic-gel",
+    "revision": "1"
+  },
+  "uvContract": "nail-local-v1-tip-to-root",
+  "generator": {
+    "path": "tools/generate-render-v0-7-2-texture-assets.mjs",
+    "sha256": "d9d97ed66cba16792a44febc3b7c3b82c4977f55ea13b31818d0cc719c0094f2"
+  },
+  "maps": {
+    "decal": {
+      "assetId": "render.texture.aurora-almond-v2.decal",
+      "revision": "1",
+      "path": "public/render-v0-7-2/aurora-almond-v2/aurora-petal-decal.png",
+      "runtimeUrl": "/render-v0-7-2/aurora-almond-v2/aurora-petal-decal.png",
+      "mimeType": "image/png",
+      "widthPx": 256,
+      "heightPx": 410,
+      "sha256": "4f39198404c6cc86e4aa9c1339941b4a4afdf7c2f41c42a0cd9398798fe1529f",
+      "bytes": 15926,
+      "colorSpace": "srgb",
+      "alphaMode": "straight",
+      "channel": "rgba"
+    },
+    "normal": {
+      "assetId": "render.texture.aurora-almond-v2.normal",
+      "revision": "1",
+      "path": "public/render-v0-7-2/aurora-almond-v2/aurora-petal-normal.png",
+      "runtimeUrl": "/render-v0-7-2/aurora-almond-v2/aurora-petal-normal.png",
+      "mimeType": "image/png",
+      "widthPx": 256,
+      "heightPx": 410,
+      "sha256": "b595d9294378e170a33e1b1ed43b23aba8ad3400afbd4e67110708628726c815",
+      "bytes": 27354,
+      "colorSpace": "linear",
+      "alphaMode": "opaque",
+      "channel": "tangent-space-rgb",
+      "convention": "OpenGL +Y"
+    },
+    "roughness": {
+      "assetId": "render.texture.aurora-almond-v2.roughness",
+      "revision": "1",
+      "path": "public/render-v0-7-2/aurora-almond-v2/aurora-petal-roughness.png",
+      "runtimeUrl": "/render-v0-7-2/aurora-almond-v2/aurora-petal-roughness.png",
+      "mimeType": "image/png",
+      "widthPx": 256,
+      "heightPx": 410,
+      "sha256": "fd6403439872dd846e7df812437ed854b2aac02b72712aac3964fac485370808",
+      "bytes": 12899,
+      "colorSpace": "linear",
+      "alphaMode": "opaque",
+      "channel": "r"
+    },
+    "height": {
+      "assetId": "render.texture.aurora-almond-v2.height",
+      "revision": "1",
+      "path": "public/render-v0-7-2/aurora-almond-v2/aurora-petal-height.png",
+      "runtimeUrl": "/render-v0-7-2/aurora-almond-v2/aurora-petal-height.png",
+      "mimeType": "image/png",
+      "widthPx": 256,
+      "heightPx": 410,
+      "sha256": "650c055aac48688a68896a3357c97ad91eed79d9b7f7a26a7abc3785aea4744a",
+      "bytes": 9824,
+      "colorSpace": "linear",
+      "alphaMode": "opaque",
+      "channel": "r",
+      "heightScaleMm": 0.18
+    }
+  },
+  "limitations": [
+    "Procedural screen-space render assets only.",
+    "No measured gel, optical, curing, adhesion, fit, strength, print, or manufacturing evidence.",
+    "Height is consumed as visual bump, not mesh displacement or manufacturing height."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "profileId": "almond-medium-elegant-v1",
+  "status": "PRODUCT_VISUAL_SIGNED_OFF_NOT_PROMOTED",
+  "units": "mm",
+  "symmetryAxis": "x=0",
+  "coordinateSystem": {
+    "x": "left_to_right",
+    "y": "tip_negative_to_root_positive"
+  },
+  "reference": {
+    "shapeId": "almond",
+    "lengthId": "medium",
+    "signedSilhouette": "material-library/shapes/silhouettes/almond_medium.svg",
+    "preserveNominalLengthMm": 18,
+    "preserveMaximumWidthMm": 11
+  },
+  "rightHalfFromRootToTip": [
+    {
+      "start": [0, 1.1],
+      "control1": [1.9, 1.1],
+      "control2": [4.0, 0.48],
+      "end": [4.45, -0.05],
+      "role": "soft_cuticle_arc"
+    },
+    {
+      "start": [4.45, -0.05],
+      "control1": [4.9, -0.58],
+      "control2": [5.5, -2.45],
+      "end": [5.5, -4.15],
+      "role": "rounded_shoulder_to_max_width"
+    },
+    {
+      "start": [5.5, -4.15],
+      "control1": [5.5, -5.95],
+      "control2": [5.2, -8.75],
+      "end": [4.8, -10.45],
+      "role": "early_organic_taper"
+    },
+    {
+      "start": [4.8, -10.45],
+      "control1": [4.4, -12.15],
+      "control2": [1.15, -18.0],
+      "end": [0, -18.0],
+      "role": "rounded_tip_cap"
+    }
+  ],
+  "acceptance": {
+    "rootArcRiseMm": [1.0, 1.3],
+    "rootShoulderHalfWidthMm": [4.3, 4.6],
+    "maximumWidthPositionFromRootRatio": [0.2, 0.3],
+    "postMaximumTaper": "strictly_non_increasing",
+    "minimumJoinContinuity": "C1",
+    "tip": "rounded_cap_without_row_fan",
+    "manufacturingValidated": false
+  }
+}
