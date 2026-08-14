@@ -1,0 +1,153 @@
+{
+  "selectedFingers": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+  ],
+  "cameraMetrics": {
+    "surface": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "oblique_left": {
+      "fit": "bounds-aware",
+      "coverage": 0.8445,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "oblique_right": {
+      "fit": "bounds-aware",
+      "coverage": 0.8445,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "side_profile": {
+      "fit": "bounds-aware",
+      "coverage": 0.8541,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "tip_grazing": {
+      "fit": "bounds-aware",
+      "coverage": 0.4975,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    }
+  },
+  "desktopMetrics": {
+    "L1": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "L2": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "L3": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "L4": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "L5": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "R1": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "R2": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "R3": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "R4": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    },
+    "R5": {
+      "fit": "bounds-aware",
+      "coverage": 0.6393,
+      "hostWidth": 451.796875,
+      "hostHeight": 522,
+      "canvasWidth": 450,
+      "canvasHeight": 520
+    }
+  },
+  "mobileMetrics": {
+    "fit": "bounds-aware",
+    "coverage": 0.5525,
+    "hostWidth": 366,
+    "hostHeight": 489.515625,
+    "canvasWidth": 364,
+    "canvasHeight": 488
+  },
+  "mobileLayout": {
+    "bodyOverflow": 0,
+    "minimumTarget": 44
+  },
+  "writerZero": true,
+  "consoleErrors": [],
+  "pageErrors": []
+}

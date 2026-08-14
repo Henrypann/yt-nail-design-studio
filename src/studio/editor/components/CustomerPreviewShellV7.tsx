@@ -155,6 +155,27 @@ export function CustomerPreviewShellV7({
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         <main className="min-h-0 min-w-0 flex-1 overflow-auto p-3 sm:p-5" aria-label="顾客预览画布">
           {loadWarnings.length > 0 && <div className="mb-3 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-xs text-warning" role="status">旧设计已按兼容 reader 打开：{loadWarnings.join('；')}</div>}
+          {mode === 'single' && (
+            <nav className="sticky top-0 z-20 mx-auto mb-3 flex w-fit max-w-full gap-1 overflow-x-auto rounded-2xl border border-white bg-white/90 p-1.5 shadow-sm backdrop-blur" aria-label="单指聚焦切换" data-testid="customer-single-finger-switcher">
+              {FINGER_CODES.map((finger) => {
+                const identity = EDITOR_FINGER_IDENTITY_V7[finger];
+                return (
+                  <button
+                    key={finger}
+                    type="button"
+                    data-finger={finger}
+                    aria-label={`切换到${fingerDisplayNameV7(finger)} ${finger}`}
+                    aria-pressed={selectedFinger === finger}
+                    onClick={() => setSelectedFinger(finger)}
+                    className={cx('min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-nano font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary', selectedFinger === finger ? 'bg-gray-900 text-white' : 'bg-surface-soft text-body hover:bg-primary-soft hover:text-primary')}
+                  >
+                    <span className="block font-mono">{finger}</span>
+                    <span className="block whitespace-nowrap text-[inherit] font-normal opacity-80">{identity.name}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          )}
           {mode === 'set' ? (
             <div className="mx-auto flex min-h-full max-w-7xl flex-col justify-center gap-4">
               <div className="text-center"><p className="text-nano font-semibold uppercase tracking-[0.16em] text-primary">Customer set preview</p><h1 className="mt-1 text-xl font-semibold text-gray-900">十指整体方案</h1><p className="mt-1 text-xs text-gray-500">点击任意指甲查看细节；可在结构化 2D 与模拟组合之间比较。</p></div>

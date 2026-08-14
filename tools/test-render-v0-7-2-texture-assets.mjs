@@ -60,6 +60,13 @@ inactive.steps.forEach((step) => {
 });
 assert.equal(resolveRenderTextureAssetSetV1(inactive), null, 'skipped material step must not project maps');
 
+const { FOUR_LOOK_SET_AUTHORITIES_V0_7_2 } = await import('../src/integration/community-studio/v0-7-2-four-look-sets.ts');
+for (const authority of FOUR_LOOK_SET_AUTHORITIES_V0_7_2) {
+  const resolvedLook = resolveRenderTextureAssetSetV1(authority.doc.nails.L1);
+  assert.ok(resolvedLook, `${authority.definition.id} must resolve texture asset set`);
+  assert.equal(resolvedLook.assetSetId, `render.texture-set.${authority.definition.id}.v1`);
+}
+
 const runtime = await readFile(new URL('../src/studio/rendering/v0-7-2/SingleNailPbrPreviewV072.tsx', import.meta.url), 'utf8');
 assert.match(runtime, /render_texture_integrity_failed/);
 assert.match(runtime, /normalMap:/);

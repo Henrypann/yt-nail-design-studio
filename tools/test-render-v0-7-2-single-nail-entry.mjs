@@ -52,6 +52,9 @@ assert.match(shell, /lazy\(\(\) => import\('@\/studio\/rendering\/v0-7-2\/Single
 assert.match(shell, /presentation === 'composite'/);
 assert.match(shell, /mode === 'single' && presentation === 'composite'/);
 assert.match(shell, /v7-svg-composite/);
+assert.match(shell, /data-testid="customer-single-finger-switcher"/);
+assert.match(shell, /FINGER_CODES\.map\(\(finger\)/);
+assert.match(shell, /aria-label={`切换到\$\{fingerDisplayNameV7\(finger\)\} \$\{finger\}`}/);
 assert.match(runtime, /ACESFilmicToneMapping/);
 assert.match(runtime, /MeshPhysicalMaterial/);
 assert.match(runtime, /CanvasTexture/);
@@ -59,6 +62,10 @@ assert.match(runtime, /SRGBColorSpace/);
 assert.match(runtime, /loadPromotedGeometryV2/);
 assert.match(runtime, /resolvePromotedGeometryV2/);
 assert.match(runtime, /data-geometry-registry-entry/);
+assert.match(runtime, /fitCameraToPromotedNailV072/);
+assert.match(runtime, /data-testid="single-nail-pbr-canvas-host"/);
+assert.match(runtime, /cameraFramingSafe/);
+assert.match(runtime, /Math\.min\(verticalFov, horizontalFov\)/);
 assert.doesNotMatch(runtime, /createSingleNailPreviewSurfaceV1|3\.2 \+ decoration\.heightMm/,
   'promoted runtime must not reuse the procedural slab or fixed-Z decoration placement');
 assert.match(runtime, /single-nail-pbr-fallback/);

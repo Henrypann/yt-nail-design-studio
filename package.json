@@ -36,6 +36,7 @@
     "test:render-v0-7-2-material-projection": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-render-v0-7-2-material-projection.mjs",
     "test:render-v0-7-2-material-projection:e2e": "node tools/walkthrough-render-v0-7-2-material-projection.mjs",
     "test:render-v0-7-2-single-nail:e2e": "node tools/walkthrough-render-v0-7-2-single-nail.mjs",
+    "test:render-v0-7-2-single-nail-navigation:e2e": "node tools/walkthrough-render-v0-7-2-single-nail-navigation.mjs",
     "test:community-content-states": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-content-states.mjs",
     "test:community-content-states:e2e": "node tools/e2e-community-content-states.mjs",
     "test:community-intent": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-intent.mjs",

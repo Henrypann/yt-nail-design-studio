@@ -80,6 +80,52 @@ for (const testCase of cases) {
   await dimensionalCanvas.waitFor();
   assert.ok((await dimensionalCanvas.textContent())?.trim().length > 0, `${testCase.id} dimensional preview is visible`);
   await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-editor-dimensional.png`), fullPage: true });
+
+  // Stage 3: Customer Preview & 3D PBR View
+  await page.locator('[data-stage-id="customer"]').click();
+  const customerPreview = page.locator('[data-testid="customer-preview-v7"]');
+  await customerPreview.waitFor();
+  await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-customer-overview.png`), fullPage: true });
+
+  await page.getByRole('button', { name: '模拟 3D' }).click();
+  await page.getByRole('button', { name: '单指聚焦' }).click();
+  const pbr = page.locator('[data-testid="single-nail-pbr-v0-7-2"]');
+  await pbr.waitFor();
+
+  const switcher = page.locator('[data-testid="customer-single-finger-switcher"]');
+  if (await switcher.count()) {
+    // Switch to L1 and verify PBR rendering
+    await switcher.locator('button[data-finger="L1"]').click();
+    await page.waitForFunction(() => {
+      const root = document.querySelector('[data-testid="customer-preview-v7"]');
+      const runtime = document.querySelector('[data-testid="single-nail-pbr-v0-7-2"]');
+      const host = document.querySelector('[data-testid="single-nail-pbr-canvas-host"]');
+      const canvas = host?.querySelector('canvas');
+      return root?.getAttribute('data-selected-finger') === 'L1'
+        && runtime?.getAttribute('data-runtime-status') === 'ready'
+        && host?.getAttribute('data-camera-framing-safe') === 'true'
+        && Boolean(canvas && canvas.getAttribute('aria-label')?.startsWith('L1 ')
+          && canvas.getBoundingClientRect().width > 0 && canvas.getBoundingClientRect().height > 0);
+    });
+    await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-pbr-3d-L1.png`), fullPage: true });
+
+    // Switch to accent finger (R3 for crimson-reliquary, R4 for other looks) and verify 3D accessories
+    const targetFinger = testCase.id === 'crimson-reliquary' ? 'R3' : 'R4';
+    await switcher.locator(`button[data-finger="${targetFinger}"]`).click();
+    await page.waitForFunction((finger) => {
+      const root = document.querySelector('[data-testid="customer-preview-v7"]');
+      const runtime = document.querySelector('[data-testid="single-nail-pbr-v0-7-2"]');
+      const host = document.querySelector('[data-testid="single-nail-pbr-canvas-host"]');
+      const canvas = host?.querySelector('canvas');
+      return root?.getAttribute('data-selected-finger') === finger
+        && runtime?.getAttribute('data-runtime-status') === 'ready'
+        && host?.getAttribute('data-camera-framing-safe') === 'true'
+        && Boolean(canvas && canvas.getAttribute('aria-label')?.startsWith(`${finger} `)
+          && canvas.getBoundingClientRect().width > 0 && canvas.getBoundingClientRect().height > 0);
+    }, targetFinger);
+    await page.screenshot({ path: path.join(screenshotRoot, `${testCase.id}-${testCase.width}-pbr-3d-${targetFinger}.png`), fullPage: true });
+  }
+
   assert.deepEqual(errors, []);
   report.push({ lookId, viewport: `${testCase.width}x${testCase.height}`, canonical: stored, errors });
   await fs.writeFile(path.join(evidenceRoot, 'walkthrough-report.json'), `${JSON.stringify({ baseURL, report }, null, 2)}\n`);
