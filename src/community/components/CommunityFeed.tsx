@@ -107,6 +107,13 @@ export function CommunityFeed({
     (next: DiscoveryQueryStateV2) => {
       const effective = lockedSource ? { ...next, source: lockedSource } : next;
       const params = new URLSearchParams(serializeDiscoveryQueryV2(effective));
+      // TAX-03: 不兼容条件原样保留（含重复值）；显式移除是唯一清除路径。
+      const issueKeys = new Set(effective.incompatible.map((issue) => issue.key));
+      for (const key of issueKeys) {
+        for (const value of searchParams.getAll(key)) {
+          params.append(key, value);
+        }
+      }
       // 只保留显式产品上下文 entry / return_to；筛选/搜索状态本身就是 URL 真源。
       for (const key of ['entry', 'return_to'] as const) {
         const v = searchParams.get(key);

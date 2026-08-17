@@ -461,11 +461,18 @@ const defaultState = () =>
 
   const feed = read('src/community/components/CommunityFeed.tsx');
   assert.match(feed, /loadLookReadModels/, 'feed consumes look read models');
-  assert.match(feed, /parseExploreState/, 'feed parses URL explore state');
-  assert.match(feed, /exploreStateToSearchParams/, 'feed serializes URL state');
+  assert.match(feed, /parseDiscoveryQueryV2/, 'feed parses URL via discovery-query v2');
+  assert.match(feed, /serializeDiscoveryQueryV2/, 'feed serializes URL via discovery-query v2');
+  assert.match(feed, /executeDiscoveryQueryV2/, 'feed runs the v2 pure pipeline');
+  assert.match(feed, /CommunityDiscoveryRuntimeFilters/, 'feed renders v2 runtime filters');
+  assert.match(feed, /community-incompatible-filters/, 'feed surfaces incompatible conditions');
+  assert.match(feed, /\.getAll\(/, 'feed preserves raw URL values with getAll');
+  assert.match(feed, /\.append\(/, 'feed re-appends raw incompatible values');
   assert.match(feed, /CommunityLookCard/, 'feed renders look cards');
   assert.match(feed, /CommunityCreatorCard/, 'feed renders creator cards');
   assert.match(feed, /community-feed-empty/, 'empty state kept');
+  assert.doesNotMatch(feed, /filterLookReadModels/, 'feed never uses the legacy V1 filter');
+  assert.doesNotMatch(feed, /<CommunityFilters/, 'feed never renders the legacy filters panel');
   assert.doesNotMatch(feed, /from ['"]three|EditorHqPreview/, 'no Three.js in feed');
   assert.doesNotMatch(feed, /localStorage|useToast/, 'no fake persistence/toast in feed');
 
