@@ -274,6 +274,9 @@ assert.equal(parseCreatorPublicationStoreV2(gateStore).discovery['look.v2.gate']
     // (a) Stored V2 envelope with PENDING rights: structurally valid store,
     // blocked at the read-time governance gate before any projection.
     const pendingGate = structuredClone(gateStore);
+    const pendingGateLook = pendingGate.looks.find((look) => look.lookId === 'look.v2.gate');
+    assert.ok(pendingGateLook, 'gate store must contain exactly look.v2.gate');
+    pendingGateLook.creatorProfileId = 'profile.local-demo.creator';
     pendingGate.discovery['look.v2.gate'].discovery.rights.status = 'PENDING';
     assert.ok(parseCreatorPublicationStoreV2(pendingGate), 'PENDING-rights V2 store stays structurally valid');
     writeEnvelope(StorageKeys.creatorPublications, pendingGate);
@@ -288,6 +291,9 @@ assert.equal(parseCreatorPublicationStoreV2(gateStore).discovery['look.v2.gate']
     // state (no overall style): creator content may never use that exception,
     // so the read gate blocks with a legacy-exception reason.
     const reviewGate = structuredClone(gateStore);
+    const reviewGateLook = reviewGate.looks.find((look) => look.lookId === 'look.v2.gate');
+    assert.ok(reviewGateLook, 'gate store must contain exactly look.v2.gate');
+    reviewGateLook.creatorProfileId = 'profile.local-demo.creator';
     const reviewDiscovery = reviewGate.discovery['look.v2.gate'].discovery;
     reviewDiscovery.styleIds = [];
     reviewDiscovery.techniqueIds = ['technique:french'];
