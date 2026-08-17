@@ -235,7 +235,7 @@ async function scenarioCompatibleHistory(page, context, width) {
 
   // Open the runtime filter drawer and select length:short.
   await page.getByTestId('community-runtime-filter-toggle').click();
-  await page.getByTestId('community-runtime-filter-panel').waitFor();
+  await page.locator('#community-runtime-filter-panel').waitFor();
   await page.getByTestId('runtime-filter-length:short').click();
   await waitForSearchParams(page, { length: ['length:short'] });
   const shortUrl = page.url();
@@ -266,7 +266,7 @@ async function scenarioCompatibleHistory(page, context, width) {
     // The fresh shared page loads with the auxiliary filter drawer closed,
     // so open it before reading the pressed state of the length filter.
     await shared.getByTestId('community-runtime-filter-toggle').click();
-    await shared.getByTestId('community-runtime-filter-panel').waitFor();
+    await shared.locator('#community-runtime-filter-panel').waitFor();
     const pressed = await shared
       .getByTestId('runtime-filter-length:short')
       .getAttribute('aria-pressed');
@@ -278,7 +278,7 @@ async function scenarioCompatibleHistory(page, context, width) {
   // Same-dimension OR: add length:medium → one length param with both ids,
   // count >= short-only count.
   await page.getByTestId('community-runtime-filter-toggle').click();
-  await page.getByTestId('community-runtime-filter-panel').waitFor();
+  await page.locator('#community-runtime-filter-panel').waitFor();
   await page.getByTestId('runtime-filter-length:medium').click();
   await waitForSearchParams(page, { length: ['length:medium,length:short'] });
   const orCount = await readCount(page);
