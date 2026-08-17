@@ -410,9 +410,52 @@ test('french aliases behave like ST-02 and never produce a sixth browse value', 
     );
     assert.equal(result.state.browse, 'recommended');
   }
-  const back = parseUrl(serializeDiscoveryQueryV2(parseUrl('style=ST-02').state));
-  expectCompatible(back);
-  assert.deepEqual(back.state, parseUrl('style=ST-02').state);
+  // Round-trip: the compatibility marker is parse-time provenance for an old
+  // URL and is intentionally removable. Canonical serialization drops it, so a
+  // reparsed canonical URL must have empty markers while preserving the
+  // browse/topic/techniqueIds and staying byte-stable.
+  const first = parseUrl('style=ST-02');
+  assert.equal(first.state.markers.length, 1, 'marker present before round-trip');
+  const canonical = serializeDiscoveryQueryV2(first.state);
+  assert.equal(canonical, 'technique=technique%3Afrench');
+  const back = parseUrl(canonical);
+  expectCompatible(back, 'reparsed canonical french');
+  assert.deepEqual(back.state.markers, [], 'markers must not persist into canonical state');
+  assert.equal(back.state.browse, first.state.browse);
+  assert.equal(back.state.topic, first.state.topic);
+  assert.deepEqual(back.state.techniqueIds, first.state.techniqueIds);
+  assert.equal(
+    serializeDiscoveryQueryV2(back.state),
+    canonical,
+    'french round-trip serialization is byte-stable',
+  );
+});
+
+test('entry and return_to are passthrough context keys, not discovery filters', () => {
+  const passthrough = 'entry=wizard&return_to=%2Fstudio%2Fdesign%2Fnew%3Ffresh%3D1';
+
+  // passthrough keys + a legacy style still parse compatibly, produce the
+  // french marker, and never surface as unknown-key issues.
+  const result = parseUrl(`${passthrough}&style=ST-02`);
+  expectCompatible(result, 'passthrough + style=ST-02');
+  assert.deepEqual(result.state.incompatible, []);
+  assert.equal(result.state.browse, 'recommended');
+  assert.equal(result.state.topic, 'for-you');
+  assert.deepEqual(result.state.techniqueIds, ['technique:french']);
+  assert.equal(result.state.markers.length, 1);
+  assert.equal(result.state.markers[0].code, 'compat-style-french');
+  // the serializer omits the passthrough keys: only the canonical technique remains
+  assert.equal(serializeDiscoveryQueryV2(result.state), 'technique=technique%3Afrench');
+
+  // passthrough keys alone carry no discovery filter and serialize empty
+  const bare = parseUrl(passthrough);
+  expectCompatible(bare, 'passthrough only');
+  assert.deepEqual(bare.state, createDefaultDiscoveryQueryState());
+  assert.equal(serializeDiscoveryQueryV2(bare.state), '');
+
+  // unknown keys (e.g. foo) remain incompatible even alongside passthrough keys
+  const foo = parseUrl(`${passthrough}&foo=bar`);
+  expectIncompatible(foo, 'unknown-key', 'unknown foo alongside passthrough');
 });
 
 test('other legacy ST ids resolve via taxonomy alias to a style browse', () => {

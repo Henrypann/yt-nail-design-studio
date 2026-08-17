@@ -126,6 +126,19 @@ export const LOSSY_LEGACY_PARAMS = [
 ] as const;
 
 /**
+ * Known passthrough context keys, NOT discovery filters.
+ *
+ * `entry` and `return_to` are product-navigation bookkeeping that CommunityFeed
+ * preserves and re-attaches verbatim around a discovery query (e.g. the Studio
+ * "new design" flow). They carry no taxonomy meaning, so `parseDiscoveryQueryV2`
+ * must tolerate them without recording incompatible issues, and
+ * `serializeDiscoveryQueryV2` must still omit them (their raw values live on
+ * the CommunityFeed envelope, not in the discovery filter state). Any OTHER
+ * unknown key remains incompatible.
+ */
+export const DISCOVERY_PASSTHROUGH_PARAMS = ['entry', 'return_to'] as const;
+
+/**
  * Bare legacy shape values → canonical SHAPE tag id. `coffin` intentionally
  * maps to `shape:coffin-ballerina` (the canonical v2 id).
  */
@@ -543,6 +556,7 @@ export function parseDiscoveryQueryV2(
     'style',
     'shape',
     ...LOSSY_LEGACY_PARAMS,
+    ...DISCOVERY_PASSTHROUGH_PARAMS,
   ]);
   const unknownKeys = [...new Set(params.keys())]
     .filter((key) => !knownKeys.has(key))
