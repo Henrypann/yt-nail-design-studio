@@ -1,0 +1,649 @@
+{
+  "schemaVersion": 2,
+  "contractVersion": "COMM-v0.7.2-TAX-01",
+  "defaultLocale": "zh-CN",
+  "description": "Strict Community browse/tag taxonomy per Community_标签与Studio_法式工具_PRD_2026-08-14 (v0.7.2). English labels are proposed translations; zh-CN labels follow the PRD verbatim. schemaVersion 1 taxonomy.json remains compatibility data and is unchanged.",
+  "browse": {
+    "primary": [
+      {
+        "id": "recommended",
+        "kind": "channel",
+        "labels": { "zh-CN": "为你推荐", "en": "Recommended" },
+        "defaultSubchannelId": "for-you"
+      },
+      {
+        "id": "shape",
+        "kind": "dimension",
+        "dimension": "SHAPE",
+        "labels": { "zh-CN": "甲型", "en": "Shape" }
+      },
+      {
+        "id": "style",
+        "kind": "dimension",
+        "dimension": "STYLE",
+        "labels": { "zh-CN": "风格", "en": "Style" }
+      },
+      {
+        "id": "scene",
+        "kind": "dimension",
+        "dimension": "SCENE",
+        "labels": { "zh-CN": "场景", "en": "Scene" }
+      },
+      {
+        "id": "theme",
+        "kind": "dimension",
+        "dimension": "THEME",
+        "labels": { "zh-CN": "主题", "en": "Theme" }
+      }
+    ],
+    "recommendationChannels": [
+      {
+        "id": "for-you",
+        "labels": { "zh-CN": "为你推荐", "en": "For You" },
+        "isDefault": true
+      },
+      {
+        "id": "trending",
+        "labels": { "zh-CN": "当前趋势", "en": "Trending" }
+      },
+      {
+        "id": "new",
+        "labels": { "zh-CN": "最新发布", "en": "New" }
+      },
+      {
+        "id": "editorial",
+        "labels": { "zh-CN": "编辑精选", "en": "Editorial" }
+      },
+      {
+        "id": "following",
+        "labels": { "zh-CN": "关注新作", "en": "Following" },
+        "requiresRelationshipProvider": true
+      },
+      {
+        "id": "makeable",
+        "labels": { "zh-CN": "当前可制作", "en": "Makeable" }
+      },
+      {
+        "id": "dimensional",
+        "labels": { "zh-CN": "立体复杂款", "en": "Dimensional" }
+      },
+      {
+        "id": "emerging-creator",
+        "labels": { "zh-CN": "新锐创作者", "en": "Emerging Creators" }
+      },
+      {
+        "id": "collections",
+        "labels": { "zh-CN": "主题合集", "en": "Collections" }
+      }
+    ]
+  },
+  "dimensions": {
+    "STYLE": {
+      "tags": [
+        {
+          "id": "style:minimal-clean",
+          "labels": { "zh-CN": "极简清爽", "en": "Minimal Clean" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-01", "极简/轻奢", "Minimal / Quiet Luxury"]
+        },
+        {
+          "id": "style:classic-refined",
+          "labels": { "zh-CN": "经典精致", "en": "Classic Refined" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:quiet-luxury",
+          "labels": { "zh-CN": "静奢", "en": "Quiet Luxury" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:soft-delicate",
+          "labels": { "zh-CN": "柔和精致", "en": "Soft Delicate" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-03", "浪漫", "Romantic"]
+        },
+        {
+          "id": "style:glamorous-sparkling",
+          "labels": { "zh-CN": "闪耀华丽", "en": "Glamorous Sparkling" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-10", "华丽/3D", "Ornate / 3D"]
+        },
+        {
+          "id": "style:bold-ornate",
+          "labels": { "zh-CN": "大胆繁复", "en": "Bold Ornate" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:fierce-sexy",
+          "labels": { "zh-CN": "强势辣感", "en": "Fierce Sexy" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:bow-ballerina",
+          "labels": { "zh-CN": "蝴蝶结芭蕾风", "en": "Bow Ballerina" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:preppy",
+          "labels": { "zh-CN": "学院派", "en": "Preppy" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:y2k",
+          "labels": { "zh-CN": "千禧一代", "en": "Y2K" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-05", "Y2K/复古/街头", "Y2K / Retro / Street"]
+        },
+        {
+          "id": "style:retro-nostalgic",
+          "labels": { "zh-CN": "复古怀旧", "en": "Retro Nostalgic" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:gothic-dark",
+          "labels": { "zh-CN": "哥特暗黑", "en": "Gothic Dark" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-06", "哥特/朋克", "Gothic / Punk"]
+        },
+        {
+          "id": "style:punk-grunge",
+          "labels": { "zh-CN": "朋克/垃圾摇滚", "en": "Punk / Grunge" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:alt-emo",
+          "labels": { "zh-CN": "另类/情绪摇滚", "en": "Alt / Emo" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:boho-natural",
+          "labels": { "zh-CN": "波西米亚自然感", "en": "Boho Natural" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-08", "自然/海洋", "Nature / Ocean"]
+        },
+        {
+          "id": "style:western",
+          "labels": { "zh-CN": "西部牛仔", "en": "Western" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:street",
+          "labels": { "zh-CN": "街头潮流", "en": "Street" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:cute-pop",
+          "labels": { "zh-CN": "可爱流行", "en": "Cute Pop" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-04", "可爱", "Cute"]
+        },
+        {
+          "id": "style:futuristic",
+          "labels": { "zh-CN": "未来感", "en": "Futuristic" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-07", "赛博/机甲", "Cyber / Mech"]
+        },
+        {
+          "id": "style:editorial-avant-garde",
+          "labels": { "zh-CN": "编辑前卫", "en": "Editorial Avant-Garde" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "style:artistic-abstract",
+          "labels": { "zh-CN": "艺术抽象", "en": "Artistic Abstract" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-09", "艺术/抽象", "Art / Abstract"]
+        },
+        {
+          "id": "style:whimsical-pastoral",
+          "labels": { "zh-CN": "奇趣田园", "en": "Whimsical Pastoral" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "SHAPE": {
+      "tags": [
+        {
+          "id": "shape:almond",
+          "labels": { "zh-CN": "杏仁甲", "en": "Almond" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:oval",
+          "labels": { "zh-CN": "椭圆甲", "en": "Oval" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:round",
+          "labels": { "zh-CN": "圆甲", "en": "Round" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:square",
+          "labels": { "zh-CN": "方甲", "en": "Square" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:squoval",
+          "labels": { "zh-CN": "方圆甲", "en": "Squoval" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:tapered-square",
+          "labels": { "zh-CN": "收窄方甲", "en": "Tapered Square" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:coffin-ballerina",
+          "labels": { "zh-CN": "棺材/芭蕾甲", "en": "Coffin / Ballerina" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:stiletto",
+          "labels": { "zh-CN": "水滴形尖甲", "en": "Stiletto" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "shape:special",
+          "labels": { "zh-CN": "异形甲", "en": "Unique Shape" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "SCENE": {
+      "tags": [
+        {
+          "id": "scene:daily",
+          "labels": { "zh-CN": "日常", "en": "Daily" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:work-commute",
+          "labels": { "zh-CN": "工作通勤", "en": "Work / Commute" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:date",
+          "labels": { "zh-CN": "约会", "en": "Date" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:bridal",
+          "labels": { "zh-CN": "新娘", "en": "Bridal" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:wedding-guest",
+          "labels": { "zh-CN": "婚礼宾客", "en": "Wedding Guest" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:prom-homecoming",
+          "labels": { "zh-CN": "舞会返校季", "en": "Prom / Homecoming" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:graduation",
+          "labels": { "zh-CN": "毕业季", "en": "Graduation" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:travel-vacation",
+          "labels": { "zh-CN": "旅行度假", "en": "Travel / Vacation" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:party-nightlife",
+          "labels": { "zh-CN": "派对夜生活", "en": "Party / Nightlife" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:music-festival",
+          "labels": { "zh-CN": "音乐节", "en": "Music Festival" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:concert-fandom",
+          "labels": { "zh-CN": "演唱会粉丝活动", "en": "Concert / Fandom" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:formal-dinner",
+          "labels": { "zh-CN": "正式晚宴", "en": "Formal Dinner" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:content-shooting",
+          "labels": { "zh-CN": "内容拍摄", "en": "Content Shooting" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:birthday",
+          "labels": { "zh-CN": "生日", "en": "Birthday" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:festival-celebration",
+          "labels": { "zh-CN": "节日庆典", "en": "Festival Celebration" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:halloween",
+          "labels": { "zh-CN": "万圣节", "en": "Halloween" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:pride",
+          "labels": { "zh-CN": "骄傲月", "en": "Pride" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "scene:gift-custom",
+          "labels": { "zh-CN": "礼物定制", "en": "Gift / Custom" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "THEME": {
+      "tags": [
+        {
+          "id": "theme:art-museum",
+          "labels": { "zh-CN": "艺术与博物馆", "en": "Art & Museum" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:floral-plants",
+          "labels": { "zh-CN": "花卉植物", "en": "Floral & Plants" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:butterfly-insects",
+          "labels": { "zh-CN": "蝴蝶昆虫", "en": "Butterfly & Insects" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:animals-pets",
+          "labels": { "zh-CN": "动物萌宠", "en": "Animals & Pets" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:ocean-coast",
+          "labels": { "zh-CN": "海洋海岸", "en": "Ocean & Coast" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:sky-clouds",
+          "labels": { "zh-CN": "天空云朵", "en": "Sky & Clouds" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:stars-cosmos",
+          "labels": { "zh-CN": "星辰宇宙", "en": "Stars & Cosmos" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:nature-landscape",
+          "labels": { "zh-CN": "自然风景", "en": "Nature & Landscape" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:crystal-minerals",
+          "labels": { "zh-CN": "水晶矿石", "en": "Crystal & Minerals" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:food-drinks",
+          "labels": { "zh-CN": "食物饮品", "en": "Food & Drinks" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:jewelry-gems",
+          "labels": { "zh-CN": "珠宝宝石", "en": "Jewelry & Gems" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:fashion-fabrics",
+          "labels": { "zh-CN": "时装面料", "en": "Fashion & Fabrics" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:geometry-architecture",
+          "labels": { "zh-CN": "几何建筑", "en": "Geometry & Architecture" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:film-games",
+          "labels": { "zh-CN": "影视游戏", "en": "Film & Games" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:music-pop-culture",
+          "labels": { "zh-CN": "音乐流行文化", "en": "Music & Pop Culture" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:zodiac-astrology",
+          "labels": { "zh-CN": "星座占星", "en": "Zodiac & Astrology" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:myth-folklore",
+          "labels": { "zh-CN": "神话民间传说", "en": "Myth & Folklore" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:fantasy-fairytale",
+          "labels": { "zh-CN": "幻想童话", "en": "Fantasy & Fairytale" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:city-travel",
+          "labels": { "zh-CN": "城市旅行", "en": "City & Travel" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:sports-teams",
+          "labels": { "zh-CN": "体育球队", "en": "Sports & Teams" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:heritage-folk-art",
+          "labels": { "zh-CN": "文化传承与民间艺术", "en": "Heritage & Folk Art" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:festival-seasonal",
+          "labels": { "zh-CN": "节日季节", "en": "Festival & Seasonal" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "theme:brand-logos",
+          "labels": { "zh-CN": "品牌标志", "en": "Brand & Logos" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "TECHNIQUE": {
+      "tags": [
+        {
+          "id": "technique:french",
+          "labels": { "zh-CN": "法式", "en": "French" },
+          "lifecycle": "ACTIVE",
+          "aliases": ["ST-02", "法式", "French", "french", "French Tip", "法式线"]
+        }
+      ]
+    },
+    "LENGTH": {
+      "tags": [
+        {
+          "id": "length:extra-short",
+          "labels": { "zh-CN": "极短", "en": "Extra Short" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "length:short",
+          "labels": { "zh-CN": "短", "en": "Short" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "length:medium",
+          "labels": { "zh-CN": "中", "en": "Medium" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "length:long",
+          "labels": { "zh-CN": "长", "en": "Long" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "length:extra-long",
+          "labels": { "zh-CN": "特长", "en": "Extra Long" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "length:ultra-long",
+          "labels": { "zh-CN": "超长", "en": "Ultra Long" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "MAKEABILITY": {
+      "tags": [
+        {
+          "id": "makeability:machine-direct",
+          "labels": { "zh-CN": "机器可直接制作", "en": "Machine Direct" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "makeability:machine-hand-finish",
+          "labels": { "zh-CN": "机器与手工收尾", "en": "Machine + Hand Finish" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "makeability:hand-made",
+          "labels": { "zh-CN": "纯手工", "en": "Hand Made" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "makeability:dimensional-module",
+          "labels": { "zh-CN": "立体模块", "en": "Dimensional Module" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "makeability:concept-only",
+          "labels": { "zh-CN": "仅概念", "en": "Concept Only" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    },
+    "RIGHTS": {
+      "tags": [
+        {
+          "id": "rights:original",
+          "labels": { "zh-CN": "原创", "en": "Original" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "rights:licensed",
+          "labels": { "zh-CN": "已授权", "en": "Licensed" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "rights:remix-allowed",
+          "labels": { "zh-CN": "允许改编", "en": "Remix Allowed" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "rights:personal-use-only",
+          "labels": { "zh-CN": "仅限个人使用", "en": "Personal Use Only" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        },
+        {
+          "id": "rights:pending",
+          "labels": { "zh-CN": "版权待确认", "en": "Pending" },
+          "lifecycle": "ACTIVE",
+          "aliases": []
+        }
+      ]
+    }
+  },
+  "deprecatedIds": ["ST-01", "ST-02", "ST-03", "ST-04", "ST-05", "ST-06", "ST-07", "ST-08", "ST-09", "ST-10"]
+}

@@ -12,6 +12,7 @@
     "typecheck": "tsc -b --noEmit",
     "test:community-content": "node tools/validate-community-content.mjs",
     "test:community-taxonomy": "node tools/validate-community-taxonomy.mjs",
+    "test:community-taxonomy-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-taxonomy-v2.mjs",
     "test:community-official": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/validate-community-official.mjs",
     "test:community-domain": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-domain.mjs",
     "test:community-v7-1-identity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-identity.mjs",
