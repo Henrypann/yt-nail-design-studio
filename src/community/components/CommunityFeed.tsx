@@ -7,8 +7,9 @@
  *   V1 taxonomy，发现查询改用 TAX-03 的 V2 taxonomy。
  * - URL 为唯一真源：tab / q / sort / source / browse / topic / length /
  *   makeability / rights / technique 经 `parseDiscoveryQueryV2` 解析、
- *   `serializeDiscoveryQueryV2` 回写（replace），刷新/分享可恢复；只保留
- *   产品上下文 entry / return_to。
+ *   `serializeDiscoveryQueryV2` 回写；用户发起的筛选变更 push 进浏览器
+ *   历史（Back 恢复上一个可分享结果，满足刷新/返回/分享契约），刷新/分享
+ *   可恢复；只保留产品上下文 entry / return_to。
  * - 旧 legacy 条件只产生兼容标记（可逐条移除）或不兼容问题（可见 banner，
  *   逐 key 删除，绝不自动清除、绝不静默映射）。
  * - 结果由 `executeDiscoveryQueryV2` 纯管道产生（治理 → 过滤 → 排序）；
@@ -121,7 +122,9 @@ export function CommunityFeed({
         const v = searchParams.get(key);
         if (v) params.set(key, v);
       }
-      setSearchParams(params, { replace: true });
+      // TAX-03: 用户发起的变更使用 push（默认 replace:false），浏览器 Back
+      // 可恢复上一个可分享结果；URL 仍是唯一真源，不做初始自动 canonical 导航。
+      setSearchParams(params);
     },
     [lockedSource, searchParams, setSearchParams],
   );
@@ -158,9 +161,8 @@ export function CommunityFeed({
    */
   const removeIncompatibleIssue = useCallback(
     (issue: DiscoveryIncompatibleIssueV2) => {
-      setSearchParams(removeDiscoveryQueryIncompatibleIssue(searchParams, issue), {
-        replace: true,
-      });
+      // TAX-03: 显式移除同样 push，浏览器 Back 恢复移除前的原始链接/状态。
+      setSearchParams(removeDiscoveryQueryIncompatibleIssue(searchParams, issue));
     },
     [searchParams, setSearchParams],
   );
