@@ -263,6 +263,10 @@ async function scenarioCompatibleHistory(page, context, width) {
       (await readCount(shared)) === shortCount,
       `${tag}: shared URL count mismatch (${shortCount}) @ ${width}`,
     );
+    // The fresh shared page loads with the auxiliary filter drawer closed,
+    // so open it before reading the pressed state of the length filter.
+    await shared.getByTestId('community-runtime-filter-toggle').click();
+    await shared.getByTestId('community-runtime-filter-panel').waitFor();
     const pressed = await shared
       .getByTestId('runtime-filter-length:short')
       .getAttribute('aria-pressed');
