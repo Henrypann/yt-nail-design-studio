@@ -18,6 +18,14 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
   await page.getByRole('button', { name: /新建发布|New publication/ }).click();
   await page.getByTestId('creator-publish-wizard').waitFor();
   await page.getByLabel(/作品标题|Title/).fill(`Publish acceptance ${viewport.width}`);
+  // COMM-v0.7.2-TAX-02: the metadata step cannot advance until structured
+  // discovery is complete (>=1 overall style, >=1 recommended shape,
+  // non-PENDING rights) — taxonomy options carry the shared fixture labels.
+  if (!(await page.getByRole('button', { name: /下一步：可见性|Next: visibility/ }).isDisabled())) throw new Error('Next: visibility must stay disabled until structured discovery is complete');
+  await page.getByTestId('taxonomy-option-style:minimal-clean').click();
+  await page.getByTestId('taxonomy-option-shape:almond').click();
+  await page.getByTestId('taxonomy-option-rights:original').click();
+  await page.getByTestId('discovery-validation-summary').waitFor();
   await page.getByRole('button', { name: /下一步：可见性|Next: visibility/ }).click();
   const publicChoice = page.getByRole('button', { name: /PUBLIC/ });
   if (!(await publicChoice.isDisabled())) throw new Error('PUBLIC must remain disabled before exact-revision clearance');

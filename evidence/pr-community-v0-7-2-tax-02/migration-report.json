@@ -1,0 +1,782 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-TAX-02",
+  "title": "Community v0.7.2 · TAX-02 content migration report",
+  "generatedAt": "2026-08-17T00:00:00.000Z",
+  "fixtures": {
+    "taxonomy": {
+      "path": "public/community/taxonomy-v2.json",
+      "strictParse": "PASS",
+      "tagCount": 89
+    },
+    "migrationManifest": {
+      "path": "public/community/migration-manifest-v1.json",
+      "strictParse": "PASS",
+      "entryCount": 24
+    },
+    "contentIndex": {
+      "path": "public/community/content-index.json",
+      "recordCount": 18,
+      "strictCoverage": "PASS",
+      "blocked": []
+    }
+  },
+  "entries": [
+    {
+      "contentId": "cc_mercury_dew",
+      "subjectRef": "look:cc_mercury_dew",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-01",
+        "ST-10"
+      ],
+      "styles": [
+        "style:minimal-clean",
+        "style:glamorous-sparkling"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond",
+        "shape:oval"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:short",
+        "length:medium",
+        "length:long"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "Mercury Dew"
+      }
+    },
+    {
+      "contentId": "cc_petal_veil",
+      "subjectRef": "look:cc_petal_veil",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MANUAL_REVIEW",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NEEDS_STYLE_REVIEW",
+      "legacyStyleIds": [
+        "ST-02"
+      ],
+      "styles": [],
+      "techniques": [
+        "technique:french"
+      ],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium",
+        "length:long"
+      ],
+      "reviewOrBlockReason": "french NEEDS_STYLE_REVIEW exception (technique:french, empty styleIds)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "Petal Veil French"
+      }
+    },
+    {
+      "contentId": "cc_petal_pearl_bloom",
+      "subjectRef": "look:cc_petal_pearl_bloom",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MANUAL_REVIEW",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NEEDS_STYLE_REVIEW",
+      "legacyStyleIds": [
+        "ST-02",
+        "ST-10"
+      ],
+      "styles": [],
+      "techniques": [
+        "technique:french"
+      ],
+      "recommendedShapes": [
+        "shape:oval",
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium",
+        "length:long"
+      ],
+      "reviewOrBlockReason": "french NEEDS_STYLE_REVIEW exception (technique:french, empty styleIds)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "花瓣珍珠绽放"
+      }
+    },
+    {
+      "contentId": "cc_pearl_tide",
+      "subjectRef": "look:cc_pearl_tide",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-08"
+      ],
+      "styles": [
+        "style:boho-natural"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:oval"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:short",
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "Pearl Tide Shell"
+      }
+    },
+    {
+      "contentId": "cc_micro_coquette",
+      "subjectRef": "look:cc_micro_coquette",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MANUAL_REVIEW",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NEEDS_STYLE_REVIEW",
+      "legacyStyleIds": [
+        "ST-02",
+        "ST-04"
+      ],
+      "styles": [],
+      "techniques": [
+        "technique:french"
+      ],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "french NEEDS_STYLE_REVIEW exception (technique:french, empty styleIds)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "Micro Coquette"
+      }
+    },
+    {
+      "contentId": "cc_starfish_bloom",
+      "subjectRef": "look:cc_starfish_bloom",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-08",
+        "ST-10"
+      ],
+      "styles": [
+        "style:boho-natural",
+        "style:glamorous-sparkling"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond",
+        "shape:oval"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:short",
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "海星绽放"
+      }
+    },
+    {
+      "contentId": "cc_sea_glass_chrome",
+      "subjectRef": "look:cc_sea_glass_chrome",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-08",
+        "ST-01"
+      ],
+      "styles": [
+        "style:boho-natural",
+        "style:minimal-clean"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond",
+        "shape:oval"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:short",
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "海玻璃光影"
+      }
+    },
+    {
+      "contentId": "cc_sunset_aura_glaze",
+      "subjectRef": "look:cc_sunset_aura_glaze",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-09"
+      ],
+      "styles": [
+        "style:artistic-abstract"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond",
+        "shape:coffin-ballerina"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium",
+        "length:long"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "落日极光釉"
+      }
+    },
+    {
+      "contentId": "cc_liquid_chrome_statement",
+      "subjectRef": "look:cc_liquid_chrome_statement",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-05",
+        "ST-10"
+      ],
+      "styles": [
+        "style:y2k",
+        "style:glamorous-sparkling"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:coffin-ballerina",
+        "shape:stiletto"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium",
+        "length:long"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "液态铬光宣言"
+      }
+    },
+    {
+      "contentId": "cc_butter_glaze_quiet",
+      "subjectRef": "look:cc_butter_glaze_quiet",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-01"
+      ],
+      "styles": [
+        "style:minimal-clean"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond",
+        "shape:oval"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:short",
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "OFFICIAL",
+        "title": "静谧黄油釉"
+      }
+    },
+    {
+      "contentId": "cc_pugc_luna_blush",
+      "subjectRef": "look:cc_pugc_luna_blush",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-03"
+      ],
+      "styles": [
+        "style:soft-delicate"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "压花玫瑰"
+      }
+    },
+    {
+      "contentId": "cc_pugc_luna_pearl",
+      "subjectRef": "look:cc_pugc_luna_pearl",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-04"
+      ],
+      "styles": [
+        "style:cute-pop"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "粉樱甜珠"
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_circuit",
+      "subjectRef": "look:cc_pugc_kai_circuit",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-05"
+      ],
+      "styles": [
+        "style:y2k"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "铬光街头"
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_oxblood",
+      "subjectRef": "look:cc_pugc_kai_oxblood",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-06"
+      ],
+      "styles": [
+        "style:gothic-dark"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "血色锁链"
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_mirror",
+      "subjectRef": "look:cc_pugc_kai_mirror",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-07"
+      ],
+      "styles": [
+        "style:futuristic"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "青电机械"
+      }
+    },
+    {
+      "contentId": "cc_pugc_mio_gallery",
+      "subjectRef": "look:cc_pugc_mio_gallery",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-09"
+      ],
+      "styles": [
+        "style:artistic-abstract"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "画廊笔触"
+      }
+    },
+    {
+      "contentId": "cc_pugc_mio_jewel",
+      "subjectRef": "look:cc_pugc_mio_jewel",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-10"
+      ],
+      "styles": [
+        "style:glamorous-sparkling"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "PUBLISHED",
+        "publisherType": "VERIFIED_CREATOR",
+        "title": "酒红宝石"
+      }
+    },
+    {
+      "contentId": "cc_draft_internal_gate",
+      "subjectRef": "look:cc_draft_internal_gate",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "LEGACY_STYLE_MIGRATED",
+      "legacyStyleIds": [
+        "ST-01"
+      ],
+      "styles": [
+        "style:minimal-clean"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)",
+      "sourceRecord": {
+        "status": "DRAFT",
+        "publisherType": "OFFICIAL",
+        "title": "内部草稿（不得出现在 Discover）"
+      }
+    },
+    {
+      "contentId": "look.v7-1.petal-veil",
+      "subjectRef": "look:look.v7-1.petal-veil",
+      "sourceClass": "CANONICAL_DEMO",
+      "publicStatus": "MANUAL_REVIEW",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NEEDS_STYLE_REVIEW",
+      "legacyStyleIds": [],
+      "styles": [],
+      "techniques": [
+        "technique:french"
+      ],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "french NEEDS_STYLE_REVIEW exception (technique:french, empty styleIds)"
+    },
+    {
+      "contentId": "look.v0-7-2.leopard-gilded-nude",
+      "subjectRef": "look:look.v0-7-2.leopard-gilded-nude",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NONE",
+      "legacyStyleIds": [],
+      "styles": [
+        "style:glamorous-sparkling"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [
+        "scene:date",
+        "scene:party-nightlife"
+      ],
+      "themes": [
+        "theme:animals-pets",
+        "theme:jewelry-gems"
+      ],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)"
+    },
+    {
+      "contentId": "look.v0-7-2.crimson-reliquary",
+      "subjectRef": "look:look.v0-7-2.crimson-reliquary",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NONE",
+      "legacyStyleIds": [],
+      "styles": [
+        "style:gothic-dark"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [
+        "scene:formal-dinner"
+      ],
+      "themes": [
+        "theme:myth-folklore"
+      ],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)"
+    },
+    {
+      "contentId": "look.v0-7-2.ivory-lace-crystal",
+      "subjectRef": "look:look.v0-7-2.ivory-lace-crystal",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NONE",
+      "legacyStyleIds": [],
+      "styles": [
+        "style:soft-delicate"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [
+        "scene:bridal",
+        "scene:date"
+      ],
+      "themes": [
+        "theme:floral-plants",
+        "theme:jewelry-gems"
+      ],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)"
+    },
+    {
+      "contentId": "look.v0-7-2.honey-petal-glass",
+      "subjectRef": "look:look.v0-7-2.honey-petal-glass",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "publicStatus": "MIGRATED",
+      "rights": "ORIGINAL",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NONE",
+      "legacyStyleIds": [],
+      "styles": [
+        "style:soft-delicate"
+      ],
+      "techniques": [],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [
+        "scene:date"
+      ],
+      "themes": [
+        "theme:floral-plants"
+      ],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "discovery gate passed (>=1 style, >=1 shape, non-PENDING rights, makeability)"
+    },
+    {
+      "contentId": "look.creator-fixture.petal-veil",
+      "subjectRef": "look:look.creator-fixture.petal-veil",
+      "sourceClass": "CREATOR_V1_FIXTURE",
+      "publicStatus": "PUBLIC_BLOCKED",
+      "rights": "PENDING",
+      "makeability": "CONCEPT_ONLY",
+      "migrationState": "NONE",
+      "legacyStyleIds": [],
+      "styles": [
+        "style:soft-delicate"
+      ],
+      "techniques": [
+        "technique:french"
+      ],
+      "recommendedShapes": [
+        "shape:almond"
+      ],
+      "scenes": [
+        "scene:date"
+      ],
+      "themes": [],
+      "lengths": [
+        "length:medium"
+      ],
+      "reviewOrBlockReason": "rights PENDING (never public)"
+    }
+  ],
+  "summary": {
+    "totalEntries": 24,
+    "bySourceClass": {
+      "LEGACY_CONTENT_INDEX": 18,
+      "CANONICAL_DEMO": 1,
+      "V0_7_2_LOOK_SET": 4,
+      "CREATOR_V1_FIXTURE": 1
+    },
+    "byPublicStatus": {
+      "MIGRATED": 11,
+      "MANUAL_REVIEW": 4,
+      "PUBLIC_BLOCKED": 9
+    },
+    "byRights": {
+      "ORIGINAL": 15,
+      "PENDING": 9
+    },
+    "byMakeability": {
+      "CONCEPT_ONLY": 24
+    },
+    "byMigrationState": {
+      "LEGACY_STYLE_MIGRATED": 15,
+      "NEEDS_STYLE_REVIEW": 4,
+      "NONE": 5
+    },
+    "coverageBlocked": 0
+  }
+}
