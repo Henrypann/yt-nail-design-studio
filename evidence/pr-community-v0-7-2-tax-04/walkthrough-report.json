@@ -1,0 +1,659 @@
+{
+  "meta": {
+    "tag": "tax-04-home-ui:e2e",
+    "baseUrl": "http://127.0.0.1:5244",
+    "evidenceDir": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04",
+    "ranAt": "2026-08-17T06:01:34.003Z",
+    "script": "tools/walkthrough-community-tax-04-home-ui.mjs"
+  },
+  "viewports": [
+    {
+      "viewport": 390,
+      "touch": true,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "tap"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 358,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/detail-390.png"
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-390.png",
+        "detail": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/detail-390.png"
+      }
+    },
+    {
+      "viewport": 768,
+      "touch": true,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "tap"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 720,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": null
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-768.png"
+      }
+    },
+    {
+      "viewport": 1024,
+      "touch": false,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "click"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 976,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": null
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-1024.png"
+      }
+    },
+    {
+      "viewport": 1280,
+      "touch": false,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "click"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 1152,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": null
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-1280.png"
+      }
+    },
+    {
+      "viewport": 1366,
+      "touch": false,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "click"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 1152,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": null
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-1366.png"
+      }
+    },
+    {
+      "viewport": 1440,
+      "touch": false,
+      "status": "pass",
+      "scenarios": [
+        {
+          "name": "primary-order",
+          "status": "pass",
+          "ids": [
+            "browse-primary-recommended",
+            "browse-primary-shape",
+            "browse-primary-style",
+            "browse-primary-scene",
+            "browse-primary-theme"
+          ],
+          "labelCount": 5
+        },
+        {
+          "name": "recommended-channels",
+          "status": "pass",
+          "ids": [
+            "browse-topic-for-you",
+            "browse-topic-trending",
+            "browse-topic-new",
+            "browse-topic-editorial",
+            "browse-topic-makeable",
+            "browse-topic-dimensional",
+            "browse-topic-emerging-creator",
+            "browse-topic-collections"
+          ],
+          "channelCount": 8
+        },
+        {
+          "name": "touch-targets",
+          "status": "pass",
+          "measured": 37,
+          "iconOnlyRemove": {
+            "w": 44,
+            "h": 44
+          }
+        },
+        {
+          "name": "keyboard-focus",
+          "status": "pass",
+          "keyboardTopic": "shape:oval",
+          "pointerBrowse": "style"
+        },
+        {
+          "name": "session-memory",
+          "status": "pass",
+          "shapeOvalCount": 6,
+          "memoryRestored": true
+        },
+        {
+          "name": "theme-transition",
+          "status": "pass",
+          "method": "click"
+        },
+        {
+          "name": "secondary-overflow",
+          "status": "pass",
+          "clientWidth": 1152,
+          "scrollWidth": 1865,
+          "scrollLeft": 300
+        },
+        {
+          "name": "auxiliary-filters",
+          "status": "pass",
+          "defaultCount": 15,
+          "afterLengthCount": 5,
+          "afterRightsCount": 15
+        },
+        {
+          "name": "cards",
+          "status": "pass",
+          "cardCount": 15,
+          "styleCardCount": 3
+        },
+        {
+          "name": "detail",
+          "status": "pass",
+          "groups": [
+            "STYLE",
+            "SHAPE",
+            "SCENE",
+            "THEME",
+            "LENGTH"
+          ],
+          "lookUrl": "http://127.0.0.1:5244/look/look.v0-7-2.honey-petal-glass",
+          "screenshot": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/detail-1440.png"
+        }
+      ],
+      "counts": {
+        "defaultHome": 15
+      },
+      "overflow": "ok",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshots": {
+        "home": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/home-1440.png",
+        "detail": "/Users/henry.macbook/Desktop/nextGen Beauty/.staging/nextGen-beauty-community-tax-04/evidence/pr-community-v0-7-2-tax-04/screenshots/detail-1440.png"
+      }
+    }
+  ],
+  "feedback": [
+    {
+      "name": "feedback-invalid-link",
+      "status": "pass",
+      "counts": {
+        "before": 0,
+        "after": 15
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "name": "feedback-rights-pending",
+      "status": "pass",
+      "counts": {
+        "before": 0,
+        "after": 15
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "name": "feedback-load-failure",
+      "status": "pass",
+      "counts": {},
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "pageErrors": []
+    }
+  ]
+}
