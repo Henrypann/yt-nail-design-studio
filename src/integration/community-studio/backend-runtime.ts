@@ -233,20 +233,35 @@ export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceRe
 /**
  * COMM-v0.7.2-TAX-02 typed diagnostics for the creator-look slice. A creator
  * look is excluded from public browse (never synthesized) when its store
- * discovery envelope is missing or invalid.
+ * discovery envelope is missing, invalid, or fails the read-time governance
+ * gate. All failure paths are typed and non-sensitive (no paths, URLs or raw
+ * errors).
  */
 export type CreatorLookLoadDiagnosticV1 =
   | { scope: 'creator-look-slice'; code: 'UNAVAILABLE' }
+  | { scope: 'creator-look-slice'; code: 'TAXONOMY_UNAVAILABLE' }
   | { scope: 'creator-look-slice'; code: 'ENVELOPE_MISSING'; lookId: string }
-  | { scope: 'creator-look-slice'; code: 'ENVELOPE_INVALID'; lookId: string };
+  | { scope: 'creator-look-slice'; code: 'ENVELOPE_INVALID'; lookId: string }
+  | { scope: 'creator-look-slice'; code: 'PUBLIC_GATE_BLOCKED'; lookId: string; reasons?: string[] };
 
 export async function loadCreatorPublishedLookReadModelsV1(input?: {
   onDiagnostic?: (diagnostic: CreatorLookLoadDiagnosticV1) => void;
 }): Promise<CanonicalPublishedLookReadModelV1[]> {
   const emitDiagnostic = input?.onDiagnostic ?? (() => undefined);
-  const [workspace, governance] = await Promise.all([creatorWorkspaceServiceV1.load(), governanceServiceV1.load()]);
+  const [workspace, governance, taxonomy] = await Promise.all([
+    creatorWorkspaceServiceV1.load(),
+    governanceServiceV1.load(),
+    loadCommunityTaxonomyV2(),
+  ]);
   if (!workspace.ok) throw new Error(workspace.error.reason);
   if (!governance.ok) throw new Error(governance.error.reason);
+  // TAX-02: the read gate is fail-closed on the taxonomy source. Without the
+  // strict-parsed taxonomy-v2 there is no way to verify discovery/curation
+  // references or eligibility, so no creator look is projected publicly.
+  if (!taxonomy) {
+    emitDiagnostic({ scope: 'creator-look-slice', code: 'TAXONOMY_UNAVAILABLE' });
+    return [];
+  }
   const publicLooks = workspace.value.publication.looks.filter((look) => look.status === 'PUBLISHED'
     && look.visibility === 'PUBLIC' && isCreatorLookGovernanceVisibleV1(look.lookId, governance.value.cases));
   const output: CanonicalPublishedLookReadModelV1[] = [];
@@ -263,6 +278,43 @@ export async function loadCreatorPublishedLookReadModelsV1(input?: {
     const expectedSubjectId = `look:${look.lookId}`;
     if (envelope.discovery.subjectRef.id !== expectedSubjectId || envelope.curation.subjectRef.id !== expectedSubjectId) {
       emitDiagnostic({ scope: 'creator-look-slice', code: 'ENVELOPE_INVALID', lookId: look.lookId });
+      continue;
+    }
+    // TAX-02 read-time governance gate: the stored envelope must strict-parse
+    // against the shipped taxonomy and pass the same public eligibility rules
+    // as authoring-time. Creator content may never use the legacy
+    // NEEDS_STYLE_REVIEW exception (not even the narrow French migration
+    // carve-out that legacy content records may use).
+    const parsedDiscovery = parseDiscoveryMetadataV1(envelope.discovery, taxonomy);
+    const parsedCuration = parseCurationMetadataV1(envelope.curation);
+    if (!parsedDiscovery.ok || !parsedCuration.ok) {
+      emitDiagnostic({
+        scope: 'creator-look-slice',
+        code: 'PUBLIC_GATE_BLOCKED',
+        lookId: look.lookId,
+        reasons: [
+          ...(parsedDiscovery.ok ? [] : parsedDiscovery.issues.map((issue) => `discovery.${issue.code}: ${issue.message}`)),
+          ...(parsedCuration.ok ? [] : parsedCuration.issues.map((issue) => `curation.${issue.code}: ${issue.message}`)),
+        ],
+      });
+      continue;
+    }
+    const publication = publicationEligibility(parsedDiscovery.value, taxonomy);
+    const curated = curationPublicEligibility(parsedDiscovery.value, parsedCuration.value, taxonomy);
+    const gateReasons: string[] = [...publication.reasons];
+    for (const reason of curated.reasons) {
+      if (!gateReasons.includes(reason)) gateReasons.push(reason);
+    }
+    if (publication.legacyExceptionApplied || parsedDiscovery.value.migration.state === 'NEEDS_STYLE_REVIEW') {
+      gateReasons.push('creator content must never use the legacy NEEDS_STYLE_REVIEW exception');
+    }
+    if (!publication.eligible || !curated.eligible || publication.legacyExceptionApplied) {
+      emitDiagnostic({
+        scope: 'creator-look-slice',
+        code: 'PUBLIC_GATE_BLOCKED',
+        lookId: look.lookId,
+        reasons: gateReasons,
+      });
       continue;
     }
     const authority = await readAuthoritativePackageByVersionV1({ identity: creatorIdentity, authority: authorityPort, designVersionId: look.designVersionId });
