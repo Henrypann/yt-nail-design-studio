@@ -15,6 +15,7 @@
     "test:community-taxonomy-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-taxonomy-v2.mjs",
     "test:community-discovery-query-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-discovery-query-v2.mjs",
     "test:community-tax-04-home-ui": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-tax-04-home-ui.mjs",
+    "test:community-tax-04-home-ui:e2e": "node tools/walkthrough-community-tax-04-home-ui.mjs",
     "test:community-discovery-query-v2:e2e": "node tools/walkthrough-community-tax-03-filter-runtime.mjs",
     "test:community-discovery-migration": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-discovery-migration.mjs",
     "generate:community-tax-02-migration-report": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-community-tax-02-migration-report.mjs",
