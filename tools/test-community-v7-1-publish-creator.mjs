@@ -14,7 +14,10 @@
  *  - valid structured discovery plus governance clearance publishes an exact
  *    discovery/curation envelope snapshot;
  *  - an old V1 PUBLIC look without a discovery envelope fails closed from the
- *    creator public read-model projection (typed ENVELOPE_MISSING diagnostic).
+ *    creator public read-model projection (typed ENVELOPE_MISSING diagnostic);
+ *  - stored V2 envelopes that are structurally valid but fail the read-time
+ *    gate (PENDING rights; legacy NEEDS_STYLE_REVIEW migration state) are
+ *    blocked with a typed PUBLIC_GATE_BLOCKED diagnostic.
  */
 
 import assert from 'node:assert/strict';
@@ -220,6 +223,7 @@ assert.ok(parseCreatorPublicationStoreV2(gateStore), 'published V2 store round-t
 assert.equal(parseCreatorPublicationStoreV2(gateStore).discovery['look.v2.gate'].discovery.subjectRef.id, 'look:look.v2.gate');
 
 // --- old V1 PUBLIC look without discovery fails closed from public browse --
+// --- stored V2 envelope read-gate cases (PENDING rights / NEEDS_STYLE_REVIEW)
 {
   const v1Public = createEmptyCreatorPublicationStoreV1();
   const v1Draft = createCreatorPublicationDraftV1({ store: v1Public, draftId: 'draft.v1.public', creatorProfileId: 'profile.local-demo.creator', package: pkg, now });
@@ -242,12 +246,63 @@ assert.equal(parseCreatorPublicationStoreV2(gateStore).discovery['look.v2.gate']
     removeItem: (key) => mem.delete(key),
     clear: () => mem.clear(),
   };
-  const { StorageKeys, writeEnvelope } = await import('../src/lib/storage.ts');
-  writeEnvelope(StorageKeys.creatorPublications, v1Published.value);
-  const { loadCreatorPublishedLookReadModelsV1 } = await import('../src/integration/community-studio/backend-runtime.ts');
-  const diagnostics = [];
-  const models = await loadCreatorPublishedLookReadModelsV1({ onDiagnostic: (diagnostic) => diagnostics.push(diagnostic) });
-  assert.equal(models.some((look) => look.lookId === 'look.v1.public'), false, 'V1 PUBLIC look without discovery never surfaces');
-  assert.deepEqual(diagnostics, [{ scope: 'creator-look-slice', code: 'ENVELOPE_MISSING', lookId: 'look.v1.public' }]);
+  // The strict read gate loads the taxonomy over fetch('/community/taxonomy-v2.json').
+  // Node has no origin for that relative URL, so without a stub the gate fails
+  // closed as TAXONOMY_UNAVAILABLE and never exercises the envelope paths.
+  // Stub fetch with the already-loaded real taxonomy; throw for anything else.
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/community/taxonomy-v2.json')) {
+      return { ok: true, json: async () => taxonomy };
+    }
+    throw new Error(`unexpected fetch outside the taxonomy fixture: ${url}`);
+  };
+  try {
+    const { StorageKeys, writeEnvelope } = await import('../src/lib/storage.ts');
+    const { loadCreatorPublishedLookReadModelsV1 } = await import('../src/integration/community-studio/backend-runtime.ts');
+    const loadWithDiagnostics = async () => {
+      const diagnostics = [];
+      const models = await loadCreatorPublishedLookReadModelsV1({ onDiagnostic: (diagnostic) => diagnostics.push(diagnostic) });
+      return { diagnostics, models };
+    };
+
+    writeEnvelope(StorageKeys.creatorPublications, v1Published.value);
+    const v1Browse = await loadWithDiagnostics();
+    assert.equal(v1Browse.models.some((look) => look.lookId === 'look.v1.public'), false, 'V1 PUBLIC look without discovery never surfaces');
+    assert.deepEqual(v1Browse.diagnostics, [{ scope: 'creator-look-slice', code: 'ENVELOPE_MISSING', lookId: 'look.v1.public' }]);
+
+    // (a) Stored V2 envelope with PENDING rights: structurally valid store,
+    // blocked at the read-time governance gate before any projection.
+    const pendingGate = structuredClone(gateStore);
+    pendingGate.discovery['look.v2.gate'].discovery.rights.status = 'PENDING';
+    assert.ok(parseCreatorPublicationStoreV2(pendingGate), 'PENDING-rights V2 store stays structurally valid');
+    writeEnvelope(StorageKeys.creatorPublications, pendingGate);
+    const pendingBrowse = await loadWithDiagnostics();
+    assert.equal(pendingBrowse.diagnostics.length, 1, 'PENDING rights yields exactly one diagnostic');
+    assert.equal(pendingBrowse.diagnostics[0].lookId, 'look.v2.gate');
+    assert.equal(pendingBrowse.diagnostics[0].code, 'PUBLIC_GATE_BLOCKED');
+    const pendingReasons = (pendingBrowse.diagnostics[0].reasons ?? []).join(' ').toLowerCase();
+    assert.ok(pendingReasons.includes('pending') || pendingReasons.includes('rights'), `PENDING-rights reasons must mention PENDING/rights, got: "${pendingReasons}"`);
+
+    // (b) Stored V2 envelope in the legacy French NEEDS_STYLE_REVIEW migration
+    // state (no overall style): creator content may never use that exception,
+    // so the read gate blocks with a legacy-exception reason.
+    const reviewGate = structuredClone(gateStore);
+    const reviewDiscovery = reviewGate.discovery['look.v2.gate'].discovery;
+    reviewDiscovery.styleIds = [];
+    reviewDiscovery.techniqueIds = ['technique:french'];
+    reviewDiscovery.migration.state = 'NEEDS_STYLE_REVIEW';
+    reviewDiscovery.migration.legacyStyleIds = ['ST-02'];
+    assert.ok(parseCreatorPublicationStoreV2(reviewGate), 'NEEDS_STYLE_REVIEW V2 store stays structurally valid');
+    writeEnvelope(StorageKeys.creatorPublications, reviewGate);
+    const reviewBrowse = await loadWithDiagnostics();
+    assert.equal(reviewBrowse.diagnostics.length, 1, 'NEEDS_STYLE_REVIEW yields exactly one diagnostic');
+    assert.equal(reviewBrowse.diagnostics[0].lookId, 'look.v2.gate');
+    assert.equal(reviewBrowse.diagnostics[0].code, 'PUBLIC_GATE_BLOCKED');
+    const reviewReasons = (reviewBrowse.diagnostics[0].reasons ?? []).join(' ').toLowerCase();
+    assert.ok(reviewReasons.includes('needs_style_review') || reviewReasons.includes('legacy'), `NEEDS_STYLE_REVIEW reasons must mention NEEDS_STYLE_REVIEW/legacy, got: "${reviewReasons}"`);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
   console.log('[COMM-V7.1-05B] store v2 upcast/parse/revision/discovery gate/envelope/fail-closed projection: PASS');
 }
