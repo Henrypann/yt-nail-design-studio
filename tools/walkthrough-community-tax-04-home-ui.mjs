@@ -645,13 +645,13 @@ async function feedbackRightsPending(page, consoleErrors, pageErrors) {
     await feedback.waitFor();
     const before = await readCount(page);
     assert(before === 0, `${tag}: count ${before} != 0`);
-    await page.getByTestId('selected-condition-rights:rights:pending').waitFor();
+    await page.getByTestId('selected-condition-rights:pending').waitFor();
     const clearButton = feedback.getByRole('button', { name: /清除筛选|Clear filters/ });
     assert((await clearButton.count()) === 1, `${tag}: compatible clear button missing`);
     await clearButton.click();
     await waitForEmptySearch(page);
     assert(
-      (await page.getByTestId('selected-condition-rights:rights:pending').count()) === 0,
+      (await page.getByTestId('selected-condition-rights:pending').count()) === 0,
       `${tag}: rights chip remains after clear @ 1440`,
     );
     const after = await readCount(page);
