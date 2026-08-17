@@ -21,6 +21,7 @@ import {
 } from '../src/platform/backend/index.ts';
 import { StorageKeys, writeEnvelope } from '../src/lib/storage.ts';
 import { createCreatorPublicationDraftV1, createEmptyCreatorPublicationStoreV1 } from '../src/community/domain/v7_1/creator-publication.ts';
+import { parseCommunityTaxonomyV2 } from '../src/community/domain/taxonomy-v2/parse.ts';
 import { emptyGovernanceStoreV1 } from '../src/community/domain/v7_1/governance.ts';
 import { emptyClientApprovalStoreV1 } from '../src/studio/approval/client-approval.ts';
 import {
@@ -30,6 +31,23 @@ import {
 import { CANONICAL_USE_DEMO_RELEASE_RECORD_V1 } from '../src/integration/community-studio/canonical-use-demo.ts';
 
 const now = '2026-08-12T12:00:00.000Z';
+// COMM-v0.7.2-TAX-02: every creator service construction resolves discovery
+// against the shipped taxonomy-v2 fixture through the strict runtime parser.
+const fixtureUrl = (name) => new URL(`../public/community/${name}`, import.meta.url);
+const contentIndexRaw = JSON.parse(await readFile(fixtureUrl('content-index.json'), 'utf8'));
+const taxonomyRaw = JSON.parse(await readFile(fixtureUrl('taxonomy-v2.json'), 'utf8'));
+const migrationManifestRaw = JSON.parse(await readFile(fixtureUrl('migration-manifest-v1.json'), 'utf8'));
+const parsedTaxonomy = parseCommunityTaxonomyV2(taxonomyRaw);
+assert.equal(parsedTaxonomy.ok, true, 'shipped taxonomy-v2 fixture must strict-parse for creator discovery');
+const strictTaxonomyProvider = { load: async () => parsedTaxonomy.value };
+// Structured discovery authoring that fully resolves against the taxonomy.
+const VALID_DISCOVERY = {
+  styleIds: ['style:minimal-clean'],
+  recommendedShapeIds: ['shape:almond'],
+  sceneIds: [], themeIds: [], techniqueIds: [], lengthIds: ['length:medium'],
+  rights: 'ORIGINAL',
+  makeability: 'CONCEPT_ONLY',
+};
 class MemoryStorage {
   #items = new Map();
   getItem(key) { return this.#items.get(key) ?? null; }
@@ -257,6 +275,31 @@ const corruptedEvents = await versionedUse.readEvents(versionedReadContext.value
 assert.equal(corruptedEvents.error.code, 'DATA_CORRUPTED');
 localStorage.clear();
 
+// COMM-v0.7.2-TAX-02: a corrupted legacy V1 publication payload fails closed
+// (DATA_CORRUPTED), stays byte-unchanged, and never falls back to an empty
+// store write on the authority key.
+{
+  const corruptLegacyPayload = {
+    schemaVersion: 1, kind: 'CREATOR_PUBLICATION_STORE',
+    drafts: 'not-an-array', looks: [],
+  };
+  writeEnvelope(StorageKeys.creatorPublications, corruptLegacyPayload);
+  const authorityKey = `nail-studio:${StorageKeys.backendPublicationRepository}`;
+  const legacyKey = `nail-studio:${StorageKeys.creatorPublications}`;
+  const legacyRawBefore = localStorage.getItem(legacyKey);
+  assert.ok(legacyRawBefore, 'corrupt legacy payload must be seeded');
+  assert.equal(localStorage.getItem(authorityKey), null, 'authority key starts empty');
+  const corruptPort = createLocalCreatorPublicationPortV1();
+  const corruptReadContext = await identity.issueContext({ operation: 'publication.read' });
+  const corruptRead = await corruptPort.read(corruptReadContext.value);
+  assert.equal(corruptRead.ok, false);
+  assert.equal(corruptRead.error.code, 'DATA_CORRUPTED');
+  assert.equal(corruptRead.error.reason, 'publication.store_corrupted');
+  assert.equal(localStorage.getItem(legacyKey), legacyRawBefore, 'corrupted legacy payload is byte-unchanged');
+  assert.equal(localStorage.getItem(authorityKey), null, 'no empty authority store overwrites the corrupted payload');
+  localStorage.clear();
+}
+
 // Application services own identity, time, ETag and domain commands; pages only consume them.
 function memoryPort(initial) {
   let value = structuredClone(initial);
@@ -286,12 +329,18 @@ const appNextId = (scope) => { domainIdCalls += 1; return `${scope}${++appId}`; 
 const app = createCreatorWorkspaceApplicationServiceV1({
   identity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
   authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  taxonomy: strictTaxonomyProvider,
   token: { generate: () => 'raw-client-token', sha256: async (value) => createHash('sha256').update(value).digest('hex') },
 });
 let workspace = await app.createDraft(packageResult.package.designVersionId); assert.equal(workspace.ok, true);
 const draftId = workspace.value.draftId;
 workspace = await app.updateDraft(draftId, { title: 'Backend Authority Look', tags: ['authority'], visibility: 'UNLISTED', copyrightDeclared: true, sourceDeclared: true, step: 3 });
 assert.equal(workspace.ok, true);
+// COMM-v0.7.2-TAX-02: the PUBLIC flow authors valid structured discovery
+// (bumps contentRevision) BEFORE review is submitted and bound.
+workspace = await app.updateDraft(draftId, { discovery: structuredClone(VALID_DISCOVERY) });
+assert.equal(workspace.ok, true);
+assert.equal(workspace.value.publication.drafts[0].contentRevision, 3, 'discovery authoring bumps contentRevision once');
 workspace = await app.submitReview(draftId); assert.equal(workspace.ok, true);
 const idsBeforeDuplicateReview = domainIdCalls;
 assert.equal((await app.submitReview(draftId)).ok, false); assert.equal(domainIdCalls, idsBeforeDuplicateReview,
@@ -318,6 +367,61 @@ assert.equal(domainIdCalls, idsBeforeInvalidTransition, 'invalid governance tran
 governanceMemory.set(governanceBeforeInvalidTransition);
 workspace = await app.updateDraft(draftId, { visibility: 'PUBLIC' }); assert.equal(workspace.ok, true);
 workspace = await app.publishDraft(draftId); assert.equal(workspace.ok, true); assert.equal(workspace.value.publication.looks[0].visibility, 'PUBLIC');
+const publishedV2Look = workspace.value.publication.looks[0];
+assert.ok(workspace.value.publication.discovery[publishedV2Look.lookId], 'PUBLIC publish snapshots an exact discovery envelope');
+
+// COMM-v0.7.2-TAX-02: PUBLIC with unresolved discovery fails closed,
+// consumes no domain ids and writes nothing.
+const unresolvedDraft = await app.createDraft(packageResult.package.designVersionId);
+assert.equal(unresolvedDraft.ok, true);
+const unresolvedDraftId = unresolvedDraft.value.draftId;
+let unresolvedWorkspace = await app.updateDraft(unresolvedDraftId, {
+  title: 'Unresolved Discovery Look', visibility: 'UNLISTED', copyrightDeclared: true, sourceDeclared: true, step: 3,
+  discovery: { ...structuredClone(VALID_DISCOVERY), styleIds: ['style:nope'] },
+});
+assert.equal(unresolvedWorkspace.ok, true);
+unresolvedWorkspace = await app.submitReview(unresolvedDraftId); assert.equal(unresolvedWorkspace.ok, true);
+const unresolvedReview = unresolvedWorkspace.value.governance.publicationReviews.find((review) => review.draftId === unresolvedDraftId);
+assert.ok(unresolvedReview);
+assert.equal((await governanceApp.decidePublicationReview(unresolvedReview.reviewId, 'CLEARED')).ok, true);
+unresolvedWorkspace = await app.updateDraft(unresolvedDraftId, { visibility: 'PUBLIC' }); assert.equal(unresolvedWorkspace.ok, true);
+const idsBeforeUnresolvedPublish = domainIdCalls;
+const publicationBeforeUnresolvedPublish = publicationMemory.peek();
+const unresolvedPublish = await app.publishDraft(unresolvedDraftId);
+assert.equal(unresolvedPublish.ok, false);
+assert.equal(unresolvedPublish.error.code, 'INVALID');
+assert.equal(unresolvedPublish.error.reason, 'publication.discovery_unresolved');
+assert.equal(domainIdCalls, idsBeforeUnresolvedPublish, 'unresolved discovery consumes no domain ids');
+assert.deepEqual(publicationMemory.peek(), publicationBeforeUnresolvedPublish, 'unresolved discovery is writer-zero');
+
+// Taxonomy source failure fails closed (UNAVAILABLE) before any PUBLIC commit.
+const failingTaxonomyApp = createCreatorWorkspaceApplicationServiceV1({
+  identity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
+  authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  taxonomy: { load: async () => null },
+  token: { generate: () => 'raw-failing-token', sha256: async (value) => createHash('sha256').update(value).digest('hex') },
+});
+const unavailableDraft = await failingTaxonomyApp.createDraft(packageResult.package.designVersionId);
+assert.equal(unavailableDraft.ok, true);
+const unavailableDraftId = unavailableDraft.value.draftId;
+let unavailableWorkspace = await failingTaxonomyApp.updateDraft(unavailableDraftId, {
+  title: 'Taxonomy Unavailable Look', visibility: 'UNLISTED', copyrightDeclared: true, sourceDeclared: true, step: 3,
+  discovery: structuredClone(VALID_DISCOVERY),
+});
+assert.equal(unavailableWorkspace.ok, true);
+unavailableWorkspace = await failingTaxonomyApp.submitReview(unavailableDraftId); assert.equal(unavailableWorkspace.ok, true);
+const unavailableReview = unavailableWorkspace.value.governance.publicationReviews.find((review) => review.draftId === unavailableDraftId);
+assert.ok(unavailableReview);
+assert.equal((await governanceApp.decidePublicationReview(unavailableReview.reviewId, 'CLEARED')).ok, true);
+unavailableWorkspace = await failingTaxonomyApp.updateDraft(unavailableDraftId, { visibility: 'PUBLIC' }); assert.equal(unavailableWorkspace.ok, true);
+const idsBeforeUnavailablePublish = domainIdCalls;
+const publicationBeforeUnavailablePublish = publicationMemory.peek();
+const unavailablePublish = await failingTaxonomyApp.publishDraft(unavailableDraftId);
+assert.equal(unavailablePublish.ok, false);
+assert.equal(unavailablePublish.error.code, 'UNAVAILABLE');
+assert.equal(unavailablePublish.error.reason, 'publication.taxonomy_unavailable');
+assert.equal(domainIdCalls, idsBeforeUnavailablePublish, 'taxonomy failure consumes no domain ids');
+assert.deepEqual(publicationMemory.peek(), publicationBeforeUnavailablePublish, 'taxonomy failure is writer-zero');
 const otherIdentity = createLocalPrototypeIdentityAccessPortV1({
   actorRef: 'profile.other.creator', permissions: Object.values(BACKEND_PERMISSIONS_V1), now: () => now,
   nextId: (prefix) => `${prefix}other.${++applicationContextId}`,
@@ -325,6 +429,7 @@ const otherIdentity = createLocalPrototypeIdentityAccessPortV1({
 const otherApp = createCreatorWorkspaceApplicationServiceV1({
   identity: otherIdentity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
   authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  taxonomy: strictTaxonomyProvider,
   token: { generate: () => 'raw-other-token', sha256: async (value) => createHash('sha256').update(value).digest('hex') },
 });
 const publicationBeforeCrossOwnerCreate = publicationMemory.peek();
@@ -361,6 +466,7 @@ const approvalBeforeIdentityDrift = approvalMemory.peek();
 const rotatingShareApp = createCreatorWorkspaceApplicationServiceV1({
   identity: rotatingShareIdentity, publication: publicationMemory, governance: governanceMemory, approvals: approvalMemory,
   authority: authorityMemory, assets: packageAssets, nextId: appNextId,
+  taxonomy: strictTaxonomyProvider,
   token: { generate: () => { rotatingTokenCalls += 1; return 'raw-rotating-token'; }, sha256: async (value) => createHash('sha256').update(value).digest('hex') },
 });
 const rotatingShare = await rotatingShareApp.createClientShare(packageResult.package.designVersionId);
@@ -422,9 +528,16 @@ const staleClient = await clientApp.loadByRawToken(shared.value.rawToken); asser
 
 // Creator slice failure is isolated from legacy/official Explore and emits a
 // non-sensitive diagnostic exactly once.
-const index = JSON.parse(await readFile(new URL('../public/community/content-index.json', import.meta.url), 'utf8'));
 const originalFetch = globalThis.fetch;
-globalThis.fetch = async () => ({ ok: true, json: async () => structuredClone(index) });
+// COMM-v0.7.2-TAX-02: the fetch stub serves all three discovery fixtures by
+// URL so the strict loader (taxonomy-v2 + migration-manifest-v1 +
+// content-index) runs the real load path.
+globalThis.fetch = async (url) => {
+  const target = String(url);
+  if (target.endsWith('/community/taxonomy-v2.json')) return { ok: true, json: async () => structuredClone(taxonomyRaw) };
+  if (target.endsWith('/community/migration-manifest-v1.json')) return { ok: true, json: async () => structuredClone(migrationManifestRaw) };
+  return { ok: true, json: async () => structuredClone(contentIndexRaw) };
+};
 const { loadLookReadModels } = await import('../src/community/data/look-repository.ts');
 const { creatorLookMatchesPackageAuthorityV1, isCreatorLookGovernanceVisibleV1 } = await import('../src/integration/community-studio/backend-runtime.ts');
 const ownPublishedLook = publicationMemory.peek().looks.find((look) => look.creatorProfileId === 'profile.local-demo.creator');
