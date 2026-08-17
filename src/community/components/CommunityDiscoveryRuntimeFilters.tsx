@@ -1,11 +1,11 @@
 import { X } from 'lucide-react';
 import { cx } from '@/design-system';
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/lib/i18n';
+import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import type {
-  CommunityTaxonomyV2,
   DiscoveryCompatibilityMarkerV2,
   DiscoveryQueryStateV2,
-} from '@/community/community.types';
+} from '../domain/taxonomy-v2/discovery-query';
 
 interface CommunityDiscoveryRuntimeFiltersProps {
   taxonomy: CommunityTaxonomyV2;
@@ -39,12 +39,12 @@ export function CommunityDiscoveryRuntimeFilters({
       return text('技法：法式', 'Technique: French');
     }
     const tag = canonicalTags.find(
-      (candidate) => candidate.canonicalValue === marker.canonicalValue,
+      (candidate) => candidate.id === marker.canonicalValue,
     );
     return tag ? text(tag.labels['zh-CN'], tag.labels.en) : marker.canonicalValue;
   };
 
-  const markers = state.compatibilityMarkers ?? [];
+  const markers = state.markers;
 
   return (
     <div className="space-y-3" data-testid="community-discovery-runtime-filters">
@@ -58,10 +58,10 @@ export function CommunityDiscoveryRuntimeFilters({
               aria-pressed={active}
               onClick={() => onChange({ ...state, source: chip.id })}
               className={cx(
-                'min-h-11 rounded-full border px-3 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                'min-h-11 rounded-full border px-3 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 active
                   ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                  : 'border-gray-200 bg-white text-gray-600',
               )}
             >
               {text(chip.zh, chip.en)}
@@ -78,14 +78,14 @@ export function CommunityDiscoveryRuntimeFilters({
             <span
               key={marker.code}
               data-testid={`compatibility-marker-${marker.code}`}
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-background py-1 pl-3 pr-1"
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white py-1 pl-3 pr-1"
             >
               <span className="text-xs">{markerLabel(marker)}</span>
               <button
                 type="button"
                 aria-label={text('移除条件', 'Remove condition')}
                 onClick={() => onRemoveMarker(marker)}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-gray-700 hover:bg-accent hover:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
