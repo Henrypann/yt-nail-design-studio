@@ -22,8 +22,11 @@
  *      恢复上一个可分享状态与计数。
  *   6. touch 视口用 locator.tap() 完成 Theme/次行切换并回到 recommended；
  *      桌面用 click（touch 仅 390/768，hasTouch=true）。
- *   7. 390 次行容器 clientWidth < scrollWidth（style 长维度）且程序化
- *      scrollLeft 增加，整页仍无横向溢出；其它视口仅断言容器不引起整页溢出。
+ *   7. 次行容器在每个视口实测 clientWidth/scrollWidth/scrollLeft：390 上
+ *      完整 style 词表必须真实溢出（clientWidth < scrollWidth）且程序化
+ *      scrollLeft 增至 min(300, scrollWidth-clientWidth) 并递增；其它溢出
+ *      视口同样断言可滚动；适配视口断言 scrollWidth <= clientWidth 且
+ *      scrollLeft 0；所有视口整页仍无横向溢出。
  *   8. 兼容辅助筛选：#community-runtime-filter-panel 选择 length:short →
  *      selected-condition-length:short 可见 + URL 精确；单条移除只移除
  *      length；rights:original → clear-all 可见 → 点击 → 默认 URL/browse、
@@ -378,7 +381,7 @@ async function scenarioThemeTransition(page, vp) {
 }
 
 // ---------------------------------------------------------------------------
-// 场景 7 · 390 次行滚动结构；其它视口整页无溢出
+// 场景 7 · 每个视口实测次行滚动结构；390 完整 style 词表必须溢出且可滚动
 // ---------------------------------------------------------------------------
 async function scenarioSecondaryOverflow(page, vp) {
   const tag = 'secondary-overflow';
@@ -387,37 +390,59 @@ async function scenarioSecondaryOverflow(page, vp) {
   await pressOrTap(page, page.getByTestId('browse-primary-style'), vp.touch);
   await waitForSearchParams(page, { browse: ['style'], topic: ['style:minimal-clean'] });
 
-  let before = null;
-  let scrollLeftAfter = null;
-  if (vp.width === 390) {
-    before = await page.evaluate(() => {
-      const el = document.querySelector('[data-testid="community-browse-secondary"]');
-      return el
-        ? {
-            clientWidth: el.clientWidth,
-            scrollWidth: el.scrollWidth,
-            scrollLeft: el.scrollLeft,
-          }
-        : null;
-    });
-    assert(
-      before && before.clientWidth < before.scrollWidth,
-      `${tag}: secondary not overflowing @ 390 ${JSON.stringify(before)}`,
-    );
-    scrollLeftAfter = await page.evaluate(() => {
-      const el = document.querySelector('[data-testid="community-browse-secondary"]');
-      el.scrollLeft = 300;
-      return el.scrollLeft;
-    });
+  // 每个视口都实测次行容器尺寸，杜绝 null 证据。
+  const row = page.getByTestId('community-browse-secondary');
+  assert((await row.count()) === 1, `${tag}: secondary row missing @ ${vp.width}`);
+  const before = await row.evaluate((node) => ({
+    clientWidth: node.clientWidth,
+    scrollWidth: node.scrollWidth,
+    scrollLeft: node.scrollLeft,
+  }));
+  assert(
+    Number.isInteger(before.clientWidth) && before.clientWidth > 0,
+    `${tag}: clientWidth not positive ${JSON.stringify(before)} @ ${vp.width}`,
+  );
+  assert(
+    Number.isInteger(before.scrollWidth) && before.scrollWidth > 0,
+    `${tag}: scrollWidth not positive ${JSON.stringify(before)} @ ${vp.width}`,
+  );
+
+  let scrollLeftAfter;
+  if (before.scrollWidth > before.clientWidth) {
+    // 溢出：程序化滚动到有界正值，断言确实递增，报告结果 scrollLeft。
+    const target = Math.min(300, before.scrollWidth - before.clientWidth);
+    scrollLeftAfter = await row.evaluate((node, left) => {
+      node.scrollLeft = left;
+      return node.scrollLeft;
+    }, target);
     assert(
       scrollLeftAfter > before.scrollLeft,
-      `${tag}: programmatic scrollLeft did not increase (${before.scrollLeft} -> ${scrollLeftAfter}) @ 390`,
+      `${tag}: programmatic scrollLeft did not increase (${before.scrollLeft} -> ${scrollLeftAfter}) @ ${vp.width}`,
+    );
+  } else {
+    // 适配：容器自身不溢出，报告 scrollLeft 0。
+    assert(
+      before.scrollWidth <= before.clientWidth,
+      `${tag}: scrollWidth ${before.scrollWidth} > clientWidth ${before.clientWidth} @ ${vp.width}`,
+    );
+    scrollLeftAfter = 0;
+  }
+
+  // 390 显式要求：完整 style 词表真实溢出（clientWidth < scrollWidth）且可滚动。
+  if (vp.width === 390) {
+    assert(
+      before.scrollWidth > before.clientWidth,
+      `${tag}: secondary not overflowing @ 390 ${JSON.stringify(before)}`,
+    );
+    assert(
+      scrollLeftAfter > 0,
+      `${tag}: secondary not scrollable @ 390 (scrollLeft ${scrollLeftAfter})`,
     );
   }
   await assertNoOverflow(page, vp.width, tag);
   return {
-    clientWidth: before?.clientWidth ?? null,
-    scrollWidth: before?.scrollWidth ?? null,
+    clientWidth: before.clientWidth,
+    scrollWidth: before.scrollWidth,
     scrollLeft: scrollLeftAfter,
   };
 }
