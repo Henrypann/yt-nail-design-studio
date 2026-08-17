@@ -1,9 +1,10 @@
 /**
- * Community v0.7.2 · COMM-v0.7.2-TAX-03 Discovery query URL state (checkpoint 1).
+ * Community v0.7.2 · COMM-v0.7.2-TAX-03 Discovery query (URL state + execution).
  *
- * This checkpoint implements ONLY URL state parsing + canonical serialization
- * + compatibility markers. Query execution / filtering is a later checkpoint
- * and deliberately not implemented here.
+ * Checkpoint 1 implemented URL state parsing + canonical serialization +
+ * compatibility markers. Checkpoint 2 (the tail of this file) adds
+ * `executeDiscoveryQueryV2`, the pure governance-pass → filter → rank
+ * pipeline (see the function doc for the full algorithm).
  *
  * Contract:
  * - `parseDiscoveryQueryV2` is total (never throws) and never mutates its
@@ -32,9 +33,17 @@
 import {
   DEFAULT_RECOMMENDATION_CHANNEL,
   FOLLOWING_CHANNEL_ID,
+  MAKEABILITY_CLASSIFICATION_TAGS,
   PRIMARY_BROWSE_DIMENSION,
+  RIGHTS_STATUS_TAGS,
   type TaxonomyDimensionV2,
 } from './contract.ts';
+import {
+  curationPublicEligibility,
+  isCurrentMakeable,
+  publicationEligibility,
+  styleChannelEligible,
+} from './governance.ts';
 import {
   dimensionOfTagId,
   isFrenchLegacyAlias,
@@ -42,6 +51,16 @@ import {
   resolveTagId,
 } from './resolve.ts';
 import type { CommunityTaxonomyV2, TaxonomyTagV2 } from './types.ts';
+import type { CommunityPublisherV1 } from '../types.ts';
+import type { PublishedLookReadModelV1 } from '../v7_1/published-look-read-model.ts';
+import {
+  EMPTY_EXPLORE_FILTERS,
+  rankLooks,
+  type EffectiveSort,
+  type RankedLook,
+  type TrendingConfigV1,
+  type TrendingSignalV1,
+} from '../v7_1/explore-search.ts';
 
 /** Bound for incompatible-issue reporting: parsers never grow unbounded lists. */
 export const MAX_DISCOVERY_QUERY_ISSUES = 50;
@@ -596,4 +615,388 @@ export function serializeDiscoveryQueryV2(state: DiscoveryQueryStateV2): string 
   setCsv(out, 'rights', state.rightsIds);
   setCsv(out, 'technique', state.techniqueIds);
   return out.toString();
+}
+
+// ---------------------------------------------------------------------------
+// Execute (pure filter + rank pipeline)
+// ---------------------------------------------------------------------------
+
+export interface DiscoveryQueryExecutionInputV2 {
+  /** All published look read models; the governance pass covers every one. */
+  looks: readonly PublishedLookReadModelV1[];
+  /** Publisher records supplying displayName/handle search fields. */
+  publishers?: readonly CommunityPublisherV1[];
+  taxonomy: CommunityTaxonomyV2;
+  state: DiscoveryQueryStateV2;
+  /** Whether the relationship provider (following feed) is available. */
+  relationshipProviderAvailable: boolean;
+  /** Injected trending signals; this module never reads the clock. */
+  trendingSignals?: readonly TrendingSignalV1[];
+  /** Injected clock for trending windows. */
+  asOf: string;
+  trendingConfig?: TrendingConfigV1;
+}
+
+export interface DiscoveryQueryExecutionResultV2 {
+  /** 'incompatible' when any issue is present (carried or appended). */
+  status: 'ok' | 'incompatible';
+  items: RankedLook[];
+  effectiveSort: EffectiveSort;
+  /** Looks dropped by the governance pass (missing or ineligible discovery/curation). */
+  governanceBlocked: number;
+  /** Looks that passed the governance pass over all input looks. */
+  governedCandidateCount: number;
+  /** Governed + filtered candidates handed to the ranker (before ranking). */
+  queryCandidateCount: number;
+  /** Carried state issues plus any appended runtime issue (bounded, stable shape). */
+  incompatible: DiscoveryIncompatibleIssueV2[];
+}
+
+/**
+ * Channel-forced sort: the trending/new recommendation channels force their
+ * own sort; every other browse/topic combination keeps the state sort.
+ */
+function resolveRequestedSort(state: DiscoveryQueryStateV2): DiscoverySortV2 {
+  if (state.browse === 'recommended') {
+    if (state.topic === 'trending') return 'trending';
+    if (state.topic === 'new') return 'new';
+  }
+  return state.sort;
+}
+
+/**
+ * Deterministic zero-result effective sort: requested is the forced-or-state
+ * sort; trending always reports the no-signals fallback (no clock access).
+ */
+function zeroItemEffectiveSort(requested: DiscoverySortV2): EffectiveSort {
+  if (requested === 'trending') {
+    return { requested, applied: 'featured', fallbackReason: 'trending_no_signals' };
+  }
+  return { requested, applied: requested };
+}
+
+/** Governed candidates: non-null discovery+curation passing both eligibility gates. */
+function governedCandidates(
+  looks: readonly PublishedLookReadModelV1[],
+  taxonomy: CommunityTaxonomyV2,
+): { governed: PublishedLookReadModelV1[]; blocked: number } {
+  const governed: PublishedLookReadModelV1[] = [];
+  for (const look of looks) {
+    const discovery = look.discovery;
+    const curation = look.curation;
+    if (!discovery || !curation) continue;
+    if (!publicationEligibility(discovery, taxonomy).eligible) continue;
+    if (!curationPublicEligibility(discovery, curation, taxonomy).eligible) continue;
+    governed.push(look);
+  }
+  return { governed, blocked: looks.length - governed.length };
+}
+
+/** Source filter: OFFICIAL / VERIFIED_CREATOR publisher types only. */
+function matchesSource(look: PublishedLookReadModelV1, source: DiscoverySourceV2): boolean {
+  if (source === 'all') return true;
+  return source === 'official'
+    ? look.publisherType === 'OFFICIAL'
+    : look.publisherType === 'VERIFIED_CREATOR';
+}
+
+/**
+ * Primary browse matching: the recommended channel gate for browse=recommended,
+ * exact-topic matching on the discovery projection for dimension browses.
+ */
+function matchesPrimaryBrowse(
+  look: PublishedLookReadModelV1,
+  state: DiscoveryQueryStateV2,
+  taxonomy: CommunityTaxonomyV2,
+  relationshipProviderAvailable: boolean,
+): boolean {
+  const discovery = look.discovery;
+  if (!discovery) return false;
+  if (state.browse === 'recommended') {
+    return matchesRecommendationChannel(
+      look,
+      state.topic,
+      relationshipProviderAvailable,
+    );
+  }
+  switch (state.browse) {
+    case 'shape':
+      return discovery.recommendedShapeIds.includes(state.topic);
+    case 'style':
+      return (
+        discovery.styleIds.includes(state.topic) &&
+        styleChannelEligible(discovery, taxonomy)
+      );
+    case 'scene':
+      return discovery.sceneIds.includes(state.topic);
+    case 'theme':
+      return discovery.themeIds.includes(state.topic);
+  }
+}
+
+/** Recommendation channel gate (topic is an exact channel id on browse=recommended). */
+function matchesRecommendationChannel(
+  look: PublishedLookReadModelV1,
+  topic: string,
+  relationshipProviderAvailable: boolean,
+): boolean {
+  const discovery = look.discovery;
+  const curation = look.curation;
+  if (!discovery || !curation) return false;
+  switch (topic) {
+    case 'for-you':
+    case 'trending':
+    case 'new':
+      // unfiltered channels: every governed look qualifies
+      return true;
+    case 'editorial':
+      // curated or legacy-featured
+      return curation.curated === true || look.curationStatus === 'FEATURED_BY_OFFICIAL';
+    case 'makeable':
+      return isCurrentMakeable(discovery);
+    case 'dimensional':
+      // dimensional-module classification or legacy-featured
+      return (
+        discovery.makeability.classification === 'DIMENSIONAL_MODULE' ||
+        look.curationStatus === 'FEATURED_BY_OFFICIAL'
+      );
+    case 'emerging-creator':
+      return curation.featuredChannels.includes('emerging-creator');
+    case 'collections':
+      return curation.featuredChannels.includes('collections');
+    case FOLLOWING_CHANNEL_ID:
+      return (
+        relationshipProviderAvailable &&
+        curation.featuredChannels.includes(FOLLOWING_CHANNEL_ID)
+      );
+    default:
+      // Unknown channel id (defensive): behave like the default for-you channel.
+      return true;
+  }
+}
+
+function intersects(a: readonly string[], b: readonly string[]): boolean {
+  return a.some((id) => b.includes(id));
+}
+
+/**
+ * Auxiliary filters: OR within each dimension, AND across dimensions. The
+ * makeability/rights filters match the look's canonical derived tag ids
+ * (classification/status → tag id maps), never free-form arrays.
+ */
+function matchesAuxFilters(
+  look: PublishedLookReadModelV1,
+  state: DiscoveryQueryStateV2,
+): boolean {
+  const discovery = look.discovery;
+  if (!discovery) return false;
+  if (state.lengthIds.length > 0 && !intersects(discovery.lengthIds, state.lengthIds)) {
+    return false;
+  }
+  if (state.techniqueIds.length > 0 && !intersects(discovery.techniqueIds, state.techniqueIds)) {
+    return false;
+  }
+  if (state.makeabilityIds.length > 0) {
+    const derived = MAKEABILITY_CLASSIFICATION_TAGS[discovery.makeability.classification];
+    if (!state.makeabilityIds.includes(derived)) return false;
+  }
+  if (state.rightsIds.length > 0) {
+    const derived = RIGHTS_STATUS_TAGS[discovery.rights.status];
+    if (!state.rightsIds.includes(derived)) return false;
+  }
+  return true;
+}
+
+function normalizeSearchText(value: string): string {
+  return value.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function searchTokens(query: string): string[] {
+  const normalized = normalizeSearchText(query);
+  return normalized ? normalized.split(' ') : [];
+}
+
+/** AND across query tokens, OR across searchable fields. */
+function matchesAllTokens(searchable: readonly string[], tokens: readonly string[]): boolean {
+  if (tokens.length === 0) return true;
+  return tokens.every((token) => searchable.some((field) => field.includes(token)));
+}
+
+/** Push an exact tag id plus its bilingual labels (exact ids only, never aliases). */
+function addTagSearchFields(
+  taxonomy: CommunityTaxonomyV2,
+  dimension: TaxonomyDimensionV2,
+  ids: readonly string[],
+  out: string[],
+): void {
+  for (const id of ids) {
+    out.push(id);
+    const tag = findTag(taxonomy, dimension, id);
+    if (tag) out.push(tag.labels['zh-CN'], tag.labels.en);
+  }
+}
+
+/**
+ * Searchable fields for q matching: title/titleEn, publisher
+ * displayName+handle, discovery tag ids (including the derived makeability /
+ * rights tag ids) and the taxonomy-v2 labels of those exact ids. Legacy
+ * discovery fields and sourceContent are NEVER consulted.
+ */
+function lookSearchFieldsV2(
+  look: PublishedLookReadModelV1,
+  publisher: CommunityPublisherV1 | undefined,
+  taxonomy: CommunityTaxonomyV2,
+): string[] {
+  const raw: string[] = [look.title];
+  if (look.titleEn) raw.push(look.titleEn);
+  if (publisher) raw.push(publisher.displayName, publisher.handle);
+  const discovery = look.discovery;
+  if (discovery) {
+    addTagSearchFields(taxonomy, 'STYLE', discovery.styleIds, raw);
+    addTagSearchFields(taxonomy, 'SHAPE', discovery.recommendedShapeIds, raw);
+    addTagSearchFields(taxonomy, 'SCENE', discovery.sceneIds, raw);
+    addTagSearchFields(taxonomy, 'THEME', discovery.themeIds, raw);
+    addTagSearchFields(taxonomy, 'TECHNIQUE', discovery.techniqueIds, raw);
+    addTagSearchFields(taxonomy, 'LENGTH', discovery.lengthIds, raw);
+    addTagSearchFields(
+      taxonomy,
+      'MAKEABILITY',
+      [MAKEABILITY_CLASSIFICATION_TAGS[discovery.makeability.classification]],
+      raw,
+    );
+    addTagSearchFields(
+      taxonomy,
+      'RIGHTS',
+      [RIGHTS_STATUS_TAGS[discovery.rights.status]],
+      raw,
+    );
+  }
+  return raw.map(normalizeSearchText).filter((value) => value !== '');
+}
+
+/**
+ * COMM-v0.7.2-TAX-03 pure discovery query execution. Pipeline:
+ *
+ * 1. Governance over ALL input looks: non-null discovery+curation and both
+ *    publicationEligibility / curationPublicEligibility eligible. Counts are
+ *    preserved on every path.
+ * 2. Incompatible state (or following requested without a relationship
+ *    provider) yields zero items with the governance counts intact and a
+ *    deterministic effective sort. A bounded following-unavailable issue is
+ *    appended only when missing.
+ * 3. Source filter (OFFICIAL / VERIFIED_CREATOR publisher types).
+ * 4. Primary browse matching: recommended channel gate, or exact-topic match
+ *    on recommendedShapeIds / styleIds (+styleChannelEligible) / sceneIds /
+ *    themeIds.
+ * 5. Auxiliary filters: OR within length/technique/makeability/rights, AND
+ *    across them; makeability/rights match canonical derived tag ids.
+ * 6. q: every token must match title/titleEn, publisher displayName+handle,
+ *    discovery tag ids (incl. derived makeability/rights) or the taxonomy-v2
+ *    labels of those exact ids. Legacy discovery fields / sourceContent are
+ *    never read.
+ * 7. Recommended channels: for-you/trending/new all; trending/new force their
+ *    sort; editorial curated-or-featured; makeable isCurrentMakeable;
+ *    dimensional DIMENSIONAL_MODULE-or-featured; emerging-creator/collections/
+ *    following explicit featuredChannels membership (following also requires
+ *    the relationship provider).
+ * 8. Ranking via rankLooks with q='' (matching already happened in step 6) and
+ *    empty explore filters; signals/asOf/config are injected. queryCandidateCount
+ *    is captured before ranking.
+ *
+ * Total, pure, non-mutating: no IO, no clock, no `any`.
+ */
+export function executeDiscoveryQueryV2(
+  input: DiscoveryQueryExecutionInputV2,
+): DiscoveryQueryExecutionResultV2 {
+  const {
+    looks,
+    publishers = [],
+    taxonomy,
+    state,
+    relationshipProviderAvailable,
+    trendingSignals,
+    asOf,
+    trendingConfig,
+  } = input;
+
+  // 1. governance over all looks
+  const { governed, blocked } = governedCandidates(looks, taxonomy);
+
+  // 2. incompatible / following-unavailable zero-result path
+  const incompatible = [...state.incompatible];
+  const followingUnavailable =
+    state.browse === 'recommended' &&
+    state.topic === FOLLOWING_CHANNEL_ID &&
+    !relationshipProviderAvailable;
+  if (
+    followingUnavailable &&
+    !incompatible.some(
+      (issue) => issue.key === 'topic' && issue.code === 'following-unavailable',
+    )
+  ) {
+    if (incompatible.length < MAX_DISCOVERY_QUERY_ISSUES) {
+      incompatible.push({
+        key: 'topic',
+        rawValue: FOLLOWING_CHANNEL_ID,
+        code: 'following-unavailable',
+      });
+    }
+  }
+  if (incompatible.length > 0) {
+    return {
+      status: 'incompatible',
+      items: [],
+      effectiveSort: zeroItemEffectiveSort(resolveRequestedSort(state)),
+      governanceBlocked: blocked,
+      governedCandidateCount: governed.length,
+      queryCandidateCount: 0,
+      incompatible,
+    };
+  }
+
+  // 3-7. filter governed candidates (source → primary → aux → q)
+  const pubById = new Map(
+    publishers.map((publisher) => [publisher.publisherId, publisher]),
+  );
+  const tokens = searchTokens(state.q);
+  const candidates: PublishedLookReadModelV1[] = [];
+  for (const look of governed) {
+    const discovery = look.discovery;
+    if (!discovery) continue;
+    if (!matchesSource(look, state.source)) continue;
+    if (!matchesPrimaryBrowse(look, state, taxonomy, relationshipProviderAvailable)) continue;
+    if (!matchesAuxFilters(look, state)) continue;
+    if (tokens.length > 0) {
+      const fields = lookSearchFieldsV2(look, pubById.get(look.publisherId), taxonomy);
+      if (!matchesAllTokens(fields, tokens)) continue;
+    }
+    candidates.push(look);
+  }
+  const queryCandidateCount = candidates.length;
+
+  // 8. rank (q matching already applied; keep rankLooks' internal q empty)
+  const ranked = rankLooks({
+    looks: candidates,
+    publishers,
+    taxonomy: null,
+    state: {
+      tab: 'looks',
+      q: '',
+      sort: resolveRequestedSort(state),
+      filters: { ...EMPTY_EXPLORE_FILTERS },
+    },
+    trendingSignals,
+    asOf,
+    trendingConfig,
+  });
+
+  return {
+    status: 'ok',
+    items: ranked.items,
+    effectiveSort: ranked.effectiveSort,
+    governanceBlocked: blocked,
+    governedCandidateCount: governed.length,
+    queryCandidateCount,
+    incompatible,
+  };
 }
