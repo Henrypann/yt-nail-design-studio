@@ -1,6 +1,10 @@
 /**
  * CommunityFeed · Discover / Search / Official / Creators 共享 Explore 组件
- * （COMM-V7.1-02 + COMM-v0.7.2-TAX-03）。
+ * （COMM-V7.1-02 + COMM-v0.7.2-TAX-03 + COMM-v0.7.2-TAX-04）。
+ *
+ * - TAX-04：搜索/tabs 之后、排序/运行时筛选之前集成
+ *   `CommunityDiscoveryBrowseNavigation`（主/次浏览导航，仅 look 呈现）；
+ *   其变更同样经 `applyState` push 历史，会话记忆不读写存储、不自动导航。
  *
  * - 消费 `PublishedLookReadModelV1`（look-repository），保留 taxonomy (V1) /
  *   publisher / loading / error / retry / empty / clear 状态；卡片展示仍使用
@@ -59,6 +63,7 @@ import {
 import type { SourceFilter } from '../domain/filters';
 import { CommunitySearchBar } from '../components/CommunitySearchBar';
 import { CommunitySortControl } from '../components/CommunitySortControl';
+import { CommunityDiscoveryBrowseNavigation } from '../components/CommunityDiscoveryBrowseNavigation';
 import { CommunityDiscoveryRuntimeFilters } from '../components/CommunityDiscoveryRuntimeFilters';
 import { CommunityLookCard } from '../components/CommunityLookCard';
 import { CommunityCreatorCard } from '../components/CommunityCreatorCard';
@@ -293,6 +298,12 @@ export function CommunityFeed({
 
           {showLookSurfacing ? (
             <>
+              <CommunityDiscoveryBrowseNavigation
+                taxonomy={taxonomyV2}
+                state={queryState}
+                relationshipProviderAvailable={false}
+                onChange={applyState}
+              />
               <CommunitySortControl
                 sort={queryResult.effectiveSort.requested}
                 onChange={handleSortChange}
