@@ -8,6 +8,10 @@
 import type { CommunityContentV1 } from '@/community/domain/types';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
+import type {
+  CommunityCurationMetadataV1,
+  CommunityDiscoveryMetadataV1,
+} from '@/community/domain/taxonomy-v2/types';
 import { createBlankEditorDocV7 } from '@/studio/editor/v7/create';
 import { dimensionalMeshAssetRefV7 } from '@/studio/editor/v7/dimensional-decoration';
 import {
@@ -49,6 +53,133 @@ const MESH_ASSET_IDS = [
   'look.ivory-lace-crystal.decoration.ivory-lace-applique',
   'look.honey-petal-glass.decoration.glass-flower-pearl',
 ] as const;
+
+/**
+ * COMM-v0.7.2-TAX-02 explicit discovery envelopes for the four v0.7.2 look
+ * sets, keyed by definition id. Must stay in lockstep with the checked-in
+ * migration-manifest-v1.json entries for the same look ids (drift is a test
+ * failure). All four are ORIGINAL / CONCEPT_ONLY first-party official
+ * fixtures with a full style+shape resolution; no current-makeable claim.
+ */
+const FOUR_LOOK_SET_DISCOVERY_ENVELOPES_V0_7_2: Record<string, CommunityDiscoveryMetadataV1> = {
+  'leopard-gilded-nude': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.leopard-gilded-nude' },
+    styleIds: ['style:glamorous-sparkling'],
+    recommendedShapeIds: ['shape:almond'],
+    sceneIds: ['scene:date', 'scene:party-nightlife'],
+    themeIds: ['theme:animals-pets', 'theme:jewelry-gems'],
+    techniqueIds: [],
+    lengthIds: ['length:medium'],
+    makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+    migration: { state: 'NONE', legacyStyleIds: [], migratedAt: '2026-08-17T00:00:00.000Z' },
+    updatedAt: '2026-08-17T00:00:00.000Z',
+  },
+  'crimson-reliquary': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.crimson-reliquary' },
+    styleIds: ['style:gothic-dark'],
+    recommendedShapeIds: ['shape:almond'],
+    sceneIds: ['scene:formal-dinner'],
+    themeIds: ['theme:myth-folklore'],
+    techniqueIds: [],
+    lengthIds: ['length:medium'],
+    makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+    migration: { state: 'NONE', legacyStyleIds: [], migratedAt: '2026-08-17T00:00:00.000Z' },
+    updatedAt: '2026-08-17T00:00:00.000Z',
+  },
+  'ivory-lace-crystal': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.ivory-lace-crystal' },
+    styleIds: ['style:soft-delicate'],
+    recommendedShapeIds: ['shape:almond'],
+    sceneIds: ['scene:bridal', 'scene:date'],
+    themeIds: ['theme:floral-plants', 'theme:jewelry-gems'],
+    techniqueIds: [],
+    lengthIds: ['length:medium'],
+    makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+    migration: { state: 'NONE', legacyStyleIds: [], migratedAt: '2026-08-17T00:00:00.000Z' },
+    updatedAt: '2026-08-17T00:00:00.000Z',
+  },
+  'honey-petal-glass': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.honey-petal-glass' },
+    styleIds: ['style:soft-delicate'],
+    recommendedShapeIds: ['shape:almond'],
+    sceneIds: ['scene:date'],
+    themeIds: ['theme:floral-plants'],
+    techniqueIds: [],
+    lengthIds: ['length:medium'],
+    makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+    migration: { state: 'NONE', legacyStyleIds: [], migratedAt: '2026-08-17T00:00:00.000Z' },
+    updatedAt: '2026-08-17T00:00:00.000Z',
+  },
+};
+
+const FOUR_LOOK_SET_CURATION_ENVELOPES_V0_7_2: Record<string, CommunityCurationMetadataV1> = {
+  'leopard-gilded-nude': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.leopard-gilded-nude' },
+    curated: true,
+    curatedBy: 'operator:community-team',
+    curatedAt: '2026-08-17T00:00:00.000Z',
+    campaignTags: ['structured-v7', 'simulated-assets'],
+    featuredChannels: [],
+    evidenceRefs: [],
+  },
+  'crimson-reliquary': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.crimson-reliquary' },
+    curated: true,
+    curatedBy: 'operator:community-team',
+    curatedAt: '2026-08-17T00:00:00.000Z',
+    campaignTags: ['structured-v7', 'simulated-assets'],
+    featuredChannels: [],
+    evidenceRefs: [],
+  },
+  'ivory-lace-crystal': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.ivory-lace-crystal' },
+    curated: true,
+    curatedBy: 'operator:community-team',
+    curatedAt: '2026-08-17T00:00:00.000Z',
+    campaignTags: ['structured-v7', 'simulated-assets'],
+    featuredChannels: [],
+    evidenceRefs: [],
+  },
+  'honey-petal-glass': {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v0-7-2.honey-petal-glass' },
+    curated: true,
+    curatedBy: 'operator:community-team',
+    curatedAt: '2026-08-17T00:00:00.000Z',
+    campaignTags: ['structured-v7', 'simulated-assets'],
+    featuredChannels: [],
+    evidenceRefs: [],
+  },
+};
+
+export function getFourLookSetDiscoveryEnvelopeV0_7_2(lookId: string): {
+  discovery: CommunityDiscoveryMetadataV1;
+  curation: CommunityCurationMetadataV1;
+} | null {
+  const id = lookId.replace(/^look\.v0-7-2\./, '');
+  const discovery = FOUR_LOOK_SET_DISCOVERY_ENVELOPES_V0_7_2[id];
+  const curation = FOUR_LOOK_SET_CURATION_ENVELOPES_V0_7_2[id];
+  return discovery && curation ? { discovery, curation } : null;
+}
 
 function assetMappings(): ReleasedAssetReferenceMappingV1[] {
   return MESH_ASSET_IDS.map((assetId) => {
@@ -137,6 +268,8 @@ function buildAuthority(definition: FourLookSetDefinitionV0_7_2) {
       status: { sourceStatus: 'PUBLISHED', viewable: true, previewVerified: false, manufacturable: false, productionDispatched: false },
     },
     designVersionId: versionId, creatorProfileId: CREATOR_PROFILE_ID, visibility: 'PUBLIC', publicationGateVerified: true,
+    discovery: structuredClone(FOUR_LOOK_SET_DISCOVERY_ENVELOPES_V0_7_2[definition.id]),
+    curation: structuredClone(FOUR_LOOK_SET_CURATION_ENVELOPES_V0_7_2[definition.id]),
     sourceLook: structuredClone(publishedLook), sourceContent,
   };
   return { definition, doc, release, publishedLook, readModel };

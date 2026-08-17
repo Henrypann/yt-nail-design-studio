@@ -4,6 +4,8 @@ import type { CommunityContentV1 } from '@/community/domain/types';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { GovernanceCaseV1 } from '@/community/domain/v7_1/governance';
 import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
+import { parseCommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/parse';
+import type { CommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/types';
 import {
   BACKEND_PERMISSIONS_V1,
   createClientApprovalApplicationServiceV1,
@@ -39,6 +41,25 @@ async function sha256Bytes(bytes: Uint8Array): Promise<string> {
 
 async function sha256Text(value: string): Promise<string> {
   return sha256Bytes(new TextEncoder().encode(value));
+}
+
+/**
+ * COMM-v0.7.2-TAX-02 strict taxonomy-v2 browser loader. The checked-in
+ * fixture `public/community/taxonomy-v2.json` is parsed with the strict
+ * runtime parser — never a raw JSON cast. Any fetch/parse failure returns
+ * null so the creator publication service fails closed (UNAVAILABLE) before
+ * a PUBLIC commit.
+ */
+async function loadCommunityTaxonomyV2(): Promise<CommunityTaxonomyV2 | null> {
+  try {
+    const res = await fetch('/community/taxonomy-v2.json');
+    if (!res.ok) return null;
+    const raw: unknown = await res.json();
+    const parsed = parseCommunityTaxonomyV2(raw);
+    return parsed.ok ? parsed.value : null;
+  } catch {
+    return null;
+  }
 }
 
 function canvasPngRenderer(): PublishRendererV1 {
@@ -144,6 +165,7 @@ export const creatorWorkspaceServiceV1 = createCreatorWorkspaceApplicationServic
   authority: authorityPort,
   assets: assetPort,
   nextId,
+  taxonomy: { load: loadCommunityTaxonomyV2 },
   token: {
     generate() {
       if (!globalThis.crypto?.getRandomValues) throw new Error('secure randomness unavailable');
@@ -200,7 +222,20 @@ export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceRe
   });
 }
 
-export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalPublishedLookReadModelV1[]> {
+/**
+ * COMM-v0.7.2-TAX-02 typed diagnostics for the creator-look slice. A creator
+ * look is excluded from public browse (never synthesized) when its store
+ * discovery envelope is missing or invalid.
+ */
+export type CreatorLookLoadDiagnosticV1 =
+  | { scope: 'creator-look-slice'; code: 'UNAVAILABLE' }
+  | { scope: 'creator-look-slice'; code: 'ENVELOPE_MISSING'; lookId: string }
+  | { scope: 'creator-look-slice'; code: 'ENVELOPE_INVALID'; lookId: string };
+
+export async function loadCreatorPublishedLookReadModelsV1(input?: {
+  onDiagnostic?: (diagnostic: CreatorLookLoadDiagnosticV1) => void;
+}): Promise<CanonicalPublishedLookReadModelV1[]> {
+  const emitDiagnostic = input?.onDiagnostic ?? (() => undefined);
   const [workspace, governance] = await Promise.all([creatorWorkspaceServiceV1.load(), governanceServiceV1.load()]);
   if (!workspace.ok) throw new Error(workspace.error.reason);
   if (!governance.ok) throw new Error(governance.error.reason);
@@ -208,6 +243,20 @@ export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalP
     && look.visibility === 'PUBLIC' && isCreatorLookGovernanceVisibleV1(look.lookId, governance.value.cases));
   const output: CanonicalPublishedLookReadModelV1[] = [];
   for (const look of publicLooks) {
+    // TAX-02: the read model attaches the EXACT stored discovery/curation
+    // envelope by lookId. Missing or invalid envelope means the creator look
+    // is excluded from public browse with a typed diagnostic — never
+    // synthesized from PublishedLookV1.tags / sourceContent.
+    const envelope = workspace.value.publication.discovery[look.lookId];
+    if (!envelope) {
+      emitDiagnostic({ scope: 'creator-look-slice', code: 'ENVELOPE_MISSING', lookId: look.lookId });
+      continue;
+    }
+    const expectedSubjectId = `look:${look.lookId}`;
+    if (envelope.discovery.subjectRef.id !== expectedSubjectId || envelope.curation.subjectRef.id !== expectedSubjectId) {
+      emitDiagnostic({ scope: 'creator-look-slice', code: 'ENVELOPE_INVALID', lookId: look.lookId });
+      continue;
+    }
     const authority = await readAuthoritativePackageByVersionV1({ identity: creatorIdentity, authority: authorityPort, designVersionId: look.designVersionId });
     if (!authority.ok) continue;
     if (authority.value.ownerRef !== look.creatorProfileId || authority.value.ownerRef !== 'profile.local-demo.creator') continue;
@@ -252,7 +301,10 @@ export async function loadCreatorPublishedLookReadModelsV1(): Promise<CanonicalP
         status: { sourceStatus: 'PUBLISHED', viewable: true, previewVerified: true, manufacturable: false, productionDispatched: false },
       },
       designVersionId: look.designVersionId, creatorProfileId: look.creatorProfileId, visibility: 'PUBLIC',
-      publicationGateVerified: true, sourceLook: structuredClone(look), sourceContent,
+      publicationGateVerified: true,
+      discovery: structuredClone(envelope.discovery),
+      curation: structuredClone(envelope.curation),
+      sourceLook: structuredClone(look), sourceContent,
     });
   }
   return output;

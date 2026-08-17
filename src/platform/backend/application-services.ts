@@ -4,10 +4,12 @@ import {
   publishCreatorDraftV2,
   setCreatorLookHiddenV2,
   updateCreatorPublicationDraftV2,
+  type CreatorDiscoveryAuthoringV2,
   type CreatorPublicationDraftPatchV2,
   type CreatorPublicationStoreV2,
   type StoredDiscoveryEnvelopeV2,
 } from '@/community/domain/v7_1/creator-publication-v2';
+import type { VisibilityV1 } from '@/community/domain/v7_1/design-content-model';
 import type { CommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/types';
 import {
   decidePublicationReviewV1,
@@ -45,7 +47,12 @@ import {
   type ServiceResultV1,
 } from './service-contract';
 
-export type CreatorPublicationDraftPatchV2 = Parameters<typeof updateCreatorPublicationDraftV2>[0]['patch'];
+/**
+ * Backward-compatible alias: V2 patch is a superset of the V1 patch (adds the
+ * structured discovery-authoring block). Kept so existing UI call sites that
+ * import the V1 name keep compiling until their V2 cutover lands.
+ */
+export type CreatorPublicationDraftPatchV1 = CreatorPublicationDraftPatchV2;
 
 export interface CreatorWorkspaceStateV1 {
   publication: CreatorPublicationStoreV2;
@@ -202,6 +209,31 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
       : serviceErrorV1('FORBIDDEN', 'publication.draft_owner_mismatch', false, writeContext.value.correlationId);
   };
 
+  /**
+   * COMM-v0.7.2-TAX-02 discovery resolution gate for PUBLIC commits. Runs
+   * `creatorDiscoveryResolutionReasonsV2` through the injected strict
+   * taxonomy provider right before a PUBLIC review submission / publish.
+   * Taxonomy load failure or any unresolved authoring tag fails closed with
+   * a typed service error — discovery is never inferred or bypassed.
+   */
+  const requireResolvedPublicDiscovery = async (
+    draft: { visibility: VisibilityV1; discovery: CreatorDiscoveryAuthoringV2 },
+    correlationId?: string,
+  ): Promise<ServiceResultV1<true>> => {
+    if (draft.visibility !== 'PUBLIC') return { ok: true, value: true, changed: false };
+    let taxonomy: CommunityTaxonomyV2 | null;
+    try { taxonomy = await input.taxonomy.load(); }
+    catch { taxonomy = null; }
+    if (!taxonomy) {
+      return serviceErrorV1('UNAVAILABLE', 'publication.taxonomy_unavailable', true, correlationId);
+    }
+    const reasons = creatorDiscoveryResolutionReasonsV2(draft.discovery, taxonomy);
+    if (reasons.length > 0) {
+      return serviceErrorV1('INVALID', 'publication.discovery_unresolved', false, correlationId);
+    }
+    return { ok: true, value: true, changed: false };
+  };
+
   return {
     load,
     async createDraft(designVersionId) {
@@ -214,7 +246,7 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
       const draftIdResult = generatedId(input.nextId, 'draft.', writeContext.value.correlationId);
       if (!draftIdResult.ok) return draftIdResult;
       const draftId = draftIdResult.value;
-      const created = createCreatorPublicationDraftV1({
+      const created = createCreatorPublicationDraftV2({
         store: current.value.publication.value.value,
         draftId,
         creatorProfileId: writeContext.value.actor.actorRef,
@@ -233,7 +265,7 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
       if (!draft) return serviceErrorV1('NOT_FOUND', 'publication.draft_not_found');
       const writeContext = await writeContextForDraft(draft, BACKEND_OPERATIONS_V1.publicationWrite);
       if (!writeContext.ok) return writeContext;
-      const updated = updateCreatorPublicationDraftV1({
+      const updated = updateCreatorPublicationDraftV2({
         store: current.value.publication.value.value,
         draftId,
         patch,
@@ -254,6 +286,8 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
         && review.draftRevision === draft.contentRevision && review.status !== 'REJECTED')) {
         return serviceErrorV1('INVALID', 'governance.review_already_submitted', false, writeContext.value.correlationId);
       }
+      const discoveryGate = await requireResolvedPublicDiscovery(draft, writeContext.value.correlationId);
+      if (!discoveryGate.ok) return discoveryGate;
       const reviewId = generatedId(input.nextId, 'review.', writeContext.value.correlationId);
       if (!reviewId.ok) return reviewId;
       const auditId = generatedId(input.nextId, 'audit.', writeContext.value.correlationId);
@@ -283,9 +317,11 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
       if (draft.visibility === 'PUBLIC' && !cleared) {
         return serviceErrorV1('PRECONDITION_FAILED', 'publication.public_governance_required', false, writeContext.value.correlationId);
       }
+      const discoveryGate = await requireResolvedPublicDiscovery(draft, writeContext.value.correlationId);
+      if (!discoveryGate.ok) return discoveryGate;
       const lookId = generatedId(input.nextId, 'look.', writeContext.value.correlationId);
       if (!lookId.ok) return lookId;
-      const published = publishCreatorDraftV1({
+      const published = publishCreatorDraftV2({
         store: current.value.publication.value.value,
         draftId,
         lookId: lookId.value,
@@ -305,7 +341,7 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
       if (look.creatorProfileId !== writeContext.value.actor.actorRef) {
         return serviceErrorV1('FORBIDDEN', 'publication.look_owner_mismatch', false, writeContext.value.correlationId);
       }
-      const result = setCreatorLookHiddenV1(current.value.publication.value.value, lookId, hidden, writeContext.value.now);
+      const result = setCreatorLookHiddenV2(current.value.publication.value.value, lookId, hidden, writeContext.value.now);
       if (!result.ok) return failDomain(result.code, 'publication', writeContext.value.correlationId);
       const saved = await input.publication.replace(writeContext.value, result.value, current.value.publication.value.etag);
       return saved.ok ? state(saved.value.value, current.value.governance.value.value, writeContext.value.actor.actorRef, saved.changed) : saved;

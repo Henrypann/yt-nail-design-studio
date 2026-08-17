@@ -131,6 +131,7 @@ export function mapDomainErrorCodeV1(code: string): ServiceErrorCodeV1 {
     case 'revoked': return 'REVOKED';
     case 'stale': return 'STALE';
     case 'public_locked':
+    case 'public_gate_incomplete':
     case 'transition_denied': return 'PRECONDITION_FAILED';
     case 'persist_failed': return 'UNAVAILABLE';
     default: return 'INVALID';

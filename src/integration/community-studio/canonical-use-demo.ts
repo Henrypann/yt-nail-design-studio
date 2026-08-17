@@ -10,6 +10,10 @@
 import type { CommunityContentV1 } from '@/community/domain/types';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
+import type {
+  CommunityCurationMetadataV1,
+  CommunityDiscoveryMetadataV1,
+} from '@/community/domain/taxonomy-v2/types';
 import type { EditorDocV7, ProcessStepV7 } from '@/studio/editor/v7/model';
 import { createBlankEditorDocV7 } from '@/studio/editor/v7/create';
 import { PROCESS_STEP_TYPE_IDS_V7 } from '@/studio/editor/v7/registry';
@@ -31,7 +35,7 @@ const CREATED_AT = '2026-08-11T06:00:00.000Z';
  * NEEDS_STYLE_REVIEW — discoverable by technique, excluded from style
  * channels by TAX-01 governance. No current-makeable claim (CONCEPT_ONLY).
  */
-export const CANONICAL_USE_DEMO_DISCOVERY_V1 = {
+export const CANONICAL_USE_DEMO_DISCOVERY_V1: CommunityDiscoveryMetadataV1 = {
   schemaVersion: 1,
   contractRef: 'COMM-v0.7.2-TAX-01',
   subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v7-1.petal-veil' },
@@ -50,9 +54,9 @@ export const CANONICAL_USE_DEMO_DISCOVERY_V1 = {
     note: 'French legacy record: discoverable by technique; style review required',
   },
   updatedAt: '2026-08-17T00:00:00.000Z',
-} as const;
+};
 
-export const CANONICAL_USE_DEMO_CURATION_V1 = {
+export const CANONICAL_USE_DEMO_CURATION_V1: CommunityCurationMetadataV1 = {
   schemaVersion: 1,
   contractRef: 'COMM-v0.7.2-TAX-01',
   subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v7-1.petal-veil' },
@@ -62,7 +66,7 @@ export const CANONICAL_USE_DEMO_CURATION_V1 = {
   campaignTags: ['canonical-v7-1'],
   featuredChannels: [],
   evidenceRefs: [],
-} as const;
+};
 
 function buildSourceDoc(): EditorDocV7 {
   const created = createBlankEditorDocV7({
@@ -205,6 +209,8 @@ export const CANONICAL_USE_DEMO_READ_MODEL_V1: CanonicalPublishedLookReadModelV1
   designVersionId: CANONICAL_USE_DEMO_VERSION_ID,
   creatorProfileId: CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1.creatorProfileId,
   visibility: 'PUBLIC', publicationGateVerified: true,
+  discovery: structuredClone(CANONICAL_USE_DEMO_DISCOVERY_V1),
+  curation: structuredClone(CANONICAL_USE_DEMO_CURATION_V1),
   sourceLook: structuredClone(CANONICAL_USE_DEMO_PUBLISHED_LOOK_V1),
   sourceContent,
 };
