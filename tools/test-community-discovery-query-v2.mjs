@@ -20,7 +20,11 @@
  *  - lossy legacy params (color/occasion/effect/mood/application/verification)
  *    are always incompatible;
  *  - old+new representation conflicts are incompatible;
- *  - issues bounded at MAX_DISCOVERY_QUERY_ISSUES; inputs never mutated.
+ *  - issues bounded at MAX_DISCOVERY_QUERY_ISSUES; inputs never mutated;
+ *  - executor matrix (checkpoint 2): governance-first counting, primary /
+ *    auxiliary / q filters over the real four-look + canonical read models,
+ *    source, recommendation channels, fail-closed unknown channel and
+ *    executor immutability/determinism.
  */
 
 import assert from 'node:assert/strict';
@@ -35,14 +39,20 @@ import {
   MAX_DISCOVERY_QUERY_ISSUES,
   MAX_DISCOVERY_QUERY_Q_LENGTH,
   createDefaultDiscoveryQueryState,
+  executeDiscoveryQueryV2,
   parseDiscoveryQueryV2,
   serializeDiscoveryQueryV2,
 } from '../src/community/domain/taxonomy-v2/discovery-query.ts';
 import { parseCommunityTaxonomyV2 } from '../src/community/domain/taxonomy-v2/parse.ts';
+import { CANONICAL_USE_DEMO_READ_MODEL_V1 } from '../src/integration/community-studio/canonical-use-demo.ts';
+import { FOUR_LOOK_SET_READ_MODELS_V0_7_2 } from '../src/integration/community-studio/v0-7-2-four-look-sets.ts';
 
 const root = process.cwd();
 const fixturePath = path.join(root, 'public/community/taxonomy-v2.json');
 const rawFixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+const PUBLISHERS = JSON.parse(
+  fs.readFileSync(path.join(root, 'public/community/publishers.json'), 'utf8'),
+);
 
 const strict = parseCommunityTaxonomyV2(rawFixture);
 assert.equal(strict.ok, true, 'fixture must strict-parse before the suite runs');
@@ -634,6 +644,424 @@ test('parser is total: malformed inputs never throw', () => {
   for (const input of inputs) {
     assert.doesNotThrow(() => parseUrl(input), `must not throw for ${input}`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Executor matrix (COMM-v0.7.2-TAX-03 checkpoint 2)
+//
+// `executeDiscoveryQueryV2` is exercised through one helper that runs the real
+// `parseDiscoveryQueryV2` (injected relationship flag) and then the executor
+// with a frozen `asOf` and explicit trending signals. Crafted looks are
+// structural clones of the real governed four-look / canonical read models
+// with only the field under test changed; everything else stays governed.
+// ---------------------------------------------------------------------------
+
+const AS_OF = '2026-08-17T00:00:00.000Z';
+const REAL_LOOKS = [...FOUR_LOOK_SET_READ_MODELS_V0_7_2, CANONICAL_USE_DEMO_READ_MODEL_V1];
+
+/** Clone the ivory-lace-crystal read model (governed base) under a fresh id. */
+function craftedLook(id, patch = {}) {
+  const look = structuredClone(FOUR_LOOK_SET_READ_MODELS_V0_7_2[2]);
+  look.lookId = id;
+  look.contentId = id;
+  look.discovery = structuredClone(look.discovery);
+  look.curation = structuredClone(look.curation);
+  look.discovery.subjectRef = { kind: 'PUBLISHED_LOOK', id: `look:${id}` };
+  look.curation.subjectRef = { kind: 'PUBLISHED_LOOK', id: `look:${id}` };
+  return Object.assign(look, patch);
+}
+
+/**
+ * Parse `search` (or reuse a pre-built `state`) and execute with the frozen
+ * clock, injected relationship flag and signals. `parseRelationshipAvailable`
+ * may diverge from `relationshipProviderAvailable` to exercise the executor's
+ * own following gate on an otherwise-compatible parsed state.
+ */
+function runQuery({
+  search = '',
+  state,
+  looks,
+  publishers = PUBLISHERS,
+  relationshipProviderAvailable = false,
+  parseRelationshipAvailable = relationshipProviderAvailable,
+  trendingSignals = [],
+}) {
+  const parsed =
+    state ??
+    parseDiscoveryQueryV2(new URLSearchParams(search), taxonomy, {
+      relationshipProviderAvailable: parseRelationshipAvailable,
+    }).state;
+  return executeDiscoveryQueryV2({
+    looks,
+    publishers,
+    taxonomy,
+    state: parsed,
+    relationshipProviderAvailable,
+    trendingSignals,
+    asOf: AS_OF,
+  });
+}
+
+const itemIds = (result) => result.items.map((ranked) => ranked.look.lookId);
+const SHA_256_HEX = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+const MAKEABLE_REFS = {
+  capabilityRef: 'capability://v0.7.2/uv-inkjet@v1.2.0',
+  assetRefs: [`asset://v0.7.2/look-0001/template@sha256:${SHA_256_HEX}`],
+  evidenceRefs: ['evidence://v0.7.2/look-0001/makeability@v1.0.0'],
+};
+
+test('executor: governance-first blocks invalid records and counts exactly', () => {
+  const blockedDiscovery = craftedLook('look.v0-7-2.test.blocked-discovery', { discovery: null });
+  const blockedCuration = craftedLook('look.v0-7-2.test.blocked-curation', { curation: null });
+  const pendingRights = craftedLook('look.v0-7-2.test.pending-rights');
+  pendingRights.discovery.rights.status = 'PENDING';
+  const missingStyle = craftedLook('look.v0-7-2.test.missing-style');
+  missingStyle.discovery.styleIds = [];
+  missingStyle.discovery.techniqueIds = [];
+  missingStyle.discovery.migration.state = 'NONE';
+  const missingShape = craftedLook('look.v0-7-2.test.missing-shape');
+  missingShape.discovery.recommendedShapeIds = [];
+
+  const looks = [
+    ...REAL_LOOKS,
+    blockedDiscovery,
+    blockedCuration,
+    pendingRights,
+    missingStyle,
+    missingShape,
+  ];
+  const result = runQuery({ search: '', looks });
+  assert.equal(result.status, 'ok');
+  assert.equal(result.items.length, 5, 'only the five governed real looks surface');
+  assert.equal(result.governedCandidateCount, 5);
+  assert.equal(result.queryCandidateCount, 5);
+  assert.equal(result.governanceBlocked, 5, 'one blocked look per crafted failure mode');
+});
+
+test('executor: incompatible state still runs governance first and returns zero', () => {
+  const looks = [
+    ...REAL_LOOKS,
+    craftedLook('look.v0-7-2.test.blocked-extra', { discovery: null }),
+  ];
+  const result = runQuery({ search: 'foo=bar', looks });
+  assert.equal(result.status, 'incompatible');
+  assert.deepEqual(result.items, []);
+  assert.equal(result.governedCandidateCount, 5, 'governance ran over every input look');
+  assert.equal(result.governanceBlocked, 1);
+  assert.equal(result.queryCandidateCount, 0);
+});
+
+test('executor: french NEEDS_STYLE_REVIEW surfaces by default and technique, never by style', () => {
+  const petalVeil = CANONICAL_USE_DEMO_READ_MODEL_V1.lookId;
+
+  const def = runQuery({ search: '', looks: REAL_LOOKS });
+  assert.ok(itemIds(def).includes(petalVeil), 'french demo appears in for-you');
+
+  const french = runQuery({ search: 'technique=technique%3Afrench', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(french), [petalVeil], 'only the french record matches technique:french');
+
+  for (const topic of [
+    'style%3Aglamorous-sparkling',
+    'style%3Asoft-delicate',
+    'style%3Agothic-dark',
+  ]) {
+    const style = runQuery({ search: `browse=style&topic=${topic}`, looks: REAL_LOOKS });
+    assert.ok(style.items.length >= 1, `style browse ${topic} still surfaces real records`);
+    assert.ok(
+      !itemIds(style).includes(petalVeil),
+      `french NEEDS_STYLE_REVIEW must never appear in browse=style (${topic})`,
+    );
+  }
+});
+
+test('executor: primary shape/style exact matching on real looks', () => {
+  const almond = runQuery({ search: 'browse=shape&topic=shape%3Aalmond', looks: REAL_LOOKS });
+  assert.equal(almond.items.length, 5, 'every real look recommends almond');
+
+  const soft = runQuery({ search: 'browse=style&topic=style%3Asoft-delicate', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(soft), [
+    'look.v0-7-2.honey-petal-glass',
+    'look.v0-7-2.ivory-lace-crystal',
+  ]);
+});
+
+test('executor: scene/theme primary matching on governed clones with canonical ids', () => {
+  const sceneLook = craftedLook('look.v0-7-2.test.scene-gift');
+  sceneLook.discovery.sceneIds = ['scene:gift-custom'];
+  const themeLook = craftedLook('look.v0-7-2.test.theme-ocean');
+  themeLook.discovery.themeIds = ['theme:ocean-coast'];
+  const looks = [sceneLook, themeLook];
+
+  const scene = runQuery({ search: 'browse=scene&topic=scene%3Agift-custom', looks });
+  assert.deepEqual(itemIds(scene), ['look.v0-7-2.test.scene-gift']);
+
+  const theme = runQuery({ search: 'browse=theme&topic=theme%3Aocean-coast', looks });
+  assert.deepEqual(itemIds(theme), ['look.v0-7-2.test.theme-ocean']);
+
+  // exact ids only: an unassigned scene topic matches neither clone
+  const miss = runQuery({ search: 'browse=scene&topic=scene%3Awork-commute', looks });
+  assert.deepEqual(itemIds(miss), []);
+});
+
+test('executor: auxiliary OR within dimensions and AND across them', () => {
+  const cloneA = craftedLook('look.v0-7-2.test.aux-a');
+  cloneA.discovery.lengthIds = ['length:short'];
+  cloneA.discovery.techniqueIds = ['technique:french'];
+  cloneA.discovery.makeability = { classification: 'MACHINE_DIRECT', ...MAKEABLE_REFS };
+  cloneA.discovery.rights.status = 'LICENSED';
+
+  const cloneB = craftedLook('look.v0-7-2.test.aux-b');
+  cloneB.discovery.lengthIds = ['length:long'];
+  cloneB.discovery.techniqueIds = [];
+  cloneB.discovery.makeability = { classification: 'HAND_MADE', assetRefs: [], evidenceRefs: [] };
+  cloneB.discovery.rights.status = 'ORIGINAL';
+
+  const cloneC = craftedLook('look.v0-7-2.test.aux-c');
+  cloneC.discovery.lengthIds = ['length:medium'];
+  cloneC.discovery.techniqueIds = ['technique:french'];
+  cloneC.discovery.makeability = {
+    classification: 'MACHINE_HAND_FINISH',
+    assetRefs: [],
+    evidenceRefs: [],
+  };
+  cloneC.discovery.rights.status = 'PERSONAL_USE_ONLY';
+
+  const looks = [cloneA, cloneB, cloneC];
+
+  const lengthOr = runQuery({ search: 'length=length%3Ashort%2Clength%3Along', looks });
+  assert.deepEqual(itemIds(lengthOr), ['look.v0-7-2.test.aux-a', 'look.v0-7-2.test.aux-b']);
+
+  const makeabilityOr = runQuery({
+    search: 'makeability=makeability%3Amachine-direct%2Cmakeability%3Ahand-made',
+    looks,
+  });
+  assert.deepEqual(itemIds(makeabilityOr), ['look.v0-7-2.test.aux-a', 'look.v0-7-2.test.aux-b']);
+
+  const techniqueOr = runQuery({ search: 'technique=technique%3Afrench', looks });
+  assert.deepEqual(itemIds(techniqueOr), ['look.v0-7-2.test.aux-a', 'look.v0-7-2.test.aux-c']);
+
+  const rightsOr = runQuery({ search: 'rights=rights%3Alicensed', looks });
+  assert.deepEqual(itemIds(rightsOr), ['look.v0-7-2.test.aux-a']);
+
+  const andAcross = runQuery({
+    search:
+      'length=length%3Ashort&technique=technique%3Afrench' +
+      '&makeability=makeability%3Amachine-direct&rights=rights%3Alicensed',
+    looks,
+  });
+  assert.deepEqual(itemIds(andAcross), ['look.v0-7-2.test.aux-a']);
+
+  const miss = runQuery({ search: 'length=length%3Aextra-long', looks });
+  assert.deepEqual(itemIds(miss), []);
+});
+
+test('executor: q matches title, publisher, canonical ids and taxonomy labels', () => {
+  const byTitle = runQuery({ search: 'q=Petal+Veil', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(byTitle), ['look.v7-1.petal-veil']);
+
+  const byDisplayName = runQuery({ search: 'q=%E5%AE%98%E6%96%B9', looks: REAL_LOOKS });
+  assert.equal(byDisplayName.items.length, 5, 'displayName 官方 matches every official look');
+
+  const byHandle = runQuery({ search: 'q=nailstyle', looks: REAL_LOOKS });
+  assert.equal(byHandle.items.length, 5, 'handle nailstyle matches every official look');
+
+  const byCanonicalId = runQuery({ search: 'q=style%3Aglamorous-sparkling', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(byCanonicalId), ['look.v0-7-2.leopard-gilded-nude']);
+
+  const byZhLabel = runQuery({ search: 'q=%E9%97%AA%E8%80%80%E5%8D%8E%E4%B8%BD', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(byZhLabel), ['look.v0-7-2.leopard-gilded-nude']);
+
+  const byEnLabel = runQuery({ search: 'q=french', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(byEnLabel), ['look.v7-1.petal-veil']);
+});
+
+test('executor: legacy-only fields are never searchable via q', () => {
+  const legacyOnly = craftedLook('look.v0-7-2.test.legacy-only', {
+    mainStyleId: 'zzz-unique-token',
+    subStyleIds: ['zzz-unique-token'],
+    campaignTags: ['zzz-unique-token'],
+  });
+  legacyOnly.sourceContent.campaignTags = ['zzz-unique-token'];
+
+  const governed = runQuery({ search: '', looks: [legacyOnly] });
+  assert.deepEqual(itemIds(governed), ['look.v0-7-2.test.legacy-only'], 'look is governed');
+
+  const byLegacyToken = runQuery({ search: 'q=zzz-unique-token', looks: [legacyOnly] });
+  assert.equal(byLegacyToken.status, 'ok');
+  assert.deepEqual(itemIds(byLegacyToken), [], 'legacy fields never feed q matching');
+});
+
+test('executor: source filter splits official vs verified creators', () => {
+  const creatorLook = craftedLook('look.v0-7-2.test.creator-luna', {
+    publisherId: 'pub_demo_luna',
+    publisherType: 'VERIFIED_CREATOR',
+  });
+  const looks = [...REAL_LOOKS, creatorLook];
+
+  const all = runQuery({ search: '', looks });
+  assert.equal(all.items.length, 6);
+
+  const official = runQuery({ search: 'source=official', looks });
+  assert.equal(official.items.length, 5);
+  assert.ok(!itemIds(official).includes(creatorLook.lookId));
+
+  const creators = runQuery({ search: 'source=creators', looks });
+  assert.deepEqual(itemIds(creators), [creatorLook.lookId]);
+});
+
+test('executor: for-you surfaces every governed look; trending/new force their sort', () => {
+  const forYou = runQuery({ search: '', looks: REAL_LOOKS });
+  assert.equal(forYou.items.length, 5);
+  assert.equal(forYou.effectiveSort.requested, 'featured');
+  assert.equal(forYou.effectiveSort.applied, 'featured');
+
+  const trending = runQuery({ search: 'topic=trending', looks: REAL_LOOKS });
+  assert.equal(trending.items.length, 5);
+  assert.deepEqual(trending.effectiveSort, {
+    requested: 'trending',
+    applied: 'featured',
+    fallbackReason: 'trending_no_signals',
+  });
+
+  const fresh = runQuery({ search: 'topic=new', looks: REAL_LOOKS });
+  assert.equal(fresh.items.length, 5);
+  assert.deepEqual(fresh.effectiveSort, { requested: 'new', applied: 'new' });
+});
+
+test('executor: editorial requires curated or explicit editorial feature', () => {
+  const notCurated = craftedLook('look.v0-7-2.test.editorial-no');
+  notCurated.curation.curated = false;
+  notCurated.curation.featuredChannels = [];
+  const featuredEditorial = craftedLook('look.v0-7-2.test.editorial-yes');
+  featuredEditorial.curation.curated = false;
+  featuredEditorial.curation.featuredChannels = ['editorial'];
+
+  const editorial = runQuery({
+    search: 'topic=editorial',
+    looks: [notCurated, featuredEditorial],
+  });
+  assert.deepEqual(itemIds(editorial), ['look.v0-7-2.test.editorial-yes']);
+});
+
+test('executor: makeable needs current-makeable evidence; dimensional via classification or feature', () => {
+  const makeableEmpty = runQuery({ search: 'topic=makeable', looks: REAL_LOOKS });
+  assert.deepEqual(itemIds(makeableEmpty), [], 'real fixtures are CONCEPT_ONLY: no current-makeable');
+
+  const machineDirect = craftedLook('look.v0-7-2.test.makeable-md');
+  machineDirect.discovery.makeability = { classification: 'MACHINE_DIRECT', ...MAKEABLE_REFS };
+
+  const makeable = runQuery({ search: 'topic=makeable', looks: [machineDirect] });
+  assert.deepEqual(itemIds(makeable), ['look.v0-7-2.test.makeable-md']);
+
+  const dimensionalModule = craftedLook('look.v0-7-2.test.dimensional-module');
+  dimensionalModule.discovery.makeability = {
+    classification: 'DIMENSIONAL_MODULE',
+    assetRefs: [],
+    evidenceRefs: [],
+  };
+  const featuredDimensional = craftedLook('look.v0-7-2.test.dimensional-featured');
+  featuredDimensional.curation.featuredChannels = ['dimensional'];
+
+  const dimensional = runQuery({
+    search: 'topic=dimensional',
+    looks: [dimensionalModule, featuredDimensional],
+  });
+  assert.deepEqual(itemIds(dimensional), [
+    'look.v0-7-2.test.dimensional-featured',
+    'look.v0-7-2.test.dimensional-module',
+  ]);
+});
+
+test('executor: emerging-creator and collections are explicit-featured only', () => {
+  const emerging = craftedLook('look.v0-7-2.test.emerging');
+  emerging.curation.featuredChannels = ['emerging-creator'];
+  const collections = craftedLook('look.v0-7-2.test.collections');
+  collections.curation.featuredChannels = ['collections'];
+  const plainCurated = craftedLook('look.v0-7-2.test.plain-curated');
+
+  const looks = [emerging, collections, plainCurated];
+  assert.deepEqual(itemIds(runQuery({ search: 'topic=emerging-creator', looks })), [
+    'look.v0-7-2.test.emerging',
+  ]);
+  assert.deepEqual(itemIds(runQuery({ search: 'topic=collections', looks })), [
+    'look.v0-7-2.test.collections',
+  ]);
+});
+
+test('executor: following unavailable is incompatible zero; available needs explicit feature', () => {
+  // parser-level unavailability: the parse already records following-unavailable
+  const parserUnavailable = runQuery({
+    search: 'topic=following',
+    looks: REAL_LOOKS,
+    relationshipProviderAvailable: false,
+  });
+  assert.equal(parserUnavailable.status, 'incompatible');
+  assert.deepEqual(parserUnavailable.items, []);
+  assert.ok(
+    parserUnavailable.incompatible.some((issue) => issue.code === 'following-unavailable'),
+  );
+  assert.equal(parserUnavailable.governedCandidateCount, 5, 'governance counts still reported');
+
+  // executor-level unavailability: a compatible parsed state is re-checked
+  const executorUnavailable = runQuery({
+    search: 'topic=following',
+    looks: REAL_LOOKS,
+    parseRelationshipAvailable: true,
+    relationshipProviderAvailable: false,
+  });
+  assert.equal(executorUnavailable.status, 'incompatible');
+  assert.deepEqual(executorUnavailable.items, []);
+  assert.ok(
+    executorUnavailable.incompatible.some((issue) => issue.code === 'following-unavailable'),
+  );
+
+  // available provider: only explicit featuredChannels membership qualifies
+  const following = craftedLook('look.v0-7-2.test.following');
+  following.curation.featuredChannels = ['following'];
+  const plain = craftedLook('look.v0-7-2.test.following-plain');
+  const available = runQuery({
+    search: 'topic=following',
+    looks: [following, plain],
+    relationshipProviderAvailable: true,
+  });
+  assert.equal(available.status, 'ok');
+  assert.deepEqual(itemIds(available), ['look.v0-7-2.test.following']);
+});
+
+test('executor: unknown recommendation channel fails closed on a clean state', () => {
+  const unknownTopic = { ...createDefaultDiscoveryQueryState(), topic: 'not-a-channel' };
+  const result = runQuery({ state: unknownTopic, looks: REAL_LOOKS });
+  assert.equal(result.status, 'ok', 'clean state stays ok');
+  assert.deepEqual(result.items, [], 'unknown channel never behaves like for-you');
+  assert.equal(result.governedCandidateCount, 5, 'governance still ran over all looks');
+});
+
+test('executor: issues are carried not widened; inputs never mutate; runs are deterministic', () => {
+  // carried, not widened
+  const parsed = parseDiscoveryQueryV2(new URLSearchParams('foo=bar'), taxonomy, {
+    relationshipProviderAvailable: false,
+  });
+  const carried = runQuery({ state: parsed.state, looks: REAL_LOOKS });
+  assert.equal(carried.status, 'incompatible');
+  assert.deepEqual(carried.incompatible, parsed.state.incompatible, 'exactly the carried issues');
+
+  // inputs never mutated
+  const looks = REAL_LOOKS;
+  const state = createDefaultDiscoveryQueryState();
+  const looksBefore = structuredClone(looks);
+  const stateBefore = structuredClone(state);
+  const taxonomyBefore = structuredClone(taxonomy);
+  const publishersBefore = structuredClone(PUBLISHERS);
+  runQuery({ state, looks, publishers: PUBLISHERS });
+  assert.deepEqual(looks, looksBefore);
+  assert.deepEqual(state, stateBefore);
+  assert.deepEqual(taxonomy, taxonomyBefore);
+  assert.deepEqual(PUBLISHERS, publishersBefore);
+
+  // repeated runs deep-equal (deterministic filter + rank)
+  const first = runQuery({ search: '', looks: REAL_LOOKS });
+  const second = runQuery({ search: '', looks: REAL_LOOKS });
+  assert.deepEqual(second, first);
 });
 
 // ---------------------------------------------------------------------------
