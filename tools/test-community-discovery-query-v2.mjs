@@ -21,6 +21,10 @@
  *    are always incompatible;
  *  - old+new representation conflicts are incompatible;
  *  - issues bounded at MAX_DISCOVERY_QUERY_ISSUES; inputs never mutated;
+ *  - URL compatibility glue (checkpoint 3): canonical + raw merge preserves
+ *    the incompatible representation without duplicate accumulation
+ *    (byte-stable), CSV-item-aware explicit removal, fail-closed singleton
+ *    removal, and input immutability for both helpers;
  *  - executor matrix (checkpoint 2): governance-first counting, primary /
  *    auxiliary / q filters over the real four-look + canonical read models,
  *    source, recommendation channels, fail-closed unknown channel and
@@ -40,7 +44,9 @@ import {
   MAX_DISCOVERY_QUERY_Q_LENGTH,
   createDefaultDiscoveryQueryState,
   executeDiscoveryQueryV2,
+  mergeDiscoveryQueryIncompatibleParams,
   parseDiscoveryQueryV2,
+  removeDiscoveryQueryIncompatibleIssue,
   serializeDiscoveryQueryV2,
 } from '../src/community/domain/taxonomy-v2/discovery-query.ts';
 import { parseCommunityTaxonomyV2 } from '../src/community/domain/taxonomy-v2/parse.ts';
@@ -644,6 +650,143 @@ test('parser is total: malformed inputs never throw', () => {
   for (const input of inputs) {
     assert.doesNotThrow(() => parseUrl(input), `must not throw for ${input}`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// URL compatibility glue (COMM-v0.7.2-TAX-03 checkpoint 3)
+// ---------------------------------------------------------------------------
+
+test('glue merge: mixed csv survives the canonical merge without duplicate accumulation', () => {
+  const current = new URLSearchParams('q=hi&length=length%3Ashort%2Cultra-long');
+  const parsed = parseDiscoveryQueryV2(current, taxonomy, { relationshipProviderAvailable: false });
+  expectIncompatible(parsed, 'invalid-length-item');
+  assert.deepEqual(parsed.state.lengthIds, ['length:short'], 'valid sibling still parses');
+
+  const canonical = new URLSearchParams(serializeDiscoveryQueryV2(parsed.state));
+  assert.equal(canonical.toString(), 'q=hi&length=length%3Ashort', 'canonical carries the valid part');
+
+  const merged = mergeDiscoveryQueryIncompatibleParams(canonical, current, parsed.state.incompatible);
+  // exactly one same raw occurrence: canonical + raw are never stacked
+  assert.deepEqual(merged.getAll('length'), ['length:short,ultra-long']);
+  assert.equal(merged.toString(), 'q=hi&length=length%3Ashort%2Cultra-long');
+
+  // repeated merge on its own output: byte-stable, no accumulation
+  const parsedAgain = parseDiscoveryQueryV2(merged, taxonomy, { relationshipProviderAvailable: false });
+  expectIncompatible(parsedAgain, 'invalid-length-item');
+  assert.deepEqual(parsedAgain.state.lengthIds, ['length:short']);
+  const mergedAgain = mergeDiscoveryQueryIncompatibleParams(
+    new URLSearchParams(serializeDiscoveryQueryV2(parsedAgain.state)),
+    merged,
+    parsedAgain.state.incompatible,
+  );
+  assert.equal(mergedAgain.toString(), merged.toString(), 'repeat merge is byte-stable');
+  assert.deepEqual(mergedAgain.getAll('length'), ['length:short,ultra-long'], 'no growing duplicates');
+});
+
+test('glue merge: locked source keeps only the raw source, no growing duplicate', () => {
+  const current = new URLSearchParams('source=bogus&q=hi');
+  const parsed = parseDiscoveryQueryV2(current, taxonomy, { relationshipProviderAvailable: false });
+  expectIncompatible(parsed, 'invalid-source');
+
+  // lockedSource: effective state carries source=official while the URL must
+  // keep the raw incompatible source=bogus untouched.
+  const effective = { ...parsed.state, source: 'official' };
+  const canonical = new URLSearchParams(serializeDiscoveryQueryV2(effective));
+  assert.equal(canonical.toString(), 'q=hi&source=official');
+
+  const merged = mergeDiscoveryQueryIncompatibleParams(canonical, current, parsed.state.incompatible);
+  assert.deepEqual(merged.getAll('source'), ['bogus'], 'only the raw source survives');
+  assert.equal(merged.toString(), 'q=hi&source=bogus');
+
+  // repeating the merge on its own output never stacks source occurrences
+  const parsedAgain = parseDiscoveryQueryV2(merged, taxonomy, { relationshipProviderAvailable: false });
+  expectIncompatible(parsedAgain, 'invalid-source');
+  const mergedAgain = mergeDiscoveryQueryIncompatibleParams(
+    new URLSearchParams(serializeDiscoveryQueryV2({ ...parsedAgain.state, source: 'official' })),
+    merged,
+    parsedAgain.state.incompatible,
+  );
+  assert.deepEqual(mergedAgain.getAll('source'), ['bogus'], 'no growing duplicate');
+  assert.equal(mergedAgain.toString(), merged.toString(), 'repeat merge is byte-stable');
+});
+
+test('glue remove: dropping one csv item preserves siblings and other keys', () => {
+  const params = new URLSearchParams(
+    'q=hi&length=length%3Ashort%2Cultra-long&length=length%3Amedium&technique=technique%3Afrench',
+  );
+  const issue = { key: 'length', rawValue: 'ultra-long', code: 'invalid-length-item' };
+  const out = removeDiscoveryQueryIncompatibleIssue(params, issue);
+  assert.equal(
+    out.toString(),
+    'q=hi&length=length%3Ashort%2Clength%3Amedium&technique=technique%3Afrench',
+    'sibling items and other keys preserved, canonicalized to one occurrence',
+  );
+  assert.deepEqual(out.getAll('length'), ['length:short,length:medium']);
+  assert.deepEqual(out.getAll('technique'), ['technique:french']);
+  assert.equal(out.get('q'), 'hi');
+
+  // the cleaned URL reparses fully compatible
+  const reparsed = parseDiscoveryQueryV2(out, taxonomy, { relationshipProviderAvailable: false });
+  expectCompatible(reparsed, 'cleaned url');
+  assert.deepEqual(reparsed.state.lengthIds, ['length:medium', 'length:short']);
+});
+
+test('glue remove: empty csv item is removed for empty-csv-item issues', () => {
+  const params = new URLSearchParams('length=length%3Ashort%2C%2Clength%3Amedium');
+  const parsed = parseDiscoveryQueryV2(params, taxonomy, { relationshipProviderAvailable: false });
+  const issue = parsed.state.incompatible.find((item) => item.code === 'empty-csv-item');
+  assert.ok(issue, 'empty-csv-item issue present');
+  assert.equal(issue.rawValue, '');
+  const out = removeDiscoveryQueryIncompatibleIssue(params, issue);
+  assert.equal(out.toString(), 'length=length%3Ashort%2Clength%3Amedium', 'empty item dropped, siblings kept');
+  const reparsed = parseDiscoveryQueryV2(out, taxonomy, { relationshipProviderAvailable: false });
+  expectCompatible(reparsed, 'cleaned empty csv item');
+});
+
+test('glue remove: deleting the only csv item removes the key', () => {
+  const params = new URLSearchParams('q=hi&length=ultra-long');
+  const issue = { key: 'length', rawValue: 'ultra-long', code: 'invalid-length-item' };
+  const out = removeDiscoveryQueryIncompatibleIssue(params, issue);
+  assert.equal(out.has('length'), false, 'key deleted when no item remains');
+  assert.equal(out.toString(), 'q=hi');
+  // removal is repeatable / idempotent
+  assert.equal(removeDiscoveryQueryIncompatibleIssue(out, issue).toString(), 'q=hi');
+});
+
+test('glue remove: invalid singleton keys are deleted wholesale, others preserved', () => {
+  const params = new URLSearchParams('source=bogus&q=hi&length=length%3Ashort');
+  const issue = { key: 'source', rawValue: 'bogus', code: 'invalid-source' };
+  const out = removeDiscoveryQueryIncompatibleIssue(params, issue);
+  assert.equal(out.has('source'), false);
+  assert.equal(out.toString(), 'q=hi&length=length%3Ashort');
+
+  // duplicate singleton intent is ambiguous: the whole key fails closed
+  const dup = new URLSearchParams('source=bogus&source=everyone&q=hi');
+  const dupOut = removeDiscoveryQueryIncompatibleIssue(dup, {
+    key: 'source',
+    rawValue: 'bogus',
+    code: 'duplicate-param',
+  });
+  assert.equal(dupOut.has('source'), false, 'every duplicate occurrence is removed');
+  assert.equal(dupOut.toString(), 'q=hi');
+});
+
+test('glue helpers never mutate their inputs', () => {
+  const canonical = new URLSearchParams('q=hi&length=length%3Ashort');
+  const current = new URLSearchParams('length=length%3Ashort%2Cultra-long');
+  const issues = [{ key: 'length', rawValue: 'ultra-long', code: 'invalid-length-item' }];
+  const canonicalBefore = canonical.toString();
+  const currentBefore = current.toString();
+  const merged = mergeDiscoveryQueryIncompatibleParams(canonical, current, issues);
+  assert.notEqual(merged, canonical, 'merge returns a new instance');
+  assert.equal(canonical.toString(), canonicalBefore, 'canonical untouched');
+  assert.equal(current.toString(), currentBefore, 'current untouched');
+
+  const params = new URLSearchParams('length=length%3Ashort%2Cultra-long&source=bogus');
+  const paramsBefore = params.toString();
+  const removed = removeDiscoveryQueryIncompatibleIssue(params, issues[0]);
+  assert.notEqual(removed, params, 'removal returns a new instance');
+  assert.equal(params.toString(), paramsBefore, 'params untouched');
 });
 
 // ---------------------------------------------------------------------------

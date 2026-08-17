@@ -111,7 +111,7 @@ export function CommunityDiscoveryRuntimeFilters({
         <div className="flex flex-wrap gap-2">
           {markers.map((marker) => (
             <span
-              key={marker.code}
+              key={`${marker.code}\u0000${marker.rawValue}\u0000${marker.canonicalValue}`}
               data-testid={`compatibility-marker-${marker.code}`}
               className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white py-1 pl-3 pr-1"
             >

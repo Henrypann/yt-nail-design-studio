@@ -466,8 +466,10 @@ const defaultState = () =>
   assert.match(feed, /executeDiscoveryQueryV2/, 'feed runs the v2 pure pipeline');
   assert.match(feed, /CommunityDiscoveryRuntimeFilters/, 'feed renders v2 runtime filters');
   assert.match(feed, /community-incompatible-filters/, 'feed surfaces incompatible conditions');
-  assert.match(feed, /\.getAll\(/, 'feed preserves raw URL values with getAll');
-  assert.match(feed, /\.append\(/, 'feed re-appends raw incompatible values');
+  assert.match(feed, /mergeDiscoveryQueryIncompatibleParams/, 'feed merges raw incompatible values via the pure preservation helper');
+  assert.match(feed, /removeDiscoveryQueryIncompatibleIssue/, 'feed removes incompatible issues via the pure removal helper');
+  assert.doesNotMatch(feed, /\.getAll\(/, 'no inline raw-value re-append loop in the feed');
+  assert.doesNotMatch(feed, /\.append\(/, 'no inline append loop in the feed');
   assert.match(feed, /CommunityLookCard/, 'feed renders look cards');
   assert.match(feed, /CommunityCreatorCard/, 'feed renders creator cards');
   assert.match(feed, /community-feed-empty/, 'empty state kept');

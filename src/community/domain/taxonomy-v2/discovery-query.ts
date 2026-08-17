@@ -4,7 +4,11 @@
  * Checkpoint 1 implemented URL state parsing + canonical serialization +
  * compatibility markers. Checkpoint 2 (the tail of this file) adds
  * `executeDiscoveryQueryV2`, the pure governance-pass → filter → rank
- * pipeline (see the function doc for the full algorithm).
+ * pipeline (see the function doc for the full algorithm). Checkpoint 3 adds
+ * the pure URL compatibility-glue helpers used by CommunityFeed:
+ * `mergeDiscoveryQueryIncompatibleParams` (preserve the exact raw
+ * incompatible representation without duplicate accumulation) and
+ * `removeDiscoveryQueryIncompatibleIssue` (explicit, CSV-item-aware removal).
  *
  * Contract:
  * - `parseDiscoveryQueryV2` is total (never throws) and never mutates its
@@ -615,6 +619,79 @@ export function serializeDiscoveryQueryV2(state: DiscoveryQueryStateV2): string 
   setCsv(out, 'rights', state.rightsIds);
   setCsv(out, 'technique', state.techniqueIds);
   return out.toString();
+}
+
+// ---------------------------------------------------------------------------
+// URL compatibility glue (TAX-03)
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine a freshly canonical serialization with the raw current URL and the
+ * incompatible issues, preserving the exact raw incompatible representation.
+ *
+ * For each unique incompatible issue key (first-seen order), the key is first
+ * DELETED from the canonical params — dropping the canonical occurrence the
+ * serializer just emitted for that same key — then every raw value of the key
+ * from `current` is appended in original `getAll` order. All other keys come
+ * from `canonical` untouched.
+ *
+ * Deleting before appending is what prevents duplicate accumulation: without
+ * it, a canonical `length=length:short` merged with raw
+ * `length=length:short,ultra-long` would stack one extra occurrence per merge.
+ * Repeating the operation on its own output is byte-stable.
+ *
+ * Pure: returns a new URLSearchParams and never mutates either input.
+ */
+export function mergeDiscoveryQueryIncompatibleParams(
+  canonical: URLSearchParams,
+  current: URLSearchParams,
+  issues: readonly DiscoveryIncompatibleIssueV2[],
+): URLSearchParams {
+  const out = new URLSearchParams(canonical);
+  const seen = new Set<string>();
+  for (const issue of issues) {
+    if (seen.has(issue.key)) continue;
+    seen.add(issue.key);
+    out.delete(issue.key);
+    for (const value of current.getAll(issue.key)) {
+      out.append(issue.key, value);
+    }
+  }
+  return out;
+}
+
+/**
+ * Explicit removal of exactly one incompatible issue from a raw URL.
+ *
+ * CSV keys (length / makeability / rights / technique): only CSV items whose
+ * trimmed value equals `issue.rawValue` are removed — an empty item matches an
+ * `empty-csv-item` issue. All sibling items and every other URL key are
+ * preserved; the key is canonicalized into a single comma-joined occurrence
+ * when any item remains, and deleted when none remains.
+ *
+ * Non-CSV keys: the entire key is deleted — invalid singleton / duplicate
+ * intent is ambiguous, so removal fails closed.
+ *
+ * Pure: returns a new URLSearchParams and never mutates the input.
+ */
+export function removeDiscoveryQueryIncompatibleIssue(
+  params: URLSearchParams,
+  issue: DiscoveryIncompatibleIssueV2,
+): URLSearchParams {
+  const out = new URLSearchParams(params);
+  if (Object.prototype.hasOwnProperty.call(DISCOVERY_CSV_PARAM_DIMENSION, issue.key)) {
+    const kept: string[] = [];
+    for (const value of params.getAll(issue.key)) {
+      for (const rawItem of value.split(',')) {
+        if (rawItem.trim() !== issue.rawValue) kept.push(rawItem);
+      }
+    }
+    if (kept.length > 0) out.set(issue.key, kept.join(','));
+    else out.delete(issue.key);
+  } else {
+    out.delete(issue.key);
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

@@ -38,7 +38,9 @@ import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import {
   createDefaultDiscoveryQueryState,
   executeDiscoveryQueryV2,
+  mergeDiscoveryQueryIncompatibleParams,
   parseDiscoveryQueryV2,
+  removeDiscoveryQueryIncompatibleIssue,
   serializeDiscoveryQueryV2,
   type DiscoveryCompatibilityMarkerV2,
   type DiscoveryIncompatibleIssueV2,
@@ -106,14 +108,14 @@ export function CommunityFeed({
   const applyState = useCallback(
     (next: DiscoveryQueryStateV2) => {
       const effective = lockedSource ? { ...next, source: lockedSource } : next;
-      const params = new URLSearchParams(serializeDiscoveryQueryV2(effective));
       // TAX-03: 不兼容条件原样保留（含重复值）；显式移除是唯一清除路径。
-      const issueKeys = new Set(effective.incompatible.map((issue) => issue.key));
-      for (const key of issueKeys) {
-        for (const value of searchParams.getAll(key)) {
-          params.append(key, value);
-        }
-      }
+      // 合并 helper 先删掉 canonical 中同 key 的序列化结果，再按原始顺序
+      // 追加当前 URL 的全部原始值，避免重复累积（byte-stable）。
+      const params = mergeDiscoveryQueryIncompatibleParams(
+        new URLSearchParams(serializeDiscoveryQueryV2(effective)),
+        searchParams,
+        effective.incompatible,
+      );
       // 只保留显式产品上下文 entry / return_to；筛选/搜索状态本身就是 URL 真源。
       for (const key of ['entry', 'return_to'] as const) {
         const v = searchParams.get(key);
@@ -151,14 +153,14 @@ export function CommunityFeed({
   );
 
   /**
-   * TAX-03: 不兼容问题直接删除对应 URL key（replace），保留其余全部
-   * key/上下文；绝不自动清除。
+   * TAX-03: 显式移除不兼容问题。CSV key 只移除对应 item（保留其余兄弟项
+   * 与其它 key），单值 key 整键删除（fail-closed）；其余上下文全部保留。
    */
   const removeIncompatibleIssue = useCallback(
     (issue: DiscoveryIncompatibleIssueV2) => {
-      const params = new URLSearchParams(searchParams);
-      params.delete(issue.key);
-      setSearchParams(params, { replace: true });
+      setSearchParams(removeDiscoveryQueryIncompatibleIssue(searchParams, issue), {
+        replace: true,
+      });
     },
     [searchParams, setSearchParams],
   );
