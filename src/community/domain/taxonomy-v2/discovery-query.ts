@@ -750,15 +750,19 @@ function matchesRecommendationChannel(
       // unfiltered channels: every governed look qualifies
       return true;
     case 'editorial':
-      // curated or legacy-featured
-      return curation.curated === true || look.curationStatus === 'FEATURED_BY_OFFICIAL';
+      // curated, or explicitly featured in the editorial channel
+      return (
+        curation.curated === true ||
+        curation.featuredChannels.includes('editorial')
+      );
     case 'makeable':
       return isCurrentMakeable(discovery);
     case 'dimensional':
-      // dimensional-module classification or legacy-featured
+      // dimensional-module classification, or explicitly featured in the
+      // dimensional channel
       return (
         discovery.makeability.classification === 'DIMENSIONAL_MODULE' ||
-        look.curationStatus === 'FEATURED_BY_OFFICIAL'
+        curation.featuredChannels.includes('dimensional')
       );
     case 'emerging-creator':
       return curation.featuredChannels.includes('emerging-creator');
@@ -770,8 +774,8 @@ function matchesRecommendationChannel(
         curation.featuredChannels.includes(FOLLOWING_CHANNEL_ID)
       );
     default:
-      // Unknown channel id (defensive): behave like the default for-you channel.
-      return true;
+      // Unknown channel id: fail closed (never behave like for-you).
+      return false;
   }
 }
 
@@ -895,8 +899,9 @@ function lookSearchFieldsV2(
  *    labels of those exact ids. Legacy discovery fields / sourceContent are
  *    never read.
  * 7. Recommended channels: for-you/trending/new all; trending/new force their
- *    sort; editorial curated-or-featured; makeable isCurrentMakeable;
- *    dimensional DIMENSIONAL_MODULE-or-featured; emerging-creator/collections/
+ *    sort; editorial curated-or-featured-in-channel; makeable
+ *    isCurrentMakeable; dimensional DIMENSIONAL_MODULE-or-featured-in-channel;
+ *    emerging-creator/collections/
  *    following explicit featuredChannels membership (following also requires
  *    the relationship provider).
  * 8. Ranking via rankLooks with q='' (matching already happened in step 6) and
