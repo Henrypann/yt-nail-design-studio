@@ -44,12 +44,21 @@ const runtimeMode = import.meta.env?.MODE ?? 'integration';
 export type { CreatorLookLoadDiagnosticV1 };
 
 /**
+ * Aggregation identity guard (COMM-v0.7.2-TAX-02): the first occurrence of
+ * each lookId wins, in candidate priority order — canonical demo (only in
+ * development/integration), four-look set, creator, legacy. Every later
+ * occurrence is dropped and reported exactly once.
+ */
+type LookCandidateSource = 'canonical' | 'four-look' | 'creator' | 'legacy';
+
+/**
  * Typed diagnostics surfaced through `loadLookReadModels`. All failure paths
  * are typed and non-sensitive (no paths, URLs or raw errors).
  */
 export type CommunityLookLoadDiagnosticV1 =
   | { scope: 'discovery-index'; code: 'UNAVAILABLE'; issues: DiscoveryIndexIssueV1[] }
   | { scope: 'discovery-index'; code: 'RECORD_BLOCKED'; contentId: string; blockedCode: DiscoveryIndexBlockedEntryV1['code'] }
+  | { scope: 'look-aggregation'; code: 'IDENTITY_COLLISION'; lookId: string; keptSource: LookCandidateSource; droppedSource: LookCandidateSource }
   | CreatorLookLoadDiagnosticV1;
 
 function defaultCreatorDiagnostic(diagnostic: CommunityLookLoadDiagnosticV1): void {
@@ -85,6 +94,43 @@ async function loadDiscoveryFixtures(): Promise<DiscoveryFixtures> {
   // adapter re-validates every record strictly per record below.
   const rawIndex = indexRaw as CommunityContentIndexV1;
   return { ok: true, index: result.index, blocked: result.blocked, rawIndex };
+}
+
+interface LookCandidateV1 {
+  source: LookCandidateSource;
+  look: PublishedLookReadModelV1;
+}
+
+/**
+ * COMM-v0.7.2-TAX-02 cross-source lookId collision guard. Candidates arrive
+ * in priority order (canonical demo → four-look set → creator → legacy); the
+ * first occurrence of each lookId is kept and every later occurrence is
+ * dropped with exactly one typed IDENTITY_COLLISION diagnostic. Aggregation
+ * identity guard only: the kept model is never reordered, overwritten or
+ * re-projected, and discovery/governance/sourceContent stay untouched.
+ */
+function aggregateLookCandidates(
+  candidates: readonly LookCandidateV1[],
+  emitDiagnostic: (diagnostic: CommunityLookLoadDiagnosticV1) => void,
+): PublishedLookReadModelV1[] {
+  const keptSourceByLookId = new Map<string, LookCandidateSource>();
+  const output: PublishedLookReadModelV1[] = [];
+  for (const candidate of candidates) {
+    const keptSource = keptSourceByLookId.get(candidate.look.lookId);
+    if (keptSource !== undefined) {
+      emitDiagnostic({
+        scope: 'look-aggregation',
+        code: 'IDENTITY_COLLISION',
+        lookId: candidate.look.lookId,
+        keptSource,
+        droppedSource: candidate.source,
+      });
+      continue;
+    }
+    keptSourceByLookId.set(candidate.look.lookId, candidate.source);
+    output.push(candidate.look);
+  }
+  return output;
 }
 
 export async function loadLookReadModels(input?: {
@@ -126,9 +172,18 @@ export async function loadLookReadModels(input?: {
   } catch {
     emitDiagnostic({ scope: 'creator-look-slice', code: 'UNAVAILABLE' });
   }
-  return runtimeMode === 'development' || runtimeMode === 'integration'
-    ? [CANONICAL_USE_DEMO_READ_MODEL_V1, ...FOUR_LOOK_SET_READ_MODELS_V0_7_2, ...creator, ...legacy]
-    : [...FOUR_LOOK_SET_READ_MODELS_V0_7_2, ...creator, ...legacy];
+  // Cross-source aggregation in priority order: canonical demo (only in
+  // development/integration) → four-look set → creator → legacy. First
+  // occurrence of each lookId wins; duplicates are dropped with a typed
+  // IDENTITY_COLLISION diagnostic (aggregation identity guard only).
+  const candidates: LookCandidateV1[] = [];
+  if (runtimeMode === 'development' || runtimeMode === 'integration') {
+    candidates.push({ source: 'canonical', look: CANONICAL_USE_DEMO_READ_MODEL_V1 });
+  }
+  for (const look of FOUR_LOOK_SET_READ_MODELS_V0_7_2) candidates.push({ source: 'four-look', look });
+  for (const look of creator) candidates.push({ source: 'creator', look });
+  for (const look of legacy) candidates.push({ source: 'legacy', look });
+  return aggregateLookCandidates(candidates, emitDiagnostic);
 }
 
 export async function getLookReadModelById(

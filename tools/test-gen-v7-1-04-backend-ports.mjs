@@ -30,7 +30,10 @@ import {
   buildPublishPackageV1,
   createDeterministicPublishIdFactoryV1,
 } from '../src/studio/publishing/index.ts';
-import { CANONICAL_USE_DEMO_RELEASE_RECORD_V1 } from '../src/integration/community-studio/canonical-use-demo.ts';
+import {
+  CANONICAL_USE_DEMO_READ_MODEL_V1,
+  CANONICAL_USE_DEMO_RELEASE_RECORD_V1,
+} from '../src/integration/community-studio/canonical-use-demo.ts';
 
 const now = '2026-08-12T12:00:00.000Z';
 // COMM-v0.7.2-TAX-02: every creator service construction resolves discovery
@@ -558,6 +561,29 @@ const resilientLooks = await loadLookReadModels({
 });
 assert.ok(resilientLooks.some((look) => look.contentId === 'cc_mercury_dew'));
 assert.deepEqual(diagnostics, [{ scope: 'creator-look-slice', code: 'UNAVAILABLE' }]);
+
+// Cross-source lookId collision protection: the built-in canonical demo wins
+// over a structurally identical creator look, the dropped duplicate emits
+// exactly one typed IDENTITY_COLLISION diagnostic (keptSource canonical,
+// droppedSource creator), and non-colliding results keep priority order.
+const collisionDiagnostics = [];
+const creatorCollisionClone = structuredClone(CANONICAL_USE_DEMO_READ_MODEL_V1);
+creatorCollisionClone.title = `${CANONICAL_USE_DEMO_READ_MODEL_V1.title} (creator clone)`;
+const collidedLooks = await loadLookReadModels({
+  loadCreator: async () => [creatorCollisionClone],
+  onDiagnostic: (diagnostic) => collisionDiagnostics.push(diagnostic),
+});
+const petalVeilModels = collidedLooks.filter((look) => look.lookId === CANONICAL_USE_DEMO_READ_MODEL_V1.lookId);
+assert.equal(petalVeilModels.length, 1, 'colliding lookId aggregates exactly once');
+assert.equal(petalVeilModels[0].title, CANONICAL_USE_DEMO_READ_MODEL_V1.title, 'built-in canonical demo wins over the creator clone');
+assert.equal(collidedLooks[0].lookId, CANONICAL_USE_DEMO_READ_MODEL_V1.lookId, 'canonical demo keeps its priority position');
+assert.equal(collidedLooks.some((look) => look.title === creatorCollisionClone.title), false, 'creator clone is dropped, never kept');
+assert.equal(collidedLooks.some((look) => look.lookId === 'look.v0-7-2.leopard-gilded-nude'), true, 'non-colliding four-look set preserved');
+assert.equal(collidedLooks.some((look) => look.contentId === 'cc_mercury_dew'), true, 'non-colliding legacy records preserved');
+assert.deepEqual(collisionDiagnostics, [{
+  scope: 'look-aggregation', code: 'IDENTITY_COLLISION', lookId: CANONICAL_USE_DEMO_READ_MODEL_V1.lookId,
+  keptSource: 'canonical', droppedSource: 'creator',
+}]);
 globalThis.fetch = originalFetch;
 
 const uiFiles = [
