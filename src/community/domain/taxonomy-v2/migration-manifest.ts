@@ -315,6 +315,19 @@ export function parseMigrationManifestV1(
     // Public-status / governance consistency (fail closed, never synthesized).
     if (parsedDiscovery) {
       const rightsPending = parsedDiscovery.rights.status === 'PENDING';
+      // COMM-v0.7.2-TAX-02 hard rule: the entry-level legacy style list is the
+      // single migration authority; discovery.migration.legacyStyleIds must
+      // mirror it exactly (order-insensitive). Drift is a typed parser issue.
+      const entryLegacy = [...(Array.isArray(legacyStyleIds) ? (legacyStyleIds as string[]) : [])].sort();
+      const discoveryLegacy = [...parsedDiscovery.migration.legacyStyleIds].sort();
+      if (JSON.stringify(entryLegacy) !== JSON.stringify(discoveryLegacy)) {
+        push(
+          issues,
+          'legacy_style_mismatch',
+          `${path}.discovery.migration.legacyStyleIds`,
+          `discovery.migration.legacyStyleIds must equal entry legacyStyleIds (declared [${entryLegacy.join(', ')}])`,
+        );
+      }
       if (rightsPending && publicStatus !== 'PUBLIC_BLOCKED') {
         push(
           issues,

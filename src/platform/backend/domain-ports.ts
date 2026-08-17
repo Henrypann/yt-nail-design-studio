@@ -1,8 +1,8 @@
 import {
-  createEmptyCreatorPublicationStoreV1,
-  parseCreatorPublicationStoreV1,
-  type CreatorPublicationStoreV1,
-} from '@/community/domain/v7_1/creator-publication';
+  createEmptyCreatorPublicationStoreV2,
+  parseCreatorPublicationStoreV2,
+  type CreatorPublicationStoreV2,
+} from '@/community/domain/v7_1/creator-publication-v2';
 import {
   emptyGovernanceStoreV1,
   parseGovernanceStoreV1,
@@ -69,7 +69,14 @@ interface DomainStorePortV1<T> {
   ): Promise<ServiceResultV1<RepositorySnapshotV1<T>>>;
 }
 
-export type CreatorPublicationPortV1 = DomainStorePortV1<CreatorPublicationStoreV1>;
+/**
+ * Creator publication port (COMM-v0.7.2-TAX-02): the active local-json port
+ * now stores the Creator Store V2 contract. Failed parses return
+ * DATA_CORRUPTED and NEVER overwrite either the authority envelope key or the
+ * legacy localStorage key (see createVersionedJsonRepositoryV1). The legacy
+ * key remains a read-only mirror for V1 payloads, which are pure-upcast.
+ */
+export type CreatorPublicationPortV1 = DomainStorePortV1<CreatorPublicationStoreV2>;
 export type GovernancePortV1 = DomainStorePortV1<GovernanceStoreV1>;
 export type ClientApprovalPortV1 = DomainStorePortV1<ClientApprovalStoreV1>;
 
@@ -110,8 +117,8 @@ export function createLocalCreatorPublicationPortV1(): CreatorPublicationPortV1 
   return guardedPort(createVersionedJsonRepositoryV1({
     storage: browserStorage(StorageKeys.backendPublicationRepository),
     legacy: browserStorage(StorageKeys.creatorPublications),
-    empty: createEmptyCreatorPublicationStoreV1,
-    parse: parseCreatorPublicationStoreV1,
+    empty: createEmptyCreatorPublicationStoreV2,
+    parse: parseCreatorPublicationStoreV2,
     invalidReason: 'publication.store_corrupted',
   }), BACKEND_PERMISSIONS_V1.publicationRead, BACKEND_PERMISSIONS_V1.publicationWrite);
 }

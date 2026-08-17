@@ -1,10 +1,14 @@
 import {
-  createCreatorPublicationDraftV1,
-  publishCreatorDraftV1,
-  setCreatorLookHiddenV1,
-  updateCreatorPublicationDraftV1,
-  type CreatorPublicationStoreV1,
-} from '@/community/domain/v7_1/creator-publication';
+  createCreatorPublicationDraftV2,
+  creatorDiscoveryResolutionReasonsV2,
+  publishCreatorDraftV2,
+  setCreatorLookHiddenV2,
+  updateCreatorPublicationDraftV2,
+  type CreatorPublicationDraftPatchV2,
+  type CreatorPublicationStoreV2,
+  type StoredDiscoveryEnvelopeV2,
+} from '@/community/domain/v7_1/creator-publication-v2';
+import type { CommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/types';
 import {
   decidePublicationReviewV1,
   publicationReviewClearedV1,
@@ -41,10 +45,10 @@ import {
   type ServiceResultV1,
 } from './service-contract';
 
-export type CreatorPublicationDraftPatchV1 = Parameters<typeof updateCreatorPublicationDraftV1>[0]['patch'];
+export type CreatorPublicationDraftPatchV2 = Parameters<typeof updateCreatorPublicationDraftV2>[0]['patch'];
 
 export interface CreatorWorkspaceStateV1 {
-  publication: CreatorPublicationStoreV1;
+  publication: CreatorPublicationStoreV2;
   governance: GovernanceStoreV1;
   disclosure: 'LOCAL_PROTOTYPE' | 'REMOTE';
 }
@@ -57,7 +61,7 @@ export interface ClientShareViewV1 {
 export interface CreatorWorkspaceApplicationServiceV1 {
   load(): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
   createDraft(designVersionId: string): Promise<ServiceResultV1<CreatorWorkspaceStateV1 & { draftId: string }>>;
-  updateDraft(draftId: string, patch: CreatorPublicationDraftPatchV1): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
+  updateDraft(draftId: string, patch: CreatorPublicationDraftPatchV2): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
   submitReview(draftId: string): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
   publishDraft(draftId: string): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
   setLookHidden(lookId: string, hidden: boolean): Promise<ServiceResultV1<CreatorWorkspaceStateV1>>;
@@ -104,18 +108,28 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
   assets: AssetUploadPortV1;
   nextId(scope: string): string;
   token: { generate(): string; sha256(value: string): Promise<string> };
+  /**
+   * Strict taxonomy source used to resolve creator discovery authoring before
+   * a PUBLIC commit. Returning null / throwing fails closed (UNAVAILABLE).
+   */
+  taxonomy: { load(): Promise<CommunityTaxonomyV2 | null> };
 }): CreatorWorkspaceApplicationServiceV1 {
   const projectCreatorState = (
-    publication: CreatorPublicationStoreV1,
+    publication: CreatorPublicationStoreV2,
     governance: GovernanceStoreV1,
     actorRef: string,
   ): CreatorWorkspaceStateV1 => {
     const drafts = publication.drafts.filter((draft) => draft.creatorProfileId === actorRef);
     const looks = publication.looks.filter((look) => look.creatorProfileId === actorRef);
+    const discovery: Record<string, StoredDiscoveryEnvelopeV2> = {};
+    for (const look of looks) {
+      const envelope = publication.discovery[look.lookId];
+      if (envelope) discovery[look.lookId] = structuredClone(envelope);
+    }
     const reviews = governance.publicationReviews.filter((review) => review.creatorProfileId === actorRef);
     const ownedDraftIds = new Set([...drafts.map((draft) => draft.draftId), ...reviews.map((review) => review.draftId)]);
     return {
-      publication: { ...publication, drafts: structuredClone(drafts), looks: structuredClone(looks) },
+      publication: { ...publication, drafts: structuredClone(drafts), looks: structuredClone(looks), discovery },
       governance: {
         schemaVersion: 1,
         cases: [],
@@ -175,7 +189,7 @@ export function createCreatorWorkspaceApplicationServiceV1(input: {
     return { ok: true as const, value: { publication, governance }, changed: false };
   };
 
-  const state = (publication: CreatorPublicationStoreV1, governance: GovernanceStoreV1, actorRef: string, changed: boolean): ServiceResultV1<CreatorWorkspaceStateV1> => ({
+  const state = (publication: CreatorPublicationStoreV2, governance: GovernanceStoreV1, actorRef: string, changed: boolean): ServiceResultV1<CreatorWorkspaceStateV1> => ({
     ok: true,
     value: projectCreatorState(publication, governance, actorRef),
     changed,
