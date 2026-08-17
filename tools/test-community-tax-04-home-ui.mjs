@@ -20,6 +20,11 @@
  *    tab/source）、非默认 source 计为活动条件但不启用 clear-all（仅 source
  *    非默认时 clear-all 是 no-op）、条件摘要与结果数、抽屉辅助清除保留；
  *  - 无 legacy CommunityFilters / filterLookReadModels。
+ *  - TAX-04 空反馈：items 为空时推导 invalid-link / rights-restricted /
+ *    access-denied / empty 四种显式状态（独立稳定 testid）；invalid-link
+ *    与 access-denied 分支绝不渲染通用清除；加载失败独立
+ *    community-feed-feedback-load-failed；详情页 fetch/runtime 失败独立
+ *    community-look-load-failed（区别于内容缺失）。
  *
  * 静态/结构验证沿用仓库既定模式（.tsx 由源码断言，纯 .ts 由 Node 直接
  * 执行）；可见次行集合/顺序由 strict fixture 驱动断言。
@@ -835,6 +840,109 @@ test('package script test:community-tax-04-home-ui registered with the import/re
   assert.match(script, /--import \.\/tools\/lib\/register-node-vite\.mjs/, 'register hook');
   assert.match(script, /--experimental-strip-types/, 'strip-types flag');
   assert.match(script, /tools\/test-community-tax-04-home-ui\.mjs/, 'target tool');
+});
+
+// ---------------------------------------------------------------------------
+// 10 · TAX-04 empty feedback states (feed) + detail load-failure state
+// ---------------------------------------------------------------------------
+
+test('feed: explicit empty feedback kinds with four distinct stable testids', () => {
+  assert.match(feed, /community-feed-feedback-invalid-link/, 'invalid-link feedback testid');
+  assert.match(feed, /community-feed-feedback-rights-restricted/, 'rights-restricted feedback testid');
+  assert.match(feed, /community-feed-feedback-access-denied/, 'access-denied feedback testid');
+  assert.match(feed, /community-feed-feedback-empty/, 'empty feedback testid');
+  assert.match(feed, /data-testid="community-feed-empty"/, 'TAX-03 empty-state container anchor preserved');
+  assert.match(
+    feed,
+    /data-testid="community-feed-feedback-load-failed"/,
+    'load failure keeps its own fail-closed testid',
+  );
+});
+
+test('feed: empty feedback derivation order (invalid → rights → access → empty)', () => {
+  const body = arrowFnBody(feed, 'emptyFeedbackKind');
+  assert.match(body, /queryResult\.items\.length > 0/, 'non-empty results never reach feedback');
+  assert.match(body, /queryResult\.incompatible\.length > 0/, 'invalid-link predicate first');
+  assert.match(
+    body,
+    /queryState\.rightsIds\.includes\(RIGHTS_STATUS_TAGS\.PENDING\)/,
+    'rights-restricted predicate reads the requested PENDING rights id',
+  );
+  assert.match(body, /governedCandidateCount === 0/, 'access-denied requires zero governed candidates');
+  assert.match(body, /governanceBlocked > 0/, 'access-denied requires governance-blocked looks');
+  assert.match(body, /return 'empty'/, 'normal zero match falls through to empty');
+});
+
+test('feed: invalid-link feedback branch has no generic clear/reset action', () => {
+  const branch = feed.slice(
+    feed.indexOf('community-feed-feedback-invalid-link'),
+    feed.indexOf('community-feed-feedback-rights-restricted'),
+  );
+  assert.doesNotMatch(stripComments(branch), /清除筛选|Clear filters/, 'no generic clear copy');
+  assert.doesNotMatch(stripComments(branch), /applyState\(/, 'no generic reset dispatch');
+  assert.doesNotMatch(branch, /<Button/, 'no reset button at all');
+});
+
+test('feed: access-denied feedback branch has no generic clear/reset action', () => {
+  const branch = feed.slice(
+    feed.indexOf('community-feed-feedback-access-denied'),
+    feed.indexOf('community-feed-feedback-empty'),
+  );
+  assert.doesNotMatch(stripComments(branch), /清除筛选|Clear filters/, 'no generic clear copy');
+  assert.doesNotMatch(stripComments(branch), /applyState\(/, 'no generic reset dispatch');
+  assert.doesNotMatch(branch, /<Button/, 'no reset button at all');
+});
+
+test('feed: rights-restricted feedback explains PENDING and keeps a compatible reset', () => {
+  const branch = feed.slice(
+    feed.indexOf('community-feed-feedback-rights-restricted'),
+    feed.indexOf('community-feed-feedback-access-denied'),
+  );
+  assert.match(branch, /PENDING/, 'explains the PENDING status');
+  assert.match(branch, /不会进入公开首页\/搜索\/推荐/, 'explains PENDING never enters public surfacing');
+  assert.match(branch, /resetToDefault/, 'reset goes through the default-compatible reset');
+  assert.match(branch, /清除筛选/, 'compatible generic clear offered');
+});
+
+test('feed: generic reset rebuilds a default compatible state preserving tab/source/q', () => {
+  const body = arrowFnBody(feed, 'resetToDefault');
+  assert.match(body, /createDefaultDiscoveryQueryState\(\)/, 'resets to the default compatible state');
+  assert.match(body, /tab: queryState\.tab/, 'current tab preserved');
+  assert.match(body, /q: queryState\.q/, 'search text preserved');
+  assert.match(body, /source: lockedSource \?\? 'all'/, 'locked source preserved');
+  assert.doesNotMatch(body, /incompatible/, 'never preserves incompatible issues');
+  assert.doesNotMatch(body, /markers/, 'never preserves compatibility markers');
+});
+
+test('feed: load failure keeps fail-closed retry, never resets or widens the query', () => {
+  const errorBranch = feed.slice(
+    feed.indexOf("state === 'error'"),
+    feed.indexOf("state === 'ready'"),
+  );
+  assert.match(errorBranch, /community-feed-feedback-load-failed/, 'distinct testid on the failure state');
+  assert.match(errorBranch, /setRetry/, 'retry re-runs the loader');
+  assert.match(errorBranch, /重试|Retry/, 'visible retry label');
+  assert.doesNotMatch(errorBranch, /applyState\(/, 'failure state never touches the query state');
+});
+
+test('detail page: fetch/runtime failure is a distinct visible state, never fake content-missing', () => {
+  assert.match(page, /community-look-load-failed/, 'visible load-failed state testid');
+  assert.match(page, /community-look-missing/, 'missing-content state preserved');
+  assert.match(page, /const \[loadFailed, setLoadFailed\]/, 'separate load-failure state variable');
+  assert.match(page, /setLoadFailed\(true\)/, 'fetch/runtime failure sets the load-failed state');
+  assert.doesNotMatch(page, /setLook\(null\)/, 'catch never fakes content-missing');
+  const failedBranch = page.slice(
+    page.indexOf('community-look-load-failed'),
+    page.indexOf('community-look-missing'),
+  );
+  assert.match(failedBranch, /内容加载失败/, 'failure state is headed by load failure, not content missing');
+  assert.match(failedBranch, /setRetry/, 'retry re-runs the fetch');
+  assert.match(failedBranch, /返回 Discover/, 'navigation escape hatch kept');
+  const missingBranch = page.slice(
+    page.indexOf('community-look-missing'),
+    page.indexOf('const content = look.sourceContent'),
+  );
+  assert.match(missingBranch, /内容不存在或已下架/, 'missing-state copy preserved');
 });
 
 // ---------------------------------------------------------------------------

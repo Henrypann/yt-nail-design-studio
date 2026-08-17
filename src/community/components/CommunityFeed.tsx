@@ -50,7 +50,10 @@ import {
   type DiscoveryIncompatibleIssueV2,
   type DiscoveryQueryStateV2,
 } from '../domain/taxonomy-v2/discovery-query';
-import { DEFAULT_RECOMMENDATION_CHANNEL } from '../domain/taxonomy-v2/contract';
+import {
+  DEFAULT_RECOMMENDATION_CHANNEL,
+  RIGHTS_STATUS_TAGS,
+} from '../domain/taxonomy-v2/contract';
 import {
   DEFAULT_TRENDING_CONFIG,
   EMPTY_TRENDING_SIGNALS,
@@ -70,6 +73,12 @@ import { NailBoardSaveDialog } from '../components/NailBoardSaveDialog';
 
 type LoadState = 'loading' | 'ready' | 'error';
 type ExploreMode = 'discover' | 'search';
+
+/**
+ * TAX-04: 显式空结果反馈分类（见 emptyFeedbackKind 的推导顺序）。
+ * 每一种都是独立的稳定 testid，绝不混用通用空态文案。
+ */
+type FeedEmptyFeedbackKind = 'invalid-link' | 'rights-restricted' | 'access-denied' | 'empty';
 
 export function CommunityFeed({
   mode = 'discover',
@@ -185,6 +194,21 @@ export function CommunityFeed({
     [applyState, queryState],
   );
 
+  /**
+   * TAX-04: 通用重置 → 默认兼容状态。保留 locked source 与当前 tab（以及原有
+   * 搜索词语义）；默认 state 的 incompatible/markers 为空，绝不保留任何不兼容
+   * 条件 —— TAX-03 的逐条显式移除仍是唯一清除路径。仅供 rights-restricted 与
+   * empty 反馈使用；invalid-link / access-denied 分支不渲染此动作。
+   */
+  const resetToDefault = useCallback(() => {
+    applyState({
+      ...createDefaultDiscoveryQueryState(),
+      tab: queryState.tab,
+      q: queryState.q,
+      source: lockedSource ?? 'all',
+    });
+  }, [applyState, lockedSource, queryState.q, queryState.tab]);
+
   useEffect(() => {
     let cancelled = false;
     setState('loading');
@@ -234,6 +258,28 @@ export function CommunityFeed({
     });
   }, [lookModels, publishers, taxonomyV2, queryState]);
 
+  /**
+   * TAX-04: 显式空反馈分类（仅当 queryResult 存在且 items 为空时有效）。
+   * 顺序即优先级：
+   * - invalid-link：存在不兼容条件 → 只有逐条显式移除可解决，绝不提供通用清除；
+   * - rights-restricted：兼容状态但显式请求了永不公开的 PENDING 版权 → 提供
+   *   兼容的通用重置（回到默认兼容状态，绝不保留不兼容条件）；
+   * - access-denied：兼容状态但治理门禁拦截了全部候选（无公开可访问内容）→
+   *   不提供通用重置，绝不自动放宽；
+   * - empty：普通零匹配 → 提供通用重置。
+   */
+  const emptyFeedbackKind = useMemo<FeedEmptyFeedbackKind | null>(() => {
+    if (!queryResult || queryResult.items.length > 0) return null;
+    if (queryResult.incompatible.length > 0) return 'invalid-link';
+    if (queryState.rightsIds.includes(RIGHTS_STATUS_TAGS.PENDING)) {
+      return 'rights-restricted';
+    }
+    if (queryResult.governedCandidateCount === 0 && queryResult.governanceBlocked > 0) {
+      return 'access-denied';
+    }
+    return 'empty';
+  }, [queryResult, queryState.rightsIds]);
+
   const creators = useMemo(
     () => searchCreators({ publishers, mode: import.meta.env.MODE, q: queryState.q }),
     [publishers, queryState.q],
@@ -273,7 +319,10 @@ export function CommunityFeed({
       )}
 
       {state === 'error' && (
-        <div className="flex flex-col items-center gap-3 py-12">
+        <div
+          className="flex flex-col items-center gap-3 py-12"
+          data-testid="community-feed-feedback-load-failed"
+        >
           <p className="text-sm text-gray-500">{text('内容加载失败', 'Failed to load content')}</p>
           <Button className="min-h-11" size="sm" variant="secondary" onClick={() => setRetry((k) => k + 1)}>
             {text('重试', 'Retry')}
@@ -373,24 +422,74 @@ export function CommunityFeed({
                   className="rounded-card border border-dashed border-gray-200 bg-white px-4 py-10 text-center"
                   data-testid="community-feed-empty"
                 >
-                  <p className="text-sm font-medium text-gray-800">{text('没有匹配的已发布内容', 'No matching published looks')}</p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {text('草稿与未发布内容不会出现在 Explore。', 'Drafts and unpublished content never appear in Explore.')}
-                  </p>
-                  <Button
-                    className="mt-4 min-h-11"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() =>
-                      applyState({
-                        ...createDefaultDiscoveryQueryState(),
-                        q: queryState.q,
-                        source: lockedSource ?? 'all',
-                      })
-                    }
-                  >
-                    {text('清除筛选', 'Clear filters')}
-                  </Button>
+                  {emptyFeedbackKind === 'invalid-link' ? (
+                    <div
+                      className="mx-auto max-w-md"
+                      data-testid="community-feed-feedback-invalid-link"
+                    >
+                      <p className="text-sm font-medium text-gray-800">
+                        {text(
+                          '该链接包含无法应用的条件，未显示任何内容',
+                          'This link contains conditions that cannot be applied, so nothing is shown',
+                        )}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {text(
+                          '不兼容条件已在上方逐条列出；只有显式移除这些条件后才能查看结果（不会自动清除或放宽）。',
+                          'The incompatible conditions are listed above; only explicitly removing them can reveal results (never auto-cleared or widened).',
+                        )}
+                      </p>
+                    </div>
+                  ) : emptyFeedbackKind === 'rights-restricted' ? (
+                    <div
+                      className="mx-auto max-w-md"
+                      data-testid="community-feed-feedback-rights-restricted"
+                    >
+                      <p className="text-sm font-medium text-gray-800">
+                        {text(
+                          '所选权利状态不会出现在公开内容中',
+                          'The selected rights status never appears in public content',
+                        )}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {text(
+                          'PENDING（待定）版权内容不会进入公开首页/搜索/推荐；清除该筛选即可查看已发布内容。',
+                          'PENDING copyright content never enters public home/search/recommendations; clear this filter to see published looks.',
+                        )}
+                      </p>
+                      <Button className="mt-4 min-h-11" size="sm" variant="secondary" onClick={resetToDefault}>
+                        {text('清除筛选', 'Clear filters')}
+                      </Button>
+                    </div>
+                  ) : emptyFeedbackKind === 'access-denied' ? (
+                    <div
+                      className="mx-auto max-w-md"
+                      data-testid="community-feed-feedback-access-denied"
+                    >
+                      <p className="text-sm font-medium text-gray-800">
+                        {text(
+                          '当前没有可公开访问的内容',
+                          'No publicly accessible content is available',
+                        )}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {text(
+                          '所有候选内容都未通过公开出版/版权门禁；不会自动扩大筛选范围。',
+                          'Every candidate failed the public publication/permission gate; the filter scope is never widened automatically.',
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mx-auto max-w-md" data-testid="community-feed-feedback-empty">
+                      <p className="text-sm font-medium text-gray-800">{text('没有匹配的已发布内容', 'No matching published looks')}</p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {text('草稿与未发布内容不会出现在 Explore。', 'Drafts and unpublished content never appear in Explore.')}
+                      </p>
+                      <Button className="mt-4 min-h-11" size="sm" variant="secondary" onClick={resetToDefault}>
+                        {text('清除筛选', 'Clear filters')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </>

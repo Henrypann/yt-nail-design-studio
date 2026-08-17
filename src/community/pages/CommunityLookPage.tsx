@@ -73,12 +73,16 @@ export default function CommunityLookPage() {
   const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
   /** TAX-04: taxonomy-v2 加载/解析失败的可见诊断（fail closed，不推断）。 */
   const [taxonomyV2Error, setTaxonomyV2Error] = useState<string | null>(null);
+  /** TAX-04: fetch/runtime 加载失败的独立可见状态，绝不伪装成「内容缺失」。 */
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [coverFailed, setCoverFailed] = useState(false);
   const [approxOpen, setApproxOpen] = useState(false);
 
   useEffect(() => {
     if (!lookId) return;
     let cancelled = false;
+    setLoadFailed(false);
     setCoverFailed(false);
     setTaxonomyV2Error(null);
     void (async () => {
@@ -101,15 +105,44 @@ export default function CommunityLookPage() {
           if (!cancelled) setPublisher(pub);
         }
       } catch {
-        if (!cancelled) setLook(null);
+        // TAX-04: 网络/运行时错误 ≠ 内容不存在或已下架；独立错误状态 + 重试。
+        if (!cancelled) setLoadFailed(true);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [lookId]);
+  }, [lookId, retry]);
 
   if (!lookId) return <Navigate to={Routes.communityOfficial} replace />;
+  if (loadFailed) {
+    return (
+      <div
+        className="rounded-card border border-gray-200 bg-white p-6"
+        data-testid="community-look-load-failed"
+      >
+        <h1 className="text-lg font-semibold text-gray-900">内容加载失败</h1>
+        <p className="mt-1 text-xs text-gray-500">
+          网络或运行时错误导致无法加载该内容；这不代表内容不存在或已下架。
+        </p>
+        <div className="mt-4 flex gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setLoadFailed(false);
+              setLook(undefined);
+              setRetry((k) => k + 1);
+            }}
+          >
+            重试
+          </Button>
+          <Button variant="secondary" onClick={() => navigate(Routes.community)}>
+            返回 Discover
+          </Button>
+        </div>
+      </div>
+    );
+  }
   if (look === undefined) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6 text-sm text-gray-500">
