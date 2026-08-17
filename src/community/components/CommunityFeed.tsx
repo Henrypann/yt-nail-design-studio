@@ -195,19 +195,20 @@ export function CommunityFeed({
   );
 
   /**
-   * TAX-04: 通用重置 → 默认兼容状态。保留 locked source 与当前 tab（以及原有
-   * 搜索词语义）；默认 state 的 incompatible/markers 为空，绝不保留任何不兼容
-   * 条件 —— TAX-03 的逐条显式移除仍是唯一清除路径。仅供 rights-restricted 与
-   * empty 反馈使用；invalid-link / access-denied 分支不渲染此动作。
+   * TAX-04: 通用重置 → 默认兼容状态。保留 locked source 与当前 tab；同时清空
+   * q，让「搜索词导致的结果为空」在重置后恢复默认结果。默认 state 的
+   * incompatible/markers 为空，绝不保留任何不兼容条件 —— TAX-03 的逐条显式
+   * 移除仍是唯一清除路径。仅供 rights-restricted 与 empty 反馈使用；
+   * invalid-link / access-denied 分支不渲染此动作。
    */
   const resetToDefault = useCallback(() => {
     applyState({
       ...createDefaultDiscoveryQueryState(),
       tab: queryState.tab,
-      q: queryState.q,
+      q: '',
       source: lockedSource ?? 'all',
     });
-  }, [applyState, lockedSource, queryState.q, queryState.tab]);
+  }, [applyState, lockedSource, queryState.tab]);
 
   useEffect(() => {
     let cancelled = false;

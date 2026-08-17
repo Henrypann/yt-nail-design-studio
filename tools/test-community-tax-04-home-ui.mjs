@@ -904,12 +904,13 @@ test('feed: rights-restricted feedback explains PENDING and keeps a compatible r
   assert.match(branch, /清除筛选/, 'compatible generic clear offered');
 });
 
-test('feed: generic reset rebuilds a default compatible state preserving tab/source/q', () => {
+test('feed: generic reset rebuilds a default compatible state preserving tab/source and clearing q', () => {
   const body = arrowFnBody(feed, 'resetToDefault');
   assert.match(body, /createDefaultDiscoveryQueryState\(\)/, 'resets to the default compatible state');
   assert.match(body, /tab: queryState\.tab/, 'current tab preserved');
-  assert.match(body, /q: queryState\.q/, 'search text preserved');
+  assert.match(body, /q: '',/, 'search text cleared so search-caused empty restores results');
   assert.match(body, /source: lockedSource \?\? 'all'/, 'locked source preserved');
+  assert.doesNotMatch(body, /queryState\.q/, 'reset body never references queryState.q');
   assert.doesNotMatch(body, /incompatible/, 'never preserves incompatible issues');
   assert.doesNotMatch(body, /markers/, 'never preserves compatibility markers');
 });
