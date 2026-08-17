@@ -23,6 +23,47 @@ export const CANONICAL_USE_DEMO_EDITOR_SHA256 = '0bdbb6ab83b01f221bcea547db40311
 const PREVIEW_SHA256 = 'bb43c1d444f4661410992a66cfc199f29eda66d7423d0d93672b1f59df58b342';
 const CREATED_AT = '2026-08-11T06:00:00.000Z';
 
+/**
+ * COMM-v0.7.2-TAX-02 explicit discovery + curation envelope for the canonical
+ * demo. Must stay in lockstep with the checked-in migration manifest entry
+ * for `look.v7-1.petal-veil` (drift is a test failure). The demo is a French
+ * petal-veil design: technique:french with empty styleIds and migration
+ * NEEDS_STYLE_REVIEW — discoverable by technique, excluded from style
+ * channels by TAX-01 governance. No current-makeable claim (CONCEPT_ONLY).
+ */
+export const CANONICAL_USE_DEMO_DISCOVERY_V1 = {
+  schemaVersion: 1,
+  contractRef: 'COMM-v0.7.2-TAX-01',
+  subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v7-1.petal-veil' },
+  styleIds: [],
+  recommendedShapeIds: ['shape:almond'],
+  sceneIds: [],
+  themeIds: [],
+  techniqueIds: ['technique:french'],
+  lengthIds: ['length:medium'],
+  makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+  rights: { status: 'ORIGINAL', evidenceRefs: [] },
+  migration: {
+    state: 'NEEDS_STYLE_REVIEW',
+    legacyStyleIds: [],
+    migratedAt: '2026-08-17T00:00:00.000Z',
+    note: 'French legacy record: discoverable by technique; style review required',
+  },
+  updatedAt: '2026-08-17T00:00:00.000Z',
+} as const;
+
+export const CANONICAL_USE_DEMO_CURATION_V1 = {
+  schemaVersion: 1,
+  contractRef: 'COMM-v0.7.2-TAX-01',
+  subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:look.v7-1.petal-veil' },
+  curated: true,
+  curatedBy: 'operator:community-team',
+  curatedAt: '2026-08-17T00:00:00.000Z',
+  campaignTags: ['canonical-v7-1'],
+  featuredChannels: [],
+  evidenceRefs: [],
+} as const;
+
 function buildSourceDoc(): EditorDocV7 {
   const created = createBlankEditorDocV7({
     designId: CANONICAL_USE_DEMO_DESIGN_ID,

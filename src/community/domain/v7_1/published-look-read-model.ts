@@ -32,6 +32,11 @@ import type {
 } from '../types';
 import type { EditorDocV7RefV1, PreviewFidelityV1, PublishedLookV1 } from './design-content-model';
 import type { VisibilityV1 } from './model';
+import type {
+  CommunityCurationMetadataV1,
+  CommunityDiscoveryMetadataV1,
+} from '../taxonomy-v2/types';
+import type { MigrationManifestEntryV1 } from '../taxonomy-v2/migration-manifest';
 
 export type PublishedLookReadModelKind = 'CANONICAL' | 'LEGACY_PARTIAL';
 
@@ -132,11 +137,63 @@ export interface PublishedLookReadModelV1Base {
   demo?: boolean;
   evidence: PublishedLookEvidenceV1;
   /**
+   * COMM-v0.7.2-TAX-02 required discovery projection. Loaded strictly from the
+   * checked-in migration manifest (static content) or the creator V2 store
+   * (creator content) — NEVER synthesized at runtime from PublishedLookV1.tags,
+   * publisherType, applicationLevel or verificationLevel. `null` means the
+   * subject has no explicit discovery record; the strict load path fails
+   * closed with a typed diagnostic instead of inventing one.
+   */
+  discovery: CommunityDiscoveryMetadataV1 | null;
+  /**
+   * COMM-v0.7.2-TAX-02 required curation projection. Curation is a separate
+   * auditable contract and never mixes into discovery facts. Same strict
+   * loading guarantees as `discovery`.
+   */
+  curation: CommunityCurationMetadataV1 | null;
+  /**
    * The original legacy record consumed by the existing UI helpers
    * (canTryInStudio / createStudioImportIntent). It is preserved verbatim —
-   * never upgraded into a fake PublishedLookV1.
+   * never upgraded into a fake PublishedLookV1. After TAX-02 this field is
+   * used ONLY for legacy Studio import compatibility; discovery filtering
+   * must read `discovery`/`curation` instead.
    */
   sourceContent: CommunityContentV1;
+}
+
+/**
+ * Canonical published discovery envelope (COMM-v0.7.2-TAX-02): pairs one
+ * PublishedLookV1 or legacy content identity (subjectRef) with its
+ * CommunityDiscoveryMetadataV1 and its separate CommunityCurationMetadataV1.
+ * Built deterministically from a migration manifest entry.
+ */
+export interface PublishedDiscoveryEnvelopeV1 {
+  subjectRef: { kind: 'PUBLISHED_LOOK'; id: string };
+  discovery: CommunityDiscoveryMetadataV1;
+  curation: CommunityCurationMetadataV1;
+}
+
+/** Build the canonical discovery envelope from a validated manifest entry. */
+export function publishedDiscoveryEnvelopeV1(
+  entry: MigrationManifestEntryV1,
+): PublishedDiscoveryEnvelopeV1 {
+  return {
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: entry.subjectRef.id },
+    discovery: structuredClone(entry.discovery),
+    curation: structuredClone(entry.curation),
+  };
+}
+
+/** Pure copy of a read model with the discovery/curation projections attached. */
+export function withDiscoveryProjectionsV1<T extends PublishedLookReadModelV1>(
+  look: T,
+  envelope: PublishedDiscoveryEnvelopeV1,
+): T {
+  return {
+    ...structuredClone(look),
+    discovery: structuredClone(envelope.discovery),
+    curation: structuredClone(envelope.curation),
+  } as T;
 }
 
 /** Backed by a real PublishedLookV1 contract document. */

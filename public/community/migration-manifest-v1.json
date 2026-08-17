@@ -1,0 +1,1671 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-TAX-02",
+  "description": "COMM-v0.7.2-TAX-02 explicit discovery+curation migration for every current community content record, the canonical demo, the four v0.7.2 look sets and the creator V1 fixture.",
+  "entries": [
+    {
+      "contentId": "cc_mercury_dew",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_mercury_dew"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official hero recipe; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-01",
+        "ST-10"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_mercury_dew"
+        },
+        "styleIds": [
+          "style:minimal-clean",
+          "style:glamorous-sparkling"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond",
+          "shape:oval"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:short",
+          "length:medium",
+          "length:long"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-01",
+            "ST-10"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_mercury_dew"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "recommended"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_petal_veil",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_petal_veil"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official hero recipe; first-party fixture content"
+      },
+      "publicStatus": "MANUAL_REVIEW",
+      "legacyStyleIds": [
+        "ST-02"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_petal_veil"
+        },
+        "styleIds": [],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [
+          "technique:french"
+        ],
+        "lengthIds": [
+          "length:medium",
+          "length:long"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NEEDS_STYLE_REVIEW",
+          "legacyStyleIds": [
+            "ST-02"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z",
+          "note": "French legacy record: discoverable by technique; style review required"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_petal_veil"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "recommended"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_petal_pearl_bloom",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_petal_pearl_bloom"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MANUAL_REVIEW",
+      "legacyStyleIds": [
+        "ST-02",
+        "ST-10"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_petal_pearl_bloom"
+        },
+        "styleIds": [],
+        "recommendedShapeIds": [
+          "shape:oval",
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [
+          "technique:french"
+        ],
+        "lengthIds": [
+          "length:medium",
+          "length:long"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NEEDS_STYLE_REVIEW",
+          "legacyStyleIds": [
+            "ST-02",
+            "ST-10"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z",
+          "note": "French legacy record: discoverable by technique; style review required"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_petal_pearl_bloom"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "structured-v7",
+          "simulated-assets"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pearl_tide",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pearl_tide"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official hero recipe; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-08"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pearl_tide"
+        },
+        "styleIds": [
+          "style:boho-natural"
+        ],
+        "recommendedShapeIds": [
+          "shape:oval"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:short",
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-08"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pearl_tide"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_micro_coquette",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_micro_coquette"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official hero recipe; first-party fixture content"
+      },
+      "publicStatus": "MANUAL_REVIEW",
+      "legacyStyleIds": [
+        "ST-02",
+        "ST-04"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_micro_coquette"
+        },
+        "styleIds": [],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [
+          "technique:french"
+        ],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NEEDS_STYLE_REVIEW",
+          "legacyStyleIds": [
+            "ST-02",
+            "ST-04"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z",
+          "note": "French legacy record: discoverable by technique; style review required"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_micro_coquette"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_starfish_bloom",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_starfish_bloom"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-08",
+        "ST-10"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_starfish_bloom"
+        },
+        "styleIds": [
+          "style:boho-natural",
+          "style:glamorous-sparkling"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond",
+          "shape:oval"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:short",
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-08",
+            "ST-10"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_starfish_bloom"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "editorial-concept"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_sea_glass_chrome",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_sea_glass_chrome"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-08",
+        "ST-01"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_sea_glass_chrome"
+        },
+        "styleIds": [
+          "style:boho-natural",
+          "style:minimal-clean"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond",
+          "shape:oval"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:short",
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-08",
+            "ST-01"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_sea_glass_chrome"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "editorial-concept"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_sunset_aura_glaze",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_sunset_aura_glaze"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-09"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_sunset_aura_glaze"
+        },
+        "styleIds": [
+          "style:artistic-abstract"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond",
+          "shape:coffin-ballerina"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium",
+          "length:long"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-09"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_sunset_aura_glaze"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "editorial-concept"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_liquid_chrome_statement",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_liquid_chrome_statement"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-05",
+        "ST-10"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_liquid_chrome_statement"
+        },
+        "styleIds": [
+          "style:y2k",
+          "style:glamorous-sparkling"
+        ],
+        "recommendedShapeIds": [
+          "shape:coffin-ballerina",
+          "shape:stiletto"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium",
+          "length:long"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-05",
+            "ST-10"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_liquid_chrome_statement"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "asset-pending"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_butter_glaze_quiet",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_butter_glaze_quiet"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [
+        "ST-01"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_butter_glaze_quiet"
+        },
+        "styleIds": [
+          "style:minimal-clean"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond",
+          "shape:oval"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:short",
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-01"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_butter_glaze_quiet"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "new",
+          "inspiration-only"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_luna_blush",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_luna_blush"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-03"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_luna_blush"
+        },
+        "styleIds": [
+          "style:soft-delicate"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-03"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_luna_blush"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_luna_pearl",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_luna_pearl"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-04"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_luna_pearl"
+        },
+        "styleIds": [
+          "style:cute-pop"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-04"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_luna_pearl"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_circuit",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_kai_circuit"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-05"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_circuit"
+        },
+        "styleIds": [
+          "style:y2k"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-05"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_circuit"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_oxblood",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_kai_oxblood"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-06"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_oxblood"
+        },
+        "styleIds": [
+          "style:gothic-dark"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-06"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_oxblood"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_kai_mirror",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_kai_mirror"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-07"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_mirror"
+        },
+        "styleIds": [
+          "style:futuristic"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-07"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_kai_mirror"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_mio_gallery",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_mio_gallery"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-09"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_mio_gallery"
+        },
+        "styleIds": [
+          "style:artistic-abstract"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-09"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_mio_gallery"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_pugc_mio_jewel",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_pugc_mio_jewel"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": false,
+        "note": "demo creator fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-10"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_mio_jewel"
+        },
+        "styleIds": [
+          "style:glamorous-sparkling"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-10"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_pugc_mio_jewel"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "cc_draft_internal_gate",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:cc_draft_internal_gate"
+      },
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "provenance": {
+        "firstParty": true,
+        "note": "internal draft gate; never public; rights PENDING (no clearance exists)"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [
+        "ST-01"
+      ],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_draft_internal_gate"
+        },
+        "styleIds": [
+          "style:minimal-clean"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "LEGACY_STYLE_MIGRATED",
+          "legacyStyleIds": [
+            "ST-01"
+          ],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:cc_draft_internal_gate"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.v7-1.petal-veil",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.v7-1.petal-veil"
+      },
+      "sourceClass": "CANONICAL_DEMO",
+      "provenance": {
+        "firstParty": true,
+        "note": "architecture-golden demo; first-party fixture content"
+      },
+      "publicStatus": "MANUAL_REVIEW",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v7-1.petal-veil"
+        },
+        "styleIds": [],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [],
+        "themeIds": [],
+        "techniqueIds": [
+          "technique:french"
+        ],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NEEDS_STYLE_REVIEW",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z",
+          "note": "French legacy record: discoverable by technique; style review required"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v7-1.petal-veil"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "canonical-v7-1"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.v0-7-2.leopard-gilded-nude",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.v0-7-2.leopard-gilded-nude"
+      },
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look set; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.leopard-gilded-nude"
+        },
+        "styleIds": [
+          "style:glamorous-sparkling"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [
+          "scene:date",
+          "scene:party-nightlife"
+        ],
+        "themeIds": [
+          "theme:animals-pets",
+          "theme:jewelry-gems"
+        ],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NONE",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.leopard-gilded-nude"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "structured-v7",
+          "simulated-assets"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.v0-7-2.crimson-reliquary",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.v0-7-2.crimson-reliquary"
+      },
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look set; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.crimson-reliquary"
+        },
+        "styleIds": [
+          "style:gothic-dark"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [
+          "scene:formal-dinner"
+        ],
+        "themeIds": [
+          "theme:myth-folklore"
+        ],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NONE",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.crimson-reliquary"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "structured-v7",
+          "simulated-assets"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.v0-7-2.ivory-lace-crystal",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.v0-7-2.ivory-lace-crystal"
+      },
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look set; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.ivory-lace-crystal"
+        },
+        "styleIds": [
+          "style:soft-delicate"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [
+          "scene:bridal",
+          "scene:date"
+        ],
+        "themeIds": [
+          "theme:floral-plants",
+          "theme:jewelry-gems"
+        ],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NONE",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.ivory-lace-crystal"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "structured-v7",
+          "simulated-assets"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.v0-7-2.honey-petal-glass",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.v0-7-2.honey-petal-glass"
+      },
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "provenance": {
+        "firstParty": true,
+        "note": "official v0.7.2 look set; first-party fixture content"
+      },
+      "publicStatus": "MIGRATED",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.honey-petal-glass"
+        },
+        "styleIds": [
+          "style:soft-delicate"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [
+          "scene:date"
+        ],
+        "themeIds": [
+          "theme:floral-plants"
+        ],
+        "techniqueIds": [],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "ORIGINAL",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NONE",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.v0-7-2.honey-petal-glass"
+        },
+        "curated": true,
+        "curatedBy": "operator:community-team",
+        "curatedAt": "2026-08-17T00:00:00.000Z",
+        "campaignTags": [
+          "structured-v7",
+          "simulated-assets"
+        ],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    },
+    {
+      "contentId": "look.creator-fixture.petal-veil",
+      "subjectRef": {
+        "kind": "PUBLISHED_LOOK",
+        "id": "look:look.creator-fixture.petal-veil"
+      },
+      "sourceClass": "CREATOR_V1_FIXTURE",
+      "provenance": {
+        "firstParty": false,
+        "note": "deterministic creator V1 store fixture; no first-party provenance assertion"
+      },
+      "publicStatus": "PUBLIC_BLOCKED",
+      "legacyStyleIds": [],
+      "discovery": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.creator-fixture.petal-veil"
+        },
+        "styleIds": [
+          "style:soft-delicate"
+        ],
+        "recommendedShapeIds": [
+          "shape:almond"
+        ],
+        "sceneIds": [
+          "scene:date"
+        ],
+        "themeIds": [],
+        "techniqueIds": [
+          "technique:french"
+        ],
+        "lengthIds": [
+          "length:medium"
+        ],
+        "makeability": {
+          "classification": "CONCEPT_ONLY",
+          "assetRefs": [],
+          "evidenceRefs": []
+        },
+        "rights": {
+          "status": "PENDING",
+          "evidenceRefs": []
+        },
+        "migration": {
+          "state": "NONE",
+          "legacyStyleIds": [],
+          "migratedAt": "2026-08-17T00:00:00.000Z"
+        },
+        "updatedAt": "2026-08-17T00:00:00.000Z"
+      },
+      "curation": {
+        "schemaVersion": 1,
+        "contractRef": "COMM-v0.7.2-TAX-01",
+        "subjectRef": {
+          "kind": "PUBLISHED_LOOK",
+          "id": "look:look.creator-fixture.petal-veil"
+        },
+        "curated": false,
+        "campaignTags": [],
+        "featuredChannels": [],
+        "evidenceRefs": []
+      }
+    }
+  ]
+}

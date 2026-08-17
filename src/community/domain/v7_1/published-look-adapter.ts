@@ -283,6 +283,10 @@ export function adaptLegacyContentToLook(input: unknown): LegacyLookAdapterResul
     },
     designVersionId: undefined,
     publicationGateVerified: false,
+    // TAX-02: discovery/curation are attached by the strict load path from the
+    // checked-in migration manifest. The pure adapter never synthesizes them.
+    discovery: null,
+    curation: null,
     sourceContent: structuredClone(input) as unknown as CommunityContentV1,
   };
   return { ok: true, look };
