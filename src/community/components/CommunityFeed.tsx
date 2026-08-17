@@ -6,9 +6,9 @@
  *   `CommunityDiscoveryBrowseNavigation`（主/次浏览导航，仅 look 呈现）；
  *   其变更同样经 `applyState` push 历史，会话记忆不读写存储、不自动导航。
  *
- * - 消费 `PublishedLookReadModelV1`（look-repository），保留 taxonomy (V1) /
- *   publisher / loading / error / retry / empty / clear 状态；卡片展示仍使用
- *   V1 taxonomy，发现查询改用 TAX-03 的 V2 taxonomy。
+ * - 消费 `PublishedLookReadModelV1`（look-repository），保留 publisher /
+ *   loading / error / retry / empty / clear 状态；发现查询与卡片展示均使用
+ *   TAX-03/TAX-04 的 strict taxonomy-v2（不再为卡片加载 legacy 词表）。
  * - URL 为唯一真源：tab / q / sort / source / browse / topic / length /
  *   makeability / rights / technique 经 `parseDiscoveryQueryV2` 解析、
  *   `serializeDiscoveryQueryV2` 回写；用户发起的筛选变更 push 进浏览器
@@ -32,12 +32,11 @@ import { useLocale } from '@/lib/i18n';
 import {
   loadContentIndex,
   loadPublishers,
-  loadTaxonomy,
   officialPgcProgress,
 } from '../data/content-repository';
 import { loadLookReadModels } from '../data/look-repository';
 import { loadCommunityTaxonomyV2 } from '../data/taxonomy-repository';
-import type { CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
+import type { CommunityPublisherV1 } from '../domain/types';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
 import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import {
@@ -90,7 +89,6 @@ export function CommunityFeed({
   const [state, setState] = useState<LoadState>('loading');
   const [lookModels, setLookModels] = useState<PublishedLookReadModelV1[]>([]);
   const [publishers, setPublishers] = useState<CommunityPublisherV1[]>([]);
-  const [taxonomy, setTaxonomy] = useState<CommunityTaxonomyV1 | null>(null);
   const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
   const [progress, setProgress] = useState<{ ready: number; target: number; gap: number } | null>(null);
   const [retry, setRetry] = useState(0);
@@ -192,10 +190,9 @@ export function CommunityFeed({
     setState('loading');
     (async () => {
       try {
-        const [looks, pubs, tax, index, taxV2] = await Promise.all([
+        const [looks, pubs, index, taxV2] = await Promise.all([
           loadLookReadModels(),
           loadPublishers(),
-          loadTaxonomy(),
           loadContentIndex(),
           loadCommunityTaxonomyV2(),
         ]);
@@ -208,7 +205,6 @@ export function CommunityFeed({
         }
         setLookModels(looks);
         setPublishers(pubs);
-        setTaxonomy(tax);
         setTaxonomyV2(taxV2.taxonomy);
         setProgress(officialPgcProgress(index));
         setState('ready');
@@ -285,7 +281,7 @@ export function CommunityFeed({
         </div>
       )}
 
-      {state === 'ready' && taxonomy && taxonomyV2 && queryResult && (
+      {state === 'ready' && taxonomyV2 && queryResult && (
         <>
           <CommunitySearchBar
             value={queryState.q}
@@ -366,7 +362,8 @@ export function CommunityFeed({
                       key={look.lookId}
                       look={look}
                       publisher={pubMap.get(look.publisherId)}
-                      taxonomy={taxonomy}
+                      taxonomyV2={taxonomyV2}
+                      browse={queryState.browse}
                       onSave={(selected) => setSaveLook(selected)}
                     />
                   ))}

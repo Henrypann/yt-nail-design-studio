@@ -37,6 +37,20 @@ import {
   REQUIRED_TAG_IDS,
 } from '../src/community/domain/taxonomy-v2/contract.ts';
 import { parseCommunityTaxonomyV2 } from '../src/community/domain/taxonomy-v2/parse.ts';
+import { parseMigrationManifestV1 } from '../src/community/domain/taxonomy-v2/migration-manifest.ts';
+import {
+  CARD_TAG_DIMENSION_ORDER,
+  CARD_TAG_PILL_MAX,
+  DISCOVERY_DETAIL_GROUP_ORDER,
+  cardTagIdsForDiscovery,
+  discoveryDetailGroups,
+  discoveryGroupLabel,
+  findV2TagById,
+  makeabilityTagIdForDiscovery,
+  resolveV2TagLabel,
+  rightsTagIdForDiscovery,
+} from '../src/community/domain/taxonomy-v2/presentation.ts';
+import { actionPermissions } from '../src/community/domain/taxonomy-v2/governance.ts';
 
 const root = process.cwd();
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
@@ -46,9 +60,21 @@ const strict = parseCommunityTaxonomyV2(fixtureRaw);
 assert.equal(strict.ok, true, 'taxonomy-v2 fixture must strict-parse before the suite runs');
 const taxonomy = strict.value;
 
+const manifestRaw = JSON.parse(read('public/community/migration-manifest-v1.json'));
+const manifestResult = parseMigrationManifestV1(manifestRaw, taxonomy);
+assert.equal(
+  manifestResult.ok,
+  true,
+  'migration-manifest-v1 fixture must strict-parse before the suite runs',
+);
+const manifestEntries = manifestResult.value.entries;
+
 const nav = read('src/community/components/CommunityDiscoveryBrowseNavigation.tsx');
 const filters = read('src/community/components/CommunityDiscoveryRuntimeFilters.tsx');
 const feed = read('src/community/components/CommunityFeed.tsx');
+const card = read('src/community/components/CommunityLookCard.tsx');
+const metadata = read('src/community/components/CommunityDiscoveryMetadata.tsx');
+const page = read('src/community/pages/CommunityLookPage.tsx');
 
 let passed = 0;
 let failed = 0;
@@ -392,7 +418,414 @@ test('filters: no effect-driven state changes (empty results never auto-widen)',
 });
 
 // ---------------------------------------------------------------------------
-// 6 · Package script
+// 6 · TAX-04 presentation helpers (pure, controlled fixtures)
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimal well-typed discovery fixture. All fields the presentation helpers
+ * touch are present; tests override only what they exercise.
+ */
+function discoveryFixture(overrides = {}) {
+  return {
+    schemaVersion: 1,
+    contractRef: 'COMM-v0.7.2-TAX-01',
+    subjectRef: { kind: 'PUBLISHED_LOOK', id: 'look:test' },
+    styleIds: [],
+    recommendedShapeIds: [],
+    sceneIds: [],
+    themeIds: [],
+    techniqueIds: [],
+    lengthIds: [],
+    makeability: {
+      classification: 'CONCEPT_ONLY',
+      assetRefs: [],
+      evidenceRefs: [],
+    },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+    migration: {
+      state: 'NONE',
+      legacyStyleIds: [],
+      migratedAt: '2026-08-17T00:00:00.000Z',
+    },
+    updatedAt: '2026-08-17T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+test('card pills: current browse dimension first, then the fixed fallback order', () => {
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean', 'style:classic-refined'],
+    techniqueIds: ['technique:french'],
+    recommendedShapeIds: ['shape:almond', 'shape:oval'],
+    sceneIds: ['scene:daily'],
+    themeIds: ['theme:art-museum'],
+  });
+  // browse=style: STYLE first, then TECHNIQUE → SHAPE → SCENE → THEME.
+  assert.deepEqual(
+    cardTagIdsForDiscovery(discovery, 'style'),
+    [
+      'style:minimal-clean',
+      'style:classic-refined',
+      'technique:french',
+      'shape:almond',
+      'shape:oval',
+      'scene:daily',
+    ],
+    'style browse: current dimension first, fixed fallback after',
+  );
+  // browse=shape: SHAPE first.
+  assert.deepEqual(
+    cardTagIdsForDiscovery(discovery, 'shape').slice(0, 2),
+    ['shape:almond', 'shape:oval'],
+    'shape browse: current dimension first',
+  );
+  assert.deepEqual(
+    cardTagIdsForDiscovery(discovery, 'shape'),
+    [
+      'shape:almond',
+      'shape:oval',
+      'style:minimal-clean',
+      'style:classic-refined',
+      'technique:french',
+      'scene:daily',
+    ],
+    'shape browse: full order',
+  );
+});
+
+test('card pills: recommended browse has no extra dimension priority', () => {
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean'],
+    techniqueIds: ['technique:french'],
+    recommendedShapeIds: ['shape:almond'],
+    sceneIds: ['scene:daily'],
+    themeIds: ['theme:art-museum'],
+  });
+  assert.deepEqual(
+    cardTagIdsForDiscovery(discovery, 'recommended'),
+    [
+      'style:minimal-clean',
+      'technique:french',
+      'shape:almond',
+      'scene:daily',
+      'theme:art-museum',
+    ],
+    'recommended: plain fallback STYLE → TECHNIQUE → SHAPE → SCENE → THEME',
+  );
+  assert.deepEqual(
+    [...CARD_TAG_DIMENSION_ORDER],
+    ['STYLE', 'TECHNIQUE', 'SHAPE', 'SCENE', 'THEME'],
+    'fallback order contract constant',
+  );
+});
+
+test('card pills: de-duplicated by exact tag id (within and across arrays)', () => {
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean', 'style:minimal-clean'],
+    themeIds: ['style:minimal-clean'],
+    techniqueIds: ['technique:french', 'technique:french'],
+  });
+  assert.deepEqual(
+    cardTagIdsForDiscovery(discovery, 'recommended'),
+    ['style:minimal-clean', 'technique:french'],
+    'duplicate ids collapse to a single pill',
+  );
+});
+
+test('card pills: capped at CARD_TAG_PILL_MAX (6)', () => {
+  assert.equal(CARD_TAG_PILL_MAX, 6, 'card pill cap is exactly 6');
+  const discovery = discoveryFixture({
+    styleIds: ['style:a', 'style:b', 'style:c'],
+    techniqueIds: ['technique:french'],
+    recommendedShapeIds: ['shape:almond', 'shape:oval', 'shape:round'],
+    sceneIds: ['scene:daily', 'scene:date', 'scene:bridal'],
+    themeIds: ['theme:art-museum', 'theme:floral-plants'],
+  });
+  for (const browse of ['recommended', 'shape', 'style', 'scene', 'theme']) {
+    const ids = cardTagIdsForDiscovery(discovery, browse);
+    assert.ok(
+      ids.length <= CARD_TAG_PILL_MAX,
+      `${browse}: at most ${CARD_TAG_PILL_MAX} pills (got ${ids.length})`,
+    );
+  }
+  // scene browse: scene ids first, then style up to the cap — theme excluded.
+  const sceneIds = cardTagIdsForDiscovery(discovery, 'scene');
+  assert.deepEqual(
+    sceneIds,
+    [
+      'scene:daily',
+      'scene:date',
+      'scene:bridal',
+      'style:a',
+      'style:b',
+      'style:c',
+    ],
+    'cap truncates after the first 6 in dimension order',
+  );
+  assert.ok(
+    !sceneIds.some((id) => id.startsWith('theme:')),
+    'ids beyond the cap never appear',
+  );
+});
+
+test('card pills: rights/makeability/length ids never become pills', () => {
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean'],
+    lengthIds: ['length:short', 'length:long'],
+    makeability: { classification: 'MACHINE_DIRECT', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'PERSONAL_USE_ONLY', evidenceRefs: [] },
+  });
+  for (const browse of ['recommended', 'style', 'shape', 'scene', 'theme']) {
+    const ids = cardTagIdsForDiscovery(discovery, browse);
+    assert.ok(
+      ids.every(
+        (id) =>
+          !id.startsWith('rights:') &&
+          !id.startsWith('makeability:') &&
+          !id.startsWith('length:'),
+      ),
+      `${browse}: no rights/makeability/length pill`,
+    );
+  }
+});
+
+test('detail groups: exact order STYLE→TECHNIQUE→SHAPE→SCENE→THEME→LENGTH, non-empty only', () => {
+  assert.deepEqual(
+    [...DISCOVERY_DETAIL_GROUP_ORDER],
+    ['STYLE', 'TECHNIQUE', 'SHAPE', 'SCENE', 'THEME', 'LENGTH'],
+    'detail group order contract',
+  );
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean'],
+    techniqueIds: ['technique:french'],
+    recommendedShapeIds: [],
+    sceneIds: ['scene:daily'],
+    themeIds: [],
+    lengthIds: ['length:short'],
+  });
+  assert.deepEqual(
+    discoveryDetailGroups(discovery),
+    [
+      { dimension: 'STYLE', ids: ['style:minimal-clean'] },
+      { dimension: 'TECHNIQUE', ids: ['technique:french'] },
+      { dimension: 'SCENE', ids: ['scene:daily'] },
+      { dimension: 'LENGTH', ids: ['length:short'] },
+    ],
+    'empty groups skipped, remaining groups keep the required order',
+  );
+});
+
+test('detail groups: all ids of a non-empty group are preserved', () => {
+  const discovery = discoveryFixture({
+    styleIds: ['style:minimal-clean', 'style:glamorous-sparkling'],
+    recommendedShapeIds: ['shape:almond', 'shape:oval', 'shape:round'],
+  });
+  const groups = discoveryDetailGroups(discovery);
+  assert.deepEqual(
+    groups.find((group) => group.dimension === 'STYLE')?.ids,
+    ['style:minimal-clean', 'style:glamorous-sparkling'],
+  );
+  assert.deepEqual(
+    groups.find((group) => group.dimension === 'SHAPE')?.ids,
+    ['shape:almond', 'shape:oval', 'shape:round'],
+  );
+  assert.equal(groups.length, 2, 'only the two non-empty groups');
+});
+
+test('status ids: makeability/rights derived from the existing contract maps', () => {
+  const discovery = discoveryFixture({
+    makeability: { classification: 'CONCEPT_ONLY', assetRefs: [], evidenceRefs: [] },
+    rights: { status: 'ORIGINAL', evidenceRefs: [] },
+  });
+  assert.equal(
+    makeabilityTagIdForDiscovery(discovery),
+    'makeability:concept-only',
+  );
+  assert.equal(rightsTagIdForDiscovery(discovery), 'rights:original');
+  assert.equal(
+    rightsTagIdForDiscovery(
+      discoveryFixture({ rights: { status: 'PERSONAL_USE_ONLY', evidenceRefs: [] } }),
+    ),
+    'rights:personal-use-only',
+  );
+  assert.equal(
+    makeabilityTagIdForDiscovery(
+      discoveryFixture({
+        makeability: { classification: 'MACHINE_DIRECT', assetRefs: [], evidenceRefs: [] },
+      }),
+    ),
+    'makeability:machine-direct',
+  );
+});
+
+test('label resolution: exact namespaced V2 ids, bilingual, never legacy', () => {
+  assert.equal(
+    resolveV2TagLabel(taxonomy, 'style:minimal-clean', 'zh-CN'),
+    '极简清爽',
+  );
+  assert.equal(
+    resolveV2TagLabel(taxonomy, 'style:minimal-clean', 'en'),
+    'Minimal Clean',
+  );
+  assert.equal(resolveV2TagLabel(taxonomy, 'technique:french', 'zh-CN'), '法式');
+  assert.equal(resolveV2TagLabel(taxonomy, 'rights:personal-use-only', 'zh-CN'), '仅限个人使用');
+  // Unknown ids fall back to the raw id; aliases/legacy ids never resolve.
+  assert.equal(resolveV2TagLabel(taxonomy, 'style:does-not-exist', 'zh-CN'), 'style:does-not-exist');
+  assert.equal(findV2TagById(taxonomy, 'ST-02'), null, 'legacy style id never resolves');
+  // Group labels: taxonomy browse entries preferred, fixed vocabulary fallback.
+  assert.equal(discoveryGroupLabel(taxonomy, 'STYLE', 'zh-CN'), '风格');
+  assert.equal(discoveryGroupLabel(taxonomy, 'LENGTH', 'zh-CN'), '长度');
+  assert.equal(discoveryGroupLabel(taxonomy, 'LENGTH', 'en'), 'Length');
+});
+
+test('actionPermissions: PERSONAL_USE_ONLY is public but denies remix; PENDING denies everything', () => {
+  const personalOnly = actionPermissions(
+    discoveryFixture({ rights: { status: 'PERSONAL_USE_ONLY', evidenceRefs: [] } }),
+  );
+  assert.equal(personalOnly.public, true);
+  assert.equal(personalOnly.remix, false);
+  assert.equal(personalOnly.commercial, false);
+  const original = actionPermissions(discoveryFixture());
+  assert.equal(original.remix, true);
+  const pending = actionPermissions(
+    discoveryFixture({ rights: { status: 'PENDING', evidenceRefs: [] } }),
+  );
+  assert.equal(pending.public, false);
+  assert.equal(pending.remix, false);
+});
+
+// ---------------------------------------------------------------------------
+// 7 · TAX-04 presentation helpers (real migrated looks from the manifest)
+// ---------------------------------------------------------------------------
+
+test('real migrated looks: every discovery record presents cleanly for all browses', () => {
+  assert.ok(manifestEntries.length > 0, 'manifest has entries');
+  const browses = ['recommended', 'shape', 'style', 'scene', 'theme'];
+  for (const entry of manifestEntries) {
+    const discovery = entry.discovery;
+    for (const browse of browses) {
+      const ids = cardTagIdsForDiscovery(discovery, browse);
+      assert.ok(
+        ids.length <= CARD_TAG_PILL_MAX,
+        `${entry.contentId}@${browse}: <= ${CARD_TAG_PILL_MAX} card pills`,
+      );
+      for (const id of ids) {
+        assert.ok(findV2TagById(taxonomy, id), `${entry.contentId}: pill ${id} resolves`);
+        assert.ok(
+          !id.startsWith('rights:') &&
+            !id.startsWith('makeability:') &&
+            !id.startsWith('length:'),
+          `${entry.contentId}: pill ${id} is never a status/length id`,
+        );
+      }
+    }
+    const groups = discoveryDetailGroups(discovery);
+    const seenDimensions = groups.map((group) => group.dimension);
+    assert.deepEqual(
+      seenDimensions,
+      [...seenDimensions].sort(
+        (a, b) =>
+          DISCOVERY_DETAIL_GROUP_ORDER.indexOf(a) -
+          DISCOVERY_DETAIL_GROUP_ORDER.indexOf(b),
+      ),
+      `${entry.contentId}: detail groups stay in the required order`,
+    );
+    for (const group of groups) {
+      assert.ok(group.ids.length > 0, `${entry.contentId}:${group.dimension} non-empty`);
+      for (const id of group.ids) {
+        assert.ok(findV2TagById(taxonomy, id), `${entry.contentId}:${group.dimension} ${id} resolves`);
+      }
+    }
+    assert.ok(
+      makeabilityTagIdForDiscovery(discovery),
+      `${entry.contentId}: makeability status id resolves`,
+    );
+    assert.ok(
+      rightsTagIdForDiscovery(discovery),
+      `${entry.contentId}: rights status id resolves`,
+    );
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 8 · TAX-04 static structure: card, shared metadata UI, feed, detail page
+// ---------------------------------------------------------------------------
+
+test('card: strict taxonomy-v2 props only, no legacy taxonomy or legacy tag reads', () => {
+  assert.doesNotMatch(card, /CommunityTaxonomyV1/, 'no legacy V1 taxonomy type');
+  assert.doesNotMatch(card, /communityTaxonomyLabel/, 'no legacy V1 label helper');
+  assert.doesNotMatch(card, /mainStyleId/, 'card never reads legacy mainStyleId');
+  assert.doesNotMatch(card, /effectIds/, 'card never reads legacy effectIds');
+  assert.doesNotMatch(card, /moodIds/, 'card never reads legacy moodIds');
+  assert.match(card, /taxonomyV2: CommunityTaxonomyV2/, 'card consumes strict taxonomy-v2');
+  assert.match(card, /browse: DiscoveryBrowseV2/, 'card consumes the current browse');
+  assert.match(card, /<DiscoveryCardTags/, 'V2 card tag pills shared component (max 6 helper)');
+  assert.match(card, /<RightsBadge/, 'rights badge independent of tag pills');
+  assert.match(card, /actionPermissions\(/, 'rights gate fail closed');
+  assert.match(card, /personal-use-only-action-restricted/, 'PERSONAL_USE_ONLY non-action notice');
+  assert.match(card, /remixAllowed/, 'remix gate derived from actionPermissions');
+  assert.match(card, /look-card-save/, 'Save preserved');
+  assert.match(card, /look-card-made/, 'Made evidence preserved');
+  assert.match(card, /resolveStudioUseAvailabilityV1/, 'asset/use availability semantics kept');
+  assert.match(card, /community-card-cover-fallback/, 'cover fallback kept');
+  assert.match(card, /Routes\.communityLook\(look\.lookId\)/, 'canonical detail link kept');
+});
+
+test('shared metadata UI: pills max 6, collision-free testids, rights/makeability rows', () => {
+  assert.match(metadata, /cardTagIdsForDiscovery/, 'uses the pure pill derivation');
+  assert.match(metadata, /CARD_TAG_PILL_MAX/, 'caps pills at the contract max');
+  assert.match(metadata, /community-discovery-tag-\$\{id\}/, 'collision-free tag testid (exact id)');
+  assert.match(metadata, /data-tag-id=\{id\}/, 'tag id exposed on every pill');
+  assert.match(metadata, /community-rights-badge/, 'rights badge testid');
+  assert.match(metadata, /data-rights-status=\{status\}/, 'distinct rights status attribute');
+  assert.match(metadata, /sr-only/, 'accessible rights text');
+  assert.match(metadata, /community-discovery-detail/, 'full detail section testid');
+  assert.match(metadata, /community-discovery-group-\$\{group\.dimension\}/, 'per-group testid');
+  assert.match(metadata, /discoveryDetailGroups/, 'uses the full group derivation');
+  assert.match(metadata, /community-makeability-badge/, 'makeability row separate');
+  assert.match(metadata, /data-makeability-classification/, 'makeability classification exposed');
+  assert.match(metadata, /isCurrentMakeable/, 'never implies current-makeable without the evidence gate');
+  assert.match(metadata, /community-makeability-evidence-gated/, 'evidence-gated marker is explicit');
+});
+
+test('feed: no legacy taxonomy load/state, passes taxonomyV2 + current browse', () => {
+  assert.doesNotMatch(feed, /loadTaxonomy/, 'no legacy taxonomy load for cards');
+  assert.doesNotMatch(feed, /CommunityTaxonomyV1/, 'no legacy V1 taxonomy state');
+  assert.match(feed, /loadCommunityTaxonomyV2/, 'strict taxonomy-v2 still loaded');
+  assert.match(feed, /taxonomyV2=\{taxonomyV2\}/, 'V2 taxonomy passed to cards');
+  assert.match(feed, /browse=\{queryState\.browse\}/, 'current browse passed to cards');
+  assert.doesNotMatch(feed, /taxonomy=\{taxonomy\}/, 'no V1 taxonomy prop on cards');
+  assert.match(feed, /loadContentIndex/, 'content index/progress kept');
+  assert.match(feed, /officialPgcProgress/, 'official progress kept');
+  assert.match(feed, /CommunityDiscoveryBrowseNavigation/, 'TAX-04 navigation kept');
+  assert.match(feed, /CommunityDiscoveryRuntimeFilters/, 'TAX-03/TAX-04 filters kept');
+});
+
+test('detail page: loads V2, renders the full structure, rights gate hides content use', () => {
+  assert.match(page, /loadCommunityTaxonomyV2/, 'detail loads strict taxonomy-v2');
+  assert.doesNotMatch(page, /loadTaxonomy/, 'no legacy taxonomy load');
+  assert.doesNotMatch(page, /CommunityTaxonomyV1/, 'no legacy V1 taxonomy type');
+  assert.doesNotMatch(page, /communityTaxonomyLabel/, 'no legacy V1 style label');
+  assert.doesNotMatch(page, /taxonomyLabel\(/, 'no legacy V1 shape/length presentation');
+  assert.doesNotMatch(page, /mainStyleId/, 'no legacy mainStyleId presentation');
+  assert.match(page, /DiscoveryDetailSection/, 'renders the shared full structured discovery section');
+  assert.match(page, /community-discovery-unavailable/, 'fails visibly when discovery/taxonomy unavailable');
+  assert.match(page, /community-discovery-loading/, 'explicit loading state');
+  assert.match(page, /actionPermissions\(/, 'rights gate fail closed');
+  assert.match(page, /personal-use-only-action-restricted/, 'PERSONAL_USE_ONLY content actions replaced by a visible notice');
+  assert.match(page, /community-remix-unavailable/, 'null discovery: no remix action, visible notice');
+  assert.match(page, /community-use-versioned/, 'versioned handoff preserved when rights permit');
+  assert.match(page, /community-try-in-studio/, 'legacy handoff preserved when rights permit');
+  assert.match(page, /community-approx-confirm/, 'approximate-use modal preserved when rights permit');
+  assert.match(page, /community-open-studio/, 'generic Studio navigation remains');
+  assert.match(page, /community-look-evidence/, 'evidence section preserved');
+  assert.match(page, /ApplicationBadge/, 'application evidence badge remains separate');
+  assert.match(page, /VerificationBadge/, 'verification evidence badge remains separate');
+  assert.doesNotMatch(page, /localStorage/, 'no fake persistence');
+});
+
+// ---------------------------------------------------------------------------
+// 9 · Package script
 // ---------------------------------------------------------------------------
 
 test('package script test:community-tax-04-home-ui registered with the import/register pattern', () => {

@@ -1,10 +1,22 @@
 /**
- * `/look/:lookId` · Canonical 可分享详情（COMM-V7.1-01）。
+ * `/look/:lookId` · Canonical 可分享详情（COMM-V7.1-01 + COMM-v0.7.2-TAX-04）。
  *
  * 消费 PublishedLookReadModelV1（当前来自 legacy 静态内容的 LEGACY_PARTIAL
  * 投影）并展示显式证据块：Legacy 兼容状态、已验证 vs 不可用、以及
  * 「预览通过 ≠ 可制造 ≠ 已下发生产」的精确区分。
- * 禁止 import Wizard / Editor Store。
+ *
+ * COMM-v0.7.2-TAX-04：
+ * - 结构化发现区由共享 DiscoveryDetailSection 渲染，数据只来自
+ *   `look.discovery` + strict taxonomy-v2；不再加载 legacy 词表，不再基于
+ *   legacy 字段推断风格/甲型/长度标签。discovery 或 taxonomy-v2 不可用时
+ *   可见失败（community-discovery-unavailable），绝不推断。
+ * - 内容相关的「使用此版本定制 / 试用 / 近似应用」动作 fail closed：
+ *   `actionPermissions(look.discovery)`。PERSONAL_USE_ONLY 不渲染这些
+ *   动作与近似应用 modal 触发，改为可见的 `personal-use-only-action-restricted`
+ *   提示；discovery 为 null 时同样不提供应用/二次创作动作。通用「进入 Studio」
+ *   导航保持不变（它不应用/不 remix 本 Look）。
+ * - Application / Verification 证据徽章保留为独立 legacy 证据，不是发现标签。
+ * - 禁止 import Wizard / Editor Store。
  */
 
 import { useEffect, useState } from 'react';
@@ -15,17 +27,20 @@ import { Routes } from '@/app/routes';
 import { canUseLocalStudioHandoff, studioProductHref } from '@/app/product-navigation';
 import { CrossProductAction, CrossProductLink } from '@/app/CrossProductLink';
 import { useLocale } from '@/lib/i18n';
-import { communityTaxonomyLabel, taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
-import { getPublisherById, loadTaxonomy } from '../data/content-repository';
+import { getPublisherById } from '../data/content-repository';
 import { getLookReadModelById } from '../data/look-repository';
-import type { CommunityPublisherV1, CommunityTaxonomyV1 } from '../domain/types';
+import { loadCommunityTaxonomyV2 } from '../data/taxonomy-repository';
+import type { CommunityPublisherV1 } from '../domain/types';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
+import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
+import { actionPermissions } from '../domain/taxonomy-v2/governance';
 import {
   canTryInStudio,
   createStudioImportIntent,
 } from '../domain/studio-import-intent';
 import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
+import { DiscoveryDetailSection } from '../components/CommunityDiscoveryMetadata';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
 import { createVersionedUseIntentForLookV1 } from '@/integration/community-studio/versioned-use-runtime';
 import { resolveStudioUseAvailabilityV1 } from '../domain/studio-use-availability';
@@ -55,7 +70,9 @@ export default function CommunityLookPage() {
   const { locale, text } = useLocale();
   const [look, setLook] = useState<PublishedLookReadModelV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
-  const [taxonomy, setTaxonomy] = useState<CommunityTaxonomyV1 | null>(null);
+  const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
+  /** TAX-04: taxonomy-v2 加载/解析失败的可见诊断（fail closed，不推断）。 */
+  const [taxonomyV2Error, setTaxonomyV2Error] = useState<string | null>(null);
   const [coverFailed, setCoverFailed] = useState(false);
   const [approxOpen, setApproxOpen] = useState(false);
 
@@ -63,12 +80,22 @@ export default function CommunityLookPage() {
     if (!lookId) return;
     let cancelled = false;
     setCoverFailed(false);
+    setTaxonomyV2Error(null);
     void (async () => {
       try {
-        const [lookModel, tax] = await Promise.all([getLookReadModelById(lookId), loadTaxonomy()]);
+        const [lookModel, taxV2] = await Promise.all([
+          getLookReadModelById(lookId),
+          loadCommunityTaxonomyV2(),
+        ]);
         if (cancelled) return;
         setLook(lookModel);
-        setTaxonomy(tax);
+        if (taxV2.ok) {
+          setTaxonomyV2(taxV2.taxonomy);
+        } else {
+          setTaxonomyV2Error(
+            taxV2.issues.map((issue) => issue.code).join(','),
+          );
+        }
         if (lookModel) {
           const pub = await getPublisherById(lookModel.publisherId);
           if (!cancelled) setPublisher(pub);
@@ -103,7 +130,12 @@ export default function CommunityLookPage() {
   }
 
   const content = look.sourceContent;
-  const style = taxonomy?.mainStyles.find((s) => s.id === look.mainStyleId);
+  const discovery = look.discovery;
+  // TAX-04: rights gate fail closed — PERSONAL_USE_ONLY 与缺失 discovery 都
+  // 拒绝内容相关的应用/二次创作动作；通用 Studio 导航不受影响。
+  const permissions = discovery ? actionPermissions(discovery) : null;
+  const remixAllowed = permissions?.remix === true;
+  const personalUseOnly = discovery?.rights.status === 'PERSONAL_USE_ONLY';
   const tryable = canTryInStudio(content);
   const legacy = look.readModelKind === 'LEGACY_PARTIAL';
   const canonical = look.readModelKind === 'CANONICAL';
@@ -195,11 +227,7 @@ export default function CommunityLookPage() {
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-2">
             <PublisherBadge publisher={publisher} />
-            {style && (
-              <Badge variant="gray">
-                {communityTaxonomyLabel('community-style', style, locale)}
-              </Badge>
-            )}
+            {/* Application/Verification 是 legacy 证据徽章，不是发现/搜索标签。 */}
             <ApplicationBadge level={look.applicationLevel} />
             <VerificationBadge level={look.verificationLevel} />
           </div>
@@ -208,21 +236,29 @@ export default function CommunityLookPage() {
             {look.titleEn && <p className="mt-1 text-sm text-gray-500">{look.titleEn}</p>}
           </div>
 
-          {(look.recommendedShapes.length > 0 || look.supportedLengths.length > 0) && (
-            <div className="rounded-panel border border-gray-200 px-3 py-2 text-xs text-gray-700">
-              <p className="font-medium text-gray-800">推荐甲型与长度</p>
-              {look.recommendedShapes.length > 0 && (
-                <p className="mt-1">
-                  {text('甲型：', 'Shape: ')}
-                  {look.recommendedShapes.map((id) => taxonomyLabel('shape', id, locale)).join(' · ')}
-                </p>
-              )}
-              {look.supportedLengths.length > 0 && (
-                <p className="mt-0.5">
-                  {text('长度：', 'Length: ')}
-                  {look.supportedLengths.map((id) => taxonomyLabel('geometry-length', id, locale)).join(' · ')}
-                </p>
-              )}
+          {/* TAX-04: 结构化发现区。只消费 discovery + strict taxonomy-v2；
+              不可用时可见失败，绝不基于 legacy 字段推断标签。 */}
+          {taxonomyV2 && discovery ? (
+            <DiscoveryDetailSection
+              taxonomy={taxonomyV2}
+              discovery={discovery}
+              locale={locale}
+            />
+          ) : taxonomyV2 === null && taxonomyV2Error === null ? (
+            <div
+              className="rounded-panel border border-gray-200 px-3 py-2 text-xs text-gray-500"
+              data-testid="community-discovery-loading"
+            >
+              结构化分类加载中…
+            </div>
+          ) : (
+            <div
+              className="rounded-panel border border-amber-200 bg-amber-50/60 px-3 py-2 text-xs text-amber-800"
+              data-testid="community-discovery-unavailable"
+            >
+              {taxonomyV2Error !== null
+                ? `结构化分类（taxonomy-v2）加载失败（${taxonomyV2Error}）；本页不基于 legacy 字段推断标签。`
+                : '该内容缺少结构化发现元数据；不基于 legacy 字段推断标签。'}
             </div>
           )}
 
@@ -232,50 +268,73 @@ export default function CommunityLookPage() {
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {canonical && useAvailability.enabled ? (
-              <CrossProductAction
-                href={studioProductHref(Routes.designNew)}
-                prepareHref={prepareVersionedIntent}
-                disabledReason={crossOriginDisabledReason}
-                data-testid="community-use-versioned"
-                className="inline-flex min-h-11 items-center justify-center rounded-button bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-              >
-                使用此版本在 Studio 中定制
-              </CrossProductAction>
-            ) : tryable && useAvailability.enabled ? (
-              look.applicationLevel === 'APPROXIMATE' ? (
-                <Button onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
-                  在 Studio 中试用（Legacy 近似）
-                </Button>
-              ) : (
+            {remixAllowed ? (
+              canonical && useAvailability.enabled ? (
                 <CrossProductAction
                   href={studioProductHref(Routes.designNew)}
-                  prepareHref={prepareLegacyIntent}
+                  prepareHref={prepareVersionedIntent}
                   disabledReason={crossOriginDisabledReason}
-                  data-testid="community-try-in-studio"
-                  className="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+                  data-testid="community-use-versioned"
+                  className="inline-flex min-h-11 items-center justify-center rounded-button bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
                 >
-                  在 Studio 中试用
+                  使用此版本在 Studio 中定制
                 </CrossProductAction>
+              ) : tryable && useAvailability.enabled ? (
+                look.applicationLevel === 'APPROXIMATE' ? (
+                  <Button onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
+                    在 Studio 中试用（Legacy 近似）
+                  </Button>
+                ) : (
+                  <CrossProductAction
+                    href={studioProductHref(Routes.designNew)}
+                    prepareHref={prepareLegacyIntent}
+                    disabledReason={crossOriginDisabledReason}
+                    data-testid="community-try-in-studio"
+                    className="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+                  >
+                    在 Studio 中试用
+                  </CrossProductAction>
+                )
+              ) : (
+                <div className="flex flex-col items-start gap-1">
+                  <Button
+                    disabled
+                    variant="secondary"
+                    data-testid="community-use-disabled"
+                    data-use-state={useAvailability.state}
+                    title={useUnavailableMessage}
+                  >
+                    使用
+                  </Button>
+                  <p
+                    className="text-xs text-gray-500"
+                    data-testid={look.applicationLevel === 'INSPIRATION_ONLY'
+                      ? 'community-inspiration-only'
+                      : 'community-missing-asset'}
+                  >
+                    {useUnavailableMessage}
+                  </p>
+                </div>
               )
+            ) : personalUseOnly ? (
+              <div
+                className="flex flex-col items-start gap-1"
+                data-testid="personal-use-only-action-restricted"
+              >
+                <Badge variant="warning" className="border-amber-300 bg-amber-50 text-amber-800">
+                  仅限个人使用
+                </Badge>
+                <p className="text-xs text-amber-700">
+                  该内容仅限个人使用：不提供「使用此版本在 Studio 中定制 / 试用 / 近似应用」等应用与二次创作动作。
+                </p>
+              </div>
             ) : (
-              <div className="flex flex-col items-start gap-1">
-                <Button
-                  disabled
-                  variant="secondary"
-                  data-testid="community-use-disabled"
-                  data-use-state={useAvailability.state}
-                  title={useUnavailableMessage}
-                >
-                  使用
-                </Button>
-                <p
-                  className="text-xs text-gray-500"
-                  data-testid={look.applicationLevel === 'INSPIRATION_ONLY'
-                    ? 'community-inspiration-only'
-                    : 'community-missing-asset'}
-                >
-                  {useUnavailableMessage}
+              <div
+                className="flex flex-col items-start gap-1"
+                data-testid="community-remix-unavailable"
+              >
+                <p className="text-xs text-gray-500">
+                  该内容缺少结构化权利元数据；不提供应用/二次创作动作（fail closed，不推断）。
                 </p>
               </div>
             )}
@@ -297,7 +356,7 @@ export default function CommunityLookPage() {
                 资产清单
               </a>
             )}
-            {crossOriginDisabledReason && useAvailability.enabled && (
+            {crossOriginDisabledReason && remixAllowed && useAvailability.enabled && (
               <p className="basis-full text-xs text-amber-700" data-testid="community-cross-origin-handoff-disabled">
                 {crossOriginDisabledReason}
               </p>
