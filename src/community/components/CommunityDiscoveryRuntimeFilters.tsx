@@ -15,8 +15,8 @@
  * - 一键 clear-all：重置 browse/topic 为 recommended/for-you、清空 q、
  *   sort 回 featured、清空全部辅助 id、incompatible 与 markers；保留当前
  *   tab 与 source（lockedSource 仍由 Feed 执行）。state.incompatible
- *   非空或没有任何活动条件时绝不提供 clear-all（不静默清除不兼容原始
- *   URL key）。
+ *   非空或可清除条件数为零时绝不提供 clear-all（不静默清除不兼容原始
+ *   URL key；仅 source 非默认时 clear-all 是 no-op，不渲染该按钮）。
  * - 展示结果数与活动条件摘要；空结果绝不自动放宽条件。
  */
 
@@ -110,8 +110,9 @@ export function CommunityDiscoveryRuntimeFilters({
   /**
    * TAX-04: 一键 clear-all。重置 browse/topic 为 recommended/for-you、清空 q、
    * sort 回 featured、清空全部辅助 id、incompatible 与 markers；保留 tab 与
-   * source（lockedSource 由 Feed 的 applyState 强制）。incompatible 非空时
-   * 该控件不渲染（绝不静默清除不兼容原始 URL key）。
+   * source（lockedSource 由 Feed 的 applyState 强制）。incompatible 非空或
+   * 可清除条件数为零（仅 source 非默认）时该控件不渲染（绝不静默清除不兼容
+   * 原始 URL key，也不提供 no-op 按钮）。
    */
   const clearAll = (): void => {
     onChange({
@@ -163,7 +164,10 @@ export function CommunityDiscoveryRuntimeFilters({
     0,
   );
 
-  /** TAX-04: 活动条件摘要（source / 浏览 topic / q / sort / 辅助 id 数 / 标记数）。 */
+  /**
+   * TAX-04: 活动条件摘要（source / 浏览 topic / q / sort / 辅助 id 数 / 标记数）。
+   * source 计入摘要（可见反馈），但 clear-all 保留 source，故不计入可清除数。
+   */
   const activeConditionCount =
     (state.source !== 'all' ? 1 : 0) +
     (state.browse !== 'recommended' || state.topic !== DEFAULT_RECOMMENDATION_CHANNEL ? 1 : 0) +
@@ -175,8 +179,23 @@ export function CommunityDiscoveryRuntimeFilters({
     state.techniqueIds.filter((id) => !markerRepresentedAuxIds.has(id)).length +
     state.markers.length;
 
+  /**
+   * TAX-04: 可被 clear-all 清除的条件数（浏览 topic / q / sort / 非兼容标记
+   * 代表的辅助 id / 标记数）。source 被 clear-all 保留（lockedSource 由 Feed
+   * 执行），因此仅 source 非默认时 clear-all 是 no-op，不启用该按钮。
+   */
+  const clearableConditionCount =
+    (state.browse !== 'recommended' || state.topic !== DEFAULT_RECOMMENDATION_CHANNEL ? 1 : 0) +
+    (state.q !== '' ? 1 : 0) +
+    (state.sort !== 'featured' ? 1 : 0) +
+    state.lengthIds.filter((id) => !markerRepresentedAuxIds.has(id)).length +
+    state.makeabilityIds.length +
+    state.rightsIds.length +
+    state.techniqueIds.filter((id) => !markerRepresentedAuxIds.has(id)).length +
+    state.markers.length;
+
   const markers = state.markers;
-  const canClearAll = state.incompatible.length === 0 && activeConditionCount > 0;
+  const canClearAll = state.incompatible.length === 0 && clearableConditionCount > 0;
 
   return (
     <div className="space-y-3" data-testid="community-discovery-runtime-filters">

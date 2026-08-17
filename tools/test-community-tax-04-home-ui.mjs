@@ -16,8 +16,9 @@
  *    呈现，relationshipProviderAvailable=false；
  *  - 运行时筛选增强：已选条件 chips（collision-free testid）、兼容标记已
  *    代表的 canonical 辅助 id 不重复出 chip/计数、单条移除只移除该 id、
- *    一键 clear-all（incompatible 非空或零活动条件时隐藏、保留 tab/source）、
- *    非默认 source 计为活动条件、条件摘要与结果数、抽屉辅助清除保留；
+ *    一键 clear-all（incompatible 非空或可清除条件数为零时隐藏、保留
+ *    tab/source）、非默认 source 计为活动条件但不启用 clear-all（仅 source
+ *    非默认时 clear-all 是 no-op）、条件摘要与结果数、抽屉辅助清除保留；
  *  - 无 legacy CommunityFilters / filterLookReadModels。
  *
  * 静态/结构验证沿用仓库既定模式（.tsx 由源码断言，纯 .ts 由 Node 直接
@@ -304,13 +305,44 @@ test('filters: one-click clear-all resets discovery filters and preserves tab/so
   assert.match(clearAllBody, /markers: \[\],/, 'clears compatibility markers');
 });
 
-test('filters: global clear-all is offered only when compatible AND at least one condition is active', () => {
+test('filters: global clear-all is offered only when compatible AND at least one clearable condition exists', () => {
   assert.match(
     filters,
-    /canClearAll = state\.incompatible\.length === 0 && activeConditionCount > 0/,
-    'guard derives from incompatible state and the active condition count',
+    /canClearAll = state\.incompatible\.length === 0 && clearableConditionCount > 0/,
+    'guard derives from incompatible state and the clearable condition count',
   );
   assert.match(filters, /\{canClearAll && \(/, 'clear-all renders only when the guard holds');
+});
+
+test('filters: source-only conditions count active in the summary but never enable clear-all', () => {
+  assert.match(
+    filters,
+    /state\.source !== 'all' \? 1 : 0/,
+    'non-default source counts once in the active summary',
+  );
+  assert.match(filters, /const clearableConditionCount =/, 'clearable count is derived separately');
+  const clearableBody = filters.slice(
+    filters.indexOf('const clearableConditionCount'),
+    filters.indexOf('const markers = state.markers;'),
+  );
+  assert.doesNotMatch(
+    clearableBody,
+    /state\.source/,
+    'clearable count excludes source because clear-all preserves it',
+  );
+  assert.match(
+    clearableBody,
+    /state\.browse !== 'recommended' \|\| state\.topic !== DEFAULT_RECOMMENDATION_CHANNEL \? 1 : 0/,
+    'browse/topic counts as one clearable condition',
+  );
+  assert.match(clearableBody, /state\.q !== '' \? 1 : 0/, 'q counts as clearable');
+  assert.match(clearableBody, /state\.sort !== 'featured' \? 1 : 0/, 'sort counts as clearable');
+  assert.match(clearableBody, /state\.markers\.length/, 'markers count as clearable');
+  assert.match(
+    filters,
+    /canClearAll = state\.incompatible\.length === 0 && clearableConditionCount > 0/,
+    'source-only active state leaves clearableConditionCount at 0, hiding the no-op clear-all',
+  );
 });
 
 test('filters: aux ids represented by compatibility markers are not duplicated as chips or counts', () => {
