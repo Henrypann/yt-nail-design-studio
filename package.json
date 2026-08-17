@@ -13,6 +13,7 @@
     "test:community-content": "node tools/validate-community-content.mjs",
     "test:community-taxonomy": "node tools/validate-community-taxonomy.mjs",
     "test:community-taxonomy-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-taxonomy-v2.mjs",
+    "test:community-discovery-query-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-discovery-query-v2.mjs",
     "test:community-discovery-migration": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-discovery-migration.mjs",
     "generate:community-tax-02-migration-report": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-community-tax-02-migration-report.mjs",
     "test:community-official": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/validate-community-official.mjs",
