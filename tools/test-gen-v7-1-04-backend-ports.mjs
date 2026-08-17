@@ -5,6 +5,7 @@ import {
   createAssetReferenceResolverV1,
   createClientApprovalApplicationServiceV1,
   createCreatorWorkspaceApplicationServiceV1,
+  createLocalCreatorPublicationPortV1,
   createGovernanceApplicationServiceV1,
   createInMemoryAssetBinaryStorageV1,
   createLocalAssetUploadPortV1,
@@ -20,7 +21,8 @@ import {
   BACKEND_PERMISSIONS_V1,
 } from '../src/platform/backend/index.ts';
 import { StorageKeys, writeEnvelope } from '../src/lib/storage.ts';
-import { createCreatorPublicationDraftV1, createEmptyCreatorPublicationStoreV1 } from '../src/community/domain/v7_1/creator-publication.ts';
+import { createCreatorPublicationDraftV1 } from '../src/community/domain/v7_1/creator-publication.ts';
+import { createEmptyCreatorPublicationStoreV2 } from '../src/community/domain/v7_1/creator-publication-v2.ts';
 import { parseCommunityTaxonomyV2 } from '../src/community/domain/taxonomy-v2/parse.ts';
 import { emptyGovernanceStoreV1 } from '../src/community/domain/v7_1/governance.ts';
 import { emptyClientApprovalStoreV1 } from '../src/studio/approval/client-approval.ts';
@@ -315,7 +317,7 @@ function memoryPort(initial) {
     },
   };
 }
-const publicationMemory = memoryPort(createEmptyCreatorPublicationStoreV1());
+const publicationMemory = memoryPort(createEmptyCreatorPublicationStoreV2());
 const governanceMemory = memoryPort(emptyGovernanceStoreV1());
 const approvalMemory = memoryPort(emptyClientApprovalStoreV1());
 let authorityRecords = [structuredClone(registered.value)];
