@@ -4,7 +4,15 @@ import type { CommunityContentV1 } from '@/community/domain/types';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { GovernanceCaseV1 } from '@/community/domain/v7_1/governance';
 import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
-import { parseCommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/parse';
+import {
+  parseCommunityTaxonomyV2,
+  parseCurationMetadataV1,
+  parseDiscoveryMetadataV1,
+} from '@/community/domain/taxonomy-v2/parse';
+import {
+  curationPublicEligibility,
+  publicationEligibility,
+} from '@/community/domain/taxonomy-v2/governance';
 import type { CommunityTaxonomyV2 } from '@/community/domain/taxonomy-v2/types';
 import {
   BACKEND_PERMISSIONS_V1,
