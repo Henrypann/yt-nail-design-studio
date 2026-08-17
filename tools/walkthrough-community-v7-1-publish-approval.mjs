@@ -22,6 +22,14 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
   // discovery is complete (>=1 overall style, >=1 recommended shape,
   // non-PENDING rights) — taxonomy options carry the shared fixture labels.
   if (!(await page.getByRole('button', { name: /下一步：可见性|Next: visibility/ }).isDisabled())) throw new Error('Next: visibility must stay disabled until structured discovery is complete');
+  // COMM-v0.7.2-TAX-02: structured discovery options must be >= 44x44 CSS px
+  // touch/pointer targets (WCAG 2.5.8) at every viewport.
+  for (const testId of ['taxonomy-option-style:minimal-clean', 'taxonomy-option-shape:almond', 'taxonomy-option-rights:original']) {
+    const box = await page.getByTestId(testId).boundingBox();
+    if (!box) throw new Error(`taxonomy option ${testId} missing or hidden at ${viewport.width}`);
+    if (box.width < 44 || box.height < 44) throw new Error(`taxonomy option ${testId} target too small ${JSON.stringify(box)} at ${viewport.width} (need >= 44x44)`);
+    console.log(`[community-v7.1-publish-approval:e2e] taxonomy target ${testId} ${Math.round(box.width)}x${Math.round(box.height)} @ ${viewport.width}`);
+  }
   await page.getByTestId('taxonomy-option-style:minimal-clean').click();
   await page.getByTestId('taxonomy-option-shape:almond').click();
   await page.getByTestId('taxonomy-option-rights:original').click();

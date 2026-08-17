@@ -222,12 +222,12 @@ function DiscoverySection({label,required,children}:{label:string;required?:bool
 
 function TagPicker({tags,selected,onToggle,testIdPrefix,text}:{tags:readonly {id:string;labels:BilingualLabelsV2}[];selected:readonly string[];onToggle:(id:string)=>void;testIdPrefix:string;text:(zh:string,en:string)=>string}) {
   if (tags.length === 0) return null;
-  return <div className="flex flex-wrap gap-1.5">{tags.map((tag)=>{const active=selected.includes(tag.id);return <button key={tag.id} type="button" aria-pressed={active} data-testid={`${testIdPrefix}-${tag.id}`} onClick={()=>onToggle(tag.id)} className={`min-h-8 rounded-button border px-2.5 py-1.5 text-xs transition-colors ${active?'border-primary bg-primary-soft font-semibold text-primary':'border-gray-200 text-body hover:border-primary/40'}`}>{text(tag.labels['zh-CN'],tag.labels.en)}</button>;})}</div>;
+  return <div className="flex flex-wrap gap-1.5">{tags.map((tag)=>{const active=selected.includes(tag.id);return <button key={tag.id} type="button" aria-pressed={active} data-testid={`${testIdPrefix}-${tag.id}`} onClick={()=>onToggle(tag.id)} className={`min-h-11 rounded-button border px-2.5 py-1.5 text-xs transition-colors ${active?'border-primary bg-primary-soft font-semibold text-primary':'border-gray-200 text-body hover:border-primary/40'}`}>{text(tag.labels['zh-CN'],tag.labels.en)}</button>;})}</div>;
 }
 
 function SingleSelectPicker<T extends string>({options,value,onSelect,testIdPrefix}:{options:readonly {value:T;tagId:string;label:string}[];value:T;onSelect:(value:T)=>void;testIdPrefix:string}) {
   if (options.length === 0) return null;
-  return <div className="flex flex-wrap gap-1.5">{options.map((option)=>{const active=option.value===value;return <button key={option.value} type="button" aria-pressed={active} data-testid={`${testIdPrefix}-${option.tagId}`} onClick={()=>onSelect(option.value)} className={`min-h-8 rounded-button border px-2.5 py-1.5 text-xs transition-colors ${active?'border-primary bg-primary-soft font-semibold text-primary':'border-gray-200 text-body hover:border-primary/40'}`}>{option.label}</button>;})}</div>;
+  return <div className="flex flex-wrap gap-1.5">{options.map((option)=>{const active=option.value===value;return <button key={option.value} type="button" aria-pressed={active} data-testid={`${testIdPrefix}-${option.tagId}`} onClick={()=>onSelect(option.value)} className={`min-h-11 rounded-button border px-2.5 py-1.5 text-xs transition-colors ${active?'border-primary bg-primary-soft font-semibold text-primary':'border-gray-200 text-body hover:border-primary/40'}`}>{option.label}</button>;})}</div>;
 }
 
 function DiscoveryValidationSummary({authoring,taxonomy,taxonomyError,text}:{authoring:CreatorDiscoveryAuthoringV2;taxonomy:CommunityTaxonomyV2|null;taxonomyError:string|null;text:(zh:string,en:string)=>string}) {
