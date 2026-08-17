@@ -664,10 +664,12 @@ export function mergeDiscoveryQueryIncompatibleParams(
  * Explicit removal of exactly one incompatible issue from a raw URL.
  *
  * CSV keys (length / makeability / rights / technique): only CSV items whose
- * trimmed value equals `issue.rawValue` are removed — an empty item matches an
- * `empty-csv-item` issue. All sibling items and every other URL key are
- * preserved; the key is canonicalized into a single comma-joined occurrence
- * when any item remains, and deleted when none remains.
+ * trimmed value equals the trimmed `issue.rawValue` are removed — an empty
+ * item (including a whitespace-only one, whose parse-time rawValue keeps the
+ * untrimmed spaces) matches an `empty-csv-item` issue. All sibling items and
+ * every other URL key are preserved; the key is canonicalized into a single
+ * comma-joined occurrence when any item remains, and deleted when none
+ * remains.
  *
  * Non-CSV keys: the entire key is deleted — invalid singleton / duplicate
  * intent is ambiguous, so removal fails closed.
@@ -683,7 +685,7 @@ export function removeDiscoveryQueryIncompatibleIssue(
     const kept: string[] = [];
     for (const value of params.getAll(issue.key)) {
       for (const rawItem of value.split(',')) {
-        if (rawItem.trim() !== issue.rawValue) kept.push(rawItem);
+        if (rawItem.trim() !== issue.rawValue.trim()) kept.push(rawItem);
       }
     }
     if (kept.length > 0) out.set(issue.key, kept.join(','));

@@ -743,6 +743,28 @@ test('glue remove: empty csv item is removed for empty-csv-item issues', () => {
   expectCompatible(reparsed, 'cleaned empty csv item');
 });
 
+test('glue remove: whitespace-only csv item matches empty-csv-item removal', () => {
+  const params = new URLSearchParams('length=length%3Ashort%2C%20%20%2Clength%3Amedium');
+  const parsed = parseDiscoveryQueryV2(params, taxonomy, { relationshipProviderAvailable: false });
+  const issue = parsed.state.incompatible.find((item) => item.code === 'empty-csv-item');
+  assert.ok(issue, 'empty-csv-item issue present for whitespace-only item');
+  assert.deepEqual(issue, { key: 'length', rawValue: '  ', code: 'empty-csv-item' });
+
+  const paramsBefore = params.toString();
+  const out = removeDiscoveryQueryIncompatibleIssue(params, issue);
+  assert.equal(params.toString(), paramsBefore, 'input params untouched');
+  assert.equal(
+    out.toString(),
+    'length=length%3Ashort%2Clength%3Amedium',
+    'whitespace-only item dropped, both valid siblings kept',
+  );
+  assert.deepEqual(out.getAll('length'), ['length:short,length:medium']);
+
+  const reparsed = parseDiscoveryQueryV2(out, taxonomy, { relationshipProviderAvailable: false });
+  expectCompatible(reparsed, 'cleaned whitespace-only csv item');
+  assert.deepEqual(reparsed.state.lengthIds, ['length:medium', 'length:short']);
+});
+
 test('glue remove: deleting the only csv item removes the key', () => {
   const params = new URLSearchParams('q=hi&length=ultra-long');
   const issue = { key: 'length', rawValue: 'ultra-long', code: 'invalid-length-item' };
