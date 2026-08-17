@@ -9,10 +9,14 @@
  * TAX-04：
  * - 可见的已选条件 chips：canonical 辅助选择（V2 labels）与兼容标记分开
  *   但视觉一致；每个 chip 只移除该 id（collision-free testid，>=44px）。
+ * - 兼容标记已代表的 canonical 辅助 id（length/technique）只以兼容标记 chip
+ *   呈现：不重复出已选条件 chip，也不重复计入条件数；非默认 source 计为
+ *   一个活动条件。
  * - 一键 clear-all：重置 browse/topic 为 recommended/for-you、清空 q、
  *   sort 回 featured、清空全部辅助 id、incompatible 与 markers；保留当前
  *   tab 与 source（lockedSource 仍由 Feed 执行）。state.incompatible
- *   非空时绝不提供 clear-all（不静默清除不兼容原始 URL key）。
+ *   非空或没有任何活动条件时绝不提供 clear-all（不静默清除不兼容原始
+ *   URL key）。
  * - 展示结果数与活动条件摘要；空结果绝不自动放宽条件。
  */
 
@@ -125,17 +129,33 @@ export function CommunityDiscoveryRuntimeFilters({
     });
   };
 
+  /**
+   * TAX-04: 兼容标记已代表的 canonical 辅助 id（length/technique）。这些 id
+   * 只以兼容标记 chip 呈现：不重复出现在已选条件 chips 中，也不重复计入
+   * 条件数。topic 类标记（compat-style-alias/compat-shape）不在此列。
+   */
+  const markerRepresentedAuxIds = new Set(
+    state.markers
+      .filter(
+        (marker) =>
+          marker.canonicalKey === 'length' || marker.canonicalKey === 'technique',
+      )
+      .map((marker) => marker.canonicalValue),
+  );
+
   /** TAX-04: 已选 canonical 辅助条件 chips（V2 labels，保 AUX_GROUPS 顺序）。 */
   const selectedAuxChips = AUX_GROUPS.flatMap((group) =>
-    state[group.field].map((id) => {
-      const tag = canonicalTags.find((candidate) => candidate.id === id);
-      return {
-        id,
-        group,
-        zh: tag?.labels['zh-CN'] ?? id,
-        en: tag?.labels.en ?? id,
-      };
-    }),
+    state[group.field]
+      .filter((id) => !markerRepresentedAuxIds.has(id))
+      .map((id) => {
+        const tag = canonicalTags.find((candidate) => candidate.id === id);
+        return {
+          id,
+          group,
+          zh: tag?.labels['zh-CN'] ?? id,
+          en: tag?.labels.en ?? id,
+        };
+      }),
   );
 
   const activeAuxCount = AUX_GROUPS.reduce(
@@ -143,19 +163,20 @@ export function CommunityDiscoveryRuntimeFilters({
     0,
   );
 
-  /** TAX-04: 活动条件摘要（浏览 topic / q / sort / 辅助 id 数 / 标记数）。 */
+  /** TAX-04: 活动条件摘要（source / 浏览 topic / q / sort / 辅助 id 数 / 标记数）。 */
   const activeConditionCount =
+    (state.source !== 'all' ? 1 : 0) +
     (state.browse !== 'recommended' || state.topic !== DEFAULT_RECOMMENDATION_CHANNEL ? 1 : 0) +
     (state.q !== '' ? 1 : 0) +
     (state.sort !== 'featured' ? 1 : 0) +
-    state.lengthIds.length +
+    state.lengthIds.filter((id) => !markerRepresentedAuxIds.has(id)).length +
     state.makeabilityIds.length +
     state.rightsIds.length +
-    state.techniqueIds.length +
+    state.techniqueIds.filter((id) => !markerRepresentedAuxIds.has(id)).length +
     state.markers.length;
 
   const markers = state.markers;
-  const canClearAll = state.incompatible.length === 0;
+  const canClearAll = state.incompatible.length === 0 && activeConditionCount > 0;
 
   return (
     <div className="space-y-3" data-testid="community-discovery-runtime-filters">

@@ -14,9 +14,10 @@
  *    sessionStorage、绝不挂载自动导航（useEffect 体内无 onChange）；
  *  - Feed 接线：新组件在搜索/tabs 之后、排序/运行时筛选之前，仅 look
  *    呈现，relationshipProviderAvailable=false；
- *  - 运行时筛选增强：已选条件 chips（collision-free testid）、单条移除只
- *    移除该 id、一键 clear-all（incompatible 非空时隐藏、保留 tab/source）、
- *    条件摘要与结果数、抽屉辅助清除保留；
+ *  - 运行时筛选增强：已选条件 chips（collision-free testid）、兼容标记已
+ *    代表的 canonical 辅助 id 不重复出 chip/计数、单条移除只移除该 id、
+ *    一键 clear-all（incompatible 非空或零活动条件时隐藏、保留 tab/source）、
+ *    非默认 source 计为活动条件、条件摘要与结果数、抽屉辅助清除保留；
  *  - 无 legacy CommunityFilters / filterLookReadModels。
  *
  * 静态/结构验证沿用仓库既定模式（.tsx 由源码断言，纯 .ts 由 Node 直接
@@ -76,6 +77,38 @@ function callBody(source, name) {
     }
   }
   throw new Error(`unbalanced ${name}( call in source`);
+}
+
+/**
+ * Extract the balanced `{ ... }` body of `const name = (…): … => { … };`.
+ * Bounded to the first `const name =` declaration, so a later `name(...)`
+ * invocation elsewhere in the file cannot be confused with the definition.
+ */
+function arrowFnBody(source, name) {
+  const decl = `const ${name} =`;
+  const start = source.indexOf(decl);
+  assert.ok(start >= 0, `expected a const ${name} = declaration in source`);
+  const open = source.indexOf('{', start);
+  assert.ok(open >= 0, `expected a { body for const ${name}`);
+  let depth = 0;
+  for (let i = open; i < source.length; i += 1) {
+    if (source[i] === '{') depth += 1;
+    else if (source[i] === '}') {
+      depth -= 1;
+      if (depth === 0) return source.slice(open + 1, i);
+    }
+  }
+  throw new Error(`unbalanced ${name} arrow body in source`);
+}
+
+/**
+ * Strip /* block comments *\/ and // line comments so assertions target
+ * executable code, not documentation prose. The `[^:]` guard on line
+ * comments keeps `https://`-style string contents intact.
+ */
+function stripComments(source) {
+  const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, '');
+  return withoutBlocks.replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
 }
 
 function countOccurrences(source, token) {
@@ -192,7 +225,7 @@ test('nav: session memory is a ref, kept in sync, never storage, never auto-navi
   assert.match(nav, /topicMemory/, 'memory named and used');
   assert.match(nav, /topicMemory\.current\[state\.browse\] = state\.topic/, 'URL state syncs memory');
   assert.match(nav, /topicMemory\.current\[browse\]/, 'memory seeds the next explicit selection');
-  assert.doesNotMatch(nav, /localStorage|sessionStorage/, 'no web storage access');
+  assert.doesNotMatch(stripComments(nav), /localStorage|sessionStorage/, 'no web storage access in executable code');
   const effectBody = callBody(nav, 'useEffect');
   assert.doesNotMatch(effectBody, /onChange|setSearchParams|applyState/, 'mount effect never navigates');
   assert.equal(
@@ -257,7 +290,7 @@ test('filters: compatibility markers stay separate and removable', () => {
 
 test('filters: one-click clear-all resets discovery filters and preserves tab/source', () => {
   assert.match(filters, /community-runtime-clear-all/, 'clear-all control present');
-  const clearAllBody = callBody(filters, 'clearAll');
+  const clearAllBody = arrowFnBody(filters, 'clearAll');
   assert.match(clearAllBody, /\.\.\.state/, 'preserves tab and source (spread)');
   assert.match(clearAllBody, /q: ''/, 'clears q');
   assert.match(clearAllBody, /sort: 'featured'/, 'sort back to featured');
@@ -271,9 +304,43 @@ test('filters: one-click clear-all resets discovery filters and preserves tab/so
   assert.match(clearAllBody, /markers: \[\],/, 'clears compatibility markers');
 });
 
-test('filters: global clear-all is not offered when incompatible state is non-empty', () => {
-  assert.match(filters, /canClearAll = state\.incompatible\.length === 0/, 'guard derives from incompatible');
-  assert.match(filters, /\{canClearAll && \(/, 'clear-all renders only when compatible');
+test('filters: global clear-all is offered only when compatible AND at least one condition is active', () => {
+  assert.match(
+    filters,
+    /canClearAll = state\.incompatible\.length === 0 && activeConditionCount > 0/,
+    'guard derives from incompatible state and the active condition count',
+  );
+  assert.match(filters, /\{canClearAll && \(/, 'clear-all renders only when the guard holds');
+});
+
+test('filters: aux ids represented by compatibility markers are not duplicated as chips or counts', () => {
+  assert.match(filters, /markerRepresentedAuxIds/, 'marker-represented aux id set is derived');
+  assert.match(filters, /canonicalKey === 'length'/, 'length compatibility markers tracked');
+  assert.match(filters, /canonicalKey === 'technique'/, 'technique compatibility markers tracked');
+  assert.match(
+    filters,
+    /\.filter\(\(id\) => !markerRepresentedAuxIds\.has\(id\)\)/,
+    'selected chips exclude marker-represented ids',
+  );
+  assert.match(
+    filters,
+    /state\.lengthIds\.filter\(\(id\) => !markerRepresentedAuxIds\.has\(id\)\)\.length/,
+    'condition count excludes marker-represented length ids',
+  );
+  assert.match(
+    filters,
+    /state\.techniqueIds\.filter\(\(id\) => !markerRepresentedAuxIds\.has\(id\)\)\.length/,
+    'condition count excludes marker-represented technique ids',
+  );
+  assert.match(filters, /state\.markers\.length/, 'markers still counted once via markers.length');
+});
+
+test('filters: non-default source counts as one active condition', () => {
+  assert.match(
+    filters,
+    /state\.source !== 'all' \? 1 : 0/,
+    'source counts once when it is not the default All',
+  );
 });
 
 test('filters: result count and active condition summary shown; drawer aux-clear retained', () => {
