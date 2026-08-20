@@ -1,8 +1,8 @@
 import type { DesignSummary, FingerCode, NailLength, NailShape } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
 import { parseHexColorV7 } from './background';
-import type { EditorDocV7, FlatDesignElementV7, GeometryRefV7, ProcessStepV7, SurfaceFinishTypeV7 } from './model';
-import { getOfficialTemplatePatternAssetV7 } from './official-template-assets';
+import type { AssetRefV7, DesignSourceRefV1, EditorDocV7, FlatDesignElementV7, GeometryRefV7, ProcessStepV7, SurfaceFinishTypeV7 } from './model';
+import { assetRefV7Equal, getOfficialTemplatePatternAssetV7 } from './official-template-assets';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
 import { parseEditorDocV7 } from './schema';
 import { materializeMercuryDewV7 } from './mercury-dew';
@@ -33,6 +33,7 @@ export interface WizardEditorV7CompatibilityInput {
   finish: DesignSummary['finish'];
   recipe?: DesignSummary['recipe'];
   fingerOverrides?: DesignSummary['fingerOverrides'];
+  templateAssetRef?: AssetRefV7;
 }
 
 export interface WizardEditorV7CompatibilityItem {
@@ -97,8 +98,17 @@ function wizardCompatibilityFailure(input: WizardEditorV7CompatibilityInput): Ex
   if (unavailableFinger) {
     return { ok: false, reason: 'geometry_unavailable', message: `${input.shape}/${input.length}/${unavailableFinger} 尚无已签收 V7 轮廓` };
   }
-  if (input.templateId && input.templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID && !getOfficialTemplatePatternAssetV7(input.templateId, input.shape)) {
+  if (input.templateId && !input.templateAssetRef) {
+    return { ok: false, reason: 'template_asset_missing', message: `${input.templateId}/${input.shape} 缺少精确 AssetRefV7，拒绝使用当前注册表漂移` };
+  }
+  if (input.templateId && !getOfficialTemplatePatternAssetV7(input.templateId, input.shape)) {
     return { ok: false, reason: 'template_asset_missing', message: `${input.templateId}/${input.shape} 缺少已验证 SVG 图案资产` };
+  }
+  if (input.templateId && input.templateAssetRef) {
+    const expected = getOfficialTemplatePatternAssetV7(input.templateId, input.shape);
+    if (!expected || !assetRefV7Equal(expected, input.templateAssetRef)) {
+      return { ok: false, reason: 'template_asset_missing', message: `${input.templateId}/${input.shape} 的素材 revision/SHA 不匹配` };
+    }
   }
   return null;
 }
@@ -197,7 +207,8 @@ function buildEditorDocV7(
   input: BlankEditorDocV7Input,
   perFingerColor: (finger: FingerCode) => string,
   templateId?: string,
-  source?: { sourceId: string; revision: string },
+  source?: { sourceRefs: DesignSourceRefV1[] },
+  templateAssetRef?: AssetRefV7,
 ): EditorDocV7CreationResult {
   const now = input.now ?? new Date().toISOString();
   const finish = input.finish ?? 'gloss';
@@ -206,8 +217,8 @@ function buildEditorDocV7(
   for (const finger of FINGER_CODES) {
     const color = parseHexColorV7(perFingerColor(finger));
     if (!color) return { ok: false, reason: 'invalid_input', message: `Invalid background color for ${finger}` };
-    const asset = templateId && templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID ? getOfficialTemplatePatternAssetV7(templateId, input.shape) : null;
-    if (templateId && templateId !== PETAL_PEARL_BLOOM_TEMPLATE_ID && !asset) {
+    const asset = templateId ? templateAssetRef ?? null : null;
+    if (templateId && !asset) {
       return { ok: false, reason: 'template_asset_missing', message: `No verified ${templateId}/${input.shape} SVG asset exists` };
     }
     const templateElement: FlatDesignElementV7 | null = asset ? {
@@ -241,7 +252,7 @@ function buildEditorDocV7(
     title: input.title ?? '自由画布设计',
     nails,
     recipeInstances: {},
-    sourceRefs: source ? [{ domain: 'wizard', sourceId: source.sourceId, revision: source.revision }] : [{ domain: 'manual', sourceId: input.designId }],
+    sourceRefs: source?.sourceRefs ?? [{ domain: 'manual', sourceId: input.designId }],
     communicationRefs: [],
     outputIntent: 'design',
     revision: 1,
@@ -275,9 +286,13 @@ export function wizardDesignToEditorDocV7(
     finish: design.finish as SurfaceFinishTypeV7,
     now,
   }, (finger) => design.fingerOverrides?.[finger]?.baseColor ?? design.baseColor, petalPearlBloom ? undefined : design.templateId, {
-    sourceId: design.id,
-    revision: String(design.version),
-  });
+    sourceRefs: [
+      { domain: 'wizard', sourceId: design.id, revision: String(design.version) },
+      ...(design.communitySourceRef
+        ? [{ domain: 'community' as const, sourceId: design.communitySourceRef.contentId, revision: design.communitySourceRef.assetVersion }]
+        : []),
+    ],
+  }, design.templateAssetRef);
   if (!base.ok) return base;
   if (petalPearlBloom) {
     const materialized = materializePetalPearlBloomV7(base.doc);

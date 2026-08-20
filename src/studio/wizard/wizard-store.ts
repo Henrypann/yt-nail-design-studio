@@ -49,6 +49,9 @@ import {
   wizardSummaryCustomerId,
 } from './design-summary';
 import type { WizardDraftV1 } from './wizard-draft';
+import { assetRefV7Equal, getOfficialTemplatePatternAssetV7, identifyOfficialTemplatePatternV7 } from '@/studio/editor/v7/official-template-assets';
+import type { AssetRefV7 } from '@/studio/editor/v7/model';
+import type { CommunityLegacySourceRefV1 } from './wizard-draft';
 
 /* ── Toast 桥（页面挂载时注入，store 内不直接使用 hooks） ── */
 
@@ -124,6 +127,8 @@ interface WizardState {
   /* 设计参数 */
   templateId: string | null;
   templateName: string | null;
+  templateAssetRef: import('@/studio/editor/v7/model').AssetRefV7 | null;
+  communitySourceRef: CommunityLegacySourceRefV1 | undefined;
   baseColor: string | null;
   finish: Finish;
   fingerOverrides: FingerOverrides;
@@ -153,7 +158,7 @@ interface WizardState {
   applyShapeLengthEdit: () => Promise<boolean>;
   clearApplyError: () => void;
   setPresentNudge: (v: boolean) => void;
-  applyTemplate: (t: TemplateEntry) => void;
+  applyTemplate: (t: TemplateEntry, options?: { exactAsset?: AssetRefV7; communitySourceRef?: CommunityLegacySourceRefV1 }) => boolean;
   /** Community Intent「新建设计」：新 designId + 清空工作态，保持 draft */
   resetForNewDesign: () => void;
   /** 恢复版本化活动草稿；Customer 始终从主数据重新解析。 */
@@ -208,6 +213,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
       shape: s.appliedShape,
       length: s.appliedLength,
       templateId: s.templateId ?? undefined,
+      templateAssetRef: s.templateAssetRef ?? undefined,
+      ...(s.communitySourceRef ? { communitySourceRef: s.communitySourceRef } : {}),
       baseColor: s.baseColor,
       finish: s.finish,
       fingerOverrides: Object.keys(s.fingerOverrides).length > 0 ? s.fingerOverrides : undefined,
@@ -327,6 +334,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
     presentNudge: false,
     templateId: null,
     templateName: null,
+    templateAssetRef: null,
+    communitySourceRef: undefined,
     baseColor: null,
     finish: 'gloss',
     fingerOverrides: {},
@@ -378,13 +387,31 @@ export const useWizardStore = create<WizardState>((set, get) => {
     },
     applyShapeLengthEdit: () => applyShapeLength(false),
 
-    applyTemplate: (t) => {
-      if (get().status !== 'draft') return;
+    applyTemplate: (t, options) => {
+      if (get().status !== 'draft') return false;
       const petalP0 = PETAL_VEIL_P0_ENABLED && t.id === 't_petal_veil_french';
       const petalPearlBloom = t.id === 't_petal_pearl_bloom_simulated';
+      const resolvedShape = petalP0 ? 'almond' : get().appliedShape ?? get().shape;
+      const templateId = petalP0 ? t.id : (t.render_template_id ?? t.id);
+      const templateAssetRef = options?.exactAsset ?? (resolvedShape
+        ? getOfficialTemplatePatternAssetV7(templateId, resolvedShape)
+        : null);
+      const identity = templateAssetRef ? identifyOfficialTemplatePatternV7(templateAssetRef) : null;
+      const registeredAsset = resolvedShape ? getOfficialTemplatePatternAssetV7(templateId, resolvedShape) : null;
+      if (options?.exactAsset && (!resolvedShape || !identity || identity.templateId !== templateId || !assetRefV7Equal(templateAssetRef, registeredAsset))) {
+        set({ applyError: `模板 ${t.id} 的精确素材身份不匹配，未应用。` });
+        return false;
+      }
+      if (!resolvedShape || !templateAssetRef) {
+        set({ applyError: `模板 ${t.id} 缺少已注册的精确图案资产，未应用。` });
+        notifier?.error(`模板 ${t.name} 暂不可用：缺少精确图案资产。`);
+        return false;
+      }
       set({
-        templateId: petalP0 ? t.id : (t.render_template_id ?? t.id),
+        templateId,
         templateName: t.name,
+        templateAssetRef,
+        communitySourceRef: options?.communitySourceRef,
         baseColor: petalP0 ? '#F2E4DA' : t.default_base_color,
         finish: petalP0 ? 'gloss' : t.default_finish,
         shape: petalP0 ? 'almond' : get().shape,
@@ -406,6 +433,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
             : undefined,
       });
       markDirty(2000); // 应用模板后 2s 防抖自动保存
+      return true;
     },
 
     resetForNewDesign: () => {
@@ -430,6 +458,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
         presentNudge: false,
         templateId: null,
         templateName: null,
+        templateAssetRef: null,
+        communitySourceRef: undefined,
         baseColor: null,
         finish: 'gloss',
         fingerOverrides: {},
@@ -466,6 +496,8 @@ export const useWizardStore = create<WizardState>((set, get) => {
         presentNudge: false,
         templateId: draft.templateId,
         templateName: draft.templateName,
+        templateAssetRef: draft.templateAssetRef ? structuredClone(draft.templateAssetRef) : null,
+        communitySourceRef: draft.communitySourceRef ? structuredClone(draft.communitySourceRef) : undefined,
         baseColor: draft.baseColor,
         finish: draft.finish,
         fingerOverrides: structuredClone(draft.fingerOverrides),

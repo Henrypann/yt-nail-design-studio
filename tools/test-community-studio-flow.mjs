@@ -131,6 +131,7 @@ function makeWizard(initial = {}) {
         state.appliedTemplates.push(template.id);
         state.templateId = template.id;
         state.templateName = template.name;
+        return true;
       },
     },
     deps(extra = {}) {
@@ -294,7 +295,7 @@ mem.clear();
   };
   w.api.applyTemplate = (t) => {
     order.push('apply');
-    origApply(t);
+    return origApply(t);
   };
   const r = await consumeCommunityImportIntent(intentId, 'new', w.deps());
   assert.equal(r.ok, true);

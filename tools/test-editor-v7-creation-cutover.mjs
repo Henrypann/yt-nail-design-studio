@@ -21,6 +21,7 @@ import {
 import { setEditorV7ProductGeometry } from '../src/studio/editor/v7/commands.ts';
 import {
   OFFICIAL_TEMPLATE_PATTERN_ASSET_COUNT_V7,
+  getOfficialTemplatePatternAssetV7,
   identifyOfficialTemplatePatternV7,
 } from '../src/studio/editor/v7/official-template-assets.ts';
 import { createEditorDocV7InMap } from '../src/studio/editor/v7/repository.ts';
@@ -38,6 +39,7 @@ function summary(overrides = {}) {
     shape: 'almond',
     length: 'medium',
     templateId: 't_petal_veil_french',
+    templateAssetRef: getOfficialTemplatePatternAssetV7('t_petal_veil_french', 'almond'),
     baseColor: '#E9B7C8',
     finish: 'gloss',
     fingerOverrides: { R2: { baseColor: '#112233' } },
@@ -76,6 +78,16 @@ for (const finger of FINGER_CODES) {
   assert.equal(blank.doc.nails[finger].geometryRef.assetId, `geometry.oval.long.${finger}`);
   assert.equal(resolveBackgroundSilhouetteV7(blank.doc.nails[finger].geometryRef, finger).source, 'product');
 }
+
+const missingRefResult = openBridgeV7WithDeps('design.missing-ref', {
+  getDesign: () => summary({ id: 'design.missing-ref', templateAssetRef: undefined }),
+  inspectEditorDoc: () => ({ present: false }),
+  convertDesign: (design) => wizardDesignToEditorDocV7(design, '2026-08-10T02:00:00.000Z'),
+  createEditorDoc: () => ({ ok: true }),
+  navigate: () => { throw new Error('must not navigate'); },
+});
+assert.equal(missingRefResult.ok, false);
+assert.equal(missingRefResult.reason, 'v7_content_not_supported');
 
 // Representable Wizard content becomes V7 without losing template or per-finger color.
 const wizard = wizardDesignToEditorDocV7(summary(), '2026-08-10T02:00:00.000Z');
@@ -129,6 +141,7 @@ assert.equal(setEditorV7ProductGeometry(changedGeometry.doc, 'square', 'medium')
 assert.deepEqual(wizardDesignToEditorDocV7(summary({ finish: 'pearl' })).reason, 'unsupported_finish');
 const mercury = wizardDesignToEditorDocV7(summary({
   templateId: 't_liquid_velvet_cat_eye',
+  templateAssetRef: getOfficialTemplatePatternAssetV7('t_liquid_velvet_cat_eye', 'almond'),
   recipe: createMercuryInstance(),
 }));
 assert.equal(mercury.ok, true);

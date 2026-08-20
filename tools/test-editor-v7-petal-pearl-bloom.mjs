@@ -54,13 +54,11 @@ const summary = {
   templateId: 't_petal_pearl_bloom_simulated', baseColor: '#F4DCE5', finish: 'gloss', status: 'draft', source: 'wizard', version: 1,
 };
 const preflight = inspectWizardEditorV7Compatibility(summary);
-assert.equal(preflight.ok, true);
+assert.equal(preflight.ok, false);
+assert.equal(preflight.reason, 'template_asset_missing');
 const created = wizardDesignToEditorDocV7(summary, '2026-08-12T03:00:00.000Z');
-assert.equal(created.ok, true);
-assert.equal(created.doc.title, 'Petal Pearl Bloom');
-assert.equal(created.doc.nails.L2.steps.some((step) => step.kind === 'dimensional_decoration'), true);
-assert.equal(created.doc.nails.L3.steps.some((step) => step.kind === 'flat_design'), true);
-assert.equal(created.doc.nails.L4.steps.some((step) => step.kind === 'surface_effect'), true);
-console.log('[petal-pearl] Wizard to Editor V7 compatibility and materialization: PASS');
+assert.equal(created.ok, false);
+assert.equal(created.reason, 'template_asset_missing');
+console.log('[petal-pearl] Wizard to Editor V7 blocks unregistered template asset: PASS');
 
 console.log('[test:editor-v7-petal-pearl-bloom] PASS');

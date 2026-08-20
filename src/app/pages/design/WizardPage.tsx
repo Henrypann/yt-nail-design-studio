@@ -29,8 +29,9 @@ import { setWizardNotifier, useWizardStore } from '@/studio/wizard/wizard-store'
 import {
   chooseWizardRestoreDraft,
   clearWizardDraft,
-  readWizardDraft,
-  writeWizardDraft,
+  readWizardRecoveryDraft,
+  wizardRecoveryDraftToLegacyProjection,
+  writeWizardRecoveryDraftV2,
 } from '@/studio/wizard/wizard-draft';
 import {
   cancelCommunityImportIntent,
@@ -103,6 +104,7 @@ export default function WizardPage() {
   /** 已处理的 intentId，避免同一次落地重复消费；换新 intent 可再次进入。 */
   const intentHandledRef = useRef<string | null>(null);
   const versionedIntentHandledRef = useRef<string | null>(null);
+  const recoveryBlockedRef = useRef(false);
 
   /* Toast 桥注入 */
   useEffect(() => {
@@ -125,10 +127,17 @@ export default function WizardPage() {
       useWizardStore.getState().resetForNewDesign();
     }
     const explicitDesign = explicitId ? findDesign(explicitId) : null;
+    const recovery = explicitId || fresh ? null : readWizardRecoveryDraft();
+    if (recovery && !recovery.ok && recovery.code !== 'missing') {
+      recoveryBlockedRef.current = true;
+      toast.warning('活动草稿无法恢复，原始数据已保留；请检查后重新开始。');
+    } else if (recovery?.ok) {
+      recoveryBlockedRef.current = false;
+    }
     const draft = chooseWizardRestoreDraft({
       explicitDesignId: explicitId,
       explicitDesign,
-      activeDraft: explicitId || fresh ? null : readWizardDraft(),
+      activeDraft: recovery?.ok ? wizardRecoveryDraftToLegacyProjection(recovery.draft) : null,
     });
     if (draft) {
       useWizardStore.getState().restoreDraft(
@@ -151,7 +160,8 @@ export default function WizardPage() {
     if (!wizardReady) return;
     const persist = () => {
       try {
-        writeWizardDraft(useWizardStore.getState());
+        if (recoveryBlockedRef.current) return;
+        writeWizardRecoveryDraftV2(useWizardStore.getState());
       } catch {
         // localStorage 不可用不得阻断当前编辑会话。
       }
@@ -164,6 +174,7 @@ export default function WizardPage() {
   useEffect(() => {
     if (!wizardReady || searchParams.get('fresh') !== '1') return;
     clearWizardDraft();
+    recoveryBlockedRef.current = false;
     useWizardStore.getState().resetForNewDesign();
     const customerId = searchParams.get('customerId');
     const customer = customerId ? findCustomer(customerId) : null;
@@ -250,6 +261,15 @@ export default function WizardPage() {
                     contentId: applied.recovery.contentId,
                     returnTo: applied.recovery.returnTo,
                   }
+                : null,
+            );
+            return;
+          }
+          if (applied.reason === 'asset_mismatch') {
+            toast.warning('素材版本已更新或不可用，请从 Community 重新试用。');
+            recoverFromIntent(
+              applied.recovery?.contentId
+                ? { contentId: applied.recovery.contentId, returnTo: applied.recovery.returnTo }
                 : null,
             );
             return;
@@ -405,6 +425,15 @@ export default function WizardPage() {
                   contentId: applied.recovery.contentId,
                   returnTo: applied.recovery.returnTo ?? ui.returnTo,
                 }
+              : { contentId: ui.contentId, returnTo: ui.returnTo },
+          );
+          return;
+        }
+        if (applied.reason === 'asset_mismatch') {
+          toast.warning('素材版本已更新或不可用，请从 Community 重新试用。');
+          recoverFromIntent(
+            applied.recovery?.contentId
+              ? { contentId: applied.recovery.contentId, returnTo: applied.recovery.returnTo ?? ui.returnTo }
               : { contentId: ui.contentId, returnTo: ui.returnTo },
           );
           return;

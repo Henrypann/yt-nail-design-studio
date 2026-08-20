@@ -82,9 +82,10 @@ assert.equal(parseWizardDraft({ ...serialized, appliedShape: null }), null);
 // Malformed and future schemas are ignored and removed without throwing.
 writeEnvelope(StorageKeys.wizardDraft, { schemaVersion: 99, designId: 'future' });
 assert.equal(readWizardDraft(), null);
-assert.equal(localStorage.getItem('nail-studio:wizard.active-draft'), null);
+assert.notEqual(localStorage.getItem('nail-studio:wizard.active-draft'), null, 'future draft is preserved for recovery');
 writeEnvelope(StorageKeys.wizardDraft, { schemaVersion: 1, designId: '', step: 7 });
 assert.equal(readWizardDraft(), null);
+assert.notEqual(localStorage.getItem('nail-studio:wizard.active-draft'), null, 'invalid draft is preserved for recovery');
 
 const summary = {
   id: 'explicit-design',

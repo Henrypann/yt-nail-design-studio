@@ -11,6 +11,9 @@ import {
 } from '@/community/domain/studio-import-intent';
 import type { NailLength, NailShape } from '@/lib/types';
 import type { TemplateEntry } from '@/studio/preview/material-library';
+import { getOfficialTemplatePatternAssetForCommunityVersionV7 } from '@/studio/editor/v7/official-template-assets';
+import type { AssetRefV7 } from '@/studio/editor/v7/model';
+import type { CommunityLegacySourceRefV1 } from './wizard-draft';
 import {
   detectCommunityIntentConflictFromSnapshot,
   type CommunityIntentConflictKind,
@@ -39,7 +42,10 @@ export type WizardIntentApplyApi = {
     length: NailLength;
     enterStep2: boolean;
   }) => void;
-  applyTemplate: (template: TemplateEntry) => void;
+  applyTemplate: (template: TemplateEntry, options?: {
+    exactAsset?: AssetRefV7;
+    communitySourceRef?: CommunityLegacySourceRefV1;
+  }) => boolean;
 };
 
 export type CommunityIntentConsumeDeps = {
@@ -57,6 +63,7 @@ export type ConsumeCommunityIntentResult =
         | 'frozen'
         | 'editor_doc'
         | 'template_missing'
+        | 'asset_mismatch'
         | 'load_failed';
       validationReason?: string;
       intent?: StudioImportIntentV1 | null;
@@ -70,9 +77,9 @@ async function resolveTemplate(
 ): Promise<TemplateEntry | null> {
   const index = await loadLibraryIndex();
   return (
-    index.templates.find(
-      (t) => t.id === intent.assetRef.templateId || t.id === intent.assetRef.renderTemplateId,
-    ) ?? null
+    index.templates.find((t) => t.id === intent.assetRef.renderTemplateId)
+    ?? index.templates.find((t) => t.id === intent.assetRef.templateId)
+    ?? null
   );
 }
 
@@ -129,6 +136,20 @@ export async function consumeCommunityImportIntent(
       return { ok: false, reason: 'template_missing', intent, recovery };
     }
 
+    const snapBeforeApply = deps.wizard.getSnapshot();
+    const shapeForAsset = asShape(intent.suggestedContext?.shape) ?? snapBeforeApply.appliedShape;
+    // Published assetVersion belongs to the Community source template.  The
+    // explicit registry mapping resolves that source identity to the exact
+    // renderer template/revision; callers must not pre-resolve it here.
+    const patternTemplateId = intent.assetRef.templateId;
+    const exactAsset = shapeForAsset
+      ? getOfficialTemplatePatternAssetForCommunityVersionV7(patternTemplateId, shapeForAsset, intent.assetRef.assetVersion)
+      : null;
+    if (!shapeForAsset || !exactAsset) {
+      clearStudioImportIntent(intent.intentId);
+      return { ok: false, reason: 'asset_mismatch', intent, recovery };
+    }
+
     // ── 自此之后才允许同步改 Wizard ──
     if (mode === 'new') {
       deps.wizard.resetForNewDesign();
@@ -149,7 +170,17 @@ export async function consumeCommunityImportIntent(
       deps.wizard.setShapeLengthDraft({ shape, length, enterStep2: false });
     }
 
-    deps.wizard.applyTemplate(template);
+    const appliedSource: CommunityLegacySourceRefV1 = {
+      intentId: intent.intentId,
+      contentId: intent.contentId,
+      publisherId: intent.publisherId,
+      sourceTemplateId: intent.assetRef.templateId,
+      assetVersion: intent.assetRef.assetVersion,
+      applicationLevel: intent.applicationLevel,
+    };
+    if (!deps.wizard.applyTemplate(template, { exactAsset, communitySourceRef: appliedSource })) {
+      return { ok: false, reason: 'asset_mismatch', intent, recovery };
+    }
     clearStudioImportIntent(intent.intentId);
     return { ok: true, intent, mode };
   } catch {

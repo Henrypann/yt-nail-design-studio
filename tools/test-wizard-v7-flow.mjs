@@ -17,7 +17,8 @@ const wizard = await read('src/app/pages/design/WizardPage.tsx');
 assert.match(wizard, /searchParams\.get\('fresh'\) === '1'/);
 assert.match(wizard, /clearWizardDraft\(\);\s*useWizardStore\.getState\(\)\.resetForNewDesign\(\)/);
 assert.match(wizard, /SPA 内再次点击“新建设计”/);
-assert.match(wizard, /activeDraft: explicitId \|\| fresh \? null : readWizardDraft\(\)/);
+assert.match(wizard, /activeDraft: recovery\?\.ok \? wizardRecoveryDraftToLegacyProjection\(recovery\.draft\) : null/);
+assert.match(wizard, /readWizardRecoveryDraft\(\)/);
 
 const newEntrySources = await Promise.all([
   'src/app/layouts/AppLayout.tsx',

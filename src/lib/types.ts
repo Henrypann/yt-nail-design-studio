@@ -5,6 +5,8 @@
  *       confirmation 仅 { confirmedAt, confirmedBy } —— 无 channel / notes / sentAt。
  */
 
+import type { AssetRefV7 } from '@/studio/editor/v7/model';
+
 /* ── 基础枚举 ─────────────────────────────────────────── */
 
 /** 十指编码：L1–L5 左手拇指→小指，R1–R5 右手拇指→小指 */
@@ -110,6 +112,17 @@ export interface DesignSummary {
   /** Editor v2 的扫描相对长度语义；旧设计缺失时由 length 迁移。 */
   lengthPreset?: DesignLengthPreset;
   templateId?: string; // Wizard 应用的模板（material-library/templates/index.json）
+  /** Exact official pattern identity retained by Wizard recovery/bridge. */
+  templateAssetRef?: AssetRefV7;
+  /** Community provenance is carried alongside the Wizard source, never inferred. */
+  communitySourceRef?: {
+    intentId: string;
+    contentId: string;
+    publisherId: string;
+    sourceTemplateId: string;
+    assetVersion: string;
+    applicationLevel: 'INSPIRATION_ONLY' | 'APPROXIMATE' | 'STRUCTURED_EDITABLE' | 'REPRODUCIBLE';
+  };
   baseColor: string; // hex
   finish: Finish;
   /** Editor v2 表面结构；finish 作为 Wizard/旧设计兼容字段保留。 */
