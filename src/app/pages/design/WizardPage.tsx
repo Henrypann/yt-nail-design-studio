@@ -41,10 +41,6 @@ import {
 } from '@/studio/wizard/consume-community-intent';
 import { hasEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { loadShapeParams } from '@/studio/preview/material-library';
-import {
-  consumeVersionedUseIntentV2,
-  versionedIntentPortV2,
-} from '@/integration/community-studio/versioned-use-runtime';
 
 type IntentConflictUi = {
   intentId: string;
@@ -52,13 +48,6 @@ type IntentConflictUi = {
   returnTo?: string;
   kind: CommunityIntentConflictKind;
   applicationLevel?: StudioImportIntentV1['applicationLevel'];
-};
-
-type VersionedIntentUi = {
-  intentId: string;
-  lookId: string;
-  designVersionId: string;
-  returnTo: string;
 };
 
 function validationToastMessage(reason?: string): string {
@@ -97,13 +86,10 @@ export default function WizardPage() {
   const [summaryLabel, setSummaryLabel] = useState('');
   const [intentConflict, setIntentConflict] = useState<IntentConflictUi | null>(null);
   const [intentPending, setIntentPending] = useState(false);
-  const [versionedIntent, setVersionedIntent] = useState<VersionedIntentUi | null>(null);
-  const [versionedIntentPending, setVersionedIntentPending] = useState(false);
   const [wizardReady, setWizardReady] = useState(false);
   const initializedRef = useRef(false);
   /** 已处理的 intentId，避免同一次落地重复消费；换新 intent 可再次进入。 */
   const intentHandledRef = useRef<string | null>(null);
-  const versionedIntentHandledRef = useRef<string | null>(null);
   const recoveryBlockedRef = useRef(false);
 
   /* Toast 桥注入 */
@@ -200,12 +186,6 @@ export default function WizardPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const stripVersionedIntentParam = () => {
-    const next = new URLSearchParams(searchParams);
-    next.delete('versionedIntent');
-    setSearchParams(next, { replace: true });
-  };
-
   const recoverFromIntent = (intent?: Pick<StudioImportIntentV1, 'returnTo' | 'contentId'> | null) => {
     const fallback = intent?.contentId
       ? Routes.communityLook(intent.contentId)
@@ -219,7 +199,6 @@ export default function WizardPage() {
   /* Community StudioImportIntent 消费（草稿冲突须显式选择） */
   useEffect(() => {
     if (!wizardReady) return;
-    if (searchParams.get('versionedIntent')) return;
     const intentId = searchParams.get('communityIntent');
     if (!intentId) {
       intentHandledRef.current = null;
@@ -335,40 +314,6 @@ export default function WizardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, wizardReady]);
 
-  /* Canonical Look → exact DesignVersion intent. This path never mutates the
-   * Wizard store: current/cancel preserve it; new creates an independent V7. */
-  useEffect(() => {
-    if (!wizardReady) return;
-    const intentId = searchParams.get('versionedIntent');
-    if (!intentId) {
-      setVersionedIntent(null);
-      versionedIntentHandledRef.current = null;
-      return;
-    }
-    if (versionedIntentHandledRef.current === intentId) return;
-    versionedIntentHandledRef.current = intentId;
-    try {
-      const intent = versionedIntentPortV2.peek(intentId);
-      if (!intent) {
-        toast.warning('版本化定制意图已过期或无效，请从 Community 重新开始。');
-        stripVersionedIntentParam();
-        return;
-      }
-      setVersionedIntent({
-        intentId: intent.intentId,
-        lookId: intent.lookId,
-        designVersionId: intent.designVersionId,
-        returnTo: intent.returnTo,
-      });
-      setIntentConflict(null);
-      useWizardStore.getState().closePicker();
-    } catch {
-      toast.error('无法读取版本化定制意图，当前草稿未被修改。');
-      stripVersionedIntentParam();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, wizardReady]);
-
   const resolveIntent = (choice: 'current' | 'new' | 'cancel') => {
     if (!intentConflict || intentPending) return;
     const ui = intentConflict;
@@ -462,52 +407,6 @@ export default function WizardPage() {
     })();
   };
 
-  const resolveVersionedIntent = (choice: 'current' | 'new' | 'cancel') => {
-    if (!versionedIntent || versionedIntentPending) return;
-    const current = versionedIntent;
-    void (async () => {
-      setVersionedIntentPending(true);
-      try {
-        const result = await consumeVersionedUseIntentV2(current.intentId, choice);
-        if (!result.ok) {
-          if (result.reason === 'geometry_unavailable') {
-            toast.warning('该 Look 的十指甲型轮廓尚未全部签收，暂不能创建可空间编辑的 V7 副本。已返回 Community，当前设计未改变。');
-            setVersionedIntent(null);
-            stripVersionedIntentParam();
-            navigate(current.returnTo, { replace: true });
-            return;
-          }
-          toast[result.retryable ? 'error' : 'warning'](
-            result.retryable
-              ? 'Studio 暂时无法创建定制副本，版本化意图已保留，可重试或取消。'
-              : '来源版本已失效或权限已变化，请返回 Community 重新选择。',
-          );
-          if (!result.retryable) {
-            setVersionedIntent(null);
-            stripVersionedIntentParam();
-          }
-          return;
-        }
-        setVersionedIntent(null);
-        stripVersionedIntentParam();
-        if (!result.created) {
-          if (result.mode === 'cancel') navigate(result.returnTo, { replace: true });
-          else {
-            toast.info('已保留当前设计；Community 来源没有覆盖现有草稿。');
-            if (!useWizardStore.getState().customer) useWizardStore.getState().openPicker();
-          }
-          return;
-        }
-        toast.success('已创建独立的 Editor V7 Remix；来源后续变化不会改写此设计。');
-        navigate(`${Routes.designCanvas}?design=${encodeURIComponent(result.doc.designId)}`, { replace: true });
-      } catch {
-        toast.error('创建版本化定制副本失败，当前设计与意图均已保留。');
-      } finally {
-        setVersionedIntentPending(false);
-      }
-    })();
-  };
-
   /* 顶栏甲型·长度摘要 */
   useEffect(() => {
     if (!s.appliedShape || !s.appliedLength) {
@@ -587,6 +486,19 @@ export default function WizardPage() {
           </>
         )}
         {s.status === 'confirmed' && <Badge variant="blue">已确认 · 只读</Badge>}
+        {s.communitySourceRef && (
+          <div
+            className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] text-amber-800"
+            data-testid="wizard-legacy-source"
+            title="历史 Community 近似应用；不会形成正式顾客确认"
+          >
+            <strong>Legacy 近似应用</strong>
+            <span>来源 {s.communitySourceRef.contentId}</span>
+            <span>模板 {s.communitySourceRef.sourceTemplateId}</span>
+            <span>资产 {s.communitySourceRef.assetVersion}</span>
+            <span>能力 {s.communitySourceRef.applicationLevel}</span>
+          </div>
+        )}
 
         <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
           <CrossProductLink
@@ -749,51 +661,6 @@ export default function WizardPage() {
         </p>
       </Modal>
 
-      {/* COMM-V7.1-04：canonical Look / DesignVersion 冲突裁决。 */}
-      <Modal
-        open={versionedIntent !== null}
-        onClose={() => resolveVersionedIntent('cancel')}
-        title="使用这个版本创建 Studio 定制？"
-        footer={
-          <>
-            <Button
-              variant="ghost"
-              className="min-h-11"
-              data-testid="versioned-intent-cancel"
-              disabled={versionedIntentPending}
-              onClick={() => resolveVersionedIntent('cancel')}
-            >
-              取消并返回 Community
-            </Button>
-            <Button
-              variant="secondary"
-              className="min-h-11"
-              data-testid="versioned-intent-current"
-              disabled={versionedIntentPending}
-              onClick={() => resolveVersionedIntent('current')}
-            >
-              保留当前设计
-            </Button>
-            <Button
-              className="min-h-11"
-              data-testid="versioned-intent-new"
-              loading={versionedIntentPending}
-              onClick={() => resolveVersionedIntent('new')}
-            >
-              新建 V7 Remix
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-2 text-sm text-gray-600" data-testid="versioned-intent-conflict">
-          <p>当前 Wizard 草稿和已有 Editor 文档都不会被覆盖。</p>
-          <p>
-            新建会固定来源版本 <strong>{versionedIntent?.designVersionId}</strong>，复制为独立的
-            EditorDocV7。导入后可自由编辑，不与 Community 双向联动。
-          </p>
-          <p className="text-xs text-gray-500">预览通过不等于可制造，也不会生成设备或生产任务。</p>
-        </div>
-      </Modal>
     </div>
   );
 }

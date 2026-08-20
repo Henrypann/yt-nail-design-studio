@@ -17,6 +17,7 @@ export const Routes = {
   customerDetailPath: '/studio/customers/:id',
   designs: '/studio/design',
   designNew: '/studio/design/new', // Studio Wizard（默认入口）
+  designImport: '/studio/design/import', // Community canonical versioned import preflight
   designTemplates: '/studio/design/templates', // 选款页（甲型/长度确认后的模板选择）
   /** @deprecated 兼容旧链；replace → /official */
   designCommunity: '/studio/design/community',

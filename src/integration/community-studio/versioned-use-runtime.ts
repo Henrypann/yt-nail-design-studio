@@ -62,7 +62,7 @@ export function createVersionedUseIntentForLookV1(look: PublishedLookV1): Create
   );
   if (!result.ok) return result;
   const query = new URLSearchParams({ versionedIntent: result.intent.intentId });
-  return { ok: true, intentId: result.intent.intentId, href: `${Routes.designNew}?${query.toString()}` };
+  return { ok: true, intentId: result.intent.intentId, href: `${Routes.designImport}?${query.toString()}` };
 }
 
 function deterministicIds(intentId: string) {

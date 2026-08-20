@@ -19,7 +19,7 @@ import CustomerListPage from './pages/customers/CustomerListPage';
 import CustomerNewPage from './pages/customers/CustomerNewPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
 import DesignListPage from './pages/design/DesignListPage';
-import WizardPage from './pages/design/WizardPage';
+import VersionedImportPage from './pages/design/VersionedImportPage';
 import TemplateGalleryPage from './pages/design/TemplateGalleryPage';
 import CommunityPage from './pages/design/CommunityPage';
 import EditorPage from './pages/design/EditorPage';
@@ -52,6 +52,7 @@ const DevDebugPanel = import.meta.env.DEV
 const SurfaceBooleanDevPage = import.meta.env.DEV
   ? lazy(() => import('@/studio/geometry/v0-7-2/SurfaceBooleanDevPage'))
   : null;
+const LazyWizardPage = lazy(() => import('./pages/design/WizardPage'));
 
 function RouterChrome() {
   const location = useLocation();
@@ -76,6 +77,20 @@ function LegacyProductPathRedirect({ surface }: { surface: 'community' | 'studio
     ? legacyCommunityPathTarget(location.pathname)
     : legacyStudioPathTarget(location.pathname);
   return <Navigate replace to={`${pathname}${location.search}${location.hash}`} />;
+}
+
+/**
+ * Keep the historical versioned-intent URL explainable without mounting the
+ * Wizard. The redirect is evaluated by the route element before WizardPage is
+ * rendered, so the Wizard store/draft recovery effects never run.
+ */
+function DesignNewRoute() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (params.has('versionedIntent')) {
+    return <Navigate replace to={`${Routes.designImport}${location.search}${location.hash}`} />;
+  }
+  return <Suspense fallback={<div className="p-6 text-sm text-gray-500">正在打开快速建稿…</div>}><LazyWizardPage /></Suspense>;
 }
 
 const router = createBrowserRouter(createRoutesFromElements(
@@ -117,7 +132,8 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route element={<StudioLayout />}>
       <Route path={Routes.studioHome} element={<StudioHomePage />} />
       <Route path={Routes.designs} element={<DesignListPage />} />
-      <Route path={Routes.designNew} element={<WizardPage />} />
+      <Route path={Routes.designNew} element={<DesignNewRoute />} />
+      <Route path={Routes.designImport} element={<VersionedImportPage />} />
       <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
       <Route path={Routes.designCommunity} element={<CommunityPage />} />
       {/* 首次硬件注册始终可进入；客户/门店 Dashboard/设备列表由注册状态统一解锁。 */}

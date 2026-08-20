@@ -50,19 +50,18 @@ for (const viewport of viewports) {
   await page.waitForLoadState('networkidle');
   assert.match(communityPage.url(), /\/look\/look\.v7-1\.petal-veil$/);
   assert.equal(await page.evaluate(() => window.opener), null);
-  await page.getByTestId('versioned-intent-conflict').waitFor();
-  await page.waitForTimeout(400); // measure after modal scale-in animation settles
-  assert.match(page.url(), /\/studio\/design\/new\?versionedIntent=/);
-  assert.equal(await page.locator('[role="dialog"]').count(), 1, 'versioned flow has one active dialog');
+  await page.getByTestId('versioned-import-page').waitFor();
+  assert.match(page.url(), /\/studio\/design\/import\?versionedIntent=/);
+  assert.equal(await page.locator('[data-testid="versioned-import-page"]').count(), 1, 'versioned flow has one active preflight');
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null,
     'CTA click is not a successful customize event');
-  const sizes = await page.locator('button[data-testid^="versioned-intent-"]').evaluateAll((nodes) => nodes.map((node) => {
+  const sizes = await page.locator('button[data-testid^="versioned-import-"]').evaluateAll((nodes) => nodes.map((node) => {
     const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height };
   }));
   assert.equal(sizes.every((size) => size.height >= 44 && size.width >= 44), true);
   await page.screenshot({ path: path.join(output, `${viewport.name}-choice.png`), fullPage: true });
 
-  await page.getByTestId('versioned-intent-new').click();
+  await page.getByTestId('versioned-import-new').click();
   await page.getByTestId('editor-remix-disclosure').waitFor();
   await page.waitForTimeout(3500); // success toast must not obscure signed visual evidence
   assert.match(page.url(), /\/studio\/design\/canvas\?design=design\.remix\./);
@@ -113,10 +112,10 @@ for (const viewport of viewports) {
     communityPage.getByTestId('community-use-versioned').click(),
   ]);
   await page.waitForLoadState('networkidle');
-  const designId = await page.locator('[data-debug-id="studio.wizard.page"]').getAttribute('data-design-id');
-  await page.getByTestId('versioned-intent-current').click();
+  await page.getByTestId('versioned-import-page').waitFor();
+  await page.getByTestId('versioned-import-current').click();
   await page.locator('[data-debug-id="studio.wizard.page"]').waitFor();
-  assert.equal(await page.locator('[data-debug-id="studio.wizard.page"]').getAttribute('data-design-id'), designId);
+  assert.match(page.url(), /\/studio\/design\/new/);
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null);
   await context.close();
 }
@@ -131,7 +130,7 @@ for (const viewport of viewports) {
     communityPage.getByTestId('community-use-versioned').click(),
   ]);
   await page.waitForLoadState('networkidle');
-  await page.getByTestId('versioned-intent-cancel').click();
+  await page.getByTestId('versioned-import-cancel').click();
   await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null);
   await context.close();

@@ -44,7 +44,7 @@ export interface VersionedImportDependenciesV2 {
 export type VersionedImportResultV2 =
   | { ok: true; mode: 'current'|'cancel'; created: false; returnTo: string }
   | { ok: true; mode: 'new'; created: true; doc: EditorDocV7; event: LookCustomizeEventV1; returnTo: string }
-  | { ok: false; reason: 'missing_or_expired'|'permission'|'look_unavailable'|'version_mismatch'|'release_unavailable'|'asset_mismatch'|'asset_unavailable'|'geometry_unavailable'|'invalid_release'|'id_collision'|'write_failed'|'dependency'; retryable: boolean; message: string };
+  | { ok: false; reason: 'missing_or_expired'|'permission'|'look_unavailable'|'version_mismatch'|'source_mismatch'|'release_unavailable'|'asset_mismatch'|'asset_unavailable'|'geometry_unavailable'|'invalid_release'|'id_collision'|'write_failed'|'dependency'; retryable: boolean; message: string };
 
 export function materializeVersionedRemixV2(
   source: EditorDocV7,
@@ -90,6 +90,9 @@ export async function consumeVersionedStudioImportV2(intentId: string, mode: Ver
   if (!canRead) {
     try { deps.intents.clear(intentId); } catch { return { ok: false, reason: 'dependency', retryable: true, message: 'permission revoked; intent cleanup failed' }; }
     return { ok: false, reason: 'permission', retryable: false, message: 'permission revoked' };
+  }
+  if (look.creatorProfileId !== intent.sourceCreatorProfileId) {
+    return rejectFinal('source_mismatch', 'look creator no longer matches the versioned source lineage');
   }
   if (look.designVersionId !== intent.designVersionId) return rejectFinal('version_mismatch', 'look now references a different version');
   if (!release || release.designVersion.designVersionId !== intent.designVersionId) return { ok: false, reason: 'release_unavailable', retryable: true, message: 'released source unavailable' };
