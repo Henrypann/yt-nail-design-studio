@@ -5,5 +5,6 @@ export * from './domain-ports';
 export * from './local-asset-adapter';
 export * from './publish-authority';
 export * from './application-services';
+export * from './fixed-preview-contract';
 export * from './versioned-use-contract';
 export * from './versioned-use-local-adapter';

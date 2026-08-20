@@ -27,6 +27,7 @@ import {
   type ClientShareLinkV1,
 } from '@/studio/approval/client-approval';
 import type { ApprovalEventV1 } from '@/community/domain/v7_1/trust-contracts';
+import type { FixedPreviewReadModelV1 } from './fixed-preview-contract';
 import { canonicalJsonV1 } from '@/studio/versioning/design-release';
 import type { AssetUploadPortV1 } from './asset-contract';
 import type {
@@ -63,6 +64,7 @@ export interface CreatorWorkspaceStateV1 {
 export interface ClientShareViewV1 {
   share: ClientShareLinkV1;
   existingDecision: ApprovalEventV1 | null;
+  fixedPreview?: FixedPreviewReadModelV1;
 }
 
 export interface CreatorWorkspaceApplicationServiceV1 {
@@ -469,6 +471,7 @@ export function createClientApprovalApplicationServiceV1(input: {
   assets: AssetUploadPortV1;
   nextId(scope: string): string;
   sha256(value: string): Promise<string>;
+  readPreview?: (share: ClientShareLinkV1) => Promise<ServiceResultV1<FixedPreviewReadModelV1>>;
 }): ClientApprovalApplicationServiceV1 {
   const loadStore = async () => {
     const readContext = await context(input.identity, BACKEND_OPERATIONS_V1.approvalRead);
@@ -544,7 +547,12 @@ export function createClientApprovalApplicationServiceV1(input: {
       const resolved = await resolve(current.value.value, rawToken, readContext.value.now);
       if (!resolved.ok) return resolved;
       const existingDecision = current.value.value.events.find((event) => event.shareLinkId === resolved.value.share.shareLinkId) ?? null;
-      return { ok: true, value: { share: resolved.value.share, existingDecision }, changed: false };
+      const fixedPreview = input.readPreview ? await input.readPreview(resolved.value.share) : undefined;
+      if (input.readPreview) {
+        if (!fixedPreview) return serviceErrorV1('UNAVAILABLE', 'approval.preview_unavailable', true);
+        if (!fixedPreview.ok) return fixedPreview;
+      }
+      return { ok: true, value: { share: resolved.value.share, existingDecision, ...(fixedPreview?.ok ? { fixedPreview: fixedPreview.value } : {}) }, changed: false };
     },
     async decide(rawToken, decision, note) {
       const current = await loadStore(); if (!current.ok) return current;
@@ -552,6 +560,11 @@ export function createClientApprovalApplicationServiceV1(input: {
       if (!writeContext.ok) return writeContext;
       const resolved = await resolve(current.value.value, rawToken, writeContext.value.now);
       if (!resolved.ok) return resolved;
+      const fixedPreview = input.readPreview ? await input.readPreview(resolved.value.share) : undefined;
+      if (input.readPreview) {
+        if (!fixedPreview) return serviceErrorV1('UNAVAILABLE', 'approval.preview_unavailable', true, writeContext.value.correlationId);
+        if (!fixedPreview.ok) return fixedPreview;
+      }
       const normalizedNote = note?.trim() || undefined;
       const priorDecision = current.value.value.events.find((event) => event.shareLinkId === resolved.value.share.shareLinkId);
       if (priorDecision) {
@@ -560,7 +573,7 @@ export function createClientApprovalApplicationServiceV1(input: {
         }
         return {
           ok: true,
-          value: { share: resolved.value.share, existingDecision: structuredClone(priorDecision) },
+          value: { share: resolved.value.share, existingDecision: structuredClone(priorDecision), ...(fixedPreview?.ok ? { fixedPreview: fixedPreview.value } : {}) },
           changed: false,
         };
       }
@@ -583,7 +596,7 @@ export function createClientApprovalApplicationServiceV1(input: {
       const saved = await input.approvals.replace(writeContext.value, result.value, current.value.etag);
       if (!saved.ok) return saved;
       const existingDecision = saved.value.value.events.find((event) => event.idempotencyKey === writeContext.value.idempotencyKey) ?? null;
-      return { ok: true, value: { share: resolved.value.share, existingDecision }, changed: saved.changed };
+      return { ok: true, value: { share: resolved.value.share, existingDecision, ...(fixedPreview?.ok ? { fixedPreview: fixedPreview.value } : {}) }, changed: saved.changed };
     },
   };
 }

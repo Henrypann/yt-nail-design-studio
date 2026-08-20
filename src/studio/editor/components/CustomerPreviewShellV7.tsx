@@ -16,6 +16,7 @@ import { CustomerNailPreviewV7 } from './CustomerNailPreviewV7';
 import { EDITOR_FINGER_IDENTITY_V7, fingerDisplayNameV7 } from '../v7/finger-identity';
 import { FINGER_CODES } from '@/lib/types';
 import { NailGrid } from '@/studio/preview/NailGrid';
+import { studioApprovalApplicationServiceV1 } from '@/integration/community-studio/backend-runtime';
 
 const SingleNailPbrPreviewV072 = lazy(() => import('@/studio/rendering/v0-7-2/SingleNailPbrPreviewV072'));
 
@@ -50,6 +51,9 @@ export function CustomerPreviewShellV7({
   const [scenario, setScenario] = useState(createCustomerPreviewScenarioV7);
   const [compactPreview, setCompactPreview] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
   const [scenarioPanelOpen, setScenarioPanelOpen] = useState(() => !window.matchMedia('(max-width: 1023px)').matches);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
   const scenarioPanelRef = useRef<HTMLElement>(null);
   const scenarioToggleRef = useRef<HTMLButtonElement>(null);
   const scenarioTriggerRef = useRef<HTMLElement | null>(null);
@@ -58,6 +62,17 @@ export function CustomerPreviewShellV7({
   const selectedNail = doc.nails[selectedFinger];
   const scenarioCount = Object.keys(scenario.backgroundColors).length + (scenario.finishType ? 1 : 0);
   const confirmationReady = scenarioCount === 0 && readModels.every((model) => model.fidelity !== 'unavailable');
+  const createFixedShare = async () => {
+    if (!confirmationReady || shareBusy) return;
+    setShareBusy(true); setShareError(null);
+    const result = await studioApprovalApplicationServiceV1.createFixedVersionShare({ designId: doc.designId, expectedRevision: doc.revision });
+    if (result.ok) {
+      const url = new URL(`/community/share/${encodeURIComponent(result.value.rawToken)}`, window.location.origin).toString();
+      setShareUrl(url);
+      try { await navigator.clipboard?.writeText(url); } catch { /* visible URL remains available */ }
+    } else setShareError(result.error.reason);
+    setShareBusy(false);
+  };
 
   const resetScenario = () => setScenario(createCustomerPreviewScenarioV7());
 
@@ -141,7 +156,7 @@ export function CustomerPreviewShellV7({
         </div>
         <span className="rounded-full border border-success/20 bg-success-soft px-2.5 py-1 text-nano font-semibold text-success"><ShieldCheck size={12} className="mr-1 inline" />不修改设计</span>
         {scenarioCount > 0 && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-nano font-semibold text-violet-700">{scenarioCount} 项临时比较</span>}
-        <Button size="sm" variant="secondary" className="min-h-11" disabled title="STUDIO-04 将创建不可变 Approval / Snapshot；本预览页不持久化"><CheckCircle2 size={14} />{confirmationReady ? '预览就绪 · 确认待接入' : '检查后由 STUDIO-04 确认'}</Button>
+        <Button size="sm" variant="secondary" className="min-h-11" disabled={!confirmationReady || shareBusy} loading={shareBusy} onClick={() => void createFixedShare()} title="创建固定版本顾客确认链接"><CheckCircle2 size={14} />{confirmationReady ? '创建固定版本确认' : '检查后才能确认'}</Button>
       </header>
 
       <div className="flex items-center justify-between gap-2 border-b border-white/80 bg-white/80 px-3 py-2 sm:px-5">
@@ -211,7 +226,9 @@ export function CustomerPreviewShellV7({
                 <h1 className="mt-1 text-xl font-semibold text-gray-900">顾客沟通视图</h1>
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-nano"><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.backgroundMode}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">封层比较</dt><dd className="mt-1 font-semibold text-gray-800">{FINISH_LABEL[selectedModel.finishType]}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">平面 / 效果 / 立体</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.flatElementCount} / {selectedModel.activeSurfaceEffectCount} / {selectedModel.activeDecorationCount}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">预览等级</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.fidelity}</dd></div></dl>
                 {presentation === 'composite' && <p className="mt-3 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-nano leading-4 text-violet-700">当前为 v0.7.2 3D 能力入口：只读单指 PBR 模拟。十指整体模拟 3D 仍使用既有 SVG 2.5D 组合路径。</p>}
-                <p className={cx('mt-3 rounded-xl border px-3 py-2 text-nano leading-4', confirmationReady ? 'border-success/20 bg-success-soft text-success' : 'border-warning/20 bg-warning-soft text-warning')}>{confirmationReady ? '预览证据已就绪；STUDIO-04 可接管不可变 Approval / Snapshot。' : scenarioCount > 0 ? '当前含临时比较；重置后才能进入正式确认。' : '存在 unavailable 预览内容；修复或明确接受降级后，再由 STUDIO-04 接管确认。'}</p>
+                <p className={cx('mt-3 rounded-xl border px-3 py-2 text-nano leading-4', confirmationReady ? 'border-success/20 bg-success-soft text-success' : 'border-warning/20 bg-warning-soft text-warning')}>{confirmationReady ? '固定版本会锁定当前已保存 revision 与真实预览资产。' : scenarioCount > 0 ? '当前含临时比较；重置后才能进入正式确认。' : '存在 unavailable 预览内容；修复后才能创建固定版本。'}</p>
+                {shareUrl && <p className="mt-2 break-all rounded-xl border border-success/20 bg-success-soft px-3 py-2 text-nano text-success" role="status">确认链接已创建：{shareUrl}</p>}
+                {shareError && <p className="mt-2 rounded-xl border border-danger/20 bg-danger-soft px-3 py-2 text-nano text-danger" role="alert">创建失败：{shareError}</p>}
                 {selectedModel.warnings.length > 0 && <ul className="mt-3 space-y-1 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{selectedModel.warnings.map((warning) => <li key={warning}>· {warning}</li>)}</ul>}
               </div>
             </div>

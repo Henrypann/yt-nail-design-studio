@@ -66,6 +66,7 @@ export const StorageKeys = {
   creatorPublications: 'community.creator-publications-v1',
   /** Fixed-version client share links, snapshots and approval events. */
   clientApprovals: 'studio.client-approvals-v1',
+  fixedApprovalReceipts: 'studio.fixed-approval-receipts-v1',
   /** Operator governance queue and immutable audit trail. */
   governance: 'community.governance-v1',
   /** GEN-V7.1-04 local prototype idempotency ledgers (domain payload keys stay backward compatible). */

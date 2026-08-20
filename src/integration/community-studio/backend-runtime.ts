@@ -1,5 +1,6 @@
 /** Browser composition root for GEN-V7.1-04. No page imports localStorage repositories. */
-import { createClientId } from '@/lib/storage';
+import { createClientId, readData, StorageKeys, writeEnvelope } from '@/lib/storage';
+import { FINGER_CODES } from '@/lib/types';
 import type { CommunityContentV1 } from '@/community/domain/types';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
 import type { GovernanceCaseV1 } from '@/community/domain/v7_1/governance';
@@ -31,6 +32,10 @@ import {
   type PublishPackageAuthorityRecordV1,
   type ServiceResultV1,
 } from '@/platform/backend';
+import { createStudioApprovalApplicationServiceV1, buildFixedPreviewReadModelV1, type FixedApprovalReceiptV1 } from '@/studio/approval';
+import { identifyOfficialTemplatePatternV7 } from '@/studio/editor/v7/official-template-assets';
+import { resolveBundledFlatAssetV7 } from '@/studio/editor/v7/flat-content-assets';
+import { dimensionalMeshAssetV7 } from '@/studio/editor/v7/dimensional-decoration';
 import {
   buildPublishPackageV1,
   createDeterministicPublishIdFactoryV1,
@@ -70,7 +75,7 @@ async function loadCommunityTaxonomyV2(): Promise<CommunityTaxonomyV2 | null> {
   }
 }
 
-function canvasPngRenderer(): PublishRendererV1 {
+export function createCanvasPngRendererV1(): PublishRendererV1 {
   return {
     rendererId: 'creator.local-canvas-2d',
     async render(request: PublishRenderRequestV1) {
@@ -79,14 +84,23 @@ function canvasPngRenderer(): PublishRendererV1 {
       canvas.width = request.width; canvas.height = request.height;
       const context = canvas.getContext('2d');
       if (!context) return { ok: false, reason: 'canvas_context_unavailable' };
-      const gradient = context.createLinearGradient(0, 0, request.width, request.height);
-      gradient.addColorStop(0, request.palette[0] ?? '#f7a8c6');
-      gradient.addColorStop(1, request.palette[request.palette.length - 1] ?? '#f04e7e');
       context.fillStyle = '#faf6ef'; context.fillRect(0, 0, request.width, request.height);
       const columns = request.kind === 'COVER' ? 5 : 1;
       const rows = request.kind === 'COVER' ? 2 : 1;
       const margin = request.width * 0.06;
       for (let index = 0; index < columns * rows; index += 1) {
+        const sourceFinger = request.kind === 'COVER' ? FINGER_CODES[index] : request.finger;
+        const sourceNail = sourceFinger ? request.doc.nails[sourceFinger] : request.nail ?? request.doc.nails.L1;
+        const background = sourceNail.steps.find((step) => step.kind === 'background');
+        const color = background?.kind === 'background'
+          ? background.background.mode === 'solid' || background.background.mode === 'translucent' || background.background.mode === 'cat_eye' ? background.background.color
+            : background.background.mode === 'gradient' ? background.background.stops[0]?.color
+              : background.background.colors[0]
+          : null;
+        const cssColor = color ? `rgb(${color.r} ${color.g} ${color.b})` : (request.palette[index % request.palette.length] ?? '#f7a8c6');
+        const gradient = context.createLinearGradient(0, 0, request.width, request.height);
+        gradient.addColorStop(0, cssColor);
+        gradient.addColorStop(1, request.palette[(index + 1) % request.palette.length] ?? cssColor);
         const column = index % columns; const row = Math.floor(index / columns);
         const width = (request.width - margin * (columns + 1)) / columns;
         const height = (request.height - margin * (rows + 1)) / rows;
@@ -99,6 +113,15 @@ function canvasPngRenderer(): PublishRendererV1 {
         context.bezierCurveTo(-width * 0.45, height * 0.28, -width * 0.42, -height * 0.25, 0, -height * 0.42);
         context.closePath(); context.fillStyle = gradient; context.fill();
         context.strokeStyle = 'rgba(94,67,62,.45)'; context.lineWidth = Math.max(1, request.width / 512); context.stroke();
+        const flatCount = sourceNail.steps.filter((step) => step.kind === 'flat_design').length;
+        if (flatCount > 0) {
+          context.fillStyle = 'rgba(255,255,255,.38)';
+          context.beginPath(); context.arc(0, -height * 0.05, Math.max(2, width * 0.06 + flatCount), 0, Math.PI * 2); context.fill();
+        }
+        const finish = sourceNail.steps.find((step) => step.kind === 'surface_finish');
+        if (finish?.kind === 'surface_finish' && finish.finish.type === 'matte') {
+          context.fillStyle = 'rgba(255,255,255,.12)'; context.fillRect(-width * 0.25, -height * 0.18, width * 0.5, height * 0.08);
+        }
         context.restore();
       }
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
@@ -189,6 +212,49 @@ export const governanceServiceV1 = createGovernanceApplicationServiceV1({
 
 export const clientApprovalServiceV1 = createClientApprovalApplicationServiceV1({
   identity: anonymousIdentity, approvals: approvalPort, authority: authorityPort, assets: assetPort, nextId, sha256: sha256Text,
+  readPreview: async (share) => {
+    const context = await anonymousIdentity.issueContext({ operation: BACKEND_PERMISSIONS_V1.assetRead });
+    if (!context.ok) return context;
+    const authority = await readAuthoritativePackageByVersionV1({ identity: anonymousIdentity, authority: authorityPort, designVersionId: share.designVersionId });
+    if (!authority.ok) return authority;
+    return buildFixedPreviewReadModelV1(authority.value, assetPort, anonymousIdentity);
+  },
+});
+
+const fixedApprovalIdentity = createLocalPrototypeIdentityAccessPortV1({
+  actorRef: 'operator.local-demo', permissions: [BACKEND_PERMISSIONS_V1.approvalRead, BACKEND_PERMISSIONS_V1.approvalWrite,
+    BACKEND_PERMISSIONS_V1.packageReferenceRead, BACKEND_PERMISSIONS_V1.publicationWrite, BACKEND_PERMISSIONS_V1.assetRead,
+    BACKEND_PERMISSIONS_V1.assetWrite],
+});
+const fixedReleaseStorage = {
+  read: () => { const value = readData<unknown>(StorageKeys.designReleases); return value === null ? null : JSON.stringify(value); },
+  write: (value: string) => { writeEnvelope(StorageKeys.designReleases, JSON.parse(value)); },
+};
+const fixedApprovalReceipts = {
+  read: () => readData<unknown>(StorageKeys.fixedApprovalReceipts),
+  write: (value: FixedApprovalReceiptV1) => { writeEnvelope(StorageKeys.fixedApprovalReceipts, value); },
+};
+const resolveFixedAsset = async (ref: { assetId: string; revision: string; sha256: string; mimeType: string }) => {
+  if (/^[1-9]\d*$/.test(ref.revision)) {
+    return { ok: true as const, value: { assetId: ref.assetId, revision: Number(ref.revision), sha256: ref.sha256, mimeType: ref.mimeType }, changed: false };
+  }
+  const official = identifyOfficialTemplatePatternV7({ ...ref, kind: 'vector', widthPx: 1, heightPx: 1, colorSpace: 'srgb', alphaMode: 'straight' } as never);
+  const bundled = resolveBundledFlatAssetV7({ ...ref, kind: 'vector', widthPx: 64, heightPx: 64, colorSpace: 'srgb', alphaMode: 'straight' } as never);
+  const mesh = dimensionalMeshAssetV7(ref.assetId);
+  if (!official && !bundled && !(mesh && mesh.revision === ref.revision && mesh.evidence === 'SIMULATED')) return { ok: false as const, error: { code: 'NOT_FOUND', retryable: false, reason: 'asset.revision_alias_not_found' } };
+  return { ok: true as const, value: { assetId: ref.assetId, revision: 1, sha256: ref.sha256, mimeType: ref.mimeType }, changed: false };
+};
+export const studioApprovalApplicationServiceV1 = createStudioApprovalApplicationServiceV1({
+  identity: fixedApprovalIdentity, approvals: approvalPort, authority: authorityPort, assets: assetPort,
+  readPersistedEditorDoc: (designId) => (readData<Record<string, unknown>>(StorageKeys.editorDocs) ?? {})[designId],
+  release: {
+    storage: fixedReleaseStorage,
+    readPersistedEditorDoc: (designId) => (readData<Record<string, unknown>>(StorageKeys.editorDocs) ?? {})[designId],
+    sha256: sha256Text, nextId: () => createClientId('version.'), now: () => new Date().toISOString(),
+    releasedByIdentityId: () => 'operator.local-demo', assetReferenceResolver: { resolve: resolveFixedAsset },
+  },
+  renderer2d: createCanvasPngRendererV1(), sha256Bytes, sha256Text, nextId,
+  receipts: fixedApprovalReceipts,
 });
 
 export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceResultV1<PublishPackageAuthorityRecordV1>> {
@@ -212,7 +278,7 @@ export async function ensureCanonicalDemoPublishAuthorityV1(): Promise<ServiceRe
     return existing;
   }
   if (existing.error.code !== 'NOT_FOUND') return existing;
-  const renderer = canvasPngRenderer();
+  const renderer = createCanvasPngRendererV1();
   const generated = await buildPublishPackageV1(CANONICAL_USE_DEMO_RELEASE_RECORD_V1, {
     rendererRevision: 'creator-local-canvas-v1', renderer3d: null, renderer2d: renderer,
     sha256: sha256Bytes, nextAssetId: createDeterministicPublishIdFactoryV1(),
