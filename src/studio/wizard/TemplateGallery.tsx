@@ -1,10 +1,8 @@
 /**
- * 模板选择器 + 甲型×风格映射（DEV-PLAN §5 / Studio-PRD §12.4）
+ * Quick Start 官方模板选择器（DEV-PLAN §5 / Studio-PRD §12.4）
  *
- * - 数据全部来自 material-library/index.json（模板 + 风格标签）
- * - 风格筛选（默认「全部」）
- * - 选甲型后自动三档排序：推荐（绿标）→ 一般 → 不建议（饱和度 60% + ⚠ reason，仍可应用）
- * - 卡片最佳甲型 badge：★ 首选 / ✓ 推荐 / ⚠ 不建议
+ * - 数据来自 material-library/index.json 中受治理的官方模板
+ * - 仅保留受治理的官方模板；按当前甲型适配度确定性排序
  * - 状态：骨架屏 2×3 / 失败 Toast + [重试] / 选中 2px 主色边框 + ✓
  */
 
@@ -17,9 +15,7 @@ import {
   compatTier,
   isHighFidelityConceptGalleryTemplate,
   loadLibraryIndex,
-  loadShapeParams,
   notRecommendedReason,
-  shapeBadges,
   sortTemplatesForShape,
   type LibraryIndex,
   type TemplateEntry,
@@ -40,8 +36,6 @@ export function TemplateGallery() {
 
   const [state, setState] = useState<LoadState>('loading');
   const [index, setIndex] = useState<LibraryIndex | null>(null);
-  const [shapeNames, setShapeNames] = useState<Record<string, string>>({});
-  const [tagFilter, setTagFilter] = useState<string>('all');
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
@@ -50,12 +44,9 @@ export function TemplateGallery() {
     (async () => {
       try {
         if (isScenarioOn(mockFlags, 'templates.loadFail')) throw new Error('模板库加载失败（MOCK）');
-        const [idx, params] = await Promise.all([loadLibraryIndex(), loadShapeParams()]);
+        const idx = await loadLibraryIndex();
         if (cancelled) return;
         setIndex(idx);
-        setShapeNames(
-          Object.fromEntries(Object.entries(params.shapes).map(([k, v]) => [k, v.name_en ?? k])),
-        );
         setState('ready');
       } catch {
         if (!cancelled) {
@@ -70,45 +61,21 @@ export function TemplateGallery() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryKey, mockFlags]);
 
-  const tagNameById = useMemo(() => {
-    const map = new Map<string, string>();
-    index?.style_tags.forEach((t) => map.set(t.id, t.name));
-    return map;
-  }, [index]);
-
   const visible = useMemo(() => {
     if (!index) return [];
     const highFidelityTemplates = index.templates.filter(isHighFidelityConceptGalleryTemplate);
     const enabledTemplates = PETAL_VEIL_P0_ENABLED
       ? highFidelityTemplates
       : highFidelityTemplates.filter((template) => template.id !== 't_petal_veil_french');
-    const filtered =
-      tagFilter === 'all'
-        ? enabledTemplates
-        : enabledTemplates.filter((t) => t.style_tags.includes(tagFilter));
     return appliedShape
-      ? sortTemplatesForShape(filtered, appliedShape)
-      : [...filtered].sort((a, b) => a.sort_order - b.sort_order);
-  }, [index, tagFilter, appliedShape]);
+      ? sortTemplatesForShape(enabledTemplates, appliedShape)
+      : [...enabledTemplates].sort((a, b) => a.sort_order - b.sort_order);
+  }, [index, appliedShape]);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      {/* 风格筛选：标签完全由 material-library/index.json 驱动 */}
-      <div className="flex flex-wrap gap-1.5">
-        {[{ id: 'all', name: '全部' }, ...(index?.style_tags ?? [])].map((tag) => (
-          <button
-            key={tag.id}
-            onClick={() => setTagFilter(tag.id)}
-            className={cx(
-              'rounded-full border px-2.5 py-1 text-xs transition-colors duration-fast',
-              tagFilter === tag.id
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900',
-            )}
-          >
-            {tag.name}
-          </button>
-        ))}
+      <div className="flex items-center justify-between gap-2 border-b border-hairline pb-2">
+        <div><p className="text-sm font-semibold text-ink">官方模板</p><p className="text-nano text-mute">按当前甲型适配度排序 · 概念/模拟证据单独标注</p></div>
       </div>
 
       {/* 卡片列表（窄栏单列） */}
@@ -138,8 +105,6 @@ export function TemplateGallery() {
                 key={t.id}
                 template={t}
                 shape={appliedShape}
-                shapeNames={shapeNames}
-                tagNameById={tagNameById}
                 selected={templateId === (t.render_template_id ?? t.id) && templateName === t.name}
                 disabled={readOnly}
                 onApply={() => {
@@ -167,18 +132,14 @@ export function TemplateGallery() {
 interface TemplateCardProps {
   template: TemplateEntry;
   shape: NailShape | null;
-  shapeNames: Record<string, string>;
-  tagNameById: Map<string, string>;
   selected: boolean;
   disabled: boolean;
   onApply: () => void;
 }
 
-function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disabled, onApply }: TemplateCardProps) {
+function TemplateCard({ template, shape, selected, disabled, onApply }: TemplateCardProps) {
   const tier = shape ? compatTier(template, shape) : 'neutral';
   const reason = shape ? notRecommendedReason(template, shape) : null;
-  const badges = shapeBadges(template);
-  const shapeName = (s: NailShape) => shapeNames[s] ?? s;
 
   return (
     <div
@@ -201,11 +162,6 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
           className="h-full w-full object-cover"
           loading="lazy"
         />
-        {tier === 'high' && (
-          <span className="absolute left-1.5 top-1.5 rounded-button bg-success px-1.5 py-0.5 text-nano font-medium text-white">
-            推荐
-          </span>
-        )}
         {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
           <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-nano font-medium text-amber-800">
             {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
@@ -216,22 +172,9 @@ function TemplateCard({ template, shape, shapeNames, tagNameById, selected, disa
         <div className="flex items-center justify-between gap-1">
           <span className="truncate text-xs font-medium text-gray-900">{template.name}</span>
         </div>
-        <div className="flex flex-wrap gap-1">
-          {template.style_tags.map((tag) => (
-            <span key={tag} className="rounded-button bg-gray-100 px-1 py-0.5 text-nano text-gray-500">
-              {tagNameById.get(tag) ?? tag}
-            </span>
-          ))}
-        </div>
-        {/* 最佳甲型 badge（方向 B） */}
         <div className="flex flex-wrap gap-1 text-nano text-gray-500">
-          {badges.best && <Badge variant="success" className="px-1 py-0 text-nano">★ {shapeName(badges.best)}</Badge>}
-          {badges.good.length > 0 && (
-            <Badge variant="gray" className="px-1 py-0 text-nano">✓ {badges.good.map(shapeName).join(', ')}</Badge>
-          )}
-          {badges.bad.length > 0 && (
-            <Badge variant="warning" className="px-1 py-0 text-nano">⚠ {badges.bad.map(shapeName).join(', ')}</Badge>
-          )}
+          {tier === 'high' && <Badge variant="success" className="px-1 py-0 text-nano">适配当前甲型</Badge>}
+          {tier === 'not' && <Badge variant="warning" className="px-1 py-0 text-nano">需人工检查</Badge>}
         </div>
         {/* 不建议原因（不建议 ≠ 禁止，仍可应用） */}
         {tier === 'not' && reason && (

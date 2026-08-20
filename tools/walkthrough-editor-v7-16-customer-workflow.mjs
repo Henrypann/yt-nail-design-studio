@@ -1,17 +1,24 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
 const baseUrl = process.env.V7_WALKTHROUGH_URL ?? 'http://127.0.0.1:5218';
-const evidenceDir = new URL('../evidence/pr-editor-v7-16-customer-preview-confirmation/', import.meta.url);
+const evidenceDir = process.env.V7_WALKTHROUGH_EVIDENCE_DIR
+  ? pathToFileURL(`${resolve(process.env.V7_WALKTHROUGH_EVIDENCE_DIR)}/`)
+  : new URL('../evidence/pr-editor-v7-16-customer-preview-confirmation/', import.meta.url);
 const screenshotDir = new URL('./screenshots/', evidenceDir);
-const viewports = [
-  { name: '390', width: 390, height: 844, expectedLayout: 'mobile', lane: 'effects', kind: 'surface_effect', tool: 'effects', confirm: '添加表面效果并继续', panel: 'v7-surface-effect-panel' },
+const allViewports = [
+  { name: '390', width: 390, height: 844, expectedLayout: 'tablet', lane: 'effects', kind: 'surface_effect', tool: 'effects', confirm: '添加表面效果并继续', panel: 'v7-surface-effect-panel' },
   { name: '768', width: 768, height: 900, expectedLayout: 'tablet', lane: 'flat', kind: 'flat_design', tool: 'brush', confirm: '添加平面设计并继续', panel: 'v7-flat-vector-panel' },
-  { name: '1024', width: 1024, height: 900, expectedLayout: 'compact', lane: 'decorations', kind: 'dimensional_decoration', tool: 'decorations', confirm: '添加立体装饰并继续', panel: 'v7-dimensional-decoration-panel' },
-  { name: '1280', width: 1280, height: 900, expectedLayout: 'wide', lane: 'flat', kind: 'flat_design', tool: 'brush', confirm: '添加平面设计并继续', panel: 'v7-flat-vector-panel' },
-  { name: '1440', width: 1440, height: 900, expectedLayout: 'wide', lane: 'effects', kind: 'surface_effect', tool: 'effects', confirm: '添加表面效果并继续', panel: 'v7-surface-effect-panel' },
+  { name: '1024', width: 1024, height: 900, expectedLayout: 'focus', lane: 'decorations', kind: 'dimensional_decoration', tool: 'decorations', confirm: '添加立体装饰并继续', panel: 'v7-dimensional-decoration-panel' },
+  { name: '1280', width: 1280, height: 900, expectedLayout: 'compact', lane: 'flat', kind: 'flat_design', tool: 'brush', confirm: '添加平面设计并继续', panel: 'v7-flat-vector-panel' },
+  { name: '1366', width: 1366, height: 900, expectedLayout: 'compact', lane: 'decorations', kind: 'dimensional_decoration', tool: 'decorations', confirm: '添加立体装饰并继续', panel: 'v7-dimensional-decoration-panel' },
+  { name: '1440', width: 1440, height: 900, expectedLayout: 'full', lane: 'effects', kind: 'surface_effect', tool: 'effects', confirm: '添加表面效果并继续', panel: 'v7-surface-effect-panel' },
 ];
+const viewports = process.env.V7_WALKTHROUGH_VIEWPORT
+  ? allViewports.filter((viewport) => viewport.name === process.env.V7_WALKTHROUGH_VIEWPORT)
+  : allViewports;
 
 const captureEditor = (page) => page.evaluate(async () => {
   const { editorV7Store } = await import('/src/studio/editor/store-v7.ts');
@@ -38,7 +45,6 @@ const reports = [];
 
 for (const viewport of viewports) {
   const context = await browser.newContext({ viewport, hasTouch: viewport.width <= 768 });
-  await context.addInitScript(() => localStorage.clear());
   const page = await context.newPage();
   const activate = (locator) => viewport.width <= 768 ? locator.tap() : locator.click();
   const consoleErrors = [];
@@ -46,6 +52,8 @@ for (const viewport of viewports) {
   page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(`${message.text()} @ ${message.location().url}`); });
   page.on('pageerror', (error) => pageErrors.push(error.message));
 
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => localStorage.clear());
   await page.goto(`${baseUrl}/studio/design/canvas?blank=1`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: '创建空白画布' }).click();
   const shell = page.locator('[data-editor-schema="7"]');
@@ -73,16 +81,16 @@ for (const viewport of viewports) {
   await page.locator(`[data-testid="${viewport.panel}"]:visible`).first().waitFor();
   let compactLayerDialog = null;
   if (viewport.width < 1280) {
-    if (viewport.kind === 'flat_design') {
-      const resourceDialog = page.getByRole('dialog', { name: '资源与预设' });
-      await resourceDialog.waitFor();
+    const resourceDialog = page.getByRole('dialog', { name: '资源与预设' });
+    if (await resourceDialog.count()) {
       await resourceDialog.getByRole('button', { name: '关闭资源' }).click();
       await resourceDialog.waitFor({ state: 'detached' });
-      await page.getByRole('button', { name: '层级', exact: true }).click();
+    }
+    const propertyDialog = page.getByRole('dialog', { name: '属性面板' });
+    if (await propertyDialog.count()) {
+      await propertyDialog.getByRole('button', { name: '层级', exact: true }).click();
     } else {
-      compactLayerDialog = page.getByRole('dialog', { name: '属性面板' });
-      await compactLayerDialog.waitFor();
-      await compactLayerDialog.getByRole('button', { name: '层级', exact: true }).click();
+      await page.getByRole('button', { name: '层级', exact: true }).click();
     }
     compactLayerDialog = page.getByRole('dialog', { name: '层级面板' });
     await compactLayerDialog.waitFor();
@@ -117,7 +125,7 @@ for (const viewport of viewports) {
     || mapped.createdStepId !== mapped.selectedStepId
     || mapped.laneActive !== 'true'
     || mapped.laneState !== 'configured'
-    || mapped.toolActive !== 'true'
+    || (!compactLayerDialog && mapped.toolActive !== 'true')
     || mapped.toolStatus !== 'ready'
     || !mapped.layerSelected
     || !mapped.layerVisible
@@ -193,9 +201,69 @@ for (const viewport of viewports) {
   if (await preview.getAttribute('data-customer-confirmation-ready') !== 'false') throw new Error(`${viewport.name}: temporary scenario did not block readiness`);
   await activate(page.getByRole('button', { name: '重置全部临时方案' }));
   if (await preview.getAttribute('data-customer-confirmation-ready') !== 'true') throw new Error(`${viewport.name}: reset did not restore readiness`);
-  const confirmation = page.getByRole('button', { name: '预览就绪 · 确认待接入' });
-  if (!await confirmation.isDisabled()) throw new Error(`${viewport.name}: STUDIO-04 boundary must remain disabled`);
-  if (!await confirmation.getAttribute('title')?.then((value) => value?.includes('STUDIO-04'))) throw new Error(`${viewport.name}: confirmation ownership missing`);
+  if (await scenarioToggle.getAttribute('aria-expanded') === 'true') {
+    await activate(page.getByRole('button', { name: '关闭方案比较' }));
+    await page.locator('[aria-label="关闭临时方案"]').waitFor({ state: 'detached' }).catch(() => {});
+  }
+  const confirmation = page.getByRole('button', { name: '创建固定版本确认' });
+  if (await confirmation.isDisabled()) throw new Error(`${viewport.name}: fixed-version confirmation must be enabled after readiness passes`);
+  await activate(confirmation);
+  const shareStatus = page.getByRole('status').filter({ hasText: '确认链接已创建：' });
+  const shareAlert = page.getByRole('alert').filter({ hasText: '创建失败：' });
+  try {
+    await page.waitForFunction(() => document.body.innerText.includes('确认链接已创建：') || document.body.innerText.includes('创建失败：'), undefined, { timeout: 15_000 });
+  } catch {
+    const debug = await page.evaluate(() => ({
+      previewText: document.querySelector('[data-testid="customer-preview-v7"]')?.textContent,
+      approvalKeys: Object.keys(localStorage).filter((key) => key.includes('approval') || key.includes('release')),
+      receipt: localStorage.getItem('nail-studio:studio.fixed-approval-receipts-v1'),
+      authority: localStorage.getItem('nail-studio:platform.backend.approval-repository-v1'),
+    }));
+    throw new Error(`${viewport.name}: fixed-version share produced no visible outcome ${JSON.stringify(debug)}`);
+  }
+  if (await shareAlert.count()) throw new Error(`${viewport.name}: fixed-version share failed: ${await shareAlert.textContent()}`);
+  const shareText = await shareStatus.textContent();
+  const shareUrl = shareText?.match(/https?:\/\/\S+/)?.[0];
+  if (!shareUrl) throw new Error(`${viewport.name}: fixed-version share URL missing`);
+
+  const sharePage = await context.newPage();
+  sharePage.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(`${message.text()} @ ${message.location().url}`); });
+  sharePage.on('pageerror', (error) => pageErrors.push(error.message));
+  await sharePage.goto(shareUrl, { waitUntil: 'networkidle' });
+  try {
+    await sharePage.getByTestId('client-share-page').waitFor();
+  } catch {
+    const storage = await sharePage.evaluate(async () => {
+      const raw = localStorage.getItem('nail-studio:platform.backend.approval-repository-v1');
+      const token = decodeURIComponent(location.pathname.slice('/share/'.length));
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
+      const tokenHash = [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, '0')).join('');
+      return { raw, token, tokenHash };
+    });
+    throw new Error(`${viewport.name}: client share did not load ${JSON.stringify({ url: sharePage.url(), body: await sharePage.locator('body').innerText(), storage })}`);
+  }
+  const previewImages = sharePage.locator('[data-testid="client-share-page"] img');
+  if (await previewImages.count() !== 11) throw new Error(`${viewport.name}: fixed preview must contain one cover and ten nail assets`);
+  const previewSources = await previewImages.evaluateAll((images) => images.map((image) => image.getAttribute('src')));
+  if (!previewSources.every((source) => source?.startsWith('data:image/png'))) throw new Error(`${viewport.name}: fixed preview contains placeholder/non-image locators`);
+  const decision = ['768', '1366'].includes(viewport.name) ? 'CHANGE_REQUESTED' : 'APPROVED';
+  if (decision === 'APPROVED') {
+    await sharePage.getByRole('button', { name: '确认这个版本' }).click();
+    await sharePage.getByText('该版本已确认').waitFor();
+  } else {
+    await sharePage.getByLabel('备注（可选）').fill(`请调整 ${viewport.name}`);
+    await sharePage.getByRole('button', { name: '请求修改' }).click();
+    await sharePage.getByText('已请求修改').waitFor();
+  }
+  const approvalState = await sharePage.evaluate(() => {
+    const raw = localStorage.getItem('nail-studio:platform.backend.approval-repository-v1');
+    const value = raw ? JSON.parse(raw).data.value : null;
+    return { events: value?.events?.length ?? 0, snapshots: value?.snapshots?.length ?? 0 };
+  });
+  if (approvalState.events !== 1 || approvalState.snapshots !== (decision === 'APPROVED' ? 1 : 0)) {
+    throw new Error(`${viewport.name}: fixed decision authority mismatch ${JSON.stringify({ decision, approvalState })}`);
+  }
+  await sharePage.close();
 
   const storageAfter = await page.evaluate(() => localStorage.getItem('nail-studio:editor.docs'));
   if (storageAfter !== storageBefore) throw new Error(`${viewport.name}: preview wrote editor storage`);
@@ -241,6 +309,7 @@ for (const viewport of viewports) {
     returned: { currentFinger: returned.currentFinger, selectedStepId: returned.selectedStepId },
     metrics,
     storageWriterZero: true,
+    fixedApproval: { decision, previewAssetCount: previewSources.length, ...approvalState },
     consoleErrors,
     pageErrors,
   });

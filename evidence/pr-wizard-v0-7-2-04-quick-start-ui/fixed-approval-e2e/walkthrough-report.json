@@ -1,0 +1,362 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "expectedLayout": "tablet",
+      "lane": "effects",
+      "kind": "surface_effect",
+      "tool": "effects",
+      "confirm": "添加表面效果并继续",
+      "panel": "v7-surface-effect-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.90498aff-f797-4a3a-8a00-d4ebd7018053",
+      "selectedStepId": "step.90498aff-f797-4a3a-8a00-d4ebd7018053",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "true",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_6d39f8ec-e5fa-4d55-b1dc-de6ce6bb5828&finger=R4&step=step.90498aff-f797-4a3a-8a00-d4ebd7018053",
+    "compositeKinds": [
+      "surface_effect"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.90498aff-f797-4a3a-8a00-d4ebd7018053"
+    },
+    "metrics": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "APPROVED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 1
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 900,
+      "expectedLayout": "tablet",
+      "lane": "flat",
+      "kind": "flat_design",
+      "tool": "brush",
+      "confirm": "添加平面设计并继续",
+      "panel": "v7-flat-vector-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.81b9911c-7525-43bd-b279-20acce940568",
+      "selectedStepId": "step.81b9911c-7525-43bd-b279-20acce940568",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "false",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_1db289e9-9267-44cd-b09d-07b91a2ca7ed&finger=R4&step=step.81b9911c-7525-43bd-b279-20acce940568",
+    "compositeKinds": [
+      "flat_design"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.81b9911c-7525-43bd-b279-20acce940568"
+    },
+    "metrics": {
+      "clientWidth": 768,
+      "scrollWidth": 768,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "CHANGE_REQUESTED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 0
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 900,
+      "expectedLayout": "focus",
+      "lane": "decorations",
+      "kind": "dimensional_decoration",
+      "tool": "decorations",
+      "confirm": "添加立体装饰并继续",
+      "panel": "v7-dimensional-decoration-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.8602c2e2-af0a-4bf5-ad0c-28e3dadfd812",
+      "selectedStepId": "step.8602c2e2-af0a-4bf5-ad0c-28e3dadfd812",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "true",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_14498e9a-71d8-42aa-ae6e-7a4c498acbb5&finger=R4&step=step.8602c2e2-af0a-4bf5-ad0c-28e3dadfd812",
+    "compositeKinds": [
+      "dimensional_decoration"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.8602c2e2-af0a-4bf5-ad0c-28e3dadfd812"
+    },
+    "metrics": {
+      "clientWidth": 1024,
+      "scrollWidth": 1024,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "APPROVED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 1
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900,
+      "expectedLayout": "compact",
+      "lane": "flat",
+      "kind": "flat_design",
+      "tool": "brush",
+      "confirm": "添加平面设计并继续",
+      "panel": "v7-flat-vector-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.32e43843-7ee0-448e-8e6d-f21a14b0e157",
+      "selectedStepId": "step.32e43843-7ee0-448e-8e6d-f21a14b0e157",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "true",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_b975d5d2-8c1f-46d6-978f-504febbabc53&finger=R4&step=step.32e43843-7ee0-448e-8e6d-f21a14b0e157",
+    "compositeKinds": [
+      "flat_design"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.32e43843-7ee0-448e-8e6d-f21a14b0e157"
+    },
+    "metrics": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "APPROVED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 1
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1366",
+      "width": 1366,
+      "height": 900,
+      "expectedLayout": "compact",
+      "lane": "decorations",
+      "kind": "dimensional_decoration",
+      "tool": "decorations",
+      "confirm": "添加立体装饰并继续",
+      "panel": "v7-dimensional-decoration-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.07e46aaa-5f0b-4397-9397-e9423e387102",
+      "selectedStepId": "step.07e46aaa-5f0b-4397-9397-e9423e387102",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "true",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_4f936063-ae37-4bcc-bf26-58aa9d388a7d&finger=R4&step=step.07e46aaa-5f0b-4397-9397-e9423e387102",
+    "compositeKinds": [
+      "dimensional_decoration"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.07e46aaa-5f0b-4397-9397-e9423e387102"
+    },
+    "metrics": {
+      "clientWidth": 1366,
+      "scrollWidth": 1366,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "CHANGE_REQUESTED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 0
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900,
+      "expectedLayout": "full",
+      "lane": "effects",
+      "kind": "surface_effect",
+      "tool": "effects",
+      "confirm": "添加表面效果并继续",
+      "panel": "v7-surface-effect-panel"
+    },
+    "initial": {
+      "revision": 1,
+      "history": 0,
+      "currentFinger": "R4"
+    },
+    "mapped": {
+      "revision": 2,
+      "history": 1,
+      "createdStepId": "step.cf47b300-acf7-4ffa-b28d-a29c08615f7f",
+      "selectedStepId": "step.cf47b300-acf7-4ffa-b28d-a29c08615f7f",
+      "laneActive": "true",
+      "laneState": "configured",
+      "toolActive": "true",
+      "toolStatus": "ready",
+      "layerSelected": true,
+      "layerVisible": true,
+      "finishLast": true
+    },
+    "saved": {
+      "revision": 8,
+      "history": 7,
+      "currentFinger": "R4",
+      "saveState": "saved"
+    },
+    "previewDocBefore": "?design=design_1779f0fa-96a4-4253-89c4-c33483a3257b&finger=R4&step=step.cf47b300-acf7-4ffa-b28d-a29c08615f7f",
+    "compositeKinds": [
+      "surface_effect"
+    ],
+    "returned": {
+      "currentFinger": "R4",
+      "selectedStepId": "step.cf47b300-acf7-4ffa-b28d-a29c08615f7f"
+    },
+    "metrics": {
+      "clientWidth": 1440,
+      "scrollWidth": 1440,
+      "minButtonHeight": 44,
+      "smallButtons": []
+    },
+    "storageWriterZero": true,
+    "fixedApproval": {
+      "decision": "APPROVED",
+      "previewAssetCount": 11,
+      "events": 1,
+      "snapshots": 1
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

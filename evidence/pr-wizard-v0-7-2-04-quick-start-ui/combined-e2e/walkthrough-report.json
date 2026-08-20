@@ -1,0 +1,676 @@
+[
+  {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 900,
+      "layout": "full",
+      "minPreviewWidth": 720,
+      "minPreviewHeight": 400,
+      "library": "persistent",
+      "inspector": "persistent",
+      "libraryRange": [
+        272,
+        288
+      ],
+      "inspectorRange": [
+        292,
+        308
+      ]
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "clientHeight": 900,
+        "scrollHeight": 900,
+        "bodyClientWidth": 1440,
+        "bodyScrollWidth": 1440
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 900
+      },
+      "wizard": {
+        "x": 80,
+        "y": 150,
+        "width": 1336,
+        "height": 694
+      },
+      "library": {
+        "x": 80,
+        "y": 150,
+        "width": 280,
+        "height": 612
+      },
+      "preview": {
+        "x": 372,
+        "y": 150,
+        "width": 732,
+        "height": 612
+      },
+      "inspector": {
+        "x": 1116,
+        "y": 150,
+        "width": 300,
+        "height": 612
+      },
+      "handoff": {
+        "x": 80,
+        "y": 774,
+        "width": 1336,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 72,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 1,
+      "inspectorParamsPanelCountWhileOpen": null
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 732,
+      "previewWidthWhileOpen": 732,
+      "expandedWidth": 238.78125,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 732,
+        "previewWidthWhileOpen": 732,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": []
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1366",
+      "width": 1366,
+      "height": 768,
+      "layout": "compact",
+      "minPreviewWidth": 680,
+      "minPreviewHeight": 320,
+      "library": "persistent",
+      "inspector": "persistent",
+      "libraryRange": [
+        208,
+        232
+      ],
+      "inspectorRange": [
+        208,
+        232
+      ]
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 1366,
+        "scrollWidth": 1366,
+        "clientHeight": 768,
+        "scrollHeight": 768,
+        "bodyClientWidth": 1366,
+        "bodyScrollWidth": 1366
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 768
+      },
+      "wizard": {
+        "x": 80,
+        "y": 150,
+        "width": 1262,
+        "height": 562
+      },
+      "library": {
+        "x": 80,
+        "y": 150,
+        "width": 220,
+        "height": 480
+      },
+      "preview": {
+        "x": 312,
+        "y": 150,
+        "width": 798,
+        "height": 480
+      },
+      "inspector": {
+        "x": 1122,
+        "y": 150,
+        "width": 220,
+        "height": 480
+      },
+      "handoff": {
+        "x": 80,
+        "y": 642,
+        "width": 1262,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 72,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 1,
+      "inspectorParamsPanelCountWhileOpen": null
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 798,
+      "previewWidthWhileOpen": 798,
+      "expandedWidth": 238.75,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 798,
+        "previewWidthWhileOpen": 798,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": []
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 800,
+      "layout": "compact",
+      "minPreviewWidth": 680,
+      "minPreviewHeight": 340,
+      "library": "persistent",
+      "inspector": "persistent",
+      "libraryRange": [
+        208,
+        232
+      ],
+      "inspectorRange": [
+        208,
+        232
+      ]
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 1280,
+        "scrollWidth": 1280,
+        "clientHeight": 800,
+        "scrollHeight": 800,
+        "bodyClientWidth": 1280,
+        "bodyScrollWidth": 1280
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 800
+      },
+      "wizard": {
+        "x": 80,
+        "y": 150,
+        "width": 1176,
+        "height": 594
+      },
+      "library": {
+        "x": 80,
+        "y": 150,
+        "width": 220,
+        "height": 512
+      },
+      "preview": {
+        "x": 312,
+        "y": 150,
+        "width": 712,
+        "height": 512
+      },
+      "inspector": {
+        "x": 1036,
+        "y": 150,
+        "width": 220,
+        "height": 512
+      },
+      "handoff": {
+        "x": 80,
+        "y": 674,
+        "width": 1176,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 72,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 1,
+      "inspectorParamsPanelCountWhileOpen": null
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 712,
+      "previewWidthWhileOpen": 712,
+      "expandedWidth": 238.703125,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 712,
+        "previewWidthWhileOpen": 712,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": []
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1024",
+      "width": 1024,
+      "height": 768,
+      "layout": "focus",
+      "minPreviewWidth": 680,
+      "minPreviewHeight": 320,
+      "library": "drawer",
+      "inspector": "persistent",
+      "inspectorRange": [
+        208,
+        232
+      ]
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "clientHeight": 768,
+        "scrollHeight": 768,
+        "bodyClientWidth": 1024,
+        "bodyScrollWidth": 1024
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 768
+      },
+      "wizard": {
+        "x": 80,
+        "y": 150,
+        "width": 920,
+        "height": 562
+      },
+      "library": null,
+      "preview": {
+        "x": 80,
+        "y": 150,
+        "width": 688,
+        "height": 480
+      },
+      "inspector": {
+        "x": 780,
+        "y": 150,
+        "width": 220,
+        "height": 480
+      },
+      "handoff": {
+        "x": 80,
+        "y": 642,
+        "width": 920,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 72,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 1,
+      "inspectorParamsPanelCountWhileOpen": null
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 688,
+      "previewWidthWhileOpen": 688,
+      "expandedWidth": 234.859375,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 688,
+        "previewWidthWhileOpen": 688,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": []
+      },
+      "library": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 688,
+        "previewWidthWhileOpen": 688,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": []
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "768",
+      "width": 768,
+      "height": 1024,
+      "layout": "tablet",
+      "minPreviewWidth": 640,
+      "minPreviewHeight": 450,
+      "library": "drawer",
+      "inspector": "drawer",
+      "touch": true
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "clientHeight": 1024,
+        "scrollHeight": 1024,
+        "bodyClientWidth": 768,
+        "bodyScrollWidth": 768
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 1024
+      },
+      "wizard": {
+        "x": 80,
+        "y": 150,
+        "width": 664,
+        "height": 541.84
+      },
+      "library": null,
+      "preview": {
+        "x": 80,
+        "y": 150,
+        "width": 664,
+        "height": 459.84
+      },
+      "inspector": null,
+      "handoff": {
+        "x": 80,
+        "y": 621.84,
+        "width": 664,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 84,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 0,
+      "inspectorParamsPanelCountWhileOpen": 1
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 664,
+      "previewWidthWhileOpen": 664,
+      "expandedWidth": 234.875,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 664,
+        "previewWidthWhileOpen": 664,
+        "paramsPanelCountWhileOpen": 0,
+        "touchTargets": [
+          {
+            "label": "查看兼容详情",
+            "height": 44,
+            "width": 83.8125
+          },
+          {
+            "label": "关闭Editor V7 资产兼容详情",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      },
+      "library": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 664,
+        "previewWidthWhileOpen": 664,
+        "paramsPanelCountWhileOpen": 0,
+        "touchTargets": [
+          {
+            "label": "官方模板",
+            "height": 44,
+            "width": 94
+          },
+          {
+            "label": "关闭官方模板",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      },
+      "inspector": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 664,
+        "previewWidthWhileOpen": 664,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": [
+          {
+            "label": "单指 详情/参数",
+            "height": 44,
+            "width": 125.640625
+          },
+          {
+            "label": "关闭参数与单指详情",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "layout": "tablet",
+      "minPreviewWidth": 300,
+      "minPreviewHeight": 280,
+      "library": "drawer",
+      "inspector": "drawer",
+      "touch": true
+    },
+    "metrics": {
+      "document": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "clientHeight": 844,
+        "scrollHeight": 862,
+        "bodyClientWidth": 390,
+        "bodyScrollWidth": 390
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 862.25
+      },
+      "wizard": {
+        "x": 68,
+        "y": 210,
+        "width": 310,
+        "height": 640.25
+      },
+      "library": null,
+      "preview": {
+        "x": 68,
+        "y": 210,
+        "width": 310,
+        "height": 558.25
+      },
+      "inspector": null,
+      "handoff": {
+        "x": 68,
+        "y": 774,
+        "width": 310,
+        "height": 70
+      }
+    },
+    "acceptance": {
+      "maxHandoffHeight": 84,
+      "handoffHeightOk": true
+    },
+    "mountMetrics": {
+      "closedDialogCount": 0,
+      "finalParamsPanelCount": 0,
+      "inspectorParamsPanelCountWhileOpen": 1
+    },
+    "navigationLifecycle": {
+      "previewWidthBefore": 310,
+      "previewWidthWhileOpen": 310,
+      "expandedWidth": 234.84375,
+      "initialFocusInside": true,
+      "tabTrappedInside": true,
+      "shiftTabTrappedInside": true,
+      "focusRestored": true,
+      "triggerTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    "drawerLifecycle": {
+      "preflight": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 310,
+        "previewWidthWhileOpen": 310,
+        "paramsPanelCountWhileOpen": 0,
+        "touchTargets": [
+          {
+            "label": "查看兼容详情",
+            "height": 44,
+            "width": 83.8125
+          },
+          {
+            "label": "关闭Editor V7 资产兼容详情",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      },
+      "library": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 310,
+        "previewWidthWhileOpen": 310,
+        "paramsPanelCountWhileOpen": 0,
+        "touchTargets": [
+          {
+            "label": "官方模板",
+            "height": 44,
+            "width": 94
+          },
+          {
+            "label": "关闭官方模板",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      },
+      "inspector": {
+        "initialFocusInside": true,
+        "trappedFocusInside": true,
+        "focusRestored": true,
+        "previewWidthBefore": 310,
+        "previewWidthWhileOpen": 310,
+        "paramsPanelCountWhileOpen": 1,
+        "touchTargets": [
+          {
+            "label": "单指 详情/参数",
+            "height": 44,
+            "width": 125.640625
+          },
+          {
+            "label": "关闭参数与单指详情",
+            "height": 44,
+            "width": 44
+          }
+        ]
+      }
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

@@ -3,7 +3,7 @@
  *
  * 设计主数据存储于 StorageKeys.designs（DesignSummary[] envelope），
  * 「我的设计」列表模块从同一键读取。Wizard 负责：创建草稿、防抖自动保存、
- * 手动保存、失败重试、[顾客已确认] 状态机流转后的落盘。
+ * 手动保存与失败重试。历史 confirmation 只读；正式固定确认不由本仓库写入。
  */
 
 import type { DesignSummary } from '@/lib/types';

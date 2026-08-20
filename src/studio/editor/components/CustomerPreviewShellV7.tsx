@@ -65,13 +65,19 @@ export function CustomerPreviewShellV7({
   const createFixedShare = async () => {
     if (!confirmationReady || shareBusy) return;
     setShareBusy(true); setShareError(null);
-    const result = await studioApprovalApplicationServiceV1.createFixedVersionShare({ designId: doc.designId, expectedRevision: doc.revision });
-    if (result.ok) {
-      const url = new URL(`/community/share/${encodeURIComponent(result.value.rawToken)}`, window.location.origin).toString();
+    try {
+      const result = await studioApprovalApplicationServiceV1.createFixedVersionShare({ designId: doc.designId, expectedRevision: doc.revision });
+      if (!result.ok) {
+        setShareError(result.error.reason);
+        return;
+      }
+      const url = new URL(Routes.communityClientShare(result.value.rawToken), window.location.origin).toString();
       setShareUrl(url);
-      try { await navigator.clipboard?.writeText(url); } catch { /* visible URL remains available */ }
-    } else setShareError(result.error.reason);
-    setShareBusy(false);
+    } catch {
+      setShareError('approval.fixed_version_unavailable');
+    } finally {
+      setShareBusy(false);
+    }
   };
 
   const resetScenario = () => setScenario(createCustomerPreviewScenarioV7());
@@ -167,6 +173,13 @@ export function CustomerPreviewShellV7({
         <div className="flex flex-wrap items-center justify-end gap-1.5 text-nano text-gray-500"><div className="flex rounded-xl border border-gray-200 bg-white p-1" role="group" aria-label="呈现证据"><button type="button" aria-pressed={presentation === '2d'} onClick={() => setPresentation('2d')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === '2d' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>2D 设计</button><button type="button" aria-pressed={presentation === 'composite'} onClick={() => setPresentation('composite')} className={cx('min-h-11 rounded-lg px-3 font-medium', presentation === 'composite' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>模拟 3D</button></div><button ref={scenarioToggleRef} type="button" data-testid="customer-scenario-toggle" onClick={scenarioPanelOpen ? closeScenarioPanel : openScenarioPanel} aria-expanded={scenarioPanelOpen} className="min-h-11 rounded-xl border border-violet-200 bg-violet-50 px-3 font-medium text-violet-700"><Sparkles size={13} className="mr-1 inline" />{scenarioPanelOpen ? '收起比较' : '方案比较'}{scenarioCount > 0 ? ` · ${scenarioCount}` : ''}</button><button type="button" onClick={resetScenario} disabled={scenarioCount === 0} className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 font-medium text-gray-600 disabled:opacity-35"><RotateCcw size={13} className="mr-1 inline" />重置比较</button><span className={cx('rounded-full border px-2 py-1 font-semibold', presentation === '2d' ? 'border-success/20 bg-success-soft text-success' : 'border-warning/25 bg-warning-soft text-warning')}>{presentation === '2d' ? '结构化 2D' : mode === 'single' ? 'PBR 单指 · 模拟' : 'SVG 2.5D · 模拟'}</span></div>
       </div>
 
+      {(shareUrl || shareError) && (
+        <div className="border-b border-white/80 bg-white/90 px-3 py-2 sm:px-5" aria-live="polite" aria-atomic="true">
+          {shareUrl && <p className="break-all rounded-xl border border-success/20 bg-success-soft px-3 py-2 text-nano text-success" role="status">确认链接已创建：{shareUrl}</p>}
+          {shareError && <p className="rounded-xl border border-danger/20 bg-danger-soft px-3 py-2 text-nano text-danger" role="alert">创建失败：{shareError}</p>}
+        </div>
+      )}
+
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         <main className="min-h-0 min-w-0 flex-1 overflow-auto p-3 sm:p-5" aria-label="顾客预览画布">
           {loadWarnings.length > 0 && <div className="mb-3 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-xs text-warning" role="status">旧设计已按兼容 reader 打开：{loadWarnings.join('；')}</div>}
@@ -227,8 +240,6 @@ export function CustomerPreviewShellV7({
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-nano"><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.backgroundMode}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">封层比较</dt><dd className="mt-1 font-semibold text-gray-800">{FINISH_LABEL[selectedModel.finishType]}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">平面 / 效果 / 立体</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.flatElementCount} / {selectedModel.activeSurfaceEffectCount} / {selectedModel.activeDecorationCount}</dd></div><div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">预览等级</dt><dd className="mt-1 font-semibold text-gray-800">{selectedModel.fidelity}</dd></div></dl>
                 {presentation === 'composite' && <p className="mt-3 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-nano leading-4 text-violet-700">当前为 v0.7.2 3D 能力入口：只读单指 PBR 模拟。十指整体模拟 3D 仍使用既有 SVG 2.5D 组合路径。</p>}
                 <p className={cx('mt-3 rounded-xl border px-3 py-2 text-nano leading-4', confirmationReady ? 'border-success/20 bg-success-soft text-success' : 'border-warning/20 bg-warning-soft text-warning')}>{confirmationReady ? '固定版本会锁定当前已保存 revision 与真实预览资产。' : scenarioCount > 0 ? '当前含临时比较；重置后才能进入正式确认。' : '存在 unavailable 预览内容；修复后才能创建固定版本。'}</p>
-                {shareUrl && <p className="mt-2 break-all rounded-xl border border-success/20 bg-success-soft px-3 py-2 text-nano text-success" role="status">确认链接已创建：{shareUrl}</p>}
-                {shareError && <p className="mt-2 rounded-xl border border-danger/20 bg-danger-soft px-3 py-2 text-nano text-danger" role="alert">创建失败：{shareError}</p>}
                 {selectedModel.warnings.length > 0 && <ul className="mt-3 space-y-1 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{selectedModel.warnings.map((warning) => <li key={warning}>· {warning}</li>)}</ul>}
               </div>
             </div>
@@ -250,7 +261,7 @@ export function CustomerPreviewShellV7({
 
           <div className="mt-5"><div className="flex items-center justify-between"><p className="text-xs font-semibold text-gray-800">封层效果比较</p>{scenario.finishType && <span className="text-nano font-semibold text-violet-600">临时</span>}</div><div className="mt-2 grid grid-cols-3 gap-2">{(['gloss', 'matte', 'frosted'] as const).map((finishType) => { const canonicalFinish = selectedNail.steps[selectedNail.steps.length - 1]; const isCanonical = canonicalFinish?.kind === 'surface_finish' && canonicalFinish.finish.type === finishType; return <button key={finishType} type="button" aria-pressed={selectedModel.finishType === finishType} onClick={() => setScenario((current) => setCustomerPreviewFinishV7(current, isCanonical ? null : finishType))} className={cx('min-h-11 rounded-xl border px-2 text-nano font-medium', selectedModel.finishType === finishType ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50')}>{FINISH_LABEL[finishType]}{isCanonical ? ' · 设计值' : ''}</button>; })}</div><p className="mt-2 rounded-xl border border-dashed border-gray-300 px-3 py-2 text-nano leading-4 text-gray-500"><Sparkles size={11} className="mr-1 inline" />封层比较会同步影响 2D 与模拟组合，只存在当前内存；不会应用到设计。</p></div>
 
-          <div className="mt-5 border-t border-gray-200 pt-4"><p className="text-nano leading-4 text-gray-500">退出预览或点击重置即丢弃临时方案。本页严格不创建 Approval / Snapshot，也不覆盖设计 revision；STUDIO-04 负责不可变确认合同。</p></div>
+          <div className="mt-5 border-t border-gray-200 pt-4"><p className="text-nano leading-4 text-gray-500">退出预览或点击重置即丢弃临时方案。临时比较不会写入设计或固定确认；重置并通过 readiness 后，可创建绑定当前已保存 revision 的固定版本链接。</p></div>
         </aside>
       </div>
     </section>

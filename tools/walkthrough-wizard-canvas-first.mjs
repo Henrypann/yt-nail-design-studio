@@ -2,11 +2,14 @@
 
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
 const baseURL = process.argv[2] ?? process.env.WIZARD_CANVAS_FIRST_URL ?? 'http://127.0.0.1:5200';
-const evidenceDir = new URL('../evidence/design-v1-1-wizard-canvas-first/', import.meta.url);
+const evidenceDir = process.env.WIZARD_CANVAS_FIRST_EVIDENCE_DIR
+  ? pathToFileURL(`${resolve(process.env.WIZARD_CANVAS_FIRST_EVIDENCE_DIR)}/`)
+  : new URL('../evidence/design-v1-1-wizard-canvas-first/', import.meta.url);
 const screenshotDir = new URL('screenshots/', evidenceDir);
 
 const viewports = [
@@ -392,7 +395,7 @@ try {
       drawerLifecycle.library = await assertDrawerLifecycle({
         page,
         trigger: page.getByTestId('wizard-template-trigger'),
-        dialogName: '模板库',
+        dialogName: '官方模板',
         touch: viewport.touch,
       });
     } else {

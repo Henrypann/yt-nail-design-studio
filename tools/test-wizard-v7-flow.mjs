@@ -42,9 +42,7 @@ assert.match(customerPicker, /暂不关联客户，使用标准尺寸/);
 assert.match(stepOne, /customer\?\.name \?\? '未关联客户'/);
 assert.doesNotMatch(stepOne, /if \(!customer\) return null/);
 
-const styleRecommendations = await read('src/studio/wizard/StyleRecommendModal.tsx');
-assert.match(styleRecommendations, /filter\(\(style\) => style\.cover_status !== 'MOCK'\)/);
-assert.doesNotMatch(styleRecommendations, />MOCK 占位图</);
+assert.doesNotMatch(stepOne, /StyleRecommendModal|applyValidatedStyleRecommendation/);
 
 const backgroundInspector = await read('src/studio/editor/components/BackgroundPanelV7.tsx');
 const resourceDrawer = await read('src/studio/editor/components/EditorResourceDrawerV7.tsx');

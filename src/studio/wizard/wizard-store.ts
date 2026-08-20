@@ -3,9 +3,8 @@
  *
  * 流程：客户选择器 → STEP 1 门禁（甲型/长度）→ STEP 2 三栏画布。
  * 保存体系：应用模板 2s / 改底色 3s 防抖自动保存 + 手动保存 + 失败自动重试 3 次。
- * 确认闭环：[顾客已确认] → state-machine confirmDesign → 冻结只读（线下场景，
- * 无任何线上确认功能）。数据落 StorageKeys.designs（DesignSummary[]），
- * 供「我的设计」列表模块读取。
+ * 新写只产生可编辑草稿；历史 confirmation 仅兼容读取。正式固定版本确认由
+ * Editor Approval 服务负责。数据落 DesignSummary 列表供「我的设计」读取。
  */
 
 import { create } from 'zustand';
@@ -21,8 +20,7 @@ import type {
   NailLength,
   NailShape,
 } from '@/lib/types';
-import { confirmDesign } from '@/lib/state-machine';
-import { createClientId, readData, StorageKeys } from '@/lib/storage';
+import { createClientId } from '@/lib/storage';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { loadSilhouette } from '@/studio/preview/nail-assets';
 import { loadBackPlateV2 } from '@/studio/render';
@@ -111,7 +109,7 @@ interface WizardState {
   /* STEP 1 选择（编辑态复用） */
   shape: NailShape | null;
   length: NailLength | null;
-  /* 风格推荐弹窗（v1.3.0：选完甲型 → 弹风格推荐 → 再进入画布） */
+  /* Legacy V1/V2 草稿兼容字段；Quick Start 不再提供风格推荐 writer。 */
   styleId: string | null;
   styleName: string | null;
   stylePrompted: boolean;
@@ -122,8 +120,6 @@ interface WizardState {
   applying: boolean;
   /** 进入画布/重新生成失败的持久错误（toast 会消失，内联错误条常驻到重试成功） */
   applyError: string | null;
-  /** 手动保存成功后的「转给客人看看？」引导气泡（UI 瞬态，不持久化） */
-  presentNudge: boolean;
   /* 设计参数 */
   templateId: string | null;
   templateName: string | null;
@@ -150,14 +146,11 @@ interface WizardState {
   setTipOrientation: (o: TipOrientation) => void;
   setShape: (s: NailShape) => void;
   setLength: (l: NailLength) => void;
-  setStyle: (id: string, name: string) => void;
-  markStylePrompted: () => void;
   applyAndEnter: () => Promise<boolean>;
   startEditShapeLength: () => void;
   cancelEditShapeLength: () => void;
   applyShapeLengthEdit: () => Promise<boolean>;
   clearApplyError: () => void;
-  setPresentNudge: (v: boolean) => void;
   applyTemplate: (t: TemplateEntry, options?: { exactAsset?: AssetRefV7; communitySourceRef?: CommunityLegacySourceRefV1 }) => boolean;
   /** Community Intent「新建设计」：新 designId + 清空工作态，保持 draft */
   resetForNewDesign: () => void;
@@ -170,7 +163,6 @@ interface WizardState {
   setSelectedFinger: (fc: FingerCode | null) => void;
   saveNow: (opts?: { manual?: boolean }) => Promise<boolean>;
   retrySave: () => Promise<boolean>;
-  markConfirmed: () => Promise<boolean>;
 }
 
 /* ── 防抖自动保存 ── */
@@ -183,11 +175,6 @@ function scheduleAutosave(save: () => void, delayMs: number): void {
     autosaveTimer = null;
     save();
   }, delayMs);
-}
-
-function confirmedByFromSession(): string {
-  const session = readData<{ userName?: string; email?: string }>(StorageKeys.session);
-  return session?.userName ?? session?.email ?? '美甲师';
 }
 
 const initialDesignId = (): string => createClientId('d_');
@@ -276,7 +263,7 @@ export const useWizardStore = create<WizardState>((set, get) => {
     scheduleAutosave(() => void performSave(), delayMs);
   }
 
-  /** STEP 1 [下一步：选风格] / 顶栏 [应用→重新生成] 公共逻辑 */
+  /** STEP 1 [进入快速建稿] / 顶栏 [应用→重新生成] 公共逻辑。 */
   async function applyShapeLength(enterStep2: boolean): Promise<boolean> {
     const s = get();
     if (!s.shape || !s.length || s.applying) return false;
@@ -331,7 +318,6 @@ export const useWizardStore = create<WizardState>((set, get) => {
     editingShapeLength: false,
     applying: false,
     applyError: null,
-    presentNudge: false,
     templateId: null,
     templateName: null,
     templateAssetRef: null,
@@ -369,12 +355,9 @@ export const useWizardStore = create<WizardState>((set, get) => {
     },
     setShape: (shape) => set({ shape }),
     setLength: (length) => set({ length }),
-    setStyle: (styleId, styleName) => set({ styleId, styleName, stylePrompted: true }),
-    markStylePrompted: () => set({ stylePrompted: true }),
 
     applyAndEnter: () => applyShapeLength(true),
     clearApplyError: () => set({ applyError: null }),
-    setPresentNudge: (presentNudge) => set({ presentNudge }),
 
     startEditShapeLength: () => {
       const s = get();
@@ -455,7 +438,6 @@ export const useWizardStore = create<WizardState>((set, get) => {
         editingShapeLength: false,
         applying: false,
         applyError: null,
-        presentNudge: false,
         templateId: null,
         templateName: null,
         templateAssetRef: null,
@@ -493,7 +475,6 @@ export const useWizardStore = create<WizardState>((set, get) => {
         editingShapeLength: false,
         applying: false,
         applyError: null,
-        presentNudge: false,
         templateId: draft.templateId,
         templateName: draft.templateName,
         templateAssetRef: draft.templateAssetRef ? structuredClone(draft.templateAssetRef) : null,
@@ -549,28 +530,5 @@ export const useWizardStore = create<WizardState>((set, get) => {
     saveNow: (opts) => performSave(opts),
     retrySave: () => performSave({ manual: true }),
 
-    markConfirmed: async () => {
-      const summary = await buildSummary();
-      if (!summary) return false;
-      try {
-        const confirmed = confirmDesign(summary, confirmedByFromSession());
-        const frozen = confirmed.recipe
-          ? {
-              recipeRef: confirmed.recipe.recipeRef,
-              definitionChecksum: recipeDefinitionChecksum(confirmed.recipe.recipeRef.id),
-              rendererVersion: rendererVersionFor(confirmed.recipe),
-            }
-          : undefined;
-        const frozenDesign = frozen ? { ...confirmed, confirmationSnapshot: frozen } : confirmed;
-        const simulateFailure = isScenarioOn(useMockScenarios.getState().flags, 'save.fail');
-        await persistDesign(frozenDesign, { simulateFailure });
-        set({ status: 'confirmed', confirmation: confirmed.confirmation, saveState: 'saved' });
-        notifier?.success('已标记「顾客已确认」，设计已冻结。');
-        return true;
-      } catch (err) {
-        notifier?.error(err instanceof Error ? err.message : '操作失败，请重试。');
-        return false;
-      }
-    },
   };
 });

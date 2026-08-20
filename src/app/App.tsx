@@ -20,7 +20,6 @@ import CustomerNewPage from './pages/customers/CustomerNewPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
 import DesignListPage from './pages/design/DesignListPage';
 import VersionedImportPage from './pages/design/VersionedImportPage';
-import TemplateGalleryPage from './pages/design/TemplateGalleryPage';
 import CommunityPage from './pages/design/CommunityPage';
 import EditorPage from './pages/design/EditorPage';
 import CustomerPreviewPageV7 from './pages/design/CustomerPreviewPageV7';
@@ -45,6 +44,7 @@ import CommunityBoardsPage from '@/community/pages/CommunityBoardsPage';
 import CommunityBoardPage from '@/community/pages/CommunityBoardPage';
 import CommunityBoardSharePage from '@/community/pages/CommunityBoardSharePage';
 import { HardwareRegistrationGate } from './guards/HardwareRegistrationGate';
+import { buildOfficialTemplateRedirect } from './routing/official-template-redirect';
 
 const DevDebugPanel = import.meta.env.DEV
   ? lazy(() => import('@/lib/debug-panel').then((module) => ({ default: module.DebugPanel })))
@@ -93,6 +93,11 @@ function DesignNewRoute() {
   return <Suspense fallback={<div className="p-6 text-sm text-gray-500">正在打开快速建稿…</div>}><LazyWizardPage /></Suspense>;
 }
 
+function OfficialTemplatesRedirect() {
+  const location = useLocation();
+  return <Navigate replace to={buildOfficialTemplateRedirect(location.search, location.hash)} />;
+}
+
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<RouterChrome />}>
     {/* 登录前 */}
@@ -134,7 +139,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={Routes.designs} element={<DesignListPage />} />
       <Route path={Routes.designNew} element={<DesignNewRoute />} />
       <Route path={Routes.designImport} element={<VersionedImportPage />} />
-      <Route path={Routes.designTemplates} element={<TemplateGalleryPage />} />
+      <Route path={Routes.designTemplates} element={<OfficialTemplatesRedirect />} />
       <Route path={Routes.designCommunity} element={<CommunityPage />} />
       {/* 首次硬件注册始终可进入；客户/门店 Dashboard/设备列表由注册状态统一解锁。 */}
       <Route path={Routes.deviceBind} element={<DeviceBindPage />} />

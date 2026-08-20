@@ -29,6 +29,7 @@ for (const viewport of viewports) {
     ...(viewport.touch ? { hasTouch: true, isMobile: viewport.width < 500 } : {}),
   });
   let page = await context.newPage();
+  const activate = (locator) => viewport.touch ? locator.tap() : locator.click();
   const errors = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
@@ -43,7 +44,7 @@ for (const viewport of viewports) {
   const communityPage = page;
   [page] = await Promise.all([
     context.waitForEvent('page'),
-    communityPage.getByTestId('community-use-versioned').click(),
+    activate(communityPage.getByTestId('community-use-versioned')),
   ]);
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
@@ -61,7 +62,7 @@ for (const viewport of viewports) {
   assert.equal(sizes.every((size) => size.height >= 44 && size.width >= 44), true);
   await page.screenshot({ path: path.join(output, `${viewport.name}-choice.png`), fullPage: true });
 
-  await page.getByTestId('versioned-import-new').click();
+  await activate(page.getByTestId('versioned-import-new'));
   await page.getByTestId('editor-remix-disclosure').waitFor();
   await page.waitForTimeout(3500); // success toast must not obscure signed visual evidence
   assert.match(page.url(), /\/studio\/design\/canvas\?design=design\.remix\./);
@@ -69,7 +70,7 @@ for (const viewport of viewports) {
   assert.equal(await page.getByLabel('设计名称').isEnabled(), true, 'new Remix must be editable');
   assert.equal(await page.getByText('当前 V7 设计处于只读状态；选择与折叠仍可使用。').count(), 0);
   assert.equal(await page.evaluate(() => window.scrollY), 0, 'immersive Editor must reset inherited SPA scroll');
-  await page.getByRole('button', { name: /个性化设计/ }).click();
+  await activate(page.getByRole('button', { name: /个性化设计/ }));
   await page.getByTestId('v7-flat-design-canvas').waitFor();
   const shellGeometry = await page.locator('[data-debug-id="studio.editor.shell-v7"]').evaluate((shell) => ({
     scrollLeft: shell.scrollLeft,
@@ -90,12 +91,12 @@ for (const viewport of viewports) {
   assert.equal(Object.keys(stored.events).length, 1);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true);
   await page.screenshot({ path: path.join(output, `${viewport.name}-editor.png`), fullPage: true });
-  report.push({ viewport: viewport.name, errors, designId: doc.designId, eventCount: Object.keys(stored.events).length });
+  report.push({ viewport: viewport.name, interaction: viewport.touch ? 'tap' : 'click', errors, designId: doc.designId, eventCount: Object.keys(stored.events).length });
   assert.deepEqual(errors, []);
   const editorUrl = page.url();
   const [sourcePage] = await Promise.all([
     context.waitForEvent('page'),
-    page.getByTestId('editor-return-source').click(),
+    activate(page.getByTestId('editor-return-source')),
   ]);
   await sourcePage.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   assert.equal(page.url(), editorUrl, 'view source must preserve the Editor tab');
@@ -127,10 +128,10 @@ for (const viewport of viewports) {
   await communityPage.goto(`${baseURL}/look/look.v7-1.petal-veil`, { waitUntil: 'networkidle' });
   const [page] = await Promise.all([
     context.waitForEvent('page'),
-    communityPage.getByTestId('community-use-versioned').click(),
+    communityPage.getByTestId('community-use-versioned').tap(),
   ]);
   await page.waitForLoadState('networkidle');
-  await page.getByTestId('versioned-import-cancel').click();
+  await page.getByTestId('versioned-import-cancel').tap();
   await page.waitForURL(`${baseURL}/look/look.v7-1.petal-veil`);
   assert.equal(await page.evaluate(() => localStorage.getItem('nail-studio:community.look-customize-events-v1')), null);
   await context.close();
@@ -138,7 +139,7 @@ for (const viewport of viewports) {
 
 await fs.writeFile(
   path.join(evidenceRoot, 'walkthrough-report.json'),
-  `${JSON.stringify({ baseURL, report, current: 'PASS', cancel: 'PASS' }, null, 2)}\n`,
+  `${JSON.stringify({ baseURL, report, current: 'PASS', cancel: 'PASS', cancelInteraction: 'tap' }, null, 2)}\n`,
 );
 await browser.close();
 console.log('[e2e:community-v7-1-use-customize] PASS');

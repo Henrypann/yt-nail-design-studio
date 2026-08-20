@@ -1,0 +1,57 @@
+{
+  "baseUrl": "http://127.0.0.1:5204",
+  "report": [
+    {
+      "viewport": "390",
+      "status": "PASS",
+      "source": {
+        "intentId": "intent-6c197d0c-0215-4da8-a8d9-0a270dddedcd",
+        "contentId": "cc_mercury_dew",
+        "publisherId": "pub_nailstyle_official",
+        "sourceTemplateId": "t_mercury_dew_concept",
+        "assetVersion": "1.0.0",
+        "applicationLevel": "STRUCTURED_EDITABLE"
+      },
+      "asset": {
+        "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.almond",
+        "revision": "template-v1",
+        "kind": "vector",
+        "mimeType": "image/svg+xml",
+        "sha256": "da5ad1a1ada80cfd4ac6344492a930d5d50b0de7d20872b889fe809757f1f3fe",
+        "colorSpace": "srgb",
+        "alphaMode": "straight"
+      },
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "viewport": "1280",
+      "status": "PASS",
+      "source": {
+        "intentId": "intent-fd0e1afb-638f-4a62-84e0-60fe2147ec45",
+        "contentId": "cc_mercury_dew",
+        "publisherId": "pub_nailstyle_official",
+        "sourceTemplateId": "t_mercury_dew_concept",
+        "assetVersion": "1.0.0",
+        "applicationLevel": "STRUCTURED_EDITABLE"
+      },
+      "asset": {
+        "assetId": "asset.template-pattern.t_liquid_velvet_cat_eye.almond",
+        "revision": "template-v1",
+        "kind": "vector",
+        "mimeType": "image/svg+xml",
+        "sha256": "da5ad1a1ada80cfd4ac6344492a930d5d50b0de7d20872b889fe809757f1f3fe",
+        "colorSpace": "srgb",
+        "alphaMode": "straight"
+      },
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "viewport": "390",
+      "mismatch": "PASS",
+      "reason": "asset_mismatch",
+      "applied": false
+    }
+  ]
+}

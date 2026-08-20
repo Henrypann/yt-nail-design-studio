@@ -1,8 +1,8 @@
 /**
  * STEP 2 · Canvas-first 响应式工作区（Studio-PRD §12.4 · 三视图主视觉）
  *
- * Full/Compact：模板库｜主视觉｜Inspector；Focus：模板库进入 Drawer；
- * Tablet：模板库与 Inspector 均进入互斥 Overlay，中央预览始终优先获得空间。
+ * Full/Compact：官方模板｜主视觉｜Inspector；Focus：官方模板进入 Drawer；
+ * Tablet：官方模板与 Inspector 均进入互斥 Overlay，中央预览始终优先获得空间。
  * 三视图：整体搭配、十指平铺、单指细节；切换只改变 UI 瞬态，不改设计数据。
  * 导出/缩略图：隐藏挂载的整幅 plate 实例为唯一注册源（与当前视图无关，导出语义稳定）。
  * 顶栏 [修改]：预览区收缩为一行摘要条 → 甲型/长度重新选择 → [应用→重新生成]；
@@ -24,6 +24,7 @@ import {
   PetalVeilTiledPreview,
 } from '@/studio/petal-veil/PetalVeilPreview';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useWizardStore, type WizardViewMode } from './wizard-store';
 import { ShapeLengthPicker } from './ShapeLengthPicker';
 import { TemplateGallery } from './TemplateGallery';
@@ -61,6 +62,7 @@ export function StepTwo() {
   const [overlayPanel, setOverlayPanel] = useState<WizardOverlayPanel>(null);
   const [inspectorTab, setInspectorTab] = useState<WizardInspectorTab>('finger');
   const shellRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const overlayTriggerRef = useRef<HTMLButtonElement | null>(null);
   const petalP0 = isPetalVeilRecipe(s.recipe);
   const viewTabs = petalP0 ? VIEW_TABS.filter((tab) => tab.key !== 'ensemble') : VIEW_TABS;
@@ -104,6 +106,13 @@ export function StepTwo() {
     if (layoutMode === 'focus' && overlayPanel === 'inspector') setOverlayPanel(null);
   }, [layoutMode, overlayPanel]);
 
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('officialTemplatePanel') !== '1') return;
+    if (layoutMode === 'full' || layoutMode === 'compact') return;
+    overlayTriggerRef.current = document.querySelector<HTMLButtonElement>('[data-testid="wizard-template-trigger"]');
+    setOverlayPanel('library');
+  }, [location.search, layoutMode]);
+
   if (!s.appliedShape || !s.appliedLength) return null;
 
   const editorCompatibility = inspectWizardEditorV7Compatibility({
@@ -129,16 +138,6 @@ export function StepTwo() {
     const trigger = overlayTriggerRef.current;
     overlayTriggerRef.current = null;
     queueMicrotask(() => trigger?.isConnected && trigger.focus());
-  };
-
-  /** 「转给客人看看？」引导气泡关闭（每会话只提示一次） */
-  const dismissPresentNudge = () => {
-    try {
-      window.sessionStorage.setItem('ui.wizard-present-nudged', '1');
-    } catch {
-      /* sessionStorage 不可用时仅关闭当前气泡 */
-    }
-    s.setPresentNudge(false);
   };
 
   /** [进入 Editor]：等待自动保存 → openBridge（首次创建 / 已存在则继续） */
@@ -243,7 +242,7 @@ export function StepTwo() {
   return (
     <div ref={shellRef} className="flex min-h-0 flex-col gap-3 lg:h-full" data-testid="wizard-canvas-first" data-layout={layoutMode}>
       <div className="grid min-h-0 flex-1 gap-3" style={{ gridTemplateColumns: gridTemplate }}>
-        {/* 左：模板库（窄栏 · 风格标签 + 单列图文卡片） */}
+        {/* 左：官方模板（窄栏 · 按甲型适配度排序的单列卡片） */}
         {libraryDocked && <aside data-testid="wizard-template-library" data-debug-id="studio.wizard.step2.template-gallery" className="min-h-0 overflow-hidden rounded-card border border-hairline bg-surface p-3">
           <TemplateGallery />
         </aside>}
@@ -303,7 +302,7 @@ export function StepTwo() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 {!libraryDocked && (
                   <Button data-testid="wizard-template-trigger" size="sm" variant="secondary" className="min-h-11" aria-haspopup="dialog" onClick={(event) => openOverlay('library', event.currentTarget)}>
-                    <LibraryBig size={14} />模板
+                    <LibraryBig size={14} />官方模板
                   </Button>
                 )}
                 <div className="flex rounded-button border border-gray-200 bg-white p-0.5" role="tablist">
@@ -365,39 +364,6 @@ export function StepTwo() {
                       <Presentation size={13} />
                       顾客展示
                     </Button>
-                    {/* 保存成功后的「转给客人看看？」引导（每会话一次，确认仪式显性化） */}
-                    {s.presentNudge && !readOnly && (
-                      <div
-                        className="absolute right-0 top-9 z-30 w-64 rounded-panel border border-primary/30 bg-white p-3 shadow-modal animate-fade-in"
-                        data-debug-id="studio.wizard.present-nudge"
-                        role="status"
-                      >
-                        <p className="text-xs font-medium text-gray-900">已保存 ✓ 转给客人看看效果？</p>
-                        <p className="mt-0.5 text-nano leading-relaxed text-gray-500">
-                          顾客展示会全屏呈现设计，客人点头后可直接标记「顾客已确认」。
-                        </p>
-                        <div className="mt-2 flex justify-end gap-1.5">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              dismissPresentNudge();
-                            }}
-                          >
-                            知道了
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              dismissPresentNudge();
-                              setPresentOpen(true);
-                            }}
-                          >
-                            打开顾客展示
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </span>
                 </div>
               </div>
@@ -517,7 +483,7 @@ export function StepTwo() {
         </Button>
       </footer>}
 
-      <WizardPanelOverlay open={overlayPanel === 'library'} title="模板库" side="left" onClose={closeOverlay}>
+      <WizardPanelOverlay open={overlayPanel === 'library'} title="官方模板" side="left" onClose={closeOverlay}>
         <div className="h-[calc(100dvh-80px)] min-h-0"><TemplateGallery /></div>
       </WizardPanelOverlay>
       <WizardPanelOverlay open={overlayPanel === 'inspector'} title="参数与单指详情" side="bottom" onClose={closeOverlay}>
@@ -538,14 +504,12 @@ export function StepTwo() {
         </div>
       </WizardPanelOverlay>
 
-      {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向 · 展示内可手动标记顾客已确认） */}
+      {/* 顾客展示模式（全屏只读 · Esc 退出 · 继承当前指尖方向） */}
       {petalP0 && s.recipe ? (
         <PetalVeilPresentationMode
           open={presentOpen}
           onClose={() => setPresentOpen(false)}
           recipe={s.recipe}
-          status={s.status}
-          onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
         />
       ) : (
         <PresentationMode
@@ -559,10 +523,8 @@ export function StepTwo() {
           finish={s.finish}
           recipe={s.recipe}
           fingerOverrides={s.fingerOverrides}
-          status={s.status}
           initialFinger={s.selectedFinger}
           tipOrientation={s.tipOrientation}
-          onMarkConfirmed={s.status === 'draft' ? () => s.markConfirmed() : undefined}
         />
       )}
     </div>

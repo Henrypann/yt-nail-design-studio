@@ -87,8 +87,6 @@ for (const path of [
   'src/app/layouts/AppLayout.tsx',
   'src/app/pages/StudioHomePage.tsx',
   'src/app/pages/DashboardPage.tsx',
-  'src/app/pages/design/WizardPage.tsx',
-  'src/app/pages/design/TemplateGalleryPage.tsx',
   'src/studio/editor/components/EditorTopBar.tsx',
   'src/studio/editor/components/EditorShellV7.tsx',
 ]) {

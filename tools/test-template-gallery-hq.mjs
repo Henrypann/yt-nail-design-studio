@@ -48,7 +48,6 @@ for (const id of forbiddenGalleryMocks) {
 
 for (const sourcePath of [
   'src/studio/wizard/TemplateGallery.tsx',
-  'src/app/pages/design/TemplateGalleryPage.tsx',
 ]) {
   const gallerySource = fs.readFileSync(path.join(root, sourcePath), 'utf8');
   assert.match(

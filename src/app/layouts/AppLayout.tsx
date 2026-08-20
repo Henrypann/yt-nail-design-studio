@@ -233,9 +233,10 @@ export function AppLayout() {
                   key={item.to}
                   href={item.to}
                   title={sidebarCollapsed ? item.label : undefined}
+                  aria-label={item.label}
                   data-testid="nav-community"
                   className={cx(
-                    'block rounded-button py-1.5 text-sm text-gray-600 transition-colors duration-fast ease-out hover:bg-gray-100 hover:text-gray-900',
+                    'block min-h-11 max-w-full truncate rounded-button py-1.5 text-sm text-gray-600 transition-colors duration-fast ease-out hover:bg-gray-100 hover:text-gray-900',
                     sidebarCollapsed ? 'px-1 text-center text-nano leading-tight' : 'px-2.5',
                   )}
                 >
@@ -247,9 +248,10 @@ export function AppLayout() {
                   to={item.to}
                   end={item.end}
                   title={sidebarCollapsed ? item.label : undefined}
+                  aria-label={item.label}
                   className={({ isActive }) =>
                     cx(
-                      'block rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',
+                      'block min-h-11 max-w-full truncate rounded-button py-1.5 text-sm transition-colors duration-fast ease-out',
                       sidebarCollapsed ? 'px-1 text-center text-nano leading-tight' : 'px-2.5',
                       isActive
                         ? 'bg-primary-soft font-medium text-primary'

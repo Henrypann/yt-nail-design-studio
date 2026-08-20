@@ -1,0 +1,43 @@
+{
+  "baseURL": "http://127.0.0.1:5204",
+  "report": [
+    {
+      "viewport": "390",
+      "interaction": "tap",
+      "errors": [],
+      "designId": "design.remix.intent.v2.db79e3ca-a02c-4181-abda-d892e97f66bd",
+      "eventCount": 1
+    },
+    {
+      "viewport": "768",
+      "interaction": "tap",
+      "errors": [],
+      "designId": "design.remix.intent.v2.3992d2e0-5bfe-494b-8960-bd7d46a5631b",
+      "eventCount": 1
+    },
+    {
+      "viewport": "1024",
+      "interaction": "click",
+      "errors": [],
+      "designId": "design.remix.intent.v2.25b1d575-d92f-434d-a2f9-28cbf432f85a",
+      "eventCount": 1
+    },
+    {
+      "viewport": "1280",
+      "interaction": "click",
+      "errors": [],
+      "designId": "design.remix.intent.v2.3adb7590-a52c-4c71-93f0-3c1f5583a93a",
+      "eventCount": 1
+    },
+    {
+      "viewport": "1440",
+      "interaction": "click",
+      "errors": [],
+      "designId": "design.remix.intent.v2.5ffae487-3862-4100-999e-cc330b18b29b",
+      "eventCount": 1
+    }
+  ],
+  "current": "PASS",
+  "cancel": "PASS",
+  "cancelInteraction": "tap"
+}

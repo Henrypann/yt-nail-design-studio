@@ -44,7 +44,7 @@ function liveWizardApi(): CommunityIntentConsumeDeps['wizard'] {
         useWizardStore.setState({ shape, length, step: 1 });
       }
     },
-    applyTemplate: (template) => useWizardStore.getState().applyTemplate(template),
+    applyTemplate: (template, options) => useWizardStore.getState().applyTemplate(template, options),
   };
 }
 

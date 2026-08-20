@@ -9,12 +9,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Compass, Save } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { Badge, Button, Modal, useToast, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
-import { communityProductHref } from '@/app/product-navigation';
-import { communityHref } from '@/community/lib/entry-link';
-import { CrossProductLink } from '@/app/CrossProductLink';
 import {
   peekStudioImportIntentRaw,
   sanitizeReturnTo,
@@ -485,7 +482,7 @@ export default function WizardPage() {
               ))}
           </>
         )}
-        {s.status === 'confirmed' && <Badge variant="blue">已确认 · 只读</Badge>}
+        {s.status === 'confirmed' && <Badge variant="gray">历史本地确认 · 非固定版本 · 只读</Badge>}
         {s.communitySourceRef && (
           <div
             className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] text-amber-800"
@@ -501,21 +498,6 @@ export default function WizardPage() {
         )}
 
         <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
-          <CrossProductLink
-            data-testid="wizard-community-entry"
-            title="进入 Community"
-            aria-label="进入 Community"
-            href={communityProductHref(communityHref({
-              entry: 'wizard',
-              returnTo: Routes.designNew,
-              shape: s.appliedShape ?? undefined,
-              length: s.appliedLength ?? undefined,
-            }))}
-            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-          >
-            <Compass size={13} />
-            Community
-          </CrossProductLink>
           {/* 保存状态：💾 已保存 ↔ ● 未保存 */}
           <span
             className={cx(
@@ -542,17 +524,7 @@ export default function WizardPage() {
               disabled={s.step !== 2 || s.status !== 'draft'}
               loading={s.saveState === 'saving'}
               onClick={async () => {
-                const ok = await s.saveNow({ manual: true });
-                // 确认仪式显性化：保存成功后引导「转给客人看看？」（每会话一次）
-                if (ok && useWizardStore.getState().status === 'draft') {
-                  let nudged = false;
-                  try {
-                    nudged = window.sessionStorage.getItem('ui.wizard-present-nudged') === '1';
-                  } catch {
-                    nudged = false;
-                  }
-                  if (!nudged) s.setPresentNudge(true);
-                }
+                await s.saveNow({ manual: true });
               }}
             >
               <Save size={13} />

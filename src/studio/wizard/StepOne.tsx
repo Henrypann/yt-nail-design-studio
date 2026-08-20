@@ -2,23 +2,21 @@
  * STEP 1 · 门禁（Studio-PRD §12.3）
  *
  * 客户卡片（Twin 三态）+ 甲型卡片 + 长度按钮 + 右侧即时预览（所见即所得，
- * 甲型/长度一变即重渲染）+ [下一步：选风格 →]（首次）/ [进入画布 →]（已选过风格）。
+ * 甲型/长度一变即重渲染）+ [进入快速建稿 →]。
  * 进入画布失败：持久内联错误条（常驻到重试成功，不再只依赖会消失的 toast）。
  */
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Card, cx, useToast } from '@/design-system';
+import { Badge, Button, Card, cx } from '@/design-system';
 import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight, RefreshCw } from 'lucide-react';
 import type { Customer } from '@/lib/types';
 import { Routes } from '@/app/routes';
-import { loadLibraryIndex, loadShapeParams } from '@/studio/preview/material-library';
-import { applyValidatedStyleRecommendation } from '@/studio/preview/resolve-template';
+import { loadShapeParams } from '@/studio/preview/material-library';
 import { loadSilhouette, type SilhouetteAsset } from '@/studio/preview/nail-assets';
 import { NailCellView } from '@/studio/preview/TiledNailsPreview';
 import { useWizardStore } from './wizard-store';
 import { ShapeLengthPicker } from './ShapeLengthPicker';
-import { StyleRecommendModal, type StyleRecommendation } from './StyleRecommendModal';
 import { countDesignsByCustomer } from './design-repository';
 
 /** 未扫描指数（Twin Mock：由客户 id 稳定派生 2–5，仅展示用，标 MOCK） */
@@ -140,69 +138,22 @@ export function StepOne() {
   const length = useWizardStore((s) => s.length);
   const applying = useWizardStore((s) => s.applying);
   const applyError = useWizardStore((s) => s.applyError);
-  const stylePrompted = useWizardStore((s) => s.stylePrompted);
   const setShape = useWizardStore((s) => s.setShape);
   const setLength = useWizardStore((s) => s.setLength);
-  const setStyle = useWizardStore((s) => s.setStyle);
-  const markStylePrompted = useWizardStore((s) => s.markStylePrompted);
   const applyAndEnter = useWizardStore((s) => s.applyAndEnter);
-  const applyTemplate = useWizardStore((s) => s.applyTemplate);
   const openPicker = useWizardStore((s) => s.openPicker);
-  const [styleModalOpen, setStyleModalOpen] = useState(false);
-  const toast = useToast();
   const navigate = useNavigate();
 
   const ready = shape !== null && length !== null;
 
-  /** [进入画布]：失败由持久内联错误条呈现（applyError），样式/长度选择保留。
-   *  成功后先跳选款页（社区demo入口），已选过模板的路径直接进画布。 */
+  /** [进入快速建稿]：失败由持久内联错误条呈现，甲型/长度选择保留；
+   *  成功后打开受治理的官方模板面板。 */
   const enterCanvas = async (): Promise<void> => {
     const ok = await applyAndEnter();
-    if (ok) navigate(Routes.designTemplates);
+    if (ok) navigate(`${Routes.designNew}?officialTemplatePanel=1`, { replace: false });
   };
 
-  /** 首次点击：先弹风格推荐（每设计一次）；已选过风格则直接进入画布 */
-  const handleApply = async () => {
-    if (!stylePrompted) {
-      setStyleModalOpen(true);
-      return;
-    }
-    await enterCanvas();
-  };
-
-  /** 选用风格：模板映射必须存在；缺失时显式报错，不把纯底色冒充选款成功。
-   *  已经选定具体模板，跳过选款页直接进画布。 */
-  const handleStyleSelect = async (st: StyleRecommendation) => {
-    const result = await applyValidatedStyleRecommendation(st, {
-      loadIndex: loadLibraryIndex,
-      applyAndEnter,
-      setStyle,
-      applyTemplate,
-    });
-    if (result.status !== 'ok') {
-      if (result.status === 'missing_template') {
-        toast.error(`风格「${st.name}」引用的模板不存在，请选择其他风格。`);
-      } else if (result.status === 'load_failed') {
-        toast.error('模板目录加载失败。推荐未应用，可重试或跳过。');
-      }
-      return;
-    }
-    setStyleModalOpen(false);
-    if (st.cover_status === 'CONCEPT') {
-      toast.warning(
-        st.recipe_ref
-          ? `已应用「${st.name_en}」V7 结构化配方；2D/2.5D 与 3D 均为模拟预览，不代表制造结果。`
-          : `已应用「${st.base_template_name ?? result.entry.name}」近似基础方案；高保真 3D 层仍为概念资产，当前画布不代表生产结果。`,
-      );
-    }
-    navigate(Routes.designNew);
-  };
-
-  const handleStyleSkip = async () => {
-    markStylePrompted();
-    setStyleModalOpen(false);
-    await enterCanvas();
-  };
+  const handleApply = async () => { await enterCanvas(); };
 
   return (
     <div className="mx-auto flex h-full max-w-[860px] flex-col gap-4 overflow-y-auto" data-debug-id="studio.wizard.step1">
@@ -259,7 +210,7 @@ export function StepOne() {
         </div>
       )}
 
-      {/* [下一步：选风格 →]（首次）/ [进入画布 →]（已选过风格）：吸底常驻，短视口不被顶出折叠线 */}
+      {/* [进入快速建稿 →]：吸底常驻，短视口不被顶出折叠线。 */}
       <div className="sticky bottom-0 -mx-1 mt-auto flex justify-end border-t border-gray-100 bg-white/95 px-1 py-2 backdrop-blur-sm">
         <Button
           size="md"
@@ -270,21 +221,13 @@ export function StepOne() {
         >
           {applying ? '生成预览中…' : (
             <>
-              {stylePrompted ? '进入画布' : '下一步：选风格'}
+              进入快速建稿
               <ArrowRight size={14} />
             </>
           )}
         </Button>
       </div>
 
-      {/* 风格推荐弹窗：选定甲型长度后、进入画布前 */}
-      <StyleRecommendModal
-        open={styleModalOpen}
-        shape={shape}
-        length={length}
-        onSelect={handleStyleSelect}
-        onSkip={() => void handleStyleSkip()}
-      />
     </div>
   );
 }

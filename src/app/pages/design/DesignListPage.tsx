@@ -1,21 +1,17 @@
 /**
  * `/design` 我的设计（模块 4）
- * 卡片列表 + 状态筛选 tabs（全部/草稿/已确认/已提交）+ 徽章（draft 灰 / confirmed 蓝 /
- * submitted 深蓝，lib STATUS_BADGE）+ 空状态插画 + 状态机操作：
- * [继续编辑]（draft 进 Editor）/ 只读查看 + [基于已确认创建新版本]（confirmed）/
- * [退回草稿]（confirmed→draft，二次确认）/ 复制 / 删除。
+ * 卡片列表 + 状态筛选 tabs（全部/草稿/固定版本已确认/已提交）+ 空状态插画。
+ * 正式固定版本来自 Editor ApprovalEvent/Snapshot；历史 Wizard confirmation 只读。
  */
 
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Copy, Eye, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Copy, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Badge, Button, Card, EmptyState, Modal, Tabs, useToast } from '@/design-system';
 import { designNewFresh, Routes } from '@/app/routes';
 import {
   STATUS_BADGE,
   STATUS_LABEL,
-  createNewVersionFromConfirmed,
-  revertToDraft,
 } from '@/lib/state-machine';
 import type { DesignStatus, DesignSummary } from '@/lib/types';
 import designsEmptyUrl from '../../../../assets/illustrations/designs-empty.svg?url';
@@ -32,6 +28,7 @@ import {
 import { isEditorV7InternalEnabled } from '@/studio/editor/v7/feature';
 import { openBridge } from '@/studio/bridge';
 import { genId } from '@/studio/editor/lib/model';
+import { readDesignApprovalProjection } from '@/studio/approval/design-approval-projection';
 
 type TabKey = 'all' | 'draft' | 'confirmed' | 'submitted';
 
@@ -55,7 +52,6 @@ export default function DesignListPage() {
   const toast = useToast();
   const [tab, setTab] = useState<TabKey>('all');
   const [tick, setTick] = useState(0); // 本地增删后刷新
-  const [revertTarget, setRevertTarget] = useState<DesignSummary | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DesignSummary | null>(null);
   const editorV7Enabled = isEditorV7InternalEnabled();
 
@@ -68,12 +64,20 @@ export default function DesignListPage() {
 
   const filtered = useMemo(() => {
     if (tab === 'all') return designs;
-    return designs.filter((d) => d.status === (tab as DesignStatus));
+    if (tab === 'confirmed') return designs.filter((d) => readDesignApprovalProjection(d.id).status === 'APPROVED');
+    return designs.filter((d) => d.status === (tab as DesignStatus) && readDesignApprovalProjection(d.id).status !== 'APPROVED');
   }, [designs, tab]);
 
   const refresh = () => setTick((t) => t + 1);
 
   const openDesign = (d: DesignSummary) => {
+    const projection = readDesignApprovalProjection(d.id);
+    if (projection.status === 'CORRUPTED') toast.error('确认记录损坏，已阻断确认状态映射；独立 Editor 文档仍可打开。');
+    if (d.status === 'confirmed' || d.confirmation) {
+      navigate(`${Routes.designNew}?designId=${encodeURIComponent(d.id)}`);
+      return;
+    }
+    if (projection.status === 'APPROVED') { toast.info('固定版本不可直接编辑；请从固定版本创建新修订。'); return; }
     const probe = inspectEditorDoc(d.id);
     if (probe.present && probe.schemaVersion === 7) {
       navigate(`${Routes.designCanvas}?design=${d.id}`);
@@ -135,42 +139,6 @@ export default function DesignListPage() {
     }
   };
 
-  const newVersion = (d: DesignSummary) => {
-    const probe = inspectEditorDoc(d.id);
-    if (probe.present && probe.schemaVersion === 7) {
-      toast.error('V7 新版本将在确认快照 PR 中开放；原设计未改变。');
-      return;
-    }
-    let newId: string | null = null;
-    try {
-      newId = genId('design');
-      const copy = createNewVersionFromConfirmed(d, newId);
-      if (duplicateEditorDocV6(d.id, newId) === null) {
-        throw new Error('原画布不可读取，未创建新版本');
-      }
-      upsertDesign(copy);
-      refresh();
-      toast.success(`已基于 v${d.version} 创建新版本 v${copy.version}（草稿）`);
-    } catch (err) {
-      if (newId) {
-        try { removeEditorDoc(newId); } catch { /* preserve the original failure */ }
-      }
-      toast.error(err instanceof Error ? err.message : '操作失败');
-    }
-  };
-
-  const doRevert = () => {
-    if (!revertTarget) return;
-    try {
-      upsertDesign(revertToDraft(revertTarget));
-      setRevertTarget(null);
-      refresh();
-      toast.success('已退回草稿，可以继续编辑');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '操作失败');
-    }
-  };
-
   const doDelete = () => {
     if (!deleteTarget) return;
     removeDesign(deleteTarget.id);
@@ -188,7 +156,7 @@ export default function DesignListPage() {
             {editorV7Enabled && <Badge variant="info">V7 internal</Badge>}
           </div>
           <p className="mt-0.5 text-xs text-gray-500">
-            顾客确认为线下场景：软件内仅手动标记「顾客已确认」→ 冻结只读。
+            固定版本确认由 Editor 顾客预览产生；快速建稿只负责客户上下文、模板和草稿。
           </p>
         </div>
         <div className="flex gap-2">
@@ -205,9 +173,11 @@ export default function DesignListPage() {
       <Tabs
         items={TABS.map((t) => ({
           key: t.key,
-          label:
-            t.key === 'all'
+            label:
+              t.key === 'all'
               ? `全部（${designs.length}）`
+              : t.key === 'confirmed'
+                ? `${t.label}（${designs.filter((d) => readDesignApprovalProjection(d.id).status === 'APPROVED').length}）`
               : `${t.label}（${designs.filter((d) => d.status === t.key).length}）`,
         }))}
         activeKey={tab}
@@ -218,7 +188,7 @@ export default function DesignListPage() {
         <EmptyState
           illustration={<img src={designsEmptyUrl} alt="" className="h-28 w-auto" />}
           title={tab === 'all' ? '还没有设计。创建你的第一个美甲设计吧' : `没有「${TABS.find((t) => t.key === tab)?.label}」状态的设计`}
-          description="从 Wizard 模板快速出单，或打开自由画布精细创作。"
+          description="从快速建稿官方模板快速出单，或打开 Editor 自由画布精细创作。"
           action={
             <Button size="sm" onClick={() => navigate(designNewFresh())}>
               <Plus size={14} />
@@ -230,7 +200,10 @@ export default function DesignListPage() {
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3">
           {filtered.map((d) => {
-            const readOnly = d.status === 'confirmed' || d.status === 'submitted';
+            const approval = readDesignApprovalProjection(d.id);
+            const formalApproved = approval.status === 'APPROVED';
+            const historicalConfirmation = !formalApproved && (Boolean(d.confirmation) || d.status === 'confirmed');
+            const readOnly = formalApproved || historicalConfirmation || d.status === 'submitted';
             return (
               <Card key={d.id} padding="sm" className="flex flex-col gap-2">
                 {/* 缩略图 */}
@@ -254,40 +227,30 @@ export default function DesignListPage() {
                     <p className="mt-0.5 truncate text-nano text-gray-500">
                       {customerName(d.customerId)} · {formatTime(d.updatedAt)}
                     </p>
-                    {d.confirmation && (
-                      <p className="mt-0.5 text-nano text-info">
-                        {d.confirmation.confirmedBy} 标记于 {formatTime(d.confirmation.confirmedAt)}
-                      </p>
-                    )}
+                    {approval.status === 'HISTORICAL_LOCAL_CONFIRMATION' || d.confirmation ? (
+                      <p className="mt-0.5 text-nano text-warning">历史本地确认 · 非固定版本</p>
+                    ) : approval.status === 'CHANGE_REQUESTED' ? (
+                      <p className="mt-0.5 text-nano text-warning">顾客请求修改{approval.note ? ` · ${approval.note}` : ''}</p>
+                    ) : approval.status === 'CORRUPTED' ? (
+                      <p className="mt-0.5 text-nano text-error">确认记录损坏 · 已阻断</p>
+                    ) : null}
                   </div>
-                  <Badge variant={STATUS_BADGE[d.status]}>{STATUS_LABEL[d.status]}</Badge>
+                  <Badge variant={formalApproved ? 'blue' : STATUS_BADGE[d.status]}>{formalApproved ? '固定版本已确认' : approval.status === 'CHANGE_REQUESTED' ? '顾客请求修改' : historicalConfirmation ? '历史本地确认' : STATUS_LABEL[d.status]}</Badge>
                 </div>
 
                 {/* 操作区（状态机驱动） */}
                 <div className="flex flex-wrap gap-1 border-t border-gray-100 px-1 pt-2">
-                  {d.status === 'draft' && (
+                  {d.status === 'draft' && !historicalConfirmation && (
                     <Button size="sm" variant="ghost" onClick={() => openDesign(d)}>
                       <Pencil size={12} />
                       继续编辑
                     </Button>
                   )}
-                  {readOnly && (
+                  {readOnly && !formalApproved && (
                     <Button size="sm" variant="ghost" onClick={() => openDesign(d)}>
                       <Eye size={12} />
-                      查看
+                      查看历史草稿
                     </Button>
-                  )}
-                  {d.status === 'confirmed' && (
-                    <>
-                      <Button size="sm" variant="ghost" onClick={() => newVersion(d)}>
-                        <Copy size={12} />
-                        基于此创建新版本
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setRevertTarget(d)}>
-                        <RotateCcw size={12} />
-                        退回草稿
-                      </Button>
-                    </>
                   )}
                   <Button size="sm" variant="ghost" onClick={() => duplicateDesign(d)}>
                     <Copy size={12} />
@@ -302,28 +265,6 @@ export default function DesignListPage() {
           })}
         </div>
       )}
-
-      {/* 退回草稿 · 二次确认 */}
-      <Modal
-        open={revertTarget !== null}
-        onClose={() => setRevertTarget(null)}
-        title="退回草稿？"
-        footer={
-          <>
-            <Button variant="ghost" size="sm" onClick={() => setRevertTarget(null)}>
-              取消
-            </Button>
-            <Button variant="danger" size="sm" onClick={doRevert}>
-              退回草稿
-            </Button>
-          </>
-        }
-      >
-        <p className="text-sm text-gray-600">
-          「{revertTarget?.title ?? '未命名设计'}」将解除冻结回到草稿状态，确认记录会被清除。
-          适用于顾客线下反悔的场景。
-        </p>
-      </Modal>
 
       {/* 删除 · 二次确认 */}
       <Modal

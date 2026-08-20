@@ -12,6 +12,7 @@ const wizard = read('src/app/pages/design/WizardPage.tsx');
 const app = read('src/app/App.tsx');
 const routes = read('src/app/routes.ts');
 const runtime = read('src/integration/community-studio/versioned-use-runtime.ts');
+const legacyRuntime = read('src/studio/wizard/consume-community-intent.ts');
 
 assert.match(routes, /designImport:\s*['"]\/studio\/design\/import['"]/);
 assert.match(app, /function DesignNewRoute\(\)/);
@@ -49,5 +50,6 @@ assert.match(wizard, /Legacy 近似应用/);
 assert.match(wizard, /sourceTemplateId/);
 assert.match(wizard, /assetVersion/);
 assert.match(wizard, /applicationLevel/);
+assert.match(legacyRuntime, /applyTemplate:\s*\(template, options\)[\s\S]*applyTemplate\(template, options\)/);
 
 console.log('[test:wizard-v0-7-2-import-routing] PASS');
