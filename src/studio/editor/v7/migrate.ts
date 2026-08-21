@@ -27,6 +27,7 @@ import type {
   SurfaceFinishTypeV7,
   VersionedRefV7,
 } from './model.ts';
+import { hasRichLegacyFrenchFieldsV1 } from './french-migration-v1.ts';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry.ts';
 import { parseEditorDocV7 } from './schema.ts';
 
@@ -42,6 +43,7 @@ export type EditorDocV7MigrationDiagnosticCode =
   | 'invalid_legacy_color'
   | 'unknown_layer_type'
   | 'unknown_element_kind'
+  | 'legacy_french_rich'
   | 'coordinate_conversion_unavailable'
   | 'asset_unresolved'
   | 'recipe_preserved_with_warning'
@@ -440,6 +442,19 @@ function convertFlatElement(
   }
 
   if (element.kind === 'french_edge') {
+    if (hasRichLegacyFrenchFieldsV1(element)) {
+      addDiagnostic(
+        context,
+        {
+          code: 'legacy_french_rich',
+          path,
+          severity: 'warning',
+          message: 'Rich V3/V6 French payload cannot be flattened into V7 french_edge; retained as migration evidence.',
+        },
+        { kind: 'element', path, sourceId, value: element },
+      );
+      return null;
+    }
     const color = parseHexColor(element.color);
     const widthRatio = element.widthRatio;
     const curvature = element.curvature;
