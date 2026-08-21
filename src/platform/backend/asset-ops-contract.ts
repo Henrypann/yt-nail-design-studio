@@ -83,7 +83,6 @@ export interface GeneratedAssetCandidateV1 {
     rollbackRef?: string;
   };
 }
-
 export type GeneratedAssetPromotionGateV1 =
   | { ok: true; eligibility: 'VERSIONED_READY' }
   | { ok: false; eligibility: Exclude<AssetProductEligibilityV1, 'VERSIONED_READY'>; reasons: string[] };
@@ -190,4 +189,3 @@ export function evaluateGeneratedAssetPromotionV1(candidate: GeneratedAssetCandi
     reasons,
   };
 }
-
