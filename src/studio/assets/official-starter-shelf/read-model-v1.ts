@@ -55,6 +55,19 @@ function strings(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(string) && new Set(value).size === value.length;
 }
 
+export function parseOfficialStarterShelfEntryV1(value: unknown): OfficialStarterShelfEntryV1 | null {
+  const entry = object(value);
+  if (!entry || !exactKeys(entry, ENTRY_KEYS) || !string(entry.assetId) || !string(entry.displayName) || !string(entry.evidenceTier)
+    || !strings(entry.candidateOnlyLabels) || entry.candidateOnlyLabels.length !== 3
+    || !entry.candidateOnlyLabels.includes('CANDIDATE_ONLY') || !entry.candidateOnlyLabels.includes('RIGHTS_PENDING') || !entry.candidateOnlyLabels.includes('PROMOTION_BLOCKED')
+    || !['CONCEPT', 'SIMULATED'].includes(entry.lifecycleStatus as string) || !Number.isInteger(entry.sortOrder)
+    || entry.rightsStatus !== 'PENDING' || entry.promotionStatus !== 'BLOCKED'
+    || !['UNVERIFIED', 'CONCEPT_ONLY'].includes(entry.capabilityStatus as string)
+    || !strings(entry.blockingCodes) || !entry.blockingCodes.includes('RIGHTS_EVIDENCE_MISSING') || !entry.blockingCodes.includes('PROMOTION_NOT_AUTHORIZED')
+    || !string(entry.renderTemplateId) || !string(entry.thumbnailUrl)) return null;
+  return entry as unknown as OfficialStarterShelfEntryV1;
+}
+
 function candidateRecord(ledger: GovernanceLedgerV1, assetId: string): GovernanceRecordV1 | null {
   return ledger.records.find((record) => record.subjectType === 'MATERIAL_TEMPLATE' && record.subjectId === assetId) ?? null;
 }
@@ -113,6 +126,7 @@ export function createOfficialStarterShelfReadModelV1(input: {
   }
   if (seen.size !== STARTER_SHELF_CANDIDATE_IDS.length || entries.length !== STARTER_SHELF_CANDIDATE_IDS.length) return null;
   entries.sort((a, b) => a.sortOrder - b.sortOrder || a.assetId.localeCompare(b.assetId));
+  entries.forEach((entry, index) => { entry.sortOrder = index; });
   const visibleEntries = petalVeilEnabled ? entries : entries.filter((entry) => entry.assetId !== 't_petal_veil_french');
   return {
     schemaVersion: OFFICIAL_STARTER_SHELF_SCHEMA,
@@ -134,17 +148,10 @@ export function parseOfficialStarterShelfReadModelV1(value: unknown): OfficialSt
     || summary.visibleCount !== (flags.petalVeilEnabled ? 10 : 9) || raw.entries.length !== summary.visibleCount) return null;
   const seen = new Set<string>();
   for (const candidate of raw.entries) {
-    const entry = object(candidate);
-    if (!entry || !exactKeys(entry, ENTRY_KEYS) || !string(entry.assetId) || seen.has(entry.assetId)
+    const entry = parseOfficialStarterShelfEntryV1(candidate);
+    if (!entry || seen.has(entry.assetId)
       || !STARTER_SHELF_CANDIDATE_IDS.includes(entry.assetId as typeof STARTER_SHELF_CANDIDATE_IDS[number])
-      || !string(entry.displayName) || !string(entry.evidenceTier) || !strings(entry.candidateOnlyLabels)
-      || entry.candidateOnlyLabels.length !== 3 || new Set(entry.candidateOnlyLabels).size !== 3
-      || !entry.candidateOnlyLabels.includes('CANDIDATE_ONLY') || !entry.candidateOnlyLabels.includes('RIGHTS_PENDING')
-      || !entry.candidateOnlyLabels.includes('PROMOTION_BLOCKED') || !Number.isFinite(entry.sortOrder as number)
-      || !['CONCEPT', 'SIMULATED'].includes(entry.lifecycleStatus as string) || entry.rightsStatus !== 'PENDING'
-      || entry.promotionStatus !== 'BLOCKED' || !['UNVERIFIED', 'CONCEPT_ONLY'].includes(entry.capabilityStatus as string)
-      || !strings(entry.blockingCodes) || !entry.blockingCodes.includes('RIGHTS_EVIDENCE_MISSING')
-      || !entry.blockingCodes.includes('PROMOTION_NOT_AUTHORIZED') || !string(entry.renderTemplateId) || !string(entry.thumbnailUrl)) return null;
+    ) return null;
     if (entry.assetId === 't_petal_veil_french' && !flags.petalVeilEnabled) return null;
     seen.add(entry.assetId);
   }

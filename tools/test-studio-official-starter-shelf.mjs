@@ -36,7 +36,7 @@ assert.equal(enabled.summary.candidateDatasetCount, 10);
 assert.equal(enabled.summary.visibleCount, 10);
 assert.ok(enabled.entries.some((entry) => entry.assetId === 't_petal_veil_french'));
 assert.deepEqual(enabled.entries.map((entry) => entry.assetId), expectedCandidateOrder);
-assert.deepEqual(enabled.entries.map((entry) => entry.sortOrder), expectedCandidateOrder.map((id) => materialIndex.templates.find((entry) => entry.id === id).sort_order));
+assert.deepEqual(enabled.entries.map((entry) => entry.sortOrder), expectedCandidateOrder.map((_, index) => index));
 assert.deepEqual(enabled, createOfficialStarterShelfReadModelV1({ materialIndex, governanceLedger: ledger, petalVeilEnabled: true }));
 assert.ok(!enabled.entries.some((entry) => entry.assetId.startsWith('look:')));
 
@@ -71,6 +71,12 @@ assert.equal(parseOfficialStarterShelfReadModelV1(missingPetalLabel), null, 'Pet
 const missingRightsBlocker = clone(enabled);
 missingRightsBlocker.entries[0].blockingCodes = ['PROMOTION_NOT_AUTHORIZED'];
 assert.equal(parseOfficialStarterShelfReadModelV1(missingRightsBlocker), null, 'missing rights blocker fails closed');
+const fractionalSortOrder = clone(enabled);
+fractionalSortOrder.entries[0].sortOrder = 0.5;
+assert.equal(parseOfficialStarterShelfReadModelV1(fractionalSortOrder), null, 'fractional sort order fails closed');
+const nanSortOrder = clone(enabled);
+nanSortOrder.entries[0].sortOrder = Number.NaN;
+assert.equal(parseOfficialStarterShelfReadModelV1(nanSortOrder), null, 'NaN sort order fails closed');
 const disabledReplacement = clone(disabled);
 disabledReplacement.entries[0].assetId = 't_petal_veil_french';
 assert.equal(parseOfficialStarterShelfReadModelV1(disabledReplacement), null, 'disabled replacement/omission fails closed');
