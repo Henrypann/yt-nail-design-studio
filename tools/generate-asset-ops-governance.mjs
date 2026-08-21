@@ -4,33 +4,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const GOVERNANCE_SCHEMA = 'asset-ops-governance-v1';
-export const LIFECYCLE_STATUSES = Object.freeze(['REAL', 'CONCEPT', 'SIMULATED']);
-export const RIGHTS_STATUSES = Object.freeze(['PENDING', 'DECLARED', 'CLEARED', 'REJECTED']);
-export const CAPABILITY_STATUSES = Object.freeze(['UNVERIFIED', 'CONCEPT_ONLY']);
-export const PROMOTION_STATUSES = Object.freeze(['BLOCKED']);
+import {
+  EXPECTED_LOOK_IDS,
+  EXPECTED_TEMPLATE_IDS,
+  GOVERNANCE_SCHEMA,
+  LIFECYCLE_STATUSES,
+  parseGovernanceLedgerV1,
+} from '../src/platform/backend/asset-ops-governance-v1.ts';
+export { parseGovernanceLedgerV1 } from '../src/platform/backend/asset-ops-governance-v1.ts';
 
-const TEMPLATE_COUNT = 21;
-const LOOK_COUNT = 4;
+const TEMPLATE_COUNT = EXPECTED_TEMPLATE_IDS.length;
+const LOOK_COUNT = EXPECTED_LOOK_IDS.length;
 const FINGERS = ['L1', 'L2', 'L3', 'L4', 'L5', 'R1', 'R2', 'R3', 'R4', 'R5'];
 const SHAPES = ['almond', 'oval', 'coffin', 'squoval', 'round', 'square', 'stiletto'];
-const EXPECTED_TEMPLATE_IDS = new Set([
-  't_petal_pearl_bloom_simulated', 't_mercury_dew_concept', 't_pearl_tide_shell_concept', 't_micro_coquette_concept',
-  't_starfish_bloom_elegance_concept', 't_sea_glass_chrome_concept', 't_sunset_aura_glaze_concept',
-  't_liquid_chrome_statement_concept', 't_butter_glaze_quiet_concept', 't_liquid_velvet_cat_eye',
-  't_petal_veil_french', 't_french_white', 't_nude_gradient', 't_cat_eye_nude', 't_y2k_ice',
-  't_dark_gradient', 't_chrome_mirror', 't_checkerboard', 't_3d_waterdrop', 't_classic_high_gloss', 't_holiday_glitter',
-]);
-const EXPECTED_LOOK_IDS = new Set(['leopard-gilded-nude', 'crimson-reliquary', 'ivory-lace-crystal', 'honey-petal-glass']);
-const ROOT_KEYS = ['architectureBaseline', 'generatedFrom', 'records', 'schemaVersion', 'summary'];
-const RECORD_KEYS = [
-  'blockingCodes', 'capabilityEvidenceRefs', 'capabilityStatus', 'completeness',
-  'evidenceTier', 'lifecycleStatus', 'limitations', 'manifestRefs', 'promotionStatus',
-  'recordId', 'rightsEvidenceRefs', 'rightsStatus', 'sourceRefs', 'specRefs', 'subjectId', 'subjectType',
-];
-const COMPLETENESS_KEYS = ['binaries', 'manifest', 'source', 'spec', 'structure'];
-const COMPLETENESS_VALUES = new Set(['PRESENT', 'MISSING', 'DECLARED', 'UNKNOWN']);
-const SUMMARY_KEYS = ['lookCount', 'promotionBlockedCount', 'rightsPendingCount', 'templateCount'];
 
 function fail(message) {
   throw new Error(`ASSET-OPS-02 fail-closed: ${message}`);
@@ -188,48 +174,6 @@ function lookRecord(rootDir, entry) {
   };
 }
 
-export function parseGovernanceLedgerV1(value) {
-  const raw = object(value);
-  if (!raw || !exactKeys(raw, ROOT_KEYS) || raw.schemaVersion !== GOVERNANCE_SCHEMA || raw.architectureBaseline !== 'v0.7.2'
-    || !Array.isArray(raw.generatedFrom) || !raw.generatedFrom.every(string) || !Array.isArray(raw.records)) return null;
-  const summary = object(raw.summary);
-  if (!summary || !exactKeys(summary, SUMMARY_KEYS) || !SUMMARY_KEYS.every((key) => Number.isInteger(summary[key]) && summary[key] >= 0)) return null;
-  if (raw.records.length !== TEMPLATE_COUNT + LOOK_COUNT) return null;
-  const seen = new Set();
-  const templateIds = new Set();
-  const lookIds = new Set();
-  let templateCount = 0;
-  let lookCount = 0;
-  for (const record of raw.records) {
-    if (!object(record) || !exactKeys(record, RECORD_KEYS) || !string(record.recordId) || seen.has(record.recordId)) return null;
-    seen.add(record.recordId);
-    if (!string(record.subjectId) || !['MATERIAL_TEMPLATE', 'LOOK_ASSET_PACK'].includes(record.subjectType)
-      || !safeStatus(record.lifecycleStatus, LIFECYCLE_STATUSES) || !strings(record.sourceRefs) || !strings(record.specRefs) || !strings(record.manifestRefs)
-      || !safeStatus(record.rightsStatus, RIGHTS_STATUSES) || !strings(record.rightsEvidenceRefs)
-      || !safeStatus(record.capabilityStatus, CAPABILITY_STATUSES) || !strings(record.capabilityEvidenceRefs)
-      || !safeStatus(record.promotionStatus, PROMOTION_STATUSES) || !strings(record.blockingCodes) || !strings(record.limitations)
-      || !string(record.evidenceTier)) return null;
-    const expectedRecordId = `${record.subjectType === 'MATERIAL_TEMPLATE' ? 'template' : 'look'}:${record.subjectId}`;
-    if (record.recordId !== expectedRecordId) return null;
-    if (record.subjectType === 'MATERIAL_TEMPLATE') templateCount += 1;
-    else lookCount += 1;
-    if (record.subjectType === 'MATERIAL_TEMPLATE') templateIds.add(record.subjectId);
-    else lookIds.add(record.subjectId);
-    if (record.rightsStatus !== 'PENDING' && record.rightsEvidenceRefs.length === 0) return null;
-    // Both UNVERIFIED and CONCEPT_ONLY are deliberately allowed with an empty
-    // evidence list: the ledger must not invent capability proof.
-    if (record.promotionStatus !== 'BLOCKED') return null;
-    const completeness = object(record.completeness);
-    if (!completeness || !exactKeys(completeness, COMPLETENESS_KEYS) || !COMPLETENESS_KEYS.every((key) => COMPLETENESS_VALUES.has(completeness[key]))) return null;
-  }
-  if (templateIds.size !== EXPECTED_TEMPLATE_IDS.size || [...EXPECTED_TEMPLATE_IDS].some((id) => !templateIds.has(id))) return null;
-  if (lookIds.size !== EXPECTED_LOOK_IDS.size || [...EXPECTED_LOOK_IDS].some((id) => !lookIds.has(id))) return null;
-  if (templateCount !== summary.templateCount || lookCount !== summary.lookCount
-    || summary.rightsPendingCount !== raw.records.filter((record) => record.rightsStatus === 'PENDING').length
-    || summary.promotionBlockedCount !== raw.records.filter((record) => record.promotionStatus === 'BLOCKED').length) return null;
-  return structuredClone(value);
-}
-
 export function generateAssetOpsGovernance({ rootDir = process.cwd() } = {}) {
   const index = readJson(path.join(rootDir, 'material-library/index.json'), 'material index');
   const lookIndex = readJson(path.join(rootDir, 'assets/hero-recipes/v0-7-2-four-look-sets.json'), 'Look index');
@@ -238,9 +182,9 @@ export function generateAssetOpsGovernance({ rootDir = process.cwd() } = {}) {
   const templateIds = index.templates.map((entry) => entry?.id);
   const lookIds = lookIndex.entries.map((entry) => entry?.lookId);
   if (templateIds.some((id) => !string(id)) || new Set(templateIds).size !== TEMPLATE_COUNT
-    || templateIds.some((id) => !EXPECTED_TEMPLATE_IDS.has(id))) fail('template IDs must exactly match governed subject set');
+    || templateIds.some((id) => !EXPECTED_TEMPLATE_IDS.includes(id))) fail('template IDs must exactly match governed subject set');
   if (lookIds.some((id) => !string(id)) || new Set(lookIds).size !== LOOK_COUNT
-    || lookIds.some((id) => !EXPECTED_LOOK_IDS.has(id))) fail('Look IDs must exactly match governed subject set');
+    || lookIds.some((id) => !EXPECTED_LOOK_IDS.includes(id))) fail('Look IDs must exactly match governed subject set');
   const knownIds = new Set(templateIds);
   const records = [
     ...index.templates.map((entry) => templateRecord(rootDir, entry, knownIds)),
