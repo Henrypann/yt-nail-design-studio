@@ -42,7 +42,7 @@
     "test:community-v7-1-publish-approval:e2e": "node tools/walkthrough-community-v7-1-publish-approval.mjs",
     "test:gen-v7-1-backend-ports": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-gen-v7-1-04-backend-ports.mjs",
     "test:asset-ops-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-asset-ops-contract.mjs",
-    "generate:asset-ops-inventory": "node tools/generate-asset-ops-inventory.mjs --output evidence/pr-asset-gen-01/asset-ops-inventory-v1.json",
+    "generate:asset-ops-inventory": "node tools/generate-asset-ops-inventory.mjs --output evidence/pr-asset-gen-02/asset-ops-inventory-v1-post-migration.json",
     "test:asset-ops-inventory": "node tools/test-asset-ops-inventory.mjs",
     "test:gen-v7-1-04-backend-ports": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-gen-v7-1-04-backend-ports.mjs",
     "test:geometry-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-contract-v0-7-2.mjs",

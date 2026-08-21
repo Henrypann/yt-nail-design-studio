@@ -171,7 +171,7 @@ def check_templates() -> None:
             f"{sorted(template_shape_ids)}"
         )
     templates = index.get("templates", [])
-    canonical_templates = [t for t in templates if t.get("asset_status", "REAL") == "REAL"]
+    canonical_templates = [t for t in templates if t.get("asset_status") == "REAL"]
     concept_templates = [t for t in templates if t.get("asset_status") == "CONCEPT"]
     simulated_templates = [t for t in templates if t.get("asset_status") == "SIMULATED"]
     if len(canonical_templates) != EXPECTED_CANONICAL_TEMPLATE_COUNT:
@@ -237,7 +237,9 @@ def check_templates() -> None:
         if not re.fullmatch(r"#[0-9A-Fa-f]{6}", t.get("default_base_color", "")):
             err(f"{tid}: default_base_color 非法: {t.get('default_base_color')}")
 
-        asset_status = t.get("asset_status", "REAL")
+        if "asset_status" not in t:
+            err(f"{tid}: 必须显式声明 asset_status，禁止默认按 REAL 处理")
+        asset_status = t.get("asset_status")
         if asset_status not in {"REAL", "CONCEPT", "SIMULATED"}:
             err(f"{tid}: asset_status 必须为 REAL、CONCEPT 或 SIMULATED")
         if asset_status in {"CONCEPT", "SIMULATED"}:
@@ -247,7 +249,7 @@ def check_templates() -> None:
                 err(f"{tid}: {asset_status} 必须指向已注册基础模板，或声明自己的候选 Renderer")
             elif render_template_id != tid:
                 render_target = next((item for item in templates if item.get("id") == render_template_id), None)
-                if render_target and render_target.get("asset_status", "REAL") != "REAL":
+                if render_target and render_target.get("asset_status") != "REAL":
                     err(f"{tid}: render_template_id 必须指向 REAL 模板")
             spec_url = str(t.get("asset_spec_url", ""))
             if not spec_url or not (ROOT / spec_url.lstrip("/")).exists():
