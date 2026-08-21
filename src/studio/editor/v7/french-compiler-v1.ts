@@ -25,9 +25,11 @@ import {
   type ParsedNailPathV7,
 } from './flat-vector.ts';
 import {
+  FRENCH_EXACT_GEOMETRY_KEYS_V1,
   FRENCH_GOLDEN_FINGER_V1,
   FRENCH_SIGNED_LENGTHS_V1,
   FRENCH_SIGNED_SHAPES_V1,
+  FRENCH_VIEWBOX_KEYS_V1,
   isCanonicalSingleClosedNailPathV1,
   sha256Hex,
   type FrenchExactGeometryV1,
@@ -60,6 +62,15 @@ export const FRENCH_CONTOUR_MAX_POINTS_V1 = 2048;
 export const FRENCH_WING_ON_CONTOUR_TOLERANCE_V1 = 4e-4;
 /** Unit-interval polynomial root isolation for analytic Bezier × horizontal-line hits. */
 export const FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 = 1e-12;
+/** canvasCenterU must equal (0 - viewBox.x) / viewBox.width within this named tight bound. */
+export const FRENCH_CANVAS_CENTER_U_TOLERANCE_V1 = 1e-9;
+/**
+ * Generated smile-boundary samples must stay inside or on the exact contour.
+ * Bound covers adaptive flattening (1e-4) plus 5-decimal serialization slack.
+ */
+export const FRENCH_BOUNDARY_CONTAINMENT_TOLERANCE_V1 = 5e-4;
+/** Bounded samples per smile-boundary segment for the independent containment walk. */
+export const FRENCH_BOUNDARY_CONTAINMENT_SAMPLES_V1 = 48;
 
 export const FRENCH_EXACT_KEY_KIND_CACHE_V1 = 'french-path-cache-v1';
 export const FRENCH_EXACT_KEY_KIND_BINDING_V1 = 'french-path-binding-v1';
@@ -74,6 +85,8 @@ export const FRENCH_EXACT_KEY_FIELDS_V1 = [
   'finger',
   'registryAssetSetSha256',
   'contourIdentity',
+  'viewBox',
+  'canvasCenterU',
 ] as const;
 
 const UNIT_EPS = 1e-12;
@@ -89,6 +102,8 @@ export type FrenchPathDiagnosticCodeV1 =
   | 'geometry_not_exact'
   | 'contour_invalid'
   | 'wing_off_contour'
+  | 'center_off_contour'
+  | 'boundary_outside_contour'
   | 'non_drawable_boundary'
   | 'non_drawable_fill'
   | 'coordinates_out_of_range'
@@ -102,10 +117,16 @@ export interface FrenchPathDiagnosticV1 {
   message: string;
 }
 
+/**
+ * Derived projection of recipe-managed French geometry. Payloads are locked
+ * because recipe parameters are the only authoring truth. FRENCH-03 must
+ * replace fill/outline atomically via French-specific commands; generic
+ * vector editing is not authorized.
+ */
 export interface FrenchProjectedVectorShapeV1 {
   kind: 'vector_shape';
   visible: true;
-  locked: false;
+  locked: true;
   opacity: number;
   transform: Transform2DV7;
   pathData: string;
@@ -130,6 +151,8 @@ export interface FrenchPathCacheIdentityV1 {
   finger: FingerCode;
   registryAssetSetSha256: string;
   contourIdentity: string;
+  viewBox: FrenchViewBoxV1;
+  canvasCenterU: number;
   cacheKey: string;
   bindingKey: string;
 }
@@ -209,6 +232,32 @@ function isSafeStableIdentity(value: unknown): value is string {
   return true;
 }
 
+function hasOwn(value: Record<string, unknown>, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function unknownOrMissingKeys(
+  value: Record<string, unknown>,
+  expected: readonly string[],
+  pathPrefix: string,
+): FrenchPathDiagnosticV1[] {
+  const diagnostics: FrenchPathDiagnosticV1[] = [];
+  const expectedSet = new Set(expected);
+  for (const key of Object.keys(value)) {
+    if (!expectedSet.has(key)) {
+      const path = pathPrefix ? `${pathPrefix}.${key}` : key;
+      diagnostics.push(diagnostic('geometry_not_exact', path, `unknown exact-geometry key ${key}`));
+    }
+  }
+  for (const key of expected) {
+    if (!hasOwn(value, key)) {
+      const path = pathPrefix ? `${pathPrefix}.${key}` : key;
+      diagnostics.push(diagnostic('geometry_not_exact', path, `missing exact-geometry key ${key}`));
+    }
+  }
+  return diagnostics;
+}
+
 function isFinitePositiveViewBox(value: unknown): value is FrenchViewBoxV1 {
   if (!isRecord(value)) return false;
   const x = value.x;
@@ -218,6 +267,23 @@ function isFinitePositiveViewBox(value: unknown): value is FrenchViewBoxV1 {
   return [x, y, width, height].every((item) => typeof item === 'number' && Number.isFinite(item))
     && (width as number) > 0
     && (height as number) > 0;
+}
+
+export function canonicalFrenchNumberKeyV1(value: number): string {
+  return value.toFixed(12);
+}
+
+export function canonicalFrenchViewBoxKeyV1(viewBox: FrenchViewBoxV1): string {
+  return [
+    canonicalFrenchNumberKeyV1(viewBox.x),
+    canonicalFrenchNumberKeyV1(viewBox.y),
+    canonicalFrenchNumberKeyV1(viewBox.width),
+    canonicalFrenchNumberKeyV1(viewBox.height),
+  ].join(',');
+}
+
+export function expectedCanvasCenterUFromViewBoxV1(viewBox: FrenchViewBoxV1): number {
+  return (0 - viewBox.x) / viewBox.width;
 }
 
 /**
@@ -232,6 +298,10 @@ export function validateFrenchExactGeometryTrustBoundaryV1(geometry: unknown): F
   const push = (code: FrenchPathDiagnosticCodeV1, path: string, message: string): void => {
     diagnostics.push(diagnostic(code, path, message));
   };
+  diagnostics.push(...unknownOrMissingKeys(geometry, FRENCH_EXACT_GEOMETRY_KEYS_V1, ''));
+  if (isRecord(geometry.viewBox)) {
+    diagnostics.push(...unknownOrMissingKeys(geometry.viewBox, FRENCH_VIEWBOX_KEYS_V1, 'viewBox'));
+  }
 
   if (geometry.fidelity !== 'exact' || geometry.evidence !== 'signed_off' || geometry.manufacturingValidated !== false) {
     push('geometry_not_exact', 'geometry', 'compiler accepts only exact signed_off geometry with manufacturingValidated=false');
@@ -266,6 +336,17 @@ export function validateFrenchExactGeometryTrustBoundaryV1(geometry: unknown): F
   }
   if (typeof geometry.canvasCenterU !== 'number' || !Number.isFinite(geometry.canvasCenterU) || geometry.canvasCenterU < 0 || geometry.canvasCenterU > 1) {
     push('geometry_not_exact', 'canvasCenterU', 'canvasCenterU must be finite within [0, 1]');
+  } else if (isFinitePositiveViewBox(geometry.viewBox)) {
+    const expectedCenterU = expectedCanvasCenterUFromViewBoxV1(geometry.viewBox);
+    if (!Number.isFinite(expectedCenterU) || expectedCenterU < 0 || expectedCenterU > 1) {
+      push('geometry_not_exact', 'canvasCenterU', 'viewBox-derived canvasCenterU must stay inside finite [0, 1]');
+    } else if (Math.abs(geometry.canvasCenterU - expectedCenterU) > FRENCH_CANVAS_CENTER_U_TOLERANCE_V1) {
+      push(
+        'geometry_not_exact',
+        'canvasCenterU',
+        `canvasCenterU must equal (0 - viewBox.x) / viewBox.width within ${FRENCH_CANVAS_CENTER_U_TOLERANCE_V1}`,
+      );
+    }
   }
   if (typeof geometry.contourPathData !== 'string') {
     push('contour_invalid', 'contourPathData', 'contourPathData must be a canonical single closed subpath');
@@ -696,6 +777,100 @@ function minV(points: readonly NailPointV7[]): number {
   return Math.min(...points.map((item) => item.v));
 }
 
+function evenOddContains(polyline: readonly NailPointV7[], p: ContourPoint): boolean {
+  const count = segmentCount(polyline);
+  let inside = false;
+  for (let i = 0; i < count; i += 1) {
+    const a = polyline[i];
+    const b = polyline[i + 1] ?? polyline[0];
+    if ((a.v > p.v) !== (b.v > p.v)) {
+      const denom = b.v - a.v;
+      if (Math.abs(denom) > UNIT_EPS) {
+        const xIntersect = a.u + ((p.v - a.v) * (b.u - a.u)) / denom;
+        if (p.u < xIntersect) inside = !inside;
+      }
+    }
+  }
+  return inside;
+}
+
+function minDistToPolyline(polyline: readonly NailPointV7[], target: ContourPoint): number {
+  let best = Number.POSITIVE_INFINITY;
+  const count = segmentCount(polyline);
+  for (let i = 0; i < count; i += 1) {
+    const a = polyline[i];
+    const b = polyline[i + 1] ?? polyline[0];
+    const dx = b.u - a.u;
+    const dy = b.v - a.v;
+    const len2 = dx * dx + dy * dy;
+    const t = len2 < UNIT_EPS * UNIT_EPS
+      ? 0
+      : Math.min(1, Math.max(0, ((target.u - a.u) * dx + (target.v - a.v) * dy) / len2));
+    best = Math.min(best, Math.hypot(target.u - (a.u + t * dx), target.v - (a.v + t * dy)));
+  }
+  return best;
+}
+
+function isInsideOrOnContour(
+  polyline: readonly NailPointV7[],
+  p: ContourPoint,
+  tolerance: number,
+): boolean {
+  if (minDistToPolyline(polyline, p) <= tolerance) return true;
+  return evenOddContains(polyline, p);
+}
+
+function evalCubicRaw(
+  p0: ContourPoint,
+  p1: ContourPoint,
+  p2: ContourPoint,
+  p3: ContourPoint,
+  t: number,
+): ContourPoint {
+  const mt = 1 - t;
+  return {
+    u: mt * mt * mt * p0.u + 3 * mt * mt * t * p1.u + 3 * mt * t * t * p2.u + t * t * t * p3.u,
+    v: mt * mt * mt * p0.v + 3 * mt * mt * t * p1.v + 3 * mt * t * t * p2.v + t * t * t * p3.v,
+  };
+}
+
+function evalLineRaw(p0: ContourPoint, p1: ContourPoint, t: number): ContourPoint {
+  return { u: p0.u + (p1.u - p0.u) * t, v: p0.v + (p1.v - p0.v) * t };
+}
+
+function sampleSmileBoundary(
+  commands: ParsedNailPathV7['commands'],
+  samplesPerSegment: number,
+): ContourPoint[] | null {
+  const points: ContourPoint[] = [];
+  let current: ContourPoint | null = null;
+  for (const { command, values } of commands) {
+    if (command === 'M') {
+      current = { u: values[0], v: values[1] };
+      points.push(current);
+    } else if (command === 'L') {
+      if (!current) return null;
+      const next = { u: values[0], v: values[1] };
+      for (let step = 1; step <= samplesPerSegment; step += 1) {
+        points.push(evalLineRaw(current, next, step / samplesPerSegment));
+      }
+      current = next;
+    } else if (command === 'C') {
+      if (!current) return null;
+      const c1 = { u: values[0], v: values[1] };
+      const c2 = { u: values[2], v: values[3] };
+      const next = { u: values[4], v: values[5] };
+      for (let step = 1; step <= samplesPerSegment; step += 1) {
+        points.push(evalCubicRaw(current, c1, c2, next, step / samplesPerSegment));
+      }
+      current = next;
+    } else {
+      return null;
+    }
+  }
+  return points.length > 0 ? points : null;
+}
+
 function serializeCommands(commands: ParsedNailPathV7['commands']): string | null {
   for (const { values } of commands) {
     for (const value of values) {
@@ -735,6 +910,8 @@ function lengthPrefixedExactKeyPayload(
     finger: geometry.finger,
     registryAssetSetSha256: geometry.registryAssetSetSha256,
     contourIdentity: geometry.contourIdentity,
+    viewBox: canonicalFrenchViewBoxKeyV1(geometry.viewBox),
+    canvasCenterU: canonicalFrenchNumberKeyV1(geometry.canvasCenterU),
   };
   return FRENCH_EXACT_KEY_FIELDS_V1
     .map((key) => {
@@ -746,7 +923,10 @@ function lengthPrefixedExactKeyPayload(
 
 export function frenchExactKeyPreimageV1(
   kind: typeof FRENCH_EXACT_KEY_KIND_CACHE_V1 | typeof FRENCH_EXACT_KEY_KIND_BINDING_V1,
-  geometry: Pick<FrenchExactGeometryV1, 'assetId' | 'revision' | 'finger' | 'registryAssetSetSha256' | 'contourIdentity'>,
+  geometry: Pick<
+    FrenchExactGeometryV1,
+    'assetId' | 'revision' | 'finger' | 'registryAssetSetSha256' | 'contourIdentity' | 'viewBox' | 'canvasCenterU'
+  >,
   parameterSerialization: string,
 ): string {
   return lengthPrefixedExactKeyPayload(kind, geometry as FrenchExactGeometryV1, parameterSerialization);
@@ -768,6 +948,13 @@ function cacheIdentity(
     finger: geometry.finger,
     registryAssetSetSha256: geometry.registryAssetSetSha256,
     contourIdentity: geometry.contourIdentity,
+    viewBox: {
+      x: geometry.viewBox.x,
+      y: geometry.viewBox.y,
+      width: geometry.viewBox.width,
+      height: geometry.viewBox.height,
+    },
+    canvasCenterU: geometry.canvasCenterU,
     cacheKey,
     bindingKey,
   };
@@ -797,10 +984,14 @@ export function enumerateFrenchGoldenBindingsV1(): readonly FrenchGoldenBindingV
 
 /**
  * Pure compiler. Inputs are not mutated. Outline is a separate stroke-only
- * smile-line; the closed fill path is never stroked.
+ * smile-line; the closed fill path is never stroked. Derived fill/outline
+ * payloads are locked recipe-managed projections. FRENCH-03 must replace them
+ * atomically via French-specific commands; generic vector editing is not
+ * authorized.
  *
  * This function is a runtime trust boundary: forged exact objects, unsafe
- * identities, SHA drift, and non-canonical contours fail closed.
+ * identities, SHA drift, viewBox/center incoherence, contour-incompatible
+ * recipes, and non-canonical contours fail closed.
  */
 export function compileFrenchPathV1(
   geometry: FrenchExactGeometryV1,
@@ -840,6 +1031,29 @@ export function compileFrenchPathV1(
   const center = point(geometry.canvasCenterU, canonicalParameters.centerV);
   if (!left || !right || !center) {
     return unavailable([diagnostic('coordinates_out_of_range', 'anchors', 'compiled anchors must stay inside finite [0, 1]')]);
+  }
+
+  const centerUs = uniqueSorted(segments.flatMap((segment) => analyticUsAtV(segment, canonicalParameters.centerV)));
+  if (centerUs.length < 2) {
+    return unavailable([
+      diagnostic(
+        'center_off_contour',
+        'centerV',
+        `center horizontal section at v=${canonicalParameters.centerV} must intersect the signed exact contour`,
+      ),
+    ]);
+  }
+  const sectionMinU = Math.min(...centerUs);
+  const sectionMaxU = Math.max(...centerUs);
+  if (geometry.canvasCenterU < sectionMinU - FRENCH_WING_ON_CONTOUR_TOLERANCE_V1
+    || geometry.canvasCenterU > sectionMaxU + FRENCH_WING_ON_CONTOUR_TOLERANCE_V1) {
+    return unavailable([
+      diagnostic(
+        'center_off_contour',
+        'canvasCenterU',
+        `canvasCenterU=${geometry.canvasCenterU} must lie inside the center horizontal section [${sectionMinU}, ${sectionMaxU}]`,
+      ),
+    ]);
   }
 
   const flattened = flattenExactContour(segments);
@@ -905,6 +1119,25 @@ export function compileFrenchPathV1(
         },
       ];
 
+  const sampledBoundary = sampleSmileBoundary(boundaryCommands, FRENCH_BOUNDARY_CONTAINMENT_SAMPLES_V1);
+  if (!sampledBoundary) {
+    return unavailable([diagnostic('non_drawable_boundary', 'boundaryPathData', 'smile-line boundary could not be sampled for containment')]);
+  }
+  for (const sample of sampledBoundary) {
+    if (!Number.isFinite(sample.u) || !Number.isFinite(sample.v)) {
+      return unavailable([diagnostic('coordinates_out_of_range', 'boundaryPathData', 'smile-line boundary samples must stay finite')]);
+    }
+    if (!isInsideOrOnContour(flattened, sample, FRENCH_BOUNDARY_CONTAINMENT_TOLERANCE_V1)) {
+      return unavailable([
+        diagnostic(
+          'boundary_outside_contour',
+          'boundaryPathData',
+          `smile-line boundary exits the exact contour at u=${sample.u} v=${sample.v} (tolerance=${FRENCH_BOUNDARY_CONTAINMENT_TOLERANCE_V1})`,
+        ),
+      ]);
+    }
+  }
+
   const fillCommands: ParsedNailPathV7['commands'] = [
     ...boundaryCommands,
     ...capFromRight.slice(1).map((item) => ({ command: 'L' as const, values: [item.u, item.v] })),
@@ -933,7 +1166,7 @@ export function compileFrenchPathV1(
   const fill: FrenchProjectedVectorShapeV1 = {
     kind: 'vector_shape',
     visible: true,
-    locked: false,
+    locked: true,
     opacity: 1,
     transform: structuredClone(transform),
     pathData: fillPathData,
@@ -943,7 +1176,7 @@ export function compileFrenchPathV1(
     ? {
         kind: 'vector_shape',
         visible: true,
-        locked: false,
+        locked: true,
         opacity: 1,
         transform: structuredClone(transform),
         pathData: boundaryPathData,

@@ -26,6 +26,26 @@ export const FRENCH_SIGNED_SHAPES_V1 = ['almond', 'oval', 'coffin'] as const;
 export const FRENCH_SIGNED_LENGTHS_V1 = ['short', 'medium', 'long', 'extra-long'] as const;
 export const FRENCH_GOLDEN_FINGER_V1 = 'L1' as const;
 
+/** Frozen exact-key set of a runtime `FrenchExactGeometryV1` object. Unknown keys fail closed. */
+export const FRENCH_EXACT_GEOMETRY_KEYS_V1 = [
+  'coordinateSpace',
+  'finger',
+  'assetId',
+  'revision',
+  'shape',
+  'length',
+  'registryAssetSetSha256',
+  'contourPathData',
+  'contourIdentity',
+  'viewBox',
+  'canvasCenterU',
+  'fidelity',
+  'evidence',
+  'manufacturingValidated',
+] as const;
+
+export const FRENCH_VIEWBOX_KEYS_V1 = ['x', 'y', 'width', 'height'] as const;
+
 const FINGER_SET = new Set<string>(FINGER_CODES);
 const FULL_SHA256 = /^[0-9a-f]{64}$/;
 const PATH_TOKEN = /[MLCQHVZASTmlcqhvzast]|[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g;

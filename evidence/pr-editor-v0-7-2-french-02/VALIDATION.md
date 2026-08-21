@@ -3,18 +3,21 @@
 Date: 2026-08-21
 Branch: `codex/w34-studio-french-track`
 Checkpoint: FRENCH-02 pure exact-geometry French path compiler
-HEAD at start of this hardening pass: `040fad3`
+HEAD at start of this hardening pass: `edd2ddd`
+
+Status: **IN PROGRESS / prototype**. Codex rendered and reviewed the 60/60 SVG matrix on 2026-08-21, but post-fix red-team review still found open registry-tuple binding and cache-precision defects. Product/Design/Nail Expert human sign-off has not happened. This checkpoint remains software geometry / prototype evidence only.
 
 ## Scope verified
 
 - Strict exact geometry adapter `resolveExactFrenchGeometryInputV1(GeometryRefV7, FingerCode, expectedRegistrySha256)` calls the existing `resolveEditorGeometryV7` resolver. It accepts only `status=resolved`, `fidelity=exact`, `evidence=signed_off`, and a full 64-character product registry SHA that equals the returned digest.
 - Generated, placeholder, fallback, unknown, 1-character revision drift, wrong finger, truncated SHA, and wrong SHA are `unavailable`. Shape and length are taken from the registry entry, never inferred from `assetId`.
-- Registry silhouette `viewBox`/`path` convert to canonical canvas/viewBox-local `nail-local-v1` with `u=(x-vbX)/vbW` and `v=(y-vbY)/vbH`. Mapping is not renormalized to sampled contour extrema. The adapter accepts only finite absolute SVG `M/C/Q/L/Z` plus explicitly converted `H/V`; relative commands, `A/S/T`, malformed tokens, open/non-drawable paths, a second `M`, and multiple subpaths fail closed. Canonical output reuses the V7-07 nail-local parser/serializer and must remain a single closed subpath.
-- Pure `compileFrenchPathV1` is a runtime trust boundary, not TypeScript-only. Before compile it validates: real `FINGER_CODE`, signed shape/length sets, `registryAssetSetSha256 === PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7`, `contourIdentity === sha256Hex(contourPathData)`, finite `canvasCenterU` in `[0, 1]`, finite positive viewBox, stable non-empty `assetId`/`revision` without control chars, reserved separators (`|@\\/:=#`), or `latest`, and a canonical single closed contour. Forged exact objects fail closed with visible diagnostics.
-- Source contour is the exact signed Bezier. Smile-line wings are analytic unit-interval intersections of that exact curve. The derived tip cap is a deterministic adaptive de Casteljau flattening with `flatnessTolerance=1e-4`, `maxSubdivisionDepth=12`, `maxPoints=2048`, and fail-closed overflow. Wing-on-contour tolerance is `4e-4`. This is software-geometry exactness only; it is not physical or manufacturing exactness.
-- Tests compare compiler wings and derived cap points to an independent 256-sample + bisection reference, not a copy of the compiler sampler.
-- Cache/binding keys are SHA-256 of a length-prefixed canonical exact-key payload. Structured `cacheIdentity` still exposes compiler revision, recipe id/revision, canonical parameters, asset id/revision, finger, full registry SHA, and full contour SHA. Both key preimages include all of those identities. Raw pipe-delimited keys are gone. Cross-finger keys remain distinct. Reserved-delimiter injection and contour/registry SHA drift fail closed.
-- 60 golden cases = signed shapes `almond/oval/coffin` × 4 lengths × 5 default presets, representative finger `L1`. 600 bindings = those 60 × all 10 `FINGER_CODES` resolved through `resolveSignedProductGeometryRefV7`. Machine-readable `golden-manifest.json` is sorted; 60 SVG review images live under `svg/`.
+- Registry silhouette `viewBox`/`path` convert to canonical canvas/viewBox-local `nail-local-v1` with `u=(x-vbX)/vbW` and `v=(y-vbY)/vbH`. Mapping is not renormalized to sampled contour extrema. The adapter accepts only finite absolute SVG `M/C/Q/L/Z` plus explicitly converted `H/V`; relative commands, `A/S/T`, malformed tokens, open/non-drawable paths, a second `M`, multiple subpaths, empty paths, incomplete numbers, and commands after `Z` fail closed. Canonical output reuses the V7-07 nail-local parser/serializer and must remain a single closed subpath.
+- Pure `compileFrenchPathV1` is a runtime trust boundary, not TypeScript-only. Before compile it validates: the exact runtime key set of `FrenchExactGeometryV1` with no unknown keys, real `FINGER_CODE`, signed shape/length sets, `registryAssetSetSha256 === PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7`, `contourIdentity === sha256Hex(contourPathData)`, finite positive viewBox with exact `x/y/width/height` keys, `canvasCenterU` finite in `[0, 1]` and equal to `(0 - viewBox.x) / viewBox.width` within `FRENCH_CANVAS_CENTER_U_TOLERANCE_V1=1e-9`, stable non-empty `assetId`/`revision` without control chars, reserved separators (`|@\\/:=#`), or `latest`, and a canonical single closed contour. Forged exact objects fail closed with visible diagnostics.
+- Source contour is the exact signed Bezier. Smile-line wings are analytic unit-interval intersections of that exact curve. The center horizontal section must intersect the contour, and `canvasCenterU` must lie inside that section. The derived tip cap is a deterministic adaptive de Casteljau flattening with `flatnessTolerance=1e-4`, `maxSubdivisionDepth=12`, `maxPoints=2048`, and fail-closed overflow. Wing-on-contour tolerance is `4e-4`. The entire generated smile boundary is sampled with a bounded `48` samples/segment walk and must stay inside or on the exact contour under `boundaryContainmentTolerance=5e-4`. A contract-valid custom recipe may still be contour-incompatible; coffin/short/L1 custom smooth `leftWingV=0.04 centerV=0.02 rightWingV=0.04` is rejected (`center_off_contour`, because `centerV=0.02` does not intersect that contour). This is software-geometry exactness only; it is not physical or manufacturing exactness.
+- Derived fill and outline `vector_shape` payloads are `locked=true` and ID-free. Recipe parameters remain the only authoring truth. FRENCH-03 must replace those projections atomically via French-specific commands; generic vector editing is not authorized.
+- Tests compare compiler wings, derived cap points, and smile-boundary containment to an independent 256-sample + bisection / even-odd oracle, not a copy of the compiler sampler or adaptive flattener.
+- Cache/binding keys are SHA-256 of a length-prefixed canonical exact-key payload. Structured `cacheIdentity` exposes compiler revision, recipe id/revision, canonical parameters, asset id/revision, finger, full registry SHA, full contour SHA, canonical viewBox, and `canvasCenterU`. Both key preimages include all of those identities. Center/viewBox drift is rejected when incoherent, and changes keys when coherent; same-key/different-output is not allowed.
+- 60 golden cases = signed shapes `almond/oval/coffin` × 4 lengths × 5 default presets, representative finger `L1`. 600 bindings = those 60 × all 10 `FINGER_CODES` resolved through `resolveSignedProductGeometryRefV7`. The 600 bindings are property evidence, not visually signed golden. Machine-readable `golden-manifest.json` is sorted; 60 SVG review images live under `svg/`. Default/`--check` compares independently computed current bytes with committed evidence and does not write. Only explicit `--update` may overwrite. Per-file `sha256`/`byteLength` plus a collection digest of those file records are stored; the digest does not recursively hash itself. No reviewer approval is stored.
 
 ## Codex-discovered defects and fixes
 
@@ -27,27 +30,55 @@ HEAD at start of this hardening pass: `040fad3`
 | Raw pipe-delimited `cacheKey`/`bindingKey` were ambiguous (`params` serialization already contains `\|`) and injectable | Length-prefixed canonical payload hashed with SHA-256; both keys include revision/SHA/contour/finger identities |
 | Test asserted `assetId` contains `shape`, mixing registry truth with filename-like ids | Removed; shape/length are trusted only from registry output |
 | Missing forged-geometry coverage | Negative tests for invalid finger, mismatched shape/length, wrong product registry SHA, contourIdentity mismatch, invalid viewBox/center, multiple subpaths, noncanonical path, unsafe asset/revision, reserved delimiters, and SHA drift |
+| `canvasCenterU` was only range-checked in `[0, 1]`, so viewBox/center drift could keep the same cache key while changing compiled output | Require `canvasCenterU === (0 - viewBox.x) / viewBox.width` within `1e-9`; put canonical viewBox and `canvasCenterU` in structured cache identity and both key preimages; reject unknown geometry keys |
+| Contract-valid custom recipes could still draw a smile that exits a specific contour | Require the center horizontal section to exist and contain `canvasCenterU`; bounded smile-boundary containment with `5e-4` tolerance; reject coffin/short/L1 `0.04/0.02/0.04` (this fixture currently fails closed at `center_off_contour` because `centerV=0.02` does not intersect that contour) |
+| Derived `vector_shape` payloads were `locked=false`, which would authorize generic vector editing | Set fill and outline `locked=true`; no IDs; recipe remains authoring truth |
+| Golden generator self-certified by always writing evidence | Default/`--check` is non-mutating and compares committed bytes; only `--update` writes; missing/extra/stale SVG and byte drift fail closed |
+| Parser/test matrix was incomplete | Table-test accepted absolute `M/L/C/Q` plus `H/V` conversion; reject absolute `A/S/T`, every relative `m/l/c/q/h/v/z`, incomplete, empty/open, second `M`, two closed subpaths, and `Z` followed by commands |
+| No schema compatibility evidence for locked ID-free projections | Test-only IDs materialize fill/optional outline into a blank EditorDocV7 `flat_design` step; `parseEditorDocV7` succeeds and `locked=true` survives. Compatibility evidence only, not store/history/UI integration |
+
+## Numeric tolerances
+
+| Name | Value | Role |
+|---|---|---|
+| `FRENCH_CONTOUR_FLATNESS_TOLERANCE_V1` | `1e-4` | Adaptive cap flattening chord-to-curve bound |
+| `FRENCH_CONTOUR_MAX_SUBDIVISION_DEPTH_V1` | `12` | de Casteljau split budget; overflow fails closed |
+| `FRENCH_CONTOUR_MAX_POINTS_V1` | `2048` | Flattened vertex cap; overflow fails closed |
+| `FRENCH_WING_ON_CONTOUR_TOLERANCE_V1` | `4e-4` | Analytic wing insertion / on-contour check |
+| `FRENCH_ANALYTIC_ROOT_TOLERANCE_V1` | `1e-12` | Unit-interval Bezier × horizontal-line roots |
+| `FRENCH_CANVAS_CENTER_U_TOLERANCE_V1` | `1e-9` | `canvasCenterU` vs `(0 - viewBox.x) / viewBox.width` |
+| `FRENCH_BOUNDARY_CONTAINMENT_TOLERANCE_V1` | `5e-4` | Smile-boundary inside-or-on exact contour |
+| `FRENCH_BOUNDARY_CONTAINMENT_SAMPLES_V1` | `48` | Bounded samples per smile-boundary segment |
+| Independent oracle match bound | `5e-4` | 256-sample + bisection test oracle; not a copy of the compiler |
 
 ## Automated gates
 
 | Gate | Result |
 |---|---|
-| `npm run test:editor-v7-french-compiler` | PASS — 60 golden exact, 600 unique hashed bindings, H/V convert, second-M reject, fail-closed forgeries, independent contour oracle, deterministic bytes, separate outline stroke |
+| `npm run test:editor-v7-french-compiler` | PASS — 60 golden exact, 600 unique hashed bindings, parser matrix, center/viewBox key coherence, locked projections, coffin/short custom reject, custom/asymmetric/range-edge across 3×4, schema parity, independent containment oracle |
 | `npm run test:editor-v7-french-contract` | PASS |
 | `npm run test:editor-v7-french-migration` | PASS |
+| `npm run test:editor-v7-contract` | PASS |
 | `npm run typecheck` | PASS |
+| `npm run check:editor-v7-french-golden` | PASS — non-mutating; committed manifest + 60 SVG bytes match independently computed outputs; collection digest `71883b7f45415ff05473a07dc8ec09f98c1209522d0aa0d27c9d72f78224efc8` |
+| `npm run update:editor-v7-french-golden` then `npm run check:editor-v7-french-golden` | PASS — digest stable across update and two subsequent checks |
+| `npm run build` | PASS — existing Vite chunk-size warning only |
+| `npm run build:integration` | PASS — existing Vite chunk-size warning only |
 | `git diff --check` | PASS |
-| `npm run generate:editor-v7-french-golden` (twice, byte-stable) | PASS — 60 SVG + sorted `golden-manifest.json`; second run identical SHA-256 |
+
+`npm run generate:editor-v7-french-golden` is an alias of the non-mutating check. It does not write evidence.
 
 ## Exact compiler gates
 
 - 60/60 golden compiles are `fidelity=exact` and `manufacturingValidated=false`.
-- 600/600 bindings are exact, with 600 unique binding keys and 600 unique cache keys.
+- 600/600 bindings are exact, with 600 unique binding keys and 600 unique cache keys. They are property evidence, not visually signed golden.
 - Same input yields identical bytes; compiler does not mutate geometry or parameters.
 - All compiled coordinates are finite and inside `[0, 1]`.
 - Fill path is closed and drawable; boundary path is drawable and not closed.
-- Analytic wings match an independent higher-precision reference within `5e-4`. Derived cap vertices stay within that bound of the exact source contour. Smooth centers are closer to the canvas tip edge than both wings; pointed centers are closer to the canvas root edge than both wings.
-- Negative cases fail closed: wrong finger, 1-character revision drift, truncated/wrong SHA, unknown asset, generated square, malformed path, relative path, second `M`, forged exact objects, reserved-delimiter identity injection, and contour/registry SHA drift.
+- Fill and outline projections are `locked=true` and contain no IDs.
+- Analytic wings match an independent higher-precision reference within `5e-4`. Derived cap vertices stay within that bound of the exact source contour. Smooth centers are closer to the canvas tip edge than both wings, with G1 tangent continuity at center. Pointed centers are closer to the canvas root edge than both wings, and pointed output contains only `M/L` commands.
+- Valid custom/asymmetric/`balanceLocked=false` and range-edge recipes compile across all 3 signed shapes and 4 lengths.
+- Negative cases fail closed: wrong finger, 1-character revision drift, truncated/wrong SHA, unknown asset, generated square, malformed path, relative path, second `M`, forged exact objects, reserved-delimiter identity injection, contour/registry SHA drift, unknown geometry keys, incoherent `canvasCenterU`/viewBox, and contour-incompatible custom recipes including coffin/short/L1 `0.04/0.02/0.04`.
 
 ## Acceptance limits
 
@@ -55,8 +86,9 @@ This checkpoint is software geometry / prototype evidence only. It is not visual
 
 - EditorDocV7 / `schemaVersion: 7` remains frozen. The corrected `FrenchRecipeSpecV1` at `1c97f04` remains the sole parameter truth.
 - No Editor UI, store command, history, preview, PBR, material projection, release, import, use, or approval integration is included.
-- 60 SVG review images are deterministic algorithm dumps for later Product/Design/Nail Expert sign-off. Passing compiler tests is not that sign-off.
+- Schema parity materialization is compatibility evidence only. It does not authorize generic vector editing or FRENCH-03 integration.
+- 60 SVG review images are deterministic algorithm dumps. Codex rendered all 60 into three shape contact sheets and checked preset ordering, contour containment, clipping, symmetry/wing continuity, and pointed-versus-smooth form; 60/60 passed this software visual review. This is not Product/Design/Nail Expert human sign-off, and `golden-manifest.json` correctly keeps `visualSignoff: false`.
 - `manufacturingValidated` is always `false`. SVG, path bytes, and cache hashes are derived views, not manufacturing artifacts.
 - Exact source Bezier plus a deterministically flattened cap does not imply physical or manufacturing exactness.
 
-Evidence tier: local compiler/prototype tests. FRENCH-02 stays `IN PROGRESS` until the 60/60 visual matrix is independently signed off.
+Evidence tier: local compiler/prototype tests plus Codex software visual review. FRENCH-02 remains `IN PROGRESS` until the registry-tuple binding and cache-precision defects are fixed and re-reviewed; owner human visual sign-off remains a pre-merge/product-acceptance gate.
