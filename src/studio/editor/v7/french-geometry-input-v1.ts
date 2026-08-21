@@ -48,11 +48,27 @@ export const FRENCH_VIEWBOX_KEYS_V1 = ['x', 'y', 'width', 'height'] as const;
 
 const FINGER_SET = new Set<string>(FINGER_CODES);
 const FULL_SHA256 = /^[0-9a-f]{64}$/;
-const PATH_TOKEN = /[MLCQHVZASTmlcqhvzast]|[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g;
+const PATH_NUMBER = /^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/;
 const PATH_ALLOWED = /^[\s,MLCQHVZASTmlcqhvzast0-9eE.+-]+$/;
+const PATH_COMMAND_CHAR = /[MLCQHVZASTmlcqhvzast]/;
 const ABSOLUTE_ARITY: Record<string, number> = { M: 2, L: 2, Q: 4, C: 6, H: 1, V: 1, Z: 0 };
 const RELATIVE_COMMANDS = new Set(['m', 'l', 'c', 'q', 'h', 'v', 'z', 'a', 's', 't']);
 const UNSUPPORTED_ABSOLUTE = new Set(['A', 'S', 'T']);
+const FRENCH_EXACT_SCALAR_COMPARE_KEYS_V1 = [
+  'coordinateSpace',
+  'finger',
+  'assetId',
+  'revision',
+  'shape',
+  'length',
+  'registryAssetSetSha256',
+  'contourPathData',
+  'contourIdentity',
+  'canvasCenterU',
+  'fidelity',
+  'evidence',
+  'manufacturingValidated',
+] as const;
 
 export type FrenchSignedShapeV1 = (typeof FRENCH_SIGNED_SHAPES_V1)[number];
 export type FrenchSignedLengthV1 = (typeof FRENCH_SIGNED_LENGTHS_V1)[number];
@@ -71,7 +87,8 @@ export type FrenchGeometryUnavailableReasonV1 =
   | 'open_path'
   | 'non_drawable_path'
   | 'viewbox_invalid'
-  | 'coordinates_out_of_range';
+  | 'coordinates_out_of_range'
+  | 'registry_mismatch';
 
 export interface FrenchGeometryDiagnosticV1 {
   code: FrenchGeometryUnavailableReasonV1;
@@ -158,8 +175,98 @@ export function parseSilhouetteViewBoxV1(viewBox: string): FrenchViewBoxV1 | nul
   return { x, y, width, height };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 function isCommandToken(token: string): boolean {
-  return token.length === 1 && /[MLCQHVZASTmlcqhvzast]/.test(token);
+  return token.length === 1 && PATH_COMMAND_CHAR.test(token);
+}
+
+function isPathWhitespace(ch: string): boolean {
+  return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r' || ch === '\f';
+}
+
+function readPathNumberAt(input: string, index: number): string | null {
+  const match = input.slice(index).match(PATH_NUMBER);
+  return match ? match[0] : null;
+}
+
+/**
+ * Strict SVG path tokenizer. Commas may separate numeric pairs; leading,
+ * trailing, repeated (including whitespace-separated), command-adjacent, and
+ * pre-command commas are rejected. Valid `10,10` / `10, 10` pairs remain accepted.
+ */
+export function tokenizeStrictAbsoluteSvgPathV1(input: string): string[] | null {
+  const tokens: string[] = [];
+  let index = 0;
+  let lastKind: 'start' | 'command' | 'number' | 'comma' = 'start';
+
+  while (index < input.length) {
+    while (index < input.length && isPathWhitespace(input[index])) index += 1;
+    if (index >= input.length) break;
+    const ch = input[index];
+    if (ch === ',') {
+      if (lastKind !== 'number') return null;
+      lastKind = 'comma';
+      index += 1;
+      continue;
+    }
+    if (isCommandToken(ch)) {
+      if (lastKind === 'comma') return null;
+      tokens.push(ch);
+      lastKind = 'command';
+      index += 1;
+      continue;
+    }
+    const number = readPathNumberAt(input, index);
+    if (!number) return null;
+    tokens.push(number);
+    lastKind = 'number';
+    index += number.length;
+  }
+  if (lastKind === 'comma' || lastKind === 'start' || tokens.length === 0) return null;
+  return tokens;
+}
+
+function sameFiniteNumber(left: unknown, right: unknown): boolean {
+  return typeof left === 'number' && typeof right === 'number' && Object.is(left, right);
+}
+
+function diffSuppliedAgainstCanonicalExactGeometryV1(
+  supplied: Record<string, unknown>,
+  canonical: FrenchExactGeometryV1,
+): FrenchGeometryDiagnosticV1[] {
+  const diagnostics: FrenchGeometryDiagnosticV1[] = [];
+  const mismatch = (path: string, message: string): void => {
+    diagnostics.push({ code: 'registry_mismatch', path, message });
+  };
+
+  for (const key of FRENCH_EXACT_SCALAR_COMPARE_KEYS_V1) {
+    const suppliedValue = supplied[key];
+    const canonicalValue = canonical[key];
+    if (typeof canonicalValue === 'number') {
+      if (!sameFiniteNumber(suppliedValue, canonicalValue)) {
+        mismatch(key, `supplied ${key} does not equal canonical registry ${key}`);
+      }
+      continue;
+    }
+    if (suppliedValue !== canonicalValue) {
+      mismatch(key, `supplied ${key} does not equal canonical registry ${key}`);
+    }
+  }
+
+  const suppliedBox = supplied.viewBox;
+  if (!isRecord(suppliedBox)) {
+    mismatch('viewBox', 'supplied viewBox does not equal canonical registry viewBox');
+    return diagnostics;
+  }
+  for (const key of FRENCH_VIEWBOX_KEYS_V1) {
+    if (!sameFiniteNumber(suppliedBox[key], canonical.viewBox[key])) {
+      mismatch(`viewBox.${key}`, `supplied viewBox.${key} does not equal canonical registry viewBox.${key}`);
+    }
+  }
+  return diagnostics;
 }
 
 function readNumbers(tokens: string[], index: number, count: number): { values: number[]; next: number } | null {
@@ -178,7 +285,7 @@ function readNumbers(tokens: string[], index: number, count: number): { values: 
 
 /**
  * Strict absolute SVG subset: M/C/Q/L/Z plus H/V converted to L.
- * Relative commands, A/S/T, malformed tokens, and open paths fail closed.
+ * Relative commands, A/S/T, malformed tokens, illegal commas, and open paths fail closed.
  */
 export function canonicalizeSilhouetteToNailLocalV1(
   viewBox: string,
@@ -193,8 +300,8 @@ export function canonicalizeSilhouetteToNailLocalV1(
   if (!PATH_ALLOWED.test(input)) {
     return canonicalizeFail('malformed_path', 'pathD', 'silhouette path contains unsupported characters');
   }
-  const tokens = input.match(PATH_TOKEN);
-  if (!tokens || tokens.join('') !== input.replace(/[\s,]/g, '')) {
+  const tokens = tokenizeStrictAbsoluteSvgPathV1(input);
+  if (!tokens) {
     return canonicalizeFail('malformed_path', 'pathD', 'silhouette path tokenization is not exact');
   }
 
@@ -422,6 +529,62 @@ export function resolveExactFrenchGeometryInputV1(
       manufacturingValidated: false,
     },
   };
+}
+
+/**
+ * Runtime registry-tuple rebind. `{assetId, revision, finger, registryAssetSetSha256}`
+ * is resolved through `resolveEditorGeometryV7` + `canonicalizeSilhouetteToNailLocalV1`
+ * (via `resolveExactFrenchGeometryInputV1`). The supplied exact geometry must then
+ * match that canonical registry output field-for-field. Shape/length are never
+ * inferred from assetId filenames. A forged almond tuple with another signed
+ * contour and a recomputed public SHA fails closed.
+ */
+export function rebindFrenchExactGeometryToCanonicalRegistryV1(
+  geometry: unknown,
+): FrenchGeometryInputResultV1 {
+  if (!isRecord(geometry)) {
+    return fail('fallback', 'geometry', 'registry rebind requires a finite exact geometry object');
+  }
+  const assetId = geometry.assetId;
+  const revision = geometry.revision;
+  const finger = geometry.finger;
+  const registryAssetSetSha256 = geometry.registryAssetSetSha256;
+  if (typeof assetId !== 'string' || assetId.length === 0 || typeof revision !== 'string' || revision.length === 0) {
+    return fail('unknown_asset', 'assetId', 'registry rebind requires non-empty assetId and revision strings');
+  }
+  if (typeof finger !== 'string' || !FINGER_SET.has(finger)) {
+    return fail('wrong_finger', 'finger', 'registry rebind requires a real V7 FINGER_CODE');
+  }
+  if (typeof registryAssetSetSha256 !== 'string' || !FULL_SHA256.test(registryAssetSetSha256)) {
+    return fail('wrong_sha', 'registryAssetSetSha256', 'registry rebind requires a full 64-character lowercase hex digest');
+  }
+
+  const resolved = resolveExactFrenchGeometryInputV1(
+    { assetId, revision },
+    finger as FingerCode,
+    registryAssetSetSha256,
+  );
+  if (!resolved.ok) {
+    if (resolved.reason === 'wrong_finger') {
+      return fail('wrong_finger', 'finger', resolved.diagnostics[0]?.message ?? 'finger does not match the registry tuple');
+    }
+    if (resolved.reason === 'revision_drift') {
+      return fail('revision_drift', 'revision', resolved.diagnostics[0]?.message ?? 'revision does not match the registry tuple');
+    }
+    return resolved;
+  }
+
+  const diagnostics = diffSuppliedAgainstCanonicalExactGeometryV1(geometry, resolved.geometry);
+  if (diagnostics.length > 0) {
+    return {
+      ok: false,
+      fidelity: 'unavailable',
+      reason: 'registry_mismatch',
+      diagnostics,
+      manufacturingValidated: false,
+    };
+  }
+  return { ok: true, geometry: resolved.geometry };
 }
 
 const SHA256_K = new Uint32Array([

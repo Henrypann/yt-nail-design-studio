@@ -37,6 +37,7 @@ import {
   FRENCH_VIEWBOX_KEYS_V1,
   isCanonicalSingleClosedNailPathV1,
   resolveExactFrenchGeometryInputV1,
+  rebindFrenchExactGeometryToCanonicalRegistryV1,
   sha256Hex,
 } from '../src/studio/editor/v7/french-geometry-input-v1.ts';
 import {
@@ -385,6 +386,8 @@ console.log('[french-compiler] identity constants: PASS');
     ['M/C', '0 0 100 100', 'M 10 10 C 10 40 90 40 90 10 L 90 90 L 10 90 Z'],
     ['M/Q', '0 0 100 100', 'M 10 10 Q 50 0 90 10 L 90 90 L 10 90 Z'],
     ['H/V convert', '0 0 100 100', 'M 10 10 H 90 V 90 H 10 Z'],
+    ['comma numeric pairs', '0 0 100 100', 'M 10,10 L 90,10 L 90,90 L 10,90 Z'],
+    ['comma-space numeric pairs', '0 0 100 100', 'M 10, 10 L 90, 10 L 90, 90 L 10, 90 Z'],
   ];
   for (const [label, viewBox, pathD] of accepted) {
     const result = canonicalizeSilhouetteToNailLocalV1(viewBox, pathD);
@@ -423,6 +426,12 @@ console.log('[french-compiler] accepted absolute M/L/C/Q plus H/V conversion: PA
     ['second M', 'malformed_path', 'M 10 10 L 90 10 M 20 20 L 80 80 L 80 90 L 20 90 Z'],
     ['two closed subpaths', 'malformed_path', 'M 10 10 L 90 10 L 90 90 L 10 90 Z M 20 20 L 80 20 L 80 80 L 20 80 Z'],
     ['Z followed by commands', 'malformed_path', 'M 10 10 L 90 10 L 90 90 L 10 90 Z L 20 20'],
+    ['leading comma', 'malformed_path', ',M 10 10 L 90 10 L 90 90 L 10 90 Z'],
+    ['trailing comma', 'malformed_path', 'M 10 10 L 90 10 L 90 90 L 10 90 Z,'],
+    ['double comma', 'malformed_path', 'M 10,,10 L 90 10 L 90 90 L 10 90 Z'],
+    ['whitespace-separated double comma', 'malformed_path', 'M 10, ,10 L 90 10 L 90 90 L 10 90 Z'],
+    ['comma after command', 'malformed_path', 'M,10 10 L 90 10 L 90 90 L 10 90 Z'],
+    ['comma before command', 'malformed_path', 'M 10 10,L 90 10 L 90 90 L 10 90 Z'],
   ];
   for (const [label, reason, pathD] of rejected) {
     const result = canonicalizeSilhouetteToNailLocalV1('0 0 100 100', pathD);
@@ -433,7 +442,7 @@ console.log('[french-compiler] accepted absolute M/L/C/Q plus H/V conversion: PA
   assert.equal(implicitLine.ok, true, implicitLine.ok ? '' : JSON.stringify(implicitLine.diagnostics));
   assert.equal(isCanonicalSingleClosedNailPathV1(implicitLine.pathData), true);
 }
-console.log('[french-compiler] rejected A/S/T, relative, incomplete, empty/open, second M, two subpaths, Z-then-commands: PASS');
+console.log('[french-compiler] rejected A/S/T, relative, incomplete, empty/open, second M, two subpaths, Z-then-commands, illegal commas: PASS');
 
 {
   const goldens = enumerateFrenchGoldenCasesV1();
@@ -798,24 +807,114 @@ console.log('[french-compiler] malformed/relative path and registry shape/length
 console.log('[french-compiler] forged exact objects and identity injection fail closed: PASS');
 
 {
-  const { geometry, compiled, parameters } = compileCase('almond', 'medium', 'classic', 'L1');
-  const deltaX = geometry.canvasCenterU <= 0.5 ? -1 : 1;
-  const coherent = forgeGeometry(geometry, {
-    viewBox: { ...geometry.viewBox, x: geometry.viewBox.x + deltaX },
+  const almond = compileCase('almond', 'medium', 'classic', 'L1');
+  const oval = compileCase('oval', 'medium', 'classic', 'L1');
+  assert.notEqual(almond.geometry.contourPathData, oval.geometry.contourPathData);
+  assert.notEqual(almond.geometry.contourIdentity, oval.geometry.contourIdentity);
+
+  const forgedCrossContour = forgeGeometry(almond.geometry, {
+    contourPathData: oval.geometry.contourPathData,
+    contourIdentity: sha256Hex(oval.geometry.contourPathData),
   });
-  coherent.canvasCenterU = expectedCanvasCenterUFromViewBoxV1(coherent.viewBox);
-  assert.ok(coherent.canvasCenterU >= 0 && coherent.canvasCenterU <= 1);
-  assert.ok(
-    Math.abs(coherent.canvasCenterU - expectedCanvasCenterUFromViewBoxV1(coherent.viewBox)) <= FRENCH_CANVAS_CENTER_U_TOLERANCE_V1,
-  );
-  const drifted = compileFrenchPathV1(coherent, parameters);
-  assert.equal(drifted.ok, true, drifted.ok ? '' : JSON.stringify(drifted.diagnostics));
-  assert.notEqual(drifted.fillPathData, compiled.fillPathData, 'center/viewBox drift must change compiled output');
-  assert.notEqual(drifted.cacheIdentity.cacheKey, compiled.cacheIdentity.cacheKey, 'center/viewBox drift must change cache key');
-  assert.notEqual(drifted.cacheIdentity.bindingKey, compiled.cacheIdentity.bindingKey, 'center/viewBox drift must change binding key');
-  assert.notEqual(drifted.anchors.center.u, compiled.anchors.center.u);
+  assert.equal(forgedCrossContour.contourIdentity, sha256Hex(forgedCrossContour.contourPathData));
+  assert.equal(forgedCrossContour.assetId, almond.geometry.assetId);
+  assert.equal(forgedCrossContour.revision, almond.geometry.revision);
+  assert.equal(forgedCrossContour.finger, almond.geometry.finger);
+  assert.equal(forgedCrossContour.registryAssetSetSha256, almond.geometry.registryAssetSetSha256);
+  const reboundCross = rebindFrenchExactGeometryToCanonicalRegistryV1(forgedCrossContour);
+  assert.equal(reboundCross.ok, false);
+  assert.equal(reboundCross.reason, 'registry_mismatch');
+  assert.ok(reboundCross.diagnostics.some((item) => item.path === 'contourPathData'));
+  assertRejected(compileFrenchPathV1(forgedCrossContour, almond.parameters), 'contourPathData', 'geometry_not_exact');
+
+  const driftedRevision = `${almond.geometry.revision.slice(0, -1)}${almond.geometry.revision.at(-1) === 'a' ? 'b' : 'a'}`;
+  const flippedSha = `${PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7.slice(0, -1)}${PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7.at(-1) === 'a' ? 'b' : 'a'}`;
+  const viewBoxDeltaX = almond.geometry.canvasCenterU <= 0.5 ? -1 : 1;
+  const driftedViewBox = { ...almond.geometry.viewBox, x: almond.geometry.viewBox.x + viewBoxDeltaX };
+  const registryDriftCases = [
+    ['contourPathData', forgeGeometry(almond.geometry, {
+      contourPathData: oval.geometry.contourPathData,
+      contourIdentity: sha256Hex(oval.geometry.contourPathData),
+    }), 'contourPathData'],
+    ['viewBox.x', forgeGeometry(almond.geometry, {
+      viewBox: driftedViewBox,
+      canvasCenterU: expectedCanvasCenterUFromViewBoxV1(driftedViewBox),
+    }), 'viewBox.x'],
+    ['canvasCenterU', forgeGeometry(almond.geometry, {
+      canvasCenterU: almond.geometry.canvasCenterU + 1e-12,
+    }), 'canvasCenterU'],
+    ['shape', forgeGeometry(almond.geometry, { shape: 'oval' }), 'shape'],
+    ['length', forgeGeometry(almond.geometry, { length: 'short' }), 'length'],
+    ['finger', forgeGeometry(almond.geometry, { finger: 'R1' }), 'finger'],
+    ['revision', forgeGeometry(almond.geometry, { revision: driftedRevision }), 'revision'],
+    ['registry SHA', forgeGeometry(almond.geometry, { registryAssetSetSha256: flippedSha }), 'registryAssetSetSha256'],
+  ];
+  for (const [label, forged, path] of registryDriftCases) {
+    assertRejected(compileFrenchPathV1(forged, almond.parameters), path, 'geometry_not_exact');
+    const rebound = rebindFrenchExactGeometryToCanonicalRegistryV1(forged);
+    if (label === 'registry SHA') {
+      assert.equal(rebound.ok, false, `${label} must fail closed`);
+      continue;
+    }
+    assert.equal(rebound.ok, false, `${label} must fail registry rebind`);
+    if (label !== 'revision' && label !== 'finger' && label !== 'registry SHA') {
+      assert.equal(rebound.reason, 'registry_mismatch', `${label} expected registry_mismatch, got ${rebound.reason}`);
+    }
+  }
 }
-console.log('[french-compiler] coherent viewBox/center drift changes keys, never same-key/different-output: PASS');
+console.log('[french-compiler] forged almond tuple + oval contour + recomputed SHA, plus registry field drift, fail closed: PASS');
+
+{
+  const { geometry, compiled, parameters } = compileCase('almond', 'medium', 'classic', 'L1');
+  const serialization = compiled.cacheIdentity.parameterSerialization;
+  const epsilon = 1e-13;
+  const driftedX = geometry.viewBox.x + epsilon;
+  assert.equal(Object.is(geometry.viewBox.x, driftedX), false, '1e-13 viewBox.x drift must be a distinct IEEE-754 value');
+
+  const coherentMicro = forgeGeometry(geometry, {
+    viewBox: { ...geometry.viewBox, x: driftedX },
+  });
+  coherentMicro.canvasCenterU = expectedCanvasCenterUFromViewBoxV1(coherentMicro.viewBox);
+  assert.ok(
+    Math.abs(coherentMicro.canvasCenterU - expectedCanvasCenterUFromViewBoxV1(coherentMicro.viewBox)) <= FRENCH_CANVAS_CENTER_U_TOLERANCE_V1,
+  );
+  assert.equal(
+    canonicalFrenchNumberKeyV1(geometry.viewBox.x) === canonicalFrenchNumberKeyV1(coherentMicro.viewBox.x),
+    false,
+    'distinct accepted IEEE-754 numbers must not collapse to the same cache number key',
+  );
+  assert.notEqual(canonicalFrenchNumberKeyV1(-0), canonicalFrenchNumberKeyV1(0));
+  assert.equal(canonicalFrenchNumberKeyV1(-0), '-0');
+  assert.equal(Number(canonicalFrenchNumberKeyV1(epsilon)), epsilon);
+  assert.notEqual(
+    canonicalFrenchNumberKeyV1(1),
+    canonicalFrenchNumberKeyV1(1 + Number.EPSILON),
+  );
+
+  const baseCachePreimage = frenchExactKeyPreimageV1(FRENCH_EXACT_KEY_KIND_CACHE_V1, geometry, serialization);
+  const baseBindingPreimage = frenchExactKeyPreimageV1(FRENCH_EXACT_KEY_KIND_BINDING_V1, geometry, serialization);
+  const driftedCachePreimage = frenchExactKeyPreimageV1(FRENCH_EXACT_KEY_KIND_CACHE_V1, coherentMicro, serialization);
+  const driftedBindingPreimage = frenchExactKeyPreimageV1(FRENCH_EXACT_KEY_KIND_BINDING_V1, coherentMicro, serialization);
+  assert.notEqual(baseCachePreimage, driftedCachePreimage);
+  assert.notEqual(baseBindingPreimage, driftedBindingPreimage);
+  assert.notEqual(sha256Hex(baseCachePreimage), sha256Hex(driftedCachePreimage));
+  assert.notEqual(sha256Hex(baseBindingPreimage), sha256Hex(driftedBindingPreimage));
+  assert.match(driftedCachePreimage, new RegExp(geometry.contourIdentity));
+  assert.match(driftedCachePreimage, new RegExp(geometry.finger));
+  assert.match(driftedCachePreimage, new RegExp(PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7));
+
+  const compiledMicro = compileFrenchPathV1(coherentMicro, parameters);
+  assert.equal(compiledMicro.ok, false, 'coherent 1e-13 viewBox/center drift must fail registry binding');
+  assert.equal(compiledMicro.fidelity, 'unavailable');
+  assert.ok(compiledMicro.diagnostics.some((item) => item.path === 'viewBox.x' || item.path === 'canvasCenterU'));
+
+  const coherentMacro = forgeGeometry(geometry, {
+    viewBox: { ...geometry.viewBox, x: geometry.viewBox.x + (geometry.canvasCenterU <= 0.5 ? -1 : 1) },
+  });
+  coherentMacro.canvasCenterU = expectedCanvasCenterUFromViewBoxV1(coherentMacro.viewBox);
+  assertRejected(compileFrenchPathV1(coherentMacro, parameters), 'viewBox.x', 'geometry_not_exact');
+}
+console.log('[french-compiler] collision-free numeric keys; coherent viewBox/center drift fails registry binding: PASS');
 
 {
   const { geometry } = compileCase('coffin', 'short', 'classic', 'L1');

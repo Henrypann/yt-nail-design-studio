@@ -31,6 +31,7 @@ import {
   FRENCH_SIGNED_SHAPES_V1,
   FRENCH_VIEWBOX_KEYS_V1,
   isCanonicalSingleClosedNailPathV1,
+  rebindFrenchExactGeometryToCanonicalRegistryV1,
   sha256Hex,
   type FrenchExactGeometryV1,
   type FrenchSignedLengthV1,
@@ -270,7 +271,12 @@ function isFinitePositiveViewBox(value: unknown): value is FrenchViewBoxV1 {
 }
 
 export function canonicalFrenchNumberKeyV1(value: number): string {
-  return value.toFixed(12);
+  if (!Number.isFinite(value)) {
+    if (Number.isNaN(value)) return 'NaN';
+    return value > 0 ? 'Infinity' : '-Infinity';
+  }
+  if (Object.is(value, -0)) return '-0';
+  return value.toString();
 }
 
 export function canonicalFrenchViewBoxKeyV1(viewBox: FrenchViewBoxV1): string {
@@ -289,6 +295,9 @@ export function expectedCanvasCenterUFromViewBoxV1(viewBox: FrenchViewBoxV1): nu
 /**
  * Runtime trust boundary. A TypeScript `FrenchExactGeometryV1` object is not
  * evidence; forged exact objects must fail closed with visible diagnostics.
+ * Structural allowlists and self-consistent contour SHA are not sufficient:
+ * compileFrenchPathV1 also rebinds `{assetId, revision, finger, registryAssetSetSha256}`
+ * to the static product registry before compile.
  */
 export function validateFrenchExactGeometryTrustBoundaryV1(geometry: unknown): FrenchPathDiagnosticV1[] {
   if (!isRecord(geometry)) {
@@ -991,7 +1000,10 @@ export function enumerateFrenchGoldenBindingsV1(): readonly FrenchGoldenBindingV
  *
  * This function is a runtime trust boundary: forged exact objects, unsafe
  * identities, SHA drift, viewBox/center incoherence, contour-incompatible
- * recipes, and non-canonical contours fail closed.
+ * recipes, non-canonical contours, and registry-tuple mismatches fail closed.
+ * `{assetId, revision, finger, registryAssetSetSha256}` is rebound to the
+ * static product registry and compared field-for-field with the supplied
+ * geometry before any path is compiled.
  */
 export function compileFrenchPathV1(
   geometry: FrenchExactGeometryV1,
@@ -999,6 +1011,12 @@ export function compileFrenchPathV1(
 ): FrenchPathCompileResultV1 {
   const trust = validateFrenchExactGeometryTrustBoundaryV1(geometry);
   if (trust.length > 0) return unavailable(trust);
+
+  const rebound = rebindFrenchExactGeometryToCanonicalRegistryV1(geometry);
+  if (!rebound.ok) {
+    return unavailable(rebound.diagnostics.map((item) => diagnostic('geometry_not_exact', item.path, item.message)));
+  }
+  const canonicalGeometry = rebound.geometry;
 
   const parsedParameters = parseFrenchRecipeParametersV1(parameters);
   if (!parsedParameters.ok) {
@@ -1009,9 +1027,9 @@ export function compileFrenchPathV1(
     })));
   }
   const canonicalParameters = parsedParameters.parameters;
-  const identity = cacheIdentity(geometry, parsedParameters.serialization);
+  const identity = cacheIdentity(canonicalGeometry, parsedParameters.serialization);
 
-  const parsedContour = parseNailPathDataV7(geometry.contourPathData);
+  const parsedContour = parseNailPathDataV7(canonicalGeometry.contourPathData);
   if (!parsedContour) {
     return unavailable([diagnostic('contour_invalid', 'contourPathData', 'exact geometry contour is not a closed drawable nail-local path')]);
   }
@@ -1028,7 +1046,7 @@ export function compileFrenchPathV1(
 
   const left = point(Math.min(...leftUs), canonicalParameters.leftWingV);
   const right = point(Math.max(...rightUs), canonicalParameters.rightWingV);
-  const center = point(geometry.canvasCenterU, canonicalParameters.centerV);
+  const center = point(canonicalGeometry.canvasCenterU, canonicalParameters.centerV);
   if (!left || !right || !center) {
     return unavailable([diagnostic('coordinates_out_of_range', 'anchors', 'compiled anchors must stay inside finite [0, 1]')]);
   }
@@ -1045,13 +1063,13 @@ export function compileFrenchPathV1(
   }
   const sectionMinU = Math.min(...centerUs);
   const sectionMaxU = Math.max(...centerUs);
-  if (geometry.canvasCenterU < sectionMinU - FRENCH_WING_ON_CONTOUR_TOLERANCE_V1
-    || geometry.canvasCenterU > sectionMaxU + FRENCH_WING_ON_CONTOUR_TOLERANCE_V1) {
+  if (canonicalGeometry.canvasCenterU < sectionMinU - FRENCH_WING_ON_CONTOUR_TOLERANCE_V1
+    || canonicalGeometry.canvasCenterU > sectionMaxU + FRENCH_WING_ON_CONTOUR_TOLERANCE_V1) {
     return unavailable([
       diagnostic(
         'center_off_contour',
         'canvasCenterU',
-        `canvasCenterU=${geometry.canvasCenterU} must lie inside the center horizontal section [${sectionMinU}, ${sectionMaxU}]`,
+        `canvasCenterU=${canonicalGeometry.canvasCenterU} must lie inside the center horizontal section [${sectionMinU}, ${sectionMaxU}]`,
       ),
     ]);
   }
