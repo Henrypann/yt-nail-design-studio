@@ -4,6 +4,17 @@
  * Persistence uses the existing RecipeInstanceV7 + ProcessStepV7.recipeInstanceId
  * extension point. Recipe parameters are the only authoring truth. This module
  * does not add EditorDocV7 fields, compile paths, or claim manufacturing validity.
+ *
+ * Smile-line anchors are canonical canvas/viewBox-local v coordinates:
+ * `u = (x - viewBox.x) / viewBox.width`, `v = (y - viewBox.y) / viewBox.height`.
+ * `v = 0` is the canvas tip edge; `v = 1` is the canvas root edge. These bounds
+ * are product-canvas bounds, never contour-extrema renormalization.
+ *
+ * `FRENCH_RECIPE_PRESETS_V1` is the five default preset IDs for the 60 golden
+ * matrix. Parser also accepts `preset='custom'`. Commands must set `custom`
+ * after geometry edits. Compiler geometry is driven by `variant` and the three
+ * anchors, never by the preset label. There is no persisted `tipWidth`; a future
+ * UI control may atomically edit the anchors instead of storing a second truth.
  */
 
 import type { RecipeInstanceV7, RecipeParameterValueV7 } from './model.ts';
@@ -13,10 +24,12 @@ export const FRENCH_RECIPE_REVISION_V1 = '1.0.0';
 export const FRENCH_RECIPE_DEFAULT_INSTANCE_ID_V1 = 'recipe.french-edge.v1';
 
 export const FRENCH_RECIPE_PRESETS_V1 = ['classic', 'micro', 'soft', 'deep', 'pointed'] as const;
+export const FRENCH_RECIPE_CUSTOM_PRESET_V1 = 'custom';
 export const FRENCH_RECIPE_VARIANTS_V1 = ['smooth', 'pointed'] as const;
 export const FRENCH_RECIPE_TRANSITION_MODES_V1 = ['crisp'] as const;
 
-export type FrenchRecipePresetV1 = (typeof FRENCH_RECIPE_PRESETS_V1)[number];
+export type FrenchRecipeDefaultPresetV1 = (typeof FRENCH_RECIPE_PRESETS_V1)[number];
+export type FrenchRecipePresetV1 = FrenchRecipeDefaultPresetV1 | typeof FRENCH_RECIPE_CUSTOM_PRESET_V1;
 export type FrenchRecipeVariantV1 = (typeof FRENCH_RECIPE_VARIANTS_V1)[number];
 export type FrenchRecipeTransitionModeV1 = (typeof FRENCH_RECIPE_TRANSITION_MODES_V1)[number];
 
@@ -24,52 +37,56 @@ export type FrenchRecipeTransitionModeV1 = (typeof FRENCH_RECIPE_TRANSITION_MODE
 export const FRENCH_RECIPE_PARAMETER_KEYS_V1 = [
   'preset',
   'variant',
-  'leftOffset',
-  'centerOffset',
-  'rightOffset',
-  'tipWidth',
+  'leftWingV',
+  'centerV',
+  'rightWingV',
   'fillColor',
   'fillOpacity',
   'balanceLocked',
   'outlineEnabled',
   'outlineColor',
-  'outlineWidth',
+  'outlineWidthMm',
   'transitionMode',
 ] as const;
 
 export type FrenchRecipeParameterKeyV1 = (typeof FRENCH_RECIPE_PARAMETER_KEYS_V1)[number];
 
 export interface FrenchRecipeParametersV1 {
+  /**
+   * Default-matrix identity or `custom` after user geometry edits.
+   * Compiler geometry ignores this label and uses variant + anchors.
+   */
   preset: FrenchRecipePresetV1;
   variant: FrenchRecipeVariantV1;
-  /** Nail-local v of the left wing. 0 = tip, 1 = root. */
-  leftOffset: number;
-  /** Nail-local v of the smile-line center. */
-  centerOffset: number;
-  /** Nail-local v of the right wing. */
-  rightOffset: number;
-  /** Tip band width as a nail-local ratio. */
-  tipWidth: number;
+  /** Canvas/viewBox-local v of the left wing. 0 = canvas tip edge, 1 = canvas root edge. */
+  leftWingV: number;
+  /** Canvas/viewBox-local v of the smile-line center. 0 = canvas tip edge, 1 = canvas root edge. */
+  centerV: number;
+  /** Canvas/viewBox-local v of the right wing. 0 = canvas tip edge, 1 = canvas root edge. */
+  rightWingV: number;
   /** Canonical `#rrggbb`. Opacity is a separate scalar. */
   fillColor: string;
   fillOpacity: number;
   balanceLocked: boolean;
   outlineEnabled: boolean;
   outlineColor: string;
-  outlineWidth: number;
+  /**
+   * Outline width in millimetres for a future V7 `vector_shape.strokeWidthMm`.
+   * Disabled outlines must be 0; enabled outlines must be at least 0.05.
+   */
+  outlineWidthMm: number;
   transitionMode: FrenchRecipeTransitionModeV1;
 }
 
 export const FRENCH_RECIPE_RANGES_V1 = Object.freeze({
-  offsetMin: 0.02,
-  offsetMax: 0.72,
-  offsetSeparationMin: 0.01,
-  tipWidthMin: 0.04,
-  tipWidthMax: 0.55,
+  vMin: 0.02,
+  vMax: 0.72,
+  vSeparationMin: 0.01,
   opacityMin: 0,
   opacityMax: 1,
-  outlineWidthMin: 0,
-  outlineWidthMax: 0.08,
+  outlineWidthMmMin: 0,
+  outlineWidthMmMax: 2,
+  outlineWidthMmEnabledMin: 0.05,
   numberDecimals: 6,
 });
 
@@ -103,87 +120,83 @@ const MAX_DIAGNOSTICS = 32;
 const INSTANCE_KEYS = ['instanceId', 'recipeId', 'recipeRevision', 'parameterValues'] as const;
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const HEX_PATTERN = /^#([0-9a-fA-F]{6})$/;
-const PRESET_SET = new Set<string>(FRENCH_RECIPE_PRESETS_V1);
+const DEFAULT_PRESET_SET = new Set<string>(FRENCH_RECIPE_PRESETS_V1);
+const PRESET_SET = new Set<string>([...FRENCH_RECIPE_PRESETS_V1, FRENCH_RECIPE_CUSTOM_PRESET_V1]);
 const VARIANT_SET = new Set<string>(FRENCH_RECIPE_VARIANTS_V1);
 const TRANSITION_SET = new Set<string>(FRENCH_RECIPE_TRANSITION_MODES_V1);
 const KEY_SET = new Set<string>(FRENCH_RECIPE_PARAMETER_KEYS_V1);
 
 type UnknownRecord = Record<string, unknown>;
 
-const PRESET_DEFAULTS_V1: Record<FrenchRecipePresetV1, FrenchRecipeParametersV1> = {
+const PRESET_DEFAULTS_V1: Record<FrenchRecipeDefaultPresetV1, FrenchRecipeParametersV1> = {
   classic: {
     preset: 'classic',
     variant: 'smooth',
-    leftOffset: 0.34,
-    centerOffset: 0.18,
-    rightOffset: 0.34,
-    tipWidth: 0.22,
+    leftWingV: 0.34,
+    centerV: 0.18,
+    rightWingV: 0.34,
     fillColor: '#fffdf9',
     fillOpacity: 1,
     balanceLocked: true,
     outlineEnabled: false,
     outlineColor: '#e8d8d0',
-    outlineWidth: 0,
+    outlineWidthMm: 0,
     transitionMode: 'crisp',
   },
   micro: {
     preset: 'micro',
     variant: 'smooth',
-    leftOffset: 0.18,
-    centerOffset: 0.1,
-    rightOffset: 0.18,
-    tipWidth: 0.14,
+    leftWingV: 0.18,
+    centerV: 0.1,
+    rightWingV: 0.18,
     fillColor: '#fffdf9',
     fillOpacity: 1,
     balanceLocked: true,
     outlineEnabled: false,
     outlineColor: '#e8d8d0',
-    outlineWidth: 0,
+    outlineWidthMm: 0,
     transitionMode: 'crisp',
   },
   soft: {
     preset: 'soft',
     variant: 'smooth',
-    leftOffset: 0.42,
-    centerOffset: 0.24,
-    rightOffset: 0.42,
-    tipWidth: 0.28,
+    leftWingV: 0.42,
+    centerV: 0.24,
+    rightWingV: 0.42,
     fillColor: '#fffdf9',
     fillOpacity: 1,
     balanceLocked: true,
     outlineEnabled: false,
     outlineColor: '#e8d8d0',
-    outlineWidth: 0,
+    outlineWidthMm: 0,
     transitionMode: 'crisp',
   },
   deep: {
     preset: 'deep',
     variant: 'smooth',
-    leftOffset: 0.52,
-    centerOffset: 0.3,
-    rightOffset: 0.52,
-    tipWidth: 0.36,
+    leftWingV: 0.52,
+    centerV: 0.3,
+    rightWingV: 0.52,
     fillColor: '#fffdf9',
     fillOpacity: 1,
     balanceLocked: true,
     outlineEnabled: false,
     outlineColor: '#e8d8d0',
-    outlineWidth: 0,
+    outlineWidthMm: 0,
     transitionMode: 'crisp',
   },
   pointed: {
     preset: 'pointed',
     variant: 'pointed',
-    leftOffset: 0.34,
-    centerOffset: 0.48,
-    rightOffset: 0.34,
-    tipWidth: 0.22,
+    leftWingV: 0.34,
+    centerV: 0.48,
+    rightWingV: 0.34,
     fillColor: '#fffdf9',
     fillOpacity: 1,
     balanceLocked: true,
     outlineEnabled: false,
     outlineColor: '#e8d8d0',
-    outlineWidth: 0,
+    outlineWidthMm: 0,
     transitionMode: 'crisp',
   },
 };
@@ -225,8 +238,8 @@ function canonicalHex(value: string): string {
   return `#${value.slice(1).toLowerCase()}`;
 }
 
-function isPreset(value: unknown): value is FrenchRecipePresetV1 {
-  return typeof value === 'string' && PRESET_SET.has(value);
+function isDefaultPreset(value: unknown): value is FrenchRecipeDefaultPresetV1 {
+  return typeof value === 'string' && DEFAULT_PRESET_SET.has(value);
 }
 
 export function isFrenchRecipeIdentityV1(
@@ -241,7 +254,7 @@ export function isFrenchRecipeInstanceV1(value: unknown): value is RecipeInstanc
 }
 
 export function createDefaultFrenchRecipeParametersV1(
-  preset: FrenchRecipePresetV1,
+  preset: FrenchRecipeDefaultPresetV1,
 ): FrenchRecipeParametersV1 {
   return canonicalizeFrenchRecipeParametersV1(PRESET_DEFAULTS_V1[preset]);
 }
@@ -260,16 +273,15 @@ export function canonicalizeFrenchRecipeParametersV1(
   return orderedParameters({
     preset: parameters.preset,
     variant: parameters.variant,
-    leftOffset: canonicalNumber(parameters.leftOffset),
-    centerOffset: canonicalNumber(parameters.centerOffset),
-    rightOffset: canonicalNumber(parameters.rightOffset),
-    tipWidth: canonicalNumber(parameters.tipWidth),
+    leftWingV: canonicalNumber(parameters.leftWingV),
+    centerV: canonicalNumber(parameters.centerV),
+    rightWingV: canonicalNumber(parameters.rightWingV),
     fillColor: canonicalHex(parameters.fillColor),
     fillOpacity: canonicalNumber(parameters.fillOpacity),
     balanceLocked: parameters.balanceLocked,
     outlineEnabled: parameters.outlineEnabled,
     outlineColor: canonicalHex(parameters.outlineColor),
-    outlineWidth: canonicalNumber(parameters.outlineWidth),
+    outlineWidthMm: canonicalNumber(parameters.outlineWidthMm),
     transitionMode: parameters.transitionMode,
   });
 }
@@ -384,31 +396,47 @@ function validateCrossField(
   parameters: FrenchRecipeParametersV1,
   diagnostics: FrenchRecipeDiagnosticV1[],
 ): void {
-  const { offsetSeparationMin } = FRENCH_RECIPE_RANGES_V1;
-  if (parameters.balanceLocked && parameters.leftOffset !== parameters.rightOffset) {
+  const { vSeparationMin, outlineWidthMmEnabledMin } = FRENCH_RECIPE_RANGES_V1;
+  if (parameters.balanceLocked && parameters.leftWingV !== parameters.rightWingV) {
     addDiagnostic(
       diagnostics,
       'cross_field_invalid',
-      'leftOffset',
-      'balanceLocked requires leftOffset and rightOffset to be equal',
+      'leftWingV',
+      'balanceLocked requires leftWingV and rightWingV to be equal',
     );
   }
   if (parameters.variant === 'smooth') {
-    const wingMin = Math.min(parameters.leftOffset, parameters.rightOffset);
-    if (!(parameters.centerOffset <= wingMin - offsetSeparationMin)) {
+    const wingMin = Math.min(parameters.leftWingV, parameters.rightWingV);
+    if (!(parameters.centerV <= wingMin - vSeparationMin)) {
       addDiagnostic(
         diagnostics,
         'cross_field_invalid',
-        'centerOffset',
-        'smooth variant requires centerOffset closer to the tip than both wings',
+        'centerV',
+        'smooth variant requires centerV closer to the canvas tip edge than both wings',
       );
     }
-  } else if (!(parameters.centerOffset >= Math.max(parameters.leftOffset, parameters.rightOffset) + offsetSeparationMin)) {
+  } else if (!(parameters.centerV >= Math.max(parameters.leftWingV, parameters.rightWingV) + vSeparationMin)) {
     addDiagnostic(
       diagnostics,
       'cross_field_invalid',
-      'centerOffset',
-      'pointed variant requires centerOffset closer to the root than both wings',
+      'centerV',
+      'pointed variant requires centerV closer to the canvas root edge than both wings',
+    );
+  }
+  if (!parameters.outlineEnabled && parameters.outlineWidthMm !== 0) {
+    addDiagnostic(
+      diagnostics,
+      'cross_field_invalid',
+      'outlineWidthMm',
+      'outlineEnabled=false requires outlineWidthMm to be 0',
+    );
+  }
+  if (parameters.outlineEnabled && parameters.outlineWidthMm < outlineWidthMmEnabledMin) {
+    addDiagnostic(
+      diagnostics,
+      'cross_field_invalid',
+      'outlineWidthMm',
+      `outlineEnabled=true requires outlineWidthMm >= ${outlineWidthMmEnabledMin}`,
     );
   }
 }
@@ -431,32 +459,25 @@ export function parseFrenchRecipeParametersV1(value: unknown): FrenchRecipeParam
 
   const preset = parseEnum(raw, 'preset', PRESET_SET, diagnostics);
   const variant = parseEnum(raw, 'variant', VARIANT_SET, diagnostics);
-  const leftOffset = parseBoundedNumber(
+  const leftWingV = parseBoundedNumber(
     raw,
-    'leftOffset',
-    FRENCH_RECIPE_RANGES_V1.offsetMin,
-    FRENCH_RECIPE_RANGES_V1.offsetMax,
+    'leftWingV',
+    FRENCH_RECIPE_RANGES_V1.vMin,
+    FRENCH_RECIPE_RANGES_V1.vMax,
     diagnostics,
   );
-  const centerOffset = parseBoundedNumber(
+  const centerV = parseBoundedNumber(
     raw,
-    'centerOffset',
-    FRENCH_RECIPE_RANGES_V1.offsetMin,
-    FRENCH_RECIPE_RANGES_V1.offsetMax,
+    'centerV',
+    FRENCH_RECIPE_RANGES_V1.vMin,
+    FRENCH_RECIPE_RANGES_V1.vMax,
     diagnostics,
   );
-  const rightOffset = parseBoundedNumber(
+  const rightWingV = parseBoundedNumber(
     raw,
-    'rightOffset',
-    FRENCH_RECIPE_RANGES_V1.offsetMin,
-    FRENCH_RECIPE_RANGES_V1.offsetMax,
-    diagnostics,
-  );
-  const tipWidth = parseBoundedNumber(
-    raw,
-    'tipWidth',
-    FRENCH_RECIPE_RANGES_V1.tipWidthMin,
-    FRENCH_RECIPE_RANGES_V1.tipWidthMax,
+    'rightWingV',
+    FRENCH_RECIPE_RANGES_V1.vMin,
+    FRENCH_RECIPE_RANGES_V1.vMax,
     diagnostics,
   );
   const fillColor = parseHexColor(raw, 'fillColor', diagnostics);
@@ -470,11 +491,11 @@ export function parseFrenchRecipeParametersV1(value: unknown): FrenchRecipeParam
   const balanceLocked = parseBoolean(raw, 'balanceLocked', diagnostics);
   const outlineEnabled = parseBoolean(raw, 'outlineEnabled', diagnostics);
   const outlineColor = parseHexColor(raw, 'outlineColor', diagnostics);
-  const outlineWidth = parseBoundedNumber(
+  const outlineWidthMm = parseBoundedNumber(
     raw,
-    'outlineWidth',
-    FRENCH_RECIPE_RANGES_V1.outlineWidthMin,
-    FRENCH_RECIPE_RANGES_V1.outlineWidthMax,
+    'outlineWidthMm',
+    FRENCH_RECIPE_RANGES_V1.outlineWidthMmMin,
+    FRENCH_RECIPE_RANGES_V1.outlineWidthMmMax,
     diagnostics,
   );
   const transitionMode = parseEnum(raw, 'transitionMode', TRANSITION_SET, diagnostics);
@@ -482,16 +503,15 @@ export function parseFrenchRecipeParametersV1(value: unknown): FrenchRecipeParam
   if (
     preset === undefined ||
     variant === undefined ||
-    leftOffset === undefined ||
-    centerOffset === undefined ||
-    rightOffset === undefined ||
-    tipWidth === undefined ||
+    leftWingV === undefined ||
+    centerV === undefined ||
+    rightWingV === undefined ||
     fillColor === undefined ||
     fillOpacity === undefined ||
     balanceLocked === undefined ||
     outlineEnabled === undefined ||
     outlineColor === undefined ||
-    outlineWidth === undefined ||
+    outlineWidthMm === undefined ||
     transitionMode === undefined
   ) {
     return { ok: false, diagnostics };
@@ -500,16 +520,15 @@ export function parseFrenchRecipeParametersV1(value: unknown): FrenchRecipeParam
   const parameters = canonicalizeFrenchRecipeParametersV1({
     preset: preset as FrenchRecipePresetV1,
     variant: variant as FrenchRecipeVariantV1,
-    leftOffset,
-    centerOffset,
-    rightOffset,
-    tipWidth,
+    leftWingV,
+    centerV,
+    rightWingV,
     fillColor,
     fillOpacity,
     balanceLocked,
     outlineEnabled,
     outlineColor,
-    outlineWidth,
+    outlineWidthMm,
     transitionMode: transitionMode as FrenchRecipeTransitionModeV1,
   });
   validateCrossField(parameters, diagnostics);
@@ -580,14 +599,14 @@ export function parseFrenchRecipeInstanceV1(value: unknown): FrenchRecipeInstanc
 
 export function createFrenchRecipeInstanceV1(
   instanceId: string,
-  input: FrenchRecipePresetV1 | FrenchRecipeParametersV1,
+  input: FrenchRecipeDefaultPresetV1 | FrenchRecipeParametersV1,
 ): FrenchRecipeInstanceParseResultV1 {
   const diagnostics: FrenchRecipeDiagnosticV1[] = [];
   if (!ID_PATTERN.test(instanceId)) {
     addDiagnostic(diagnostics, 'invalid_id', 'instanceId', 'instanceId must be a stable V7 id');
     return { ok: false, diagnostics };
   }
-  const parsed = isPreset(input)
+  const parsed = isDefaultPreset(input)
     ? parseFrenchRecipeParametersV1(createDefaultFrenchRecipeParametersV1(input))
     : parseFrenchRecipeParametersV1(input);
   if (!parsed.ok) return parsed;

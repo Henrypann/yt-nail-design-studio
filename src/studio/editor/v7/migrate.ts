@@ -461,9 +461,11 @@ function convertFlatElement(
     if (
       !color ||
       typeof widthRatio !== 'number' ||
+      !Number.isFinite(widthRatio) ||
       widthRatio < 0 ||
       widthRatio > 1 ||
       typeof curvature !== 'number' ||
+      !Number.isFinite(curvature) ||
       curvature < -1 ||
       curvature > 1
     ) {

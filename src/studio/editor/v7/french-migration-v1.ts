@@ -25,7 +25,8 @@ export type FrenchLegacyDiagnosticCodeV1 =
   | 'unsupported_legacy_variant'
   | 'mixed_legacy_fields'
   | 'curvature_has_no_three_point_mapping'
-  | 'stroke_width_units_unavailable';
+  | 'stroke_width_units_unavailable'
+  | 'source_not_cloneable';
 
 export interface FrenchLegacyDiagnosticV1 {
   code: FrenchLegacyDiagnosticCodeV1;
@@ -80,8 +81,12 @@ function hasOwn(raw: UnknownRecord, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(raw, key);
 }
 
-function cloneSource(value: unknown): unknown {
-  return structuredClone(value);
+function tryCloneSource(value: unknown): { ok: true; source: unknown } | { ok: false } {
+  try {
+    return { ok: true, source: structuredClone(value) };
+  } catch {
+    return { ok: false };
+  }
 }
 
 export function hasRichLegacyFrenchFieldsV1(value: unknown): boolean {
@@ -243,7 +248,7 @@ function previewRich(
     diagnostics.push({
       code: 'stroke_width_units_unavailable',
       path: identity.path ? `${identity.path}.strokeWidth` : 'strokeWidth',
-      message: 'Legacy outline width is in 0.1mm units and has no lossless nail-local outlineWidth mapping.',
+      message: 'Legacy outline width is in 0.1mm units and has no lossless outlineWidthMm mapping.',
     });
     limitations.push('Legacy outline width stays unavailable until a geometry-backed conversion exists.');
   }
@@ -307,7 +312,25 @@ export function previewFrenchLegacyConversionV1(
   value: unknown,
   identity: { sourceId?: string; path?: string; sourceVersion?: number } = {},
 ): FrenchLegacyConversionPreviewV1 {
-  const source = cloneSource(value);
+  const cloned = tryCloneSource(value);
+  if (!cloned.ok) {
+    return previewBase(
+      null,
+      'unknown',
+      'unavailable',
+      identity,
+      [
+        'Source is not structured-cloneable; conversion is unavailable without mutation.',
+        'No recipe parameters are authored from unavailable conversion.',
+      ],
+      [{
+        code: 'source_not_cloneable',
+        path: identity.path ?? '$',
+        message: 'Source contains a non-cloneable value; preview returns unavailable without mutating the input.',
+      }],
+    );
+  }
+  const source = cloned.source;
   const raw = record(value);
   const sourceId = identity.sourceId ?? (typeof raw?.id === 'string' ? raw.id : undefined);
   const resolvedIdentity = { ...identity, sourceId };

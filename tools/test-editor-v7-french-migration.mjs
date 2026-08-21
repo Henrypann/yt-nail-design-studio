@@ -157,6 +157,29 @@ console.log('[french-migration] rich V3/V6 families and double unavailable: PASS
   assert.deepEqual(preview.source, unknown);
   assert.ok(preview.diagnostics.some((item) => item.code === 'not_french_edge'));
 }
+
+{
+  const symbolPreview = previewFrenchLegacyConversionV1(Symbol('uncloneable'));
+  assert.equal(symbolPreview.family, 'unknown');
+  assert.equal(symbolPreview.status, 'unavailable');
+  assert.equal(symbolPreview.parameters, null);
+  assert.equal(symbolPreview.source, null);
+  assert.ok(symbolPreview.diagnostics.some((item) => item.code === 'source_not_cloneable'));
+
+  const fnPreview = previewFrenchLegacyConversionV1(() => ({ kind: 'french_edge' }));
+  assert.equal(fnPreview.status, 'unavailable');
+  assert.equal(fnPreview.parameters, null);
+  assert.ok(fnPreview.diagnostics.some((item) => item.code === 'source_not_cloneable'));
+
+  const nested = { kind: 'french_edge', widthRatio: 0.22, marker: { fn() { return 1; } } };
+  const beforeNested = nested.marker.fn;
+  const nestedPreview = previewFrenchLegacyConversionV1(nested);
+  assert.equal(nestedPreview.status, 'unavailable');
+  assert.equal(nestedPreview.parameters, null);
+  assert.equal(nestedPreview.source, null);
+  assert.equal(nested.marker.fn, beforeNested);
+  assert.ok(nestedPreview.diagnostics.some((item) => item.code === 'source_not_cloneable'));
+}
 console.log('[french-migration] failed conversion preserves source: PASS');
 
 function addPatternLayer(doc, finger, element) {
@@ -209,6 +232,44 @@ function addPatternLayer(doc, finger, element) {
     color: { colorSpace: 'srgb', r: 255, g: 253, b: 249, a: 1 },
   });
   assert.equal(first.diagnostics.some((item) => item.code === 'legacy_french_rich'), false);
+}
+
+{
+  const nanSource = createEditorDocV6MigrationFixture();
+  addPatternLayer(nanSource, 'L1', {
+    id: 'element_v6_nan_french',
+    widthRatio: Number.NaN,
+    curvature: 0.3,
+    color: '#FFFDF9',
+  });
+  const nanFrozen = deepFreeze(clone(nanSource));
+  const nanResult = migrateEditorDocV7(nanFrozen, resolvers);
+  assert.ok(nanResult.status === 'migrated' || nanResult.status === 'migrated_with_warnings');
+  const nanParsed = parseEditorDocV7(nanResult.doc);
+  assert.equal(nanParsed.ok, true, nanParsed.ok ? '' : JSON.stringify(nanParsed.issues));
+  const nanFlat = nanResult.doc.nails.L1.steps.find((step) => step.kind === 'flat_design');
+  assert.ok(nanFlat);
+  assert.equal(nanFlat.elements.length, 0, 'NaN V7 simple French must not become V7 content');
+  assert.ok(nanResult.legacyEvidence.some((item) => item.sourceId === 'element_v6_nan_french'));
+  assert.equal(JSON.stringify(nanFrozen).includes('"id":"element_v6_nan_french"'), true);
+}
+
+{
+  const infSource = createEditorDocV6MigrationFixture();
+  addPatternLayer(infSource, 'R4', {
+    id: 'element_v6_inf_french',
+    widthRatio: 0.22,
+    curvature: Number.POSITIVE_INFINITY,
+    color: '#FFFDF9',
+  });
+  const infResult = migrateEditorDocV7(deepFreeze(clone(infSource)), resolvers);
+  assert.ok(infResult.status === 'migrated' || infResult.status === 'migrated_with_warnings');
+  const infParsed = parseEditorDocV7(infResult.doc);
+  assert.equal(infParsed.ok, true, infParsed.ok ? '' : JSON.stringify(infParsed.issues));
+  const infFlat = infResult.doc.nails.R4.steps.find((step) => step.kind === 'flat_design');
+  assert.ok(infFlat);
+  assert.equal(infFlat.elements.length, 0, 'Infinity V7 simple French must not become V7 content');
+  assert.ok(infResult.legacyEvidence.some((item) => item.sourceId === 'element_v6_inf_french'));
 }
 console.log('[french-migration] V7 simple legacy migrate output: PASS');
 
