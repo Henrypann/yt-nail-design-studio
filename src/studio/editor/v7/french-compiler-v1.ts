@@ -5,6 +5,14 @@
  * FrenchRecipeParametersV1. It returns derived nail-local paths, an ID-free
  * vector projection, cache identity, and diagnostics. It does not read or write
  * EditorDoc, store, history, or IDs, and it never claims manufacturing validity.
+ *
+ * Geometric contract (software only, not physical or manufacturing exactness):
+ * - `contourPathData` is the exact signed Bezier source.
+ * - Smile-line wings are analytic intersections of that exact curve with the
+ *   canonical wing v-lines, to a bounded unit-interval root tolerance.
+ * - The derived tip cap is a deterministic adaptive flattening of the exact
+ *   source, bounded by `FRENCH_CONTOUR_FLATNESS_TOLERANCE_V1`, with max depth
+ *   and point-cap fail-closed overflow.
  */
 
 import { FINGER_CODES, type FingerCode, type NailLength, type NailShape } from '../../../lib/types.ts';
@@ -20,9 +28,12 @@ import {
   FRENCH_GOLDEN_FINGER_V1,
   FRENCH_SIGNED_LENGTHS_V1,
   FRENCH_SIGNED_SHAPES_V1,
+  isCanonicalSingleClosedNailPathV1,
+  sha256Hex,
   type FrenchExactGeometryV1,
   type FrenchSignedLengthV1,
   type FrenchSignedShapeV1,
+  type FrenchViewBoxV1,
 } from './french-geometry-input-v1.ts';
 import {
   FRENCH_RECIPE_ID_V1,
@@ -33,15 +44,45 @@ import {
   type FrenchRecipeDiagnosticV1,
   type FrenchRecipeParametersV1,
 } from './french-recipe-v1.ts';
+import { PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7 } from './geometry-registry.ts';
 import type { NailPointV7, RgbaColorV7, Transform2DV7 } from './model.ts';
 
 export const FRENCH_PATH_COMPILER_REVISION_V1 = 'french-path-v1';
 export const FRENCH_PATH_COORDINATE_SPACE_V1 = 'nail-local-v1';
 
-const SAMPLE_STEPS = 24;
+/** Max chord-to-curve deviation of the derived flattened cap, in nail-local units. */
+export const FRENCH_CONTOUR_FLATNESS_TOLERANCE_V1 = 1e-4;
+/** de Casteljau split budget per curve; overflow fails closed instead of emitting a coarse chord. */
+export const FRENCH_CONTOUR_MAX_SUBDIVISION_DEPTH_V1 = 12;
+/** Total flattened-contour vertex cap; overflow fails closed. */
+export const FRENCH_CONTOUR_MAX_POINTS_V1 = 2048;
+/** Wing insertion / on-contour check. Bounded by a few flattening tolerances plus float slack. */
+export const FRENCH_WING_ON_CONTOUR_TOLERANCE_V1 = 4e-4;
+/** Unit-interval polynomial root isolation for analytic Bezier × horizontal-line hits. */
+export const FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 = 1e-12;
+
+export const FRENCH_EXACT_KEY_KIND_CACHE_V1 = 'french-path-cache-v1';
+export const FRENCH_EXACT_KEY_KIND_BINDING_V1 = 'french-path-binding-v1';
+export const FRENCH_EXACT_KEY_FIELDS_V1 = [
+  'kind',
+  'compilerRevision',
+  'recipeId',
+  'recipeRevision',
+  'parameterSerialization',
+  'assetId',
+  'revision',
+  'finger',
+  'registryAssetSetSha256',
+  'contourIdentity',
+] as const;
+
 const UNIT_EPS = 1e-12;
-const ON_CONTOUR_EPS = 0.01;
 const FULL_SHA256 = /^[0-9a-f]{64}$/;
+const SAFE_IDENTITY = /^[A-Za-z0-9][A-Za-z0-9._-]{0,255}$/;
+const RESERVED_IDENTITY = /[\u0000-\u001f\u007f|@\\/:=#]/;
+const FINGER_SET = new Set<string>(FINGER_CODES);
+const SIGNED_SHAPE_SET = new Set<string>(FRENCH_SIGNED_SHAPES_V1);
+const SIGNED_LENGTH_SET = new Set<string>(FRENCH_SIGNED_LENGTHS_V1);
 
 export type FrenchPathDiagnosticCodeV1 =
   | 'parameters_invalid'
@@ -51,6 +92,8 @@ export type FrenchPathDiagnosticCodeV1 =
   | 'non_drawable_boundary'
   | 'non_drawable_fill'
   | 'coordinates_out_of_range'
+  | 'identity_unsafe'
+  | 'flatten_overflow'
   | FrenchRecipeDiagnosticV1['code'];
 
 export interface FrenchPathDiagnosticV1 {
@@ -132,12 +175,107 @@ export interface FrenchGoldenBindingV1 {
   finger: FingerCode;
 }
 
+interface ContourPoint {
+  u: number;
+  v: number;
+}
+
+type ExactSegment =
+  | { kind: 'L'; p0: ContourPoint; p1: ContourPoint }
+  | { kind: 'Q'; p0: ContourPoint; p1: ContourPoint; p2: ContourPoint }
+  | { kind: 'C'; p0: ContourPoint; p1: ContourPoint; p2: ContourPoint; p3: ContourPoint };
+
+interface FlattenBudget {
+  overflow: boolean;
+}
+
 function unavailable(diagnostics: FrenchPathDiagnosticV1[]): Extract<FrenchPathCompileResultV1, { ok: false }> {
   return { ok: false, fidelity: 'unavailable', manufacturingValidated: false, diagnostics };
 }
 
 function diagnostic(code: FrenchPathDiagnosticCodeV1, path: string, message: string): FrenchPathDiagnosticV1 {
   return { code, path, message };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isSafeStableIdentity(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 256) return false;
+  if (RESERVED_IDENTITY.test(value)) return false;
+  if (!SAFE_IDENTITY.test(value)) return false;
+  if (value.toLowerCase().includes('latest')) return false;
+  return true;
+}
+
+function isFinitePositiveViewBox(value: unknown): value is FrenchViewBoxV1 {
+  if (!isRecord(value)) return false;
+  const x = value.x;
+  const y = value.y;
+  const width = value.width;
+  const height = value.height;
+  return [x, y, width, height].every((item) => typeof item === 'number' && Number.isFinite(item))
+    && (width as number) > 0
+    && (height as number) > 0;
+}
+
+/**
+ * Runtime trust boundary. A TypeScript `FrenchExactGeometryV1` object is not
+ * evidence; forged exact objects must fail closed with visible diagnostics.
+ */
+export function validateFrenchExactGeometryTrustBoundaryV1(geometry: unknown): FrenchPathDiagnosticV1[] {
+  if (!isRecord(geometry)) {
+    return [diagnostic('geometry_not_exact', 'geometry', 'compiler accepts only a finite exact geometry object')];
+  }
+  const diagnostics: FrenchPathDiagnosticV1[] = [];
+  const push = (code: FrenchPathDiagnosticCodeV1, path: string, message: string): void => {
+    diagnostics.push(diagnostic(code, path, message));
+  };
+
+  if (geometry.fidelity !== 'exact' || geometry.evidence !== 'signed_off' || geometry.manufacturingValidated !== false) {
+    push('geometry_not_exact', 'geometry', 'compiler accepts only exact signed_off geometry with manufacturingValidated=false');
+  }
+  if (geometry.coordinateSpace !== FRENCH_PATH_COORDINATE_SPACE_V1) {
+    push('geometry_not_exact', 'coordinateSpace', 'exact geometry must use nail-local-v1');
+  }
+  if (!FINGER_SET.has(geometry.finger as string)) {
+    push('geometry_not_exact', 'finger', 'finger must be a real V7 FINGER_CODE');
+  }
+  if (!SIGNED_SHAPE_SET.has(geometry.shape as string)) {
+    push('geometry_not_exact', 'shape', 'shape must be one of the current signed French set from registry output');
+  }
+  if (!SIGNED_LENGTH_SET.has(geometry.length as string)) {
+    push('geometry_not_exact', 'length', 'length must be one of the current signed French set from registry output');
+  }
+  if (geometry.registryAssetSetSha256 !== PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7) {
+    push(
+      'geometry_not_exact',
+      'registryAssetSetSha256',
+      'registryAssetSetSha256 must equal the full PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7 digest',
+    );
+  }
+  if (!isSafeStableIdentity(geometry.assetId)) {
+    push('identity_unsafe', 'assetId', 'assetId must be a stable non-empty identity without control chars, reserved separators, or latest');
+  }
+  if (!isSafeStableIdentity(geometry.revision)) {
+    push('identity_unsafe', 'revision', 'revision must be a stable non-empty identity without control chars, reserved separators, or latest');
+  }
+  if (!isFinitePositiveViewBox(geometry.viewBox)) {
+    push('geometry_not_exact', 'viewBox', 'viewBox must be four finite numbers with positive width and height');
+  }
+  if (typeof geometry.canvasCenterU !== 'number' || !Number.isFinite(geometry.canvasCenterU) || geometry.canvasCenterU < 0 || geometry.canvasCenterU > 1) {
+    push('geometry_not_exact', 'canvasCenterU', 'canvasCenterU must be finite within [0, 1]');
+  }
+  if (typeof geometry.contourPathData !== 'string') {
+    push('contour_invalid', 'contourPathData', 'contourPathData must be a canonical single closed subpath');
+  } else if (!isCanonicalSingleClosedNailPathV1(geometry.contourPathData)) {
+    push('contour_invalid', 'contourPathData', 'contour must be a canonical single closed nail-local subpath');
+  } else if (typeof geometry.contourIdentity !== 'string' || !FULL_SHA256.test(geometry.contourIdentity) || geometry.contourIdentity !== sha256Hex(geometry.contourPathData)) {
+    push('geometry_not_exact', 'contourIdentity', 'contourIdentity must equal sha256Hex(contourPathData)');
+  }
+
+  return diagnostics;
 }
 
 function snapUnit(value: number): number | null {
@@ -155,7 +293,80 @@ function point(u: number, v: number): NailPointV7 | null {
   return { u: nextU, v: nextV };
 }
 
-function cubicPoint(p0: NailPointV7, p1: NailPointV7, p2: NailPointV7, p3: NailPointV7, t: number): NailPointV7 | null {
+function appendUnique(points: NailPointV7[], next: NailPointV7): void {
+  const last = points[points.length - 1];
+  if (!last || last.u !== next.u || last.v !== next.v) points.push(next);
+}
+
+function mid(a: ContourPoint, b: ContourPoint): ContourPoint | null {
+  return point((a.u + b.u) / 2, (a.v + b.v) / 2);
+}
+
+function hypot2(du: number, dv: number): number {
+  return du * du + dv * dv;
+}
+
+function distanceToLine(pointOn: ContourPoint, a: ContourPoint, b: ContourPoint): number {
+  const du = b.u - a.u;
+  const dv = b.v - a.v;
+  const len2 = hypot2(du, dv);
+  if (len2 < UNIT_EPS * UNIT_EPS) return Math.hypot(pointOn.u - a.u, pointOn.v - a.v);
+  return Math.abs((pointOn.u - a.u) * dv - (pointOn.v - a.v) * du) / Math.sqrt(len2);
+}
+
+function uniqueSorted(values: number[]): number[] {
+  const sorted = [...values].filter(Number.isFinite).sort((left, right) => left - right);
+  const unique: number[] = [];
+  for (const value of sorted) {
+    const last = unique[unique.length - 1];
+    if (last === undefined || Math.abs(value - last) > UNIT_EPS) unique.push(value);
+  }
+  return unique;
+}
+
+function parseExactSegments(parsed: ParsedNailPathV7): ExactSegment[] | null {
+  const segments: ExactSegment[] = [];
+  let current: ContourPoint | null = null;
+  let start: ContourPoint | null = null;
+  let moves = 0;
+  for (const { command, values } of parsed.commands) {
+    if (command === 'M') {
+      moves += 1;
+      if (moves > 1) return null;
+      current = point(values[0], values[1]);
+      if (!current) return null;
+      start = current;
+    } else if (command === 'L') {
+      const next = point(values[0], values[1]);
+      if (!current || !next) return null;
+      segments.push({ kind: 'L', p0: current, p1: next });
+      current = next;
+    } else if (command === 'Q') {
+      const control = point(values[0], values[1]);
+      const next = point(values[2], values[3]);
+      if (!current || !control || !next) return null;
+      segments.push({ kind: 'Q', p0: current, p1: control, p2: next });
+      current = next;
+    } else if (command === 'C') {
+      const c1 = point(values[0], values[1]);
+      const c2 = point(values[2], values[3]);
+      const next = point(values[4], values[5]);
+      if (!current || !c1 || !c2 || !next) return null;
+      segments.push({ kind: 'C', p0: current, p1: c1, p2: c2, p3: next });
+      current = next;
+    } else if (command === 'Z') {
+      if (!current || !start) return null;
+      if (Math.hypot(current.u - start.u, current.v - start.v) > UNIT_EPS) {
+        segments.push({ kind: 'L', p0: current, p1: start });
+      }
+    } else {
+      return null;
+    }
+  }
+  return segments.length > 0 ? segments : null;
+}
+
+function evalCubic(p0: ContourPoint, p1: ContourPoint, p2: ContourPoint, p3: ContourPoint, t: number): ContourPoint | null {
   const mt = 1 - t;
   return point(
     mt * mt * mt * p0.u + 3 * mt * mt * t * p1.u + 3 * mt * t * t * p2.u + t * t * t * p3.u,
@@ -163,7 +374,7 @@ function cubicPoint(p0: NailPointV7, p1: NailPointV7, p2: NailPointV7, p3: NailP
   );
 }
 
-function quadraticPoint(p0: NailPointV7, p1: NailPointV7, p2: NailPointV7, t: number): NailPointV7 | null {
+function evalQuadratic(p0: ContourPoint, p1: ContourPoint, p2: ContourPoint, t: number): ContourPoint | null {
   const mt = 1 - t;
   return point(
     mt * mt * p0.u + 2 * mt * t * p1.u + t * t * p2.u,
@@ -171,70 +382,244 @@ function quadraticPoint(p0: NailPointV7, p1: NailPointV7, p2: NailPointV7, t: nu
   );
 }
 
-function appendUnique(points: NailPointV7[], next: NailPointV7): void {
-  const last = points[points.length - 1];
-  if (!last || last.u !== next.u || last.v !== next.v) points.push(next);
+function evalLine(p0: ContourPoint, p1: ContourPoint, t: number): ContourPoint | null {
+  return point(p0.u + (p1.u - p0.u) * t, p0.v + (p1.v - p0.v) * t);
 }
 
-function sampleContour(parsed: ParsedNailPathV7): NailPointV7[] | null {
-  const points: NailPointV7[] = [];
-  let current: NailPointV7 | null = null;
-  let start: NailPointV7 | null = null;
-  for (const { command, values } of parsed.commands) {
-    if (command === 'M') {
-      current = point(values[0], values[1]);
-      if (!current) return null;
-      start = current;
-      appendUnique(points, current);
-    } else if (command === 'L') {
-      const next = point(values[0], values[1]);
-      if (!current || !next) return null;
-      appendUnique(points, next);
-      current = next;
-    } else if (command === 'Q') {
-      const control = point(values[0], values[1]);
-      const next = point(values[2], values[3]);
-      if (!current || !control || !next) return null;
-      for (let step = 1; step <= SAMPLE_STEPS; step += 1) {
-        const sampled = quadraticPoint(current, control, next, step / SAMPLE_STEPS);
-        if (!sampled) return null;
-        appendUnique(points, sampled);
-      }
-      current = next;
-    } else if (command === 'C') {
-      const c1 = point(values[0], values[1]);
-      const c2 = point(values[2], values[3]);
-      const next = point(values[4], values[5]);
-      if (!current || !c1 || !c2 || !next) return null;
-      for (let step = 1; step <= SAMPLE_STEPS; step += 1) {
-        const sampled = cubicPoint(current, c1, c2, next, step / SAMPLE_STEPS);
-        if (!sampled) return null;
-        appendUnique(points, sampled);
-      }
-      current = next;
-    } else if (command === 'Z') {
-      if (start) appendUnique(points, start);
-    }
-  }
-  return points.length >= 3 ? points : null;
+function evalPoly(coeffs: readonly number[], t: number): number {
+  let value = 0;
+  for (const coeff of coeffs) value = value * t + coeff;
+  return value;
 }
 
-function intersectionsAtV(polyline: readonly NailPointV7[], v: number): number[] {
-  const xs: number[] = [];
-  for (let i = 0; i < polyline.length - 1; i += 1) {
-    const a = polyline[i];
-    const b = polyline[i + 1];
-    const minV = Math.min(a.v, b.v);
-    const maxV = Math.max(a.v, b.v);
-    if (v < minV - UNIT_EPS || v > maxV + UNIT_EPS) continue;
-    if (Math.abs(a.v - b.v) < UNIT_EPS) {
-      if (Math.abs(v - a.v) < UNIT_EPS) xs.push(a.u, b.u);
-      continue;
+function quadraticRoots01(a: number, b: number, c: number): number[] {
+  const roots: number[] = [];
+  const push = (t: number): void => {
+    if (Number.isFinite(t) && t >= -FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 && t <= 1 + FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) {
+      roots.push(Math.min(1, Math.max(0, t)));
     }
-    const t = (v - a.v) / (b.v - a.v);
-    if (t >= -UNIT_EPS && t <= 1 + UNIT_EPS) xs.push(a.u + (b.u - a.u) * Math.min(1, Math.max(0, t)));
+  };
+  if (Math.abs(a) < FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) {
+    if (Math.abs(b) >= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) push(-c / b);
+    return uniqueSorted(roots);
   }
-  return xs.filter(Number.isFinite);
+  const disc = b * b - 4 * a * c;
+  if (disc < -FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) return [];
+  if (disc <= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) {
+    push(-b / (2 * a));
+    return uniqueSorted(roots);
+  }
+  const sqrtDisc = Math.sqrt(disc);
+  const sign = b >= 0 ? 1 : -1;
+  const q = -0.5 * (b + sign * sqrtDisc);
+  if (Math.abs(q) >= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) push(q / a);
+  if (Math.abs(q) >= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) push(c / q);
+  else {
+    push((-b + sqrtDisc) / (2 * a));
+    push((-b - sqrtDisc) / (2 * a));
+  }
+  return uniqueSorted(roots);
+}
+
+function bisectRoot(coeffs: readonly number[], lo: number, hi: number): number {
+  let a = lo;
+  let b = hi;
+  let fa = evalPoly(coeffs, a);
+  for (let step = 0; step < 80; step += 1) {
+    const midT = (a + b) / 2;
+    const fm = evalPoly(coeffs, midT);
+    if (fa === 0) return a;
+    if (fa * fm <= 0) {
+      b = midT;
+    } else {
+      a = midT;
+      fa = fm;
+    }
+  }
+  return (a + b) / 2;
+}
+
+function cubicRoots01(a: number, b: number, c: number, d: number): number[] {
+  if (Math.abs(a) < FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) return quadraticRoots01(b, c, d);
+  const coeffs = [a, b, c, d];
+  const f = (t: number): number => evalPoly(coeffs, t);
+  const samples = uniqueSorted([0, 1, ...quadraticRoots01(3 * a, 2 * b, c)]);
+  const roots: number[] = [];
+  for (const sample of samples) {
+    if (Math.abs(f(sample)) <= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 * 8) roots.push(sample);
+  }
+  for (let i = 0; i < samples.length - 1; i += 1) {
+    const lo = samples[i];
+    const hi = samples[i + 1];
+    const flo = f(lo);
+    const fhi = f(hi);
+    if (Math.abs(flo) <= FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 * 8) continue;
+    if (flo * fhi < 0) roots.push(bisectRoot(coeffs, lo, hi));
+  }
+  return uniqueSorted(roots);
+}
+
+function analyticUsAtV(segment: ExactSegment, v: number): number[] {
+  const us: number[] = [];
+  const pushPoint = (hit: ContourPoint | null): void => {
+    if (hit && Math.abs(hit.v - v) <= FRENCH_WING_ON_CONTOUR_TOLERANCE_V1) us.push(hit.u);
+  };
+
+  if (segment.kind === 'L') {
+    const { p0, p1 } = segment;
+    if (Math.abs(p0.v - v) <= UNIT_EPS && Math.abs(p1.v - v) <= UNIT_EPS) {
+      us.push(p0.u, p1.u);
+      return uniqueSorted(us);
+    }
+    const dv = p1.v - p0.v;
+    if (Math.abs(dv) < UNIT_EPS) return [];
+    const t = (v - p0.v) / dv;
+    if (t >= -FRENCH_ANALYTIC_ROOT_TOLERANCE_V1 && t <= 1 + FRENCH_ANALYTIC_ROOT_TOLERANCE_V1) {
+      pushPoint(evalLine(p0, p1, Math.min(1, Math.max(0, t))));
+    }
+    return uniqueSorted(us);
+  }
+
+  if (segment.kind === 'Q') {
+    const { p0, p1, p2 } = segment;
+    if ([p0, p1, p2].every((item) => Math.abs(item.v - v) <= UNIT_EPS)) {
+      us.push(p0.u, p1.u, p2.u);
+      return uniqueSorted(us);
+    }
+    const a = p0.v - 2 * p1.v + p2.v;
+    const b = -2 * p0.v + 2 * p1.v;
+    const c = p0.v - v;
+    for (const t of quadraticRoots01(a, b, c)) pushPoint(evalQuadratic(p0, p1, p2, t));
+    return uniqueSorted(us);
+  }
+
+  const { p0, p1, p2, p3 } = segment;
+  if ([p0, p1, p2, p3].every((item) => Math.abs(item.v - v) <= UNIT_EPS)) {
+    us.push(p0.u, p1.u, p2.u, p3.u);
+    return uniqueSorted(us);
+  }
+  const a = -p0.v + 3 * p1.v - 3 * p2.v + p3.v;
+  const b = 3 * p0.v - 6 * p1.v + 3 * p2.v;
+  const c = -3 * p0.v + 3 * p1.v;
+  const d = p0.v - v;
+  for (const t of cubicRoots01(a, b, c, d)) pushPoint(evalCubic(p0, p1, p2, p3, t));
+  return uniqueSorted(us);
+}
+
+function flattenLine(p1: ContourPoint, out: NailPointV7[], budget: FlattenBudget): void {
+  if (budget.overflow) return;
+  if (out.length >= FRENCH_CONTOUR_MAX_POINTS_V1) {
+    budget.overflow = true;
+    return;
+  }
+  const next = point(p1.u, p1.v);
+  if (!next) {
+    budget.overflow = true;
+    return;
+  }
+  appendUnique(out, next);
+}
+
+function flattenQuadratic(
+  p0: ContourPoint,
+  p1: ContourPoint,
+  p2: ContourPoint,
+  depth: number,
+  out: NailPointV7[],
+  budget: FlattenBudget,
+): void {
+  if (budget.overflow) return;
+  if (out.length >= FRENCH_CONTOUR_MAX_POINTS_V1) {
+    budget.overflow = true;
+    return;
+  }
+  if (depth > FRENCH_CONTOUR_MAX_SUBDIVISION_DEPTH_V1) {
+    budget.overflow = true;
+    return;
+  }
+  if (distanceToLine(p1, p0, p2) <= FRENCH_CONTOUR_FLATNESS_TOLERANCE_V1) {
+    flattenLine(p2, out, budget);
+    return;
+  }
+  const l1 = mid(p0, p1);
+  const r1 = mid(p1, p2);
+  if (!l1 || !r1) {
+    budget.overflow = true;
+    return;
+  }
+  const split = mid(l1, r1);
+  if (!split) {
+    budget.overflow = true;
+    return;
+  }
+  flattenQuadratic(p0, l1, split, depth + 1, out, budget);
+  flattenQuadratic(split, r1, p2, depth + 1, out, budget);
+}
+
+function flattenCubic(
+  p0: ContourPoint,
+  p1: ContourPoint,
+  p2: ContourPoint,
+  p3: ContourPoint,
+  depth: number,
+  out: NailPointV7[],
+  budget: FlattenBudget,
+): void {
+  if (budget.overflow) return;
+  if (out.length >= FRENCH_CONTOUR_MAX_POINTS_V1) {
+    budget.overflow = true;
+    return;
+  }
+  if (depth > FRENCH_CONTOUR_MAX_SUBDIVISION_DEPTH_V1) {
+    budget.overflow = true;
+    return;
+  }
+  if (
+    Math.max(distanceToLine(p1, p0, p3), distanceToLine(p2, p0, p3)) <= FRENCH_CONTOUR_FLATNESS_TOLERANCE_V1
+  ) {
+    flattenLine(p3, out, budget);
+    return;
+  }
+  const l1 = mid(p0, p1);
+  const m = mid(p1, p2);
+  const r2 = mid(p2, p3);
+  if (!l1 || !m || !r2) {
+    budget.overflow = true;
+    return;
+  }
+  const l2 = mid(l1, m);
+  const r1 = mid(m, r2);
+  if (!l2 || !r1) {
+    budget.overflow = true;
+    return;
+  }
+  const split = mid(l2, r1);
+  if (!split) {
+    budget.overflow = true;
+    return;
+  }
+  flattenCubic(p0, l1, l2, split, depth + 1, out, budget);
+  flattenCubic(split, r1, r2, p3, depth + 1, out, budget);
+}
+
+function flattenExactContour(segments: readonly ExactSegment[]): NailPointV7[] | 'overflow' | null {
+  const start = point(segments[0].p0.u, segments[0].p0.v);
+  if (!start) return null;
+  const out: NailPointV7[] = [start];
+  const budget: FlattenBudget = { overflow: false };
+  for (const segment of segments) {
+    if (segment.kind === 'L') flattenLine(segment.p1, out, budget);
+    else if (segment.kind === 'Q') flattenQuadratic(segment.p0, segment.p1, segment.p2, 0, out, budget);
+    else flattenCubic(segment.p0, segment.p1, segment.p2, segment.p3, 0, out, budget);
+    if (budget.overflow) return 'overflow';
+  }
+  const first = out[0];
+  const last = out[out.length - 1];
+  if (first && last && (first.u !== last.u || first.v !== last.v)) {
+    if (out.length >= FRENCH_CONTOUR_MAX_POINTS_V1) return 'overflow';
+    out.push({ ...first });
+  }
+  return out.length >= 3 ? out : null;
 }
 
 function isClosedPolyline(polyline: readonly NailPointV7[]): boolean {
@@ -281,7 +666,7 @@ function insertOnContour(polyline: NailPointV7[], target: NailPointV7): boolean 
       bestIndex = i;
     }
   }
-  if (bestIndex < 0 || bestDist > ON_CONTOUR_EPS) return false;
+  if (bestIndex < 0 || bestDist > FRENCH_WING_ON_CONTOUR_TOLERANCE_V1) return false;
   const a = polyline[bestIndex];
   const b = polyline[bestIndex + 1] ?? polyline[0];
   if (Math.hypot(a.u - target.u, a.v - target.v) <= UNIT_EPS) return true;
@@ -324,7 +709,8 @@ function serializeCommands(commands: ParsedNailPathV7['commands']): string | nul
     })),
   };
   const serialized = serializeNailPathDataV7(snapped);
-  return parseNailPathDataV7(serialized) ? serializeNailPathDataV7(parseNailPathDataV7(serialized)!) : null;
+  const parsed = parseNailPathDataV7(serialized);
+  return parsed ? serializeNailPathDataV7(parsed) : null;
 }
 
 function colorWithOpacity(hex: string, opacity: number): RgbaColorV7 | null {
@@ -333,29 +719,45 @@ function colorWithOpacity(hex: string, opacity: number): RgbaColorV7 | null {
   return { ...color, a: opacity };
 }
 
+function lengthPrefixedExactKeyPayload(
+  kind: typeof FRENCH_EXACT_KEY_KIND_CACHE_V1 | typeof FRENCH_EXACT_KEY_KIND_BINDING_V1,
+  geometry: FrenchExactGeometryV1,
+  serialization: string,
+): string {
+  const fields: Record<(typeof FRENCH_EXACT_KEY_FIELDS_V1)[number], string> = {
+    kind,
+    compilerRevision: FRENCH_PATH_COMPILER_REVISION_V1,
+    recipeId: FRENCH_RECIPE_ID_V1,
+    recipeRevision: FRENCH_RECIPE_REVISION_V1,
+    parameterSerialization: serialization,
+    assetId: geometry.assetId,
+    revision: geometry.revision,
+    finger: geometry.finger,
+    registryAssetSetSha256: geometry.registryAssetSetSha256,
+    contourIdentity: geometry.contourIdentity,
+  };
+  return FRENCH_EXACT_KEY_FIELDS_V1
+    .map((key) => {
+      const value = fields[key];
+      return `${key.length}:${key}:${value.length}:${value}`;
+    })
+    .join('\n');
+}
+
+export function frenchExactKeyPreimageV1(
+  kind: typeof FRENCH_EXACT_KEY_KIND_CACHE_V1 | typeof FRENCH_EXACT_KEY_KIND_BINDING_V1,
+  geometry: Pick<FrenchExactGeometryV1, 'assetId' | 'revision' | 'finger' | 'registryAssetSetSha256' | 'contourIdentity'>,
+  parameterSerialization: string,
+): string {
+  return lengthPrefixedExactKeyPayload(kind, geometry as FrenchExactGeometryV1, parameterSerialization);
+}
+
 function cacheIdentity(
   geometry: FrenchExactGeometryV1,
   serialization: string,
-): FrenchPathCacheIdentityV1 | null {
-  if (!FULL_SHA256.test(geometry.registryAssetSetSha256) || !FULL_SHA256.test(geometry.contourIdentity)) return null;
-  if (geometry.revision === 'latest' || geometry.revision.includes('latest')) return null;
-  const geometryRef = `${geometry.assetId}@${geometry.revision}`;
-  const cacheKey = [
-    `compiler=${FRENCH_PATH_COMPILER_REVISION_V1}`,
-    `recipe=${FRENCH_RECIPE_ID_V1}@${FRENCH_RECIPE_REVISION_V1}`,
-    `params=${serialization}`,
-    `geometry=${geometryRef}`,
-    `finger=${geometry.finger}`,
-    `registrySha256=${geometry.registryAssetSetSha256}`,
-    `contour=${geometry.contourIdentity}`,
-  ].join('|');
-  const bindingKey = [
-    `finger=${geometry.finger}`,
-    `geometry=${geometryRef}`,
-    `compiler=${FRENCH_PATH_COMPILER_REVISION_V1}`,
-    `recipe=${FRENCH_RECIPE_ID_V1}@${FRENCH_RECIPE_REVISION_V1}`,
-    `params=${serialization}`,
-  ].join('|');
+): FrenchPathCacheIdentityV1 {
+  const cacheKey = sha256Hex(lengthPrefixedExactKeyPayload(FRENCH_EXACT_KEY_KIND_CACHE_V1, geometry, serialization));
+  const bindingKey = sha256Hex(lengthPrefixedExactKeyPayload(FRENCH_EXACT_KEY_KIND_BINDING_V1, geometry, serialization));
   return {
     compilerRevision: FRENCH_PATH_COMPILER_REVISION_V1,
     recipeId: FRENCH_RECIPE_ID_V1,
@@ -396,19 +798,16 @@ export function enumerateFrenchGoldenBindingsV1(): readonly FrenchGoldenBindingV
 /**
  * Pure compiler. Inputs are not mutated. Outline is a separate stroke-only
  * smile-line; the closed fill path is never stroked.
+ *
+ * This function is a runtime trust boundary: forged exact objects, unsafe
+ * identities, SHA drift, and non-canonical contours fail closed.
  */
 export function compileFrenchPathV1(
   geometry: FrenchExactGeometryV1,
   parameters: FrenchRecipeParametersV1,
 ): FrenchPathCompileResultV1 {
-  if (
-    geometry.fidelity !== 'exact'
-    || geometry.evidence !== 'signed_off'
-    || geometry.manufacturingValidated !== false
-    || geometry.coordinateSpace !== FRENCH_PATH_COORDINATE_SPACE_V1
-  ) {
-    return unavailable([diagnostic('geometry_not_exact', 'geometry', 'compiler accepts only exact signed_off geometry')]);
-  }
+  const trust = validateFrenchExactGeometryTrustBoundaryV1(geometry);
+  if (trust.length > 0) return unavailable(trust);
 
   const parsedParameters = parseFrenchRecipeParametersV1(parameters);
   if (!parsedParameters.ok) {
@@ -420,23 +819,20 @@ export function compileFrenchPathV1(
   }
   const canonicalParameters = parsedParameters.parameters;
   const identity = cacheIdentity(geometry, parsedParameters.serialization);
-  if (!identity) {
-    return unavailable([diagnostic('geometry_not_exact', 'cacheIdentity', 'cache identity requires full SHA values and forbids latest/truncated digests')]);
-  }
 
   const parsedContour = parseNailPathDataV7(geometry.contourPathData);
-  if (!parsedContour || !isDrawableNailPathDataV7(geometry.contourPathData, 'area')) {
+  if (!parsedContour) {
     return unavailable([diagnostic('contour_invalid', 'contourPathData', 'exact geometry contour is not a closed drawable nail-local path')]);
   }
-  const polyline = sampleContour(parsedContour);
-  if (!polyline) {
-    return unavailable([diagnostic('contour_invalid', 'contourPathData', 'exact geometry contour could not be sampled')]);
+  const segments = parseExactSegments(parsedContour);
+  if (!segments) {
+    return unavailable([diagnostic('contour_invalid', 'contourPathData', 'exact geometry contour is not a single closed Bezier subpath')]);
   }
 
-  const leftUs = intersectionsAtV(polyline, canonicalParameters.leftWingV);
-  const rightUs = intersectionsAtV(polyline, canonicalParameters.rightWingV);
+  const leftUs = uniqueSorted(segments.flatMap((segment) => analyticUsAtV(segment, canonicalParameters.leftWingV)));
+  const rightUs = uniqueSorted(segments.flatMap((segment) => analyticUsAtV(segment, canonicalParameters.rightWingV)));
   if (leftUs.length < 2 || rightUs.length < 2) {
-    return unavailable([diagnostic('wing_off_contour', 'leftWingV', 'smile-line wings must intersect the signed contour')]);
+    return unavailable([diagnostic('wing_off_contour', 'leftWingV', 'smile-line wings must intersect the signed exact contour')]);
   }
 
   const left = point(Math.min(...leftUs), canonicalParameters.leftWingV);
@@ -446,17 +842,25 @@ export function compileFrenchPathV1(
     return unavailable([diagnostic('coordinates_out_of_range', 'anchors', 'compiled anchors must stay inside finite [0, 1]')]);
   }
 
-  const working = polyline.map((item) => ({ ...item }));
+  const flattened = flattenExactContour(segments);
+  if (flattened === 'overflow') {
+    return unavailable([diagnostic('flatten_overflow', 'contourPathData', 'adaptive contour flattening exceeded max depth or point cap')]);
+  }
+  if (!flattened) {
+    return unavailable([diagnostic('contour_invalid', 'contourPathData', 'exact geometry contour could not be flattened')]);
+  }
+
+  const working = flattened.map((item) => ({ ...item }));
   if (!insertOnContour(working, left) || !insertOnContour(working, right)) {
-    return unavailable([diagnostic('wing_off_contour', 'anchors', 'compiled wings are not on the signed contour')]);
+    return unavailable([diagnostic('wing_off_contour', 'anchors', 'analytic wings are not within flattening tolerance of the derived cap')]);
   }
   const leftIndex = nearestIndex(working, left);
   const rightIndex = nearestIndex(working, right);
   if (
-    Math.hypot(working[leftIndex].u - left.u, working[leftIndex].v - left.v) > ON_CONTOUR_EPS
-    || Math.hypot(working[rightIndex].u - right.u, working[rightIndex].v - right.v) > ON_CONTOUR_EPS
+    Math.hypot(working[leftIndex].u - left.u, working[leftIndex].v - left.v) > FRENCH_WING_ON_CONTOUR_TOLERANCE_V1
+    || Math.hypot(working[rightIndex].u - right.u, working[rightIndex].v - right.v) > FRENCH_WING_ON_CONTOUR_TOLERANCE_V1
   ) {
-    return unavailable([diagnostic('wing_off_contour', 'anchors', 'compiled wings are not on the signed contour')]);
+    return unavailable([diagnostic('wing_off_contour', 'anchors', 'compiled wings are not on the derived flattened contour')]);
   }
 
   const forward = walkPolyline(working, leftIndex, rightIndex, 1);

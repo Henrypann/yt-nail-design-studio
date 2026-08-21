@@ -239,6 +239,13 @@ export function canonicalizeSilhouetteToNailLocalV1(
       currentY = y;
       implicit = 'V';
     } else if (command === 'M') {
+      if (started) {
+        return canonicalizeFail(
+          'malformed_path',
+          'pathD',
+          'silhouette path must be a single closed subpath; a second M starts another subpath',
+        );
+      }
       const [x, y] = read.values;
       svgCommands.push({ command: 'M', values: [x, y] });
       currentX = x;
@@ -271,6 +278,9 @@ export function canonicalizeSilhouetteToNailLocalV1(
   if (svgCommands.length === 0 || svgCommands[svgCommands.length - 1]?.command !== 'Z') {
     return canonicalizeFail('open_path', 'pathD', 'silhouette path must be a single closed drawable subpath');
   }
+  if (svgCommands.filter((item) => item.command === 'M').length !== 1) {
+    return canonicalizeFail('malformed_path', 'pathD', 'silhouette path must contain exactly one M');
+  }
 
   const mapped: ParsedNailPathV7 = {
     commands: svgCommands.map(({ command, values }) => {
@@ -299,8 +309,8 @@ export function canonicalizeSilhouetteToNailLocalV1(
   const parsed = parseNailPathDataV7(pathData);
   if (!parsed) return canonicalizeFail('malformed_path', 'pathD', 'mapped silhouette is not a canonical nail-local path');
   const canonical = serializeNailPathDataV7(parsed);
-  if (!isDrawableNailPathDataV7(canonical, 'area')) {
-    return canonicalizeFail('non_drawable_path', 'pathD', 'mapped silhouette is not a closed drawable area');
+  if (!isCanonicalSingleClosedNailPathV1(canonical)) {
+    return canonicalizeFail('non_drawable_path', 'pathD', 'mapped silhouette is not a single closed drawable subpath');
   }
 
   return {
@@ -310,6 +320,23 @@ export function canonicalizeSilhouetteToNailLocalV1(
     viewBox: box,
     canvasCenterU: (0 - box.x) / box.width,
   };
+}
+
+/** Nail-local contour must be one drawable M…Z subpath in canonical serialization. */
+export function isCanonicalSingleClosedNailPathV1(pathData: unknown): pathData is string {
+  if (typeof pathData !== 'string') return false;
+  const parsed = parseNailPathDataV7(pathData);
+  if (!parsed) return false;
+  if (parsed.commands[0]?.command !== 'M') return false;
+  if (parsed.commands[parsed.commands.length - 1]?.command !== 'Z') return false;
+  let moves = 0;
+  for (const { command } of parsed.commands) {
+    if (command === 'M') moves += 1;
+    if (moves > 1) return false;
+    if (command !== 'M' && command !== 'L' && command !== 'Q' && command !== 'C' && command !== 'Z') return false;
+  }
+  if (serializeNailPathDataV7(parsed) !== pathData) return false;
+  return isDrawableNailPathDataV7(pathData, 'area');
 }
 
 function reasonFromRegistry(reason: GeometryUnavailableReasonV7): FrenchGeometryUnavailableReasonV1 {
