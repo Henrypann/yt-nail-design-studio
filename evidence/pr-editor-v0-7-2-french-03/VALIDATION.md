@@ -1,6 +1,6 @@
 # EDITOR-v0.7.2-FRENCH-03 Validation
 
-状态：`prototype / READY(branch-code)`
+状态：`prototype / READY(branch-code) / owner-accepted for software integration`
 
 本 checkpoint 落地结构化 French 的创建、调整与删除闭环。current、selected、mirror、all 均通过同一纯命令进入 Store 一次事务；每个目标指保存独立 recipe instance、managed flat step 与 fill/outline projection。Mirror 交换 `leftWingV/rightWingV`，再以目标指的 exact geometry 重新编译，不复制缓存路径。
 
@@ -33,13 +33,17 @@
 - `npm run build:integration`：通过；仅既有 large-chunk warning。
 - `git diff --check`：通过。
 
-## 未关闭门
+## 历史未关闭门（由 2026-08-24 owner decision superseded）
 
-- D6：用户已对 `1280-create-mirror.png` 中的五预设、镜像作用域和创建确认方向完成 Product 快速签收；balance unlock、三锚点再编辑、预设切换语义及 Design / Nail Expert 专业签收仍开放。自动测试与局部截图不替代完整 owner sign-off。
+- D6：原记录将 balance unlock、三锚点再编辑、预设切换语义列为开放门；用户在 A+B 六视口回归通过后明确授权按当前软件原型基线关闭该集成门。独立 Nail Expert、实体与制造签收仍不作声明。
 - outline topology 的 1↔2 元素变更在本期 UI 未开放；命令遇到既有投影元素数量漂移时 fail closed。
-- FRENCH-04 四消费者统一 renderer/PBR adapter 尚未纳入本 checkpoint。
+- FRENCH-04 四消费者统一 renderer/PBR adapter 仍由其独立 checkpoint 与联合证据负责，不由本文件重复声明。
 - 本证据等级为 `prototype`；PBR 后续结果仍只能标记 `simulated/approximate`，`manufacturingValidated=false`。
 
 ## Product quick sign-off · 2026-08-24
 
 用户明确回复“1-6通过”。FRENCH-03 对应截图为 `screenshots/1280-create-mirror.png`；该回复只关闭预设选择、镜像 scope 与创建确认的产品方向，不扩展为六视口全交互、三锚点或十指全量视觉签收。
+
+## Professional prototype gate · 2026-08-24
+
+A+B 六视口 commands E2E 复跑通过后，用户明确要求关闭 French 专业门并进入 INT。当前三点参数、balance、preset reset、selected/mirror/all 原子 scope 与 history 行为被接受为软件原型集成基线；不声称实体或制造验证。完整记录见 `../pr-int-v0-7-2-french-professional-gate/VALIDATION.md`。

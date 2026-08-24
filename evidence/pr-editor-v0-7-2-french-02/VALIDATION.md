@@ -5,7 +5,7 @@ Branch: `codex/w34-studio-french-track`
 Checkpoint: FRENCH-02 pure exact-geometry French path compiler
 HEAD at start of this post-red-team P0 pass: `e8c602a`
 
-Status: **READY(branch) / prototype**. All listed code gates passed after the registry-tuple binding, collision-free numeric cache identity, and strict SVG comma fixes. Product/Design/Nail Expert human sign-off has not happened. `visualSignoff` remains `false`. This checkpoint remains software geometry / prototype evidence only.
+Status: **READY(branch) / prototype / owner-accepted for software integration**. All listed code gates passed after the registry-tuple binding, collision-free numeric cache identity, and strict SVG comma fixes. The explicit 2026-08-24 Product owner authorization is recorded below; no independent Nail Expert or manufacturing sign-off is claimed. `visualSignoff` remains `false` in the machine-generated manifest by contract.
 
 ## Scope verified
 
@@ -96,3 +96,7 @@ This checkpoint is software geometry / prototype evidence only. It is not visual
 - Exact source Bezier plus a deterministically flattened cap does not imply physical or manufacturing exactness.
 
 Evidence tier: local compiler/prototype tests plus prior Codex software visual review of unchanged SVG bytes. FRENCH-02 is `READY(branch)` for this software checkpoint only; owner human visual sign-off remains a pre-merge/product-acceptance gate.
+
+## Professional prototype gate · 2026-08-24
+
+用户明确授权关闭本轮 French 专业门并进入 INT 开发，当前 60-case 软件视觉矩阵作为 integration baseline 获 Product owner 接受。人工授权记录在 `../pr-int-v0-7-2-french-professional-gate/VALIDATION.md`；`golden-manifest.json` 仍按自动产物合同保持 `visualSignoff=false`，不把 human approval 混入 generator output。`manufacturingValidated=false` 不变。

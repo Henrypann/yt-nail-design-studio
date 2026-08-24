@@ -50,10 +50,14 @@ The five default preset identities are conservative contract defaults for the pl
 
 The bounded Hermes/Claude rotation on 2026-08-21 produced no valid review because every configured model failed the required usage/model validation. This checkpoint is Codex-verified but not Claude-approved.
 
-Evidence tier: local contract/prototype tests + bounded browser E2E/visual QA. FRENCH-01 stays `IN PROGRESS` until owner sign-off.
+Evidence tier: local contract/prototype tests + bounded browser E2E/visual QA. The original owner gate was closed by the explicit 2026-08-24 software-prototype integration authorization recorded below; manufacturing evidence remains false.
 
 ## Product quick sign-off · 2026-08-24
 
 用户明确回复“1-6通过”。其中 FRENCH-01 对应 `1280-legacy-conversion-prompt.png` 与 `1280-legacy-converted.png`，因此旧版证据披露、五预设转换提示和转换后 locked structured projection 的 Product 快速方向签收已通过。
 
 本签收不覆盖 FRENCH-02 的 60/60 golden，也不代替 Design / Nail Expert 对预设默认值、真实美甲语义或全量视觉的签收；branch、main 与制造证据状态不变。
+
+## Professional prototype gate · 2026-08-24
+
+用户在 A+B 联合回归通过后明确要求关闭 French 专业门并进入 INT-FRENCH-01A/01B。本 checkpoint 的软件原型集成门因此关闭；详细范围见 `../pr-int-v0-7-2-french-professional-gate/VALIDATION.md`。该授权不升级为独立 Nail Expert、实体或制造签收。

@@ -1,6 +1,6 @@
 # RENDER-v0.7.2-FRENCH-04 Validation
 
-状态：`prototype / READY(branch-code)`；制造验证：`false`；合入状态：`未合入 main`。
+状态：`prototype / READY(branch-code) / owner-accepted for software integration`；制造验证：`false`；合入状态：`未合入 main`。
 
 本 candidate 新增只读 `french-render-adapter-v1`。结构化 French 必须经过 strict recipe parse、recipe map key/instance identity、全十指引用完整性、精确 geometry + registry SHA、compiler 与存储 projection parity；任何 revision/SHA/参数/projection/reference drift 返回可见 `unavailable`，不回退到 legacy `widthRatio/curvature`。缺失 recipe 同样 fail closed。无 recipe 的普通 flat step与 legacy French 保持 passthrough。
 
@@ -28,11 +28,15 @@
 - `screenshots/390-*.png`
 - `screenshots/1280-*.png`
 
-未关闭：
+历史未关闭项（由 2026-08-24 owner decision superseded for software integration）：
 
 - 用户已对 `1280-editor-flat.png`、`1280-editor-unavailable.png` 与 `1280-pbr.png` 完成 Product 快速方向签收；Editor structured path、可见 fail-closed 降级和顾客 PBR simulated 表达通过本轮抽查。
-- 60 × 4 consumer 的 Design / Nail Expert 全量人工视觉签收仍开放；Product 的三张关键截图签收、240 次自动 adapter 调用和两档浏览器证据不能代替 240 项专业视觉验收。
-- FRENCH-03 D6 与 FRENCH-04 V1 owner signoff 仍开放，因此本 checkpoint 尚不建议合入 main。
+- 原记录要求 60 × 4 consumer 的逐项人工视觉签收；用户在完整 A+B 自动矩阵、关键截图与浏览器回归通过后明确接受当前软件原型基线进入 INT。该决定不归因于独立 Nail Expert，也不升级制造证据。
+- FRENCH-03 D6 与 FRENCH-04 V1 的软件原型 owner gate 已关闭；Branch A 是否进入 main 仍由后续 INT-FRENCH-01A/01B 与 combined handoff 决定。
 - 真实 PBR、十指真实 3D、Boolean、物理材料/制造验证仍不属于本 PR。
 
 签收来源：2026-08-24 用户对本任务展示的 1–6 关键截图明确回复“1-6通过”。本记录不改变 `prototype / READY(branch-code)`、`未合入 main` 与 `manufacturingValidated=false`。
+
+## Professional prototype gate · 2026-08-24
+
+在 60×4=240 adapter、两档 renderer E2E 与 A+B 联合浏览器回归再次通过后，用户明确要求关闭 French 专业门并进入 INT。当前四消费者视觉/降级方向获软件原型集成许可；PBR 仍为 simulated，且不归因于独立 Nail Expert 或制造签收。详见 `../pr-int-v0-7-2-french-professional-gate/VALIDATION.md`。
