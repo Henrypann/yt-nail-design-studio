@@ -21,4 +21,3 @@
 3. 合入前再次确认主工作树的 `AGENTS.md`、`.obsidian/`、`docs/architecture/` 与 Vite timestamp 未被覆盖。
 
 禁止只 cherry-pick 01A/01B；它们依赖 FRENCH-01～04、Branch A 的 A+B merge commit 与 Branch B 主线。
-

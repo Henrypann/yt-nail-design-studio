@@ -23,4 +23,3 @@
 - Asset/Community：contract、inventory、governance、Starter、capability、Home、owner fail-closed、combined、TAX 与 discovery 回归全部 PASS。
 - Browser：French conversion 2 viewports、commands 6 viewports、renderers 2 viewports；Community capability 6、Home 6、content states、TAX-04 六档全部 PASS。
 - `typecheck`、`build`、`build:integration`、`git diff --check` PASS；仅保留既有 Vite chunk-size warning。
-

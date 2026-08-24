@@ -35,4 +35,3 @@ npm run test:int-v0-7-2-french-use:e2e
 - 不修改 `EditorDocV7`、`schemaVersion: 7` 或 Community intent V1/V2 exact-key 合同。
 - 不把 Legacy 近似路径升级为 canonical Versioned Use。
 - 本证据属于软件原型集成与视觉走查，不代表实物、打印、制造、生产或 Nail Expert 独立签收。
-
