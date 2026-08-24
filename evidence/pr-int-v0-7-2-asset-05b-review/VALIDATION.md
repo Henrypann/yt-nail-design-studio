@@ -51,3 +51,5 @@ PASS
 Boundary test 默认 base 已固定为本轮真实 `3f0fb9b`，避免本地 `main` 后续 fast-forward 后改变审查集合；仍可用 `ASSET_BRANCH_BASE` 显式覆盖。
 
 签收归属勘误后的 Community 横向回归：TAX-04 Home UI 49/49、Explore/Search、content states、Taxonomy V1/V2 与 discovery migration 全部 PASS。不存在 `test:community-tax-03-filter-runtime` / `test:community-tax-02-migration` 这两个 npm alias；已使用仓库真实脚本名复跑，不把 alias 缺失记为产品失败。
+
+当前 Handoff 首屏已同步到 `bb689b4`、27 commits、74 files；该增量仅更新证据与勘误，不改变 owner-gated 裁决。

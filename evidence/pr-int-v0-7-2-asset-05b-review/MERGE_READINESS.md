@@ -1,6 +1,6 @@
 # INT-ASSET-05B｜Branch B Merge Readiness Review
 
-审查实现基线：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`；本轮门禁当前 HEAD 为 `c3a68561526c510f45fd31c60cd62b66b4e5ce69`。
+审查实现基线：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`；本轮门禁当前 HEAD 为 `bb689b4e775e1449547f4e2477e3347411a38340`。
 
 裁决：`READY FOR PRODUCT/OWNER REVIEW`，**尚不建议立即 merge**。
 
@@ -8,8 +8,8 @@
 
 ## 已确认
 
-- Branch B 是 `main @ 3f0fb9b` 的直接后代，完整 stack 为 12 个实现/证据提交；禁止只 cherry-pick 后段 03B/04A/05A。
-- 实现 diff 69 文件；source 只位于 Community、platform asset authority、Studio official-starter-shelf 三个授权范围。
+- Branch B 是 `main @ 3f0fb9b` 的直接后代，完整 stack 为 27 个实现/证据提交；禁止只 cherry-pick 后段 03B/04A/05A 或 Handoff。
+- 完整 diff 74 文件；source 只位于 Community、platform asset authority、Studio official-starter-shelf 三个授权范围。
 - 未修改 EditorDoc model/schema、French recipe/compiler、Wizard、geometry registry 或 manufacturing contract。
 - 与 Branch A 唯一文件交集为 `package.json`；以 `main @ 3f0fb9b`、Branch B `8ce6d19`、Branch A `a150040` 在临时 detached worktree 执行无提交三方合并，Git 可无冲突合并。组合态 typecheck、build、build:integration、French contract/compiler/conversion/commands/renderers、资产联合矩阵、Home 合同和带显式 `ASSET_HEAD` 的边界门均通过。随后 Branch B 增加 owner review 门，当前三方 package 门再次通过并可保留 16 条资产脚本与 12 条 French 脚本。实际吸收后仍须重跑双方门禁，不把演练等同正式 merge。
 - 与 main 用户 dirty/untracked 路径无交集：`AGENTS.md`、`.obsidian/`、`docs/architecture/`、Vite timestamp 均未被 Branch B 修改。
