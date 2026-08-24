@@ -30,6 +30,9 @@
 
 未关闭：
 
-- 60 × 4 consumer 的 Product / Design / Nail Expert 人工视觉签收仍开放；240 次自动 adapter 调用和两档浏览器截图不能代替 240 项人工视觉验收。
+- 用户已对 `1280-editor-flat.png`、`1280-editor-unavailable.png` 与 `1280-pbr.png` 完成 Product 快速方向签收；Editor structured path、可见 fail-closed 降级和顾客 PBR simulated 表达通过本轮抽查。
+- 60 × 4 consumer 的 Design / Nail Expert 全量人工视觉签收仍开放；Product 的三张关键截图签收、240 次自动 adapter 调用和两档浏览器证据不能代替 240 项专业视觉验收。
 - FRENCH-03 D6 与 FRENCH-04 V1 owner signoff 仍开放，因此本 checkpoint 尚不建议合入 main。
 - 真实 PBR、十指真实 3D、Boolean、物理材料/制造验证仍不属于本 PR。
+
+签收来源：2026-08-24 用户对本任务展示的 1–6 关键截图明确回复“1-6通过”。本记录不改变 `prototype / READY(branch-code)`、`未合入 main` 与 `manufacturingValidated=false`。

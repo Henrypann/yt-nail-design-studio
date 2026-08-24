@@ -35,7 +35,11 @@
 
 ## 未关闭门
 
-- D6：balance unlock、三锚点和预设切换语义仍需 Product / Design / Nail Expert 人工签收；自动测试与 Codex 截图复核不替代 owner sign-off。
+- D6：用户已对 `1280-create-mirror.png` 中的五预设、镜像作用域和创建确认方向完成 Product 快速签收；balance unlock、三锚点再编辑、预设切换语义及 Design / Nail Expert 专业签收仍开放。自动测试与局部截图不替代完整 owner sign-off。
 - outline topology 的 1↔2 元素变更在本期 UI 未开放；命令遇到既有投影元素数量漂移时 fail closed。
 - FRENCH-04 四消费者统一 renderer/PBR adapter 尚未纳入本 checkpoint。
 - 本证据等级为 `prototype`；PBR 后续结果仍只能标记 `simulated/approximate`，`manufacturingValidated=false`。
+
+## Product quick sign-off · 2026-08-24
+
+用户明确回复“1-6通过”。FRENCH-03 对应截图为 `screenshots/1280-create-mirror.png`；该回复只关闭预设选择、镜像 scope 与创建确认的产品方向，不扩展为六视口全交互、三锚点或十指全量视觉签收。

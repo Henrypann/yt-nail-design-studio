@@ -12,6 +12,12 @@
   "cameraChecks": 10,
   "writerZero": true,
   "manufacturingValidated": false,
+  "productQuickSignoff": true,
+  "productSignedScreenshots": [
+    "1280-editor-flat.png",
+    "1280-editor-unavailable.png",
+    "1280-pbr.png"
+  ],
   "visualSignoff": false,
   "ownerSignoff": false,
   "notes": [
