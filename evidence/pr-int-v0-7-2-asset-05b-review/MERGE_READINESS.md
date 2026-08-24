@@ -1,6 +1,6 @@
 # INT-ASSET-05B｜Branch B Merge Readiness Review
 
-审查实现 HEAD：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`。
+审查实现基线：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`；本轮门禁补强基于 `b3758bc66734ac7123e546cde083869ba6116ae8`。
 
 裁决：`READY FOR PRODUCT/OWNER REVIEW`，**尚不建议立即 merge**。
 
@@ -9,7 +9,7 @@
 - Branch B 是 `main @ 3f0fb9b` 的直接后代，完整 stack 为 12 个实现/证据提交；禁止只 cherry-pick 后段 03B/04A/05A。
 - 实现 diff 69 文件；source 只位于 Community、platform asset authority、Studio official-starter-shelf 三个授权范围。
 - 未修改 EditorDoc model/schema、French recipe/compiler、Wizard、geometry registry 或 manufacturing contract。
-- 与 Branch A 唯一文件交集为 `package.json`；Branch B 若先进入 main，Branch A 吸收 main 时需人工合并 scripts，并重跑 French 全回归。
+- 与 Branch A 唯一文件交集为 `package.json`；以 `main @ 3f0fb9b`、Branch B `b3758bc`、Branch A `a150040` 执行三方合并演练，Git 可无冲突合并且保留 15 条资产脚本与 12 条 French 脚本。实际吸收后仍须重跑双方门禁，不把演练等同正式 merge。
 - 与 main 用户 dirty/untracked 路径无交集：`AGENTS.md`、`.obsidian/`、`docs/architecture/`、Vite timestamp 均未被 Branch B 修改。
 - 全资产专项、Community 回归、typecheck、build、integration build、03B/04A 六视口均通过。
 
@@ -22,7 +22,7 @@
 
 ## 仍阻止“立即 merge”的门
 
-1. Product/Design 尚未签收 04A 首页等待态表达。
+1. 用户已于 2026-08-24 明确回复“1–6 通过”，可记录为本轮所展示六张可见证据的快速视觉签收；它不替代 Marketing/Community owner 的内容选择，也不升级为发布签收。
 2. Marketing/Community owner 尚未填写 04B Banner、精选、集合与双语理由；Home 当前保持 `AWAITING_INPUT`。
 3. 25/25 rights 仍 `PENDING`，10/10 Starter candidates promotion 仍 `BLOCKED`。
 4. Hermes/Claude 外部审查此前没有通过 usage/model fail-closed 校验，不能记为外审通过。
@@ -31,11 +31,10 @@
 
 ## 建议裁决顺序
 
-1. 用户快速签收 04A 的 390/1280 等待态与失败态截图。
-2. Owner input 到位则进入 04B `IN_REVIEW`；未到位可以明确接受“合入诚实空态，但运营内容未完成”。
-3. Codex 在最终 HEAD 上重跑 branch-boundary、全资产专项、两组 E2E、typecheck/build/integration。
-4. 用户明确授权后，完整 fast-forward Branch B 到本地 main；不 push。
-5. Branch A 吸收新 main，解决唯一 `package.json` 重叠并重跑 French 门禁。
+1. Owner input 到位则进入 04B `IN_REVIEW`；未到位可以明确接受“合入诚实空态，但运营内容未完成”。
+2. Codex 在最终 HEAD 上重跑 branch-boundary、全资产专项、两组 E2E、typecheck/build/integration。
+3. 用户明确授权后，完整 fast-forward Branch B 到本地 main；不 push。
+4. Branch A 吸收新 main；`package.json` 当前演练可自动合并，但仍重跑 French 与资产双方门禁。
 
 ## 当前可安全声称
 

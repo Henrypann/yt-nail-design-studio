@@ -2,6 +2,9 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const base = process.env.ASSET_BRANCH_BASE ?? 'main';
 const frenchHead = process.env.FRENCH_HEAD ?? 'a1500407a73073bb93b27ae426f9f379904fd76a';
@@ -27,6 +30,33 @@ for (const file of assetFiles) {
 const overlap = assetFiles.filter((file) => frenchFiles.includes(file));
 assert.deepEqual(overlap, ['package.json'], 'only package scripts may overlap Branch A before absorption/rebase');
 
+const mergeDir = mkdtempSync(join(tmpdir(), 'asset-french-boundary-'));
+try {
+  const basePackage = git('show', `${base}:package.json`);
+  const assetPackage = git('show', 'HEAD:package.json');
+  const frenchPackage = git('show', `${frenchHead}:package.json`);
+  const basePath = join(mergeDir, 'base.json');
+  const assetPath = join(mergeDir, 'asset.json');
+  const frenchPath = join(mergeDir, 'french.json');
+  writeFileSync(basePath, `${basePackage}\n`);
+  writeFileSync(assetPath, `${assetPackage}\n`);
+  writeFileSync(frenchPath, `${frenchPackage}\n`);
+
+  const mergedText = execFileSync('git', ['merge-file', '-p', assetPath, basePath, frenchPath], { encoding: 'utf8' });
+  assert.ok(!mergedText.includes('<<<<<<<'), 'package.json three-way merge must remain conflict-free');
+  const merged = JSON.parse(mergedText);
+  const asset = JSON.parse(assetPackage);
+  const french = JSON.parse(frenchPackage);
+  for (const [name, command] of Object.entries(asset.scripts)) {
+    assert.equal(merged.scripts[name], command, `merged package must preserve Branch B script ${name}`);
+  }
+  for (const [name, command] of Object.entries(french.scripts)) {
+    assert.equal(merged.scripts[name], command, `merged package must preserve Branch A script ${name}`);
+  }
+} finally {
+  rmSync(mergeDir, { recursive: true, force: true });
+}
+
 const sourceFiles = assetFiles.filter((file) => file.startsWith('src/'));
 assert.ok(sourceFiles.every((file) => (
   file.startsWith('src/community/')
@@ -34,4 +64,4 @@ assert.ok(sourceFiles.every((file) => (
   || file.startsWith('src/studio/assets/official-starter-shelf/')
 )), `unexpected source scope: ${sourceFiles.join(',')}`);
 
-console.log(`test-asset-ops-branch-boundary: PASS (${assetFiles.length} files; main ancestor; only Branch A overlap=package.json; no Editor/French ownership crossing)`);
+console.log(`test-asset-ops-branch-boundary: PASS (${assetFiles.length} files; main ancestor; package.json three-way merge clean; no Editor/French ownership crossing)`);
