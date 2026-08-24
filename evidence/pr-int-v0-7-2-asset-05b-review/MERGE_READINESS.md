@@ -13,6 +13,13 @@
 - 与 main 用户 dirty/untracked 路径无交集：`AGENTS.md`、`.obsidian/`、`docs/architecture/`、Vite timestamp 均未被 Branch B 修改。
 - 全资产专项、Community 回归、typecheck、build、integration build、03B/04A 六视口均通过。
 
+## Worktree 状态勘误
+
+- tracked state 为 clean（`git status --untracked-files=no`）。
+- worktree 根目录存在未跟踪 `dist 2/`；创建于 12:35、修改于 12:47，约 65,535 个目录项，完整 `git status` 会长时间扫描。
+- 该目录不在 Branch B commit，也未被 `.gitignore` 的 `dist` 规则覆盖。当前未删除、移动、忽略或改写，因为尚未完成内容/归属确认。
+- 因此在处理该副产物前，不得把 worktree 写成“完整 clean”，也不得进入 fast-forward。
+
 ## 仍阻止“立即 merge”的门
 
 1. Product/Design 尚未签收 04A 首页等待态表达。
@@ -20,6 +27,7 @@
 3. 25/25 rights 仍 `PENDING`，10/10 Starter candidates promotion 仍 `BLOCKED`。
 4. Hermes/Claude 外部审查此前没有通过 usage/model fail-closed 校验，不能记为外审通过。
 5. 主工作树已有用户文件；即使路径不冲突，也必须在实际 fast-forward 前再次核验，不 stash/reset/clean。
+6. Branch B worktree 的未跟踪 `dist 2/` 必须先由用户确认清理/保留策略；不得静默删除。
 
 ## 建议裁决顺序
 
