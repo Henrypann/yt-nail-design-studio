@@ -38,6 +38,8 @@ import {
 } from '@/studio/wizard/consume-community-intent';
 import { hasEditorDoc } from '@/studio/editor/lib/repo-v6';
 import { loadShapeParams } from '@/studio/preview/material-library';
+import { getLookReadModelById } from '@/community/data/look-repository';
+import { deriveFrenchUsePreflightV1, type FrenchUsePreflightV1 } from '@/integration/community-studio/french-use-context-v1';
 
 type IntentConflictUi = {
   intentId: string;
@@ -84,6 +86,7 @@ export default function WizardPage() {
   const [intentConflict, setIntentConflict] = useState<IntentConflictUi | null>(null);
   const [intentPending, setIntentPending] = useState(false);
   const [wizardReady, setWizardReady] = useState(false);
+  const [legacyFrenchPreflight, setLegacyFrenchPreflight] = useState<FrenchUsePreflightV1 | null>(null);
   const initializedRef = useRef(false);
   /** 已处理的 intentId，避免同一次落地重复消费；换新 intent 可再次进入。 */
   const intentHandledRef = useRef<string | null>(null);
@@ -419,6 +422,21 @@ export default function WizardPage() {
       .catch(() => undefined);
   }, [s.appliedShape, s.appliedLength]);
 
+  useEffect(() => {
+    const contentId = s.communitySourceRef?.contentId;
+    if (!contentId) {
+      setLegacyFrenchPreflight(null);
+      return undefined;
+    }
+    let cancelled = false;
+    void getLookReadModelById(contentId).then((look) => {
+      if (!cancelled) setLegacyFrenchPreflight(deriveFrenchUsePreflightV1(look?.discovery ?? null));
+    }).catch(() => {
+      if (!cancelled) setLegacyFrenchPreflight({ status: 'DISCOVERY_UNAVAILABLE' });
+    });
+    return () => { cancelled = true; };
+  }, [s.communitySourceRef?.contentId]);
+
   /* 浏览器关闭/刷新拦截 */
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
@@ -494,6 +512,22 @@ export default function WizardPage() {
             <span>模板 {s.communitySourceRef.sourceTemplateId}</span>
             <span>资产 {s.communitySourceRef.assetVersion}</span>
             <span>能力 {s.communitySourceRef.applicationLevel}</span>
+          </div>
+        )}
+        {s.communitySourceRef && legacyFrenchPreflight?.status === 'FRENCH_DECLARED' && (
+          <div
+            className="max-w-full rounded-panel border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-[11px] leading-4 text-fuchsia-900"
+            data-testid="wizard-french-technique-hint"
+          >
+            来源明确声明「技法：法式」。本次仍是完整 Look 的 Legacy 近似应用；不会自动创建结构化法式或选择 preset，进入 Editor 后再由你明确操作。
+          </div>
+        )}
+        {s.communitySourceRef && legacyFrenchPreflight?.status === 'DISCOVERY_UNAVAILABLE' && (
+          <div
+            className="max-w-full rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] leading-4 text-amber-800"
+            data-testid="wizard-french-technique-unavailable"
+          >
+            结构化技法元数据不可用；Studio 未从 Legacy 标题、旧标签或画面猜测法式。
           </div>
         )}
 

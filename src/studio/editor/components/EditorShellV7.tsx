@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useBlocker, useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound, Waves } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
@@ -24,6 +24,8 @@ import {
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
 import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-factory';
+import type { FrenchUseContextV1 } from '@/integration/community-studio/french-use-context-v1';
+import { FRENCH_RECIPE_ID_V1 } from '../v7/french-recipe-v1';
 
 const SAVE_LABEL = {
   saved: '已保存',
@@ -45,7 +47,13 @@ function customerPreviewAvailabilityV7(
   return { enabled: true, description: '顾客只读预览可用 · 不可变审批 Snapshot 待 STUDIO-V7.1-04' };
 }
 
-export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean }) {
+export function EditorShellV7({
+  internalEnabled,
+  frenchUseContext = null,
+}: {
+  internalEnabled: boolean;
+  frenchUseContext?: FrenchUseContextV1 | null;
+}) {
   const navigate = useNavigate();
   const toast = useToast();
   const doc = useEditorV7Store((state) => state.doc);
@@ -476,6 +484,16 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
     window.setTimeout(() => document.querySelector<HTMLButtonElement>('[data-stage-id="finish"]')?.focus(), 0);
   };
 
+  const hasStructuredFrench = Object.values(doc.recipeInstances).some((instance) => instance.recipeId === FRENCH_RECIPE_ID_V1);
+  const openFrenchFromUseContext = (trigger: HTMLButtonElement) => {
+    const tool = resolveWorkspaceTool('french');
+    if (!tool?.enabled) {
+      toast.info('当前指的法式工具不可直接打开；Studio 未修改 geometry 或自动创建法式配方。');
+      return;
+    }
+    requestWorkspaceTool(tool, trigger);
+  };
+
   const trapResourceFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Tab') return;
     const focusable = Array.from(resourceDialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
@@ -592,6 +610,35 @@ export function EditorShellV7({ internalEnabled }: { internalEnabled: boolean })
         <div className="flex items-center justify-between gap-3 border-b border-error/20 bg-red-50 px-3 py-2 text-xs text-error" role="alert">
           <span className="flex min-w-0 items-center gap-2"><AlertCircle size={14} className="shrink-0" /><span className="truncate">{saveError ?? '保存失败，内存中的修改仍然保留。'}</span></span>
           <Button size="sm" variant="secondary" onClick={() => void saveNow()}>重试</Button>
+        </div>
+      )}
+
+      {frenchUseContext && !hasStructuredFrench && (
+        <div
+          className="flex flex-wrap items-center gap-2 border-b border-fuchsia-200 bg-fuchsia-50 px-3 py-2 text-xs text-fuchsia-950"
+          data-testid="french-use-context-notice"
+          data-french-use-status={frenchUseContext.authoringStatus}
+        >
+          <Waves size={15} className="shrink-0 text-fuchsia-700" />
+          <div className="min-w-[220px] flex-1">
+            <strong>来源声明「技法：法式」</strong>
+            <span className="ml-1">已导入完整 Look Remix；尚未选择预设，也没有自动写入结构化法式。</span>
+            <span className="ml-1 text-fuchsia-700">不代表当前可制作或制造验证。</span>
+            {frenchUseContext.diagnostics.length > 0 && <span className="ml-1 text-amber-800">诊断：{frenchUseContext.diagnostics.join('；')}</span>}
+          </div>
+          {frenchUseContext.action === 'OFFER_OPEN_FRENCH_TOOL' ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="min-h-11"
+              data-testid="french-use-open-tool"
+              onClick={(event) => openFrenchFromUseContext(event.currentTarget)}
+            >
+              打开法式工具（不自动添加）
+            </Button>
+          ) : (
+            <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-nano text-amber-800">需先处理甲型/长度诊断</span>
+          )}
         </div>
       )}
 

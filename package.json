@@ -109,6 +109,7 @@
     "test:editor-v7-french-renderers": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-french-renderers.mjs",
     "test:editor-v7-french-renderers:e2e": "node tools/walkthrough-editor-v7-french-renderers.mjs",
     "test:int-v0-7-2-french-use-context": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-int-v0-7-2-french-use-context.mjs",
+    "test:int-v0-7-2-french-use:e2e": "node tools/e2e-int-v0-7-2-french-use.mjs",
     "test:editor-v7-french-conversion:e2e": "node tools/walkthrough-editor-v7-french-conversion.mjs",
     "check:editor-v7-french-golden": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-editor-v7-french-golden.mjs --check",
     "update:editor-v7-french-golden": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-editor-v7-french-golden.mjs --update",

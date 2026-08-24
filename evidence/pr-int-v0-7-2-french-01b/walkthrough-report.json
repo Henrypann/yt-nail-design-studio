@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "INT-v0.7.2-FRENCH-01B",
+  "baseURL": "http://127.0.0.1:5216",
+  "evidence": "prototype",
+  "manufacturingValidated": false,
+  "report": [
+    {
+      "viewport": 390,
+      "interaction": "touch",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    },
+    {
+      "viewport": 768,
+      "interaction": "touch",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    },
+    {
+      "viewport": 1024,
+      "interaction": "pointer",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    },
+    {
+      "viewport": 1280,
+      "interaction": "pointer",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    },
+    {
+      "viewport": 1366,
+      "interaction": "pointer",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "interaction": "pointer",
+      "preflight": "FRENCH_DECLARED",
+      "openToolWriterZero": true,
+      "explicitRevisionDelta": 1,
+      "recipeRevision": "1.0.0",
+      "sourceRef": {
+        "domain": "community",
+        "sourceId": "look.v7-1.petal-veil",
+        "revision": "dv.v7-1.petal-veil.1"
+      },
+      "geometryCount": 10,
+      "saveReopen": "PASS",
+      "customerPreviewWriterZero": true,
+      "errors": []
+    }
+  ],
+  "legacyReport": {
+    "viewport": 1280,
+    "interaction": "pointer",
+    "contentId": "cc_petal_veil",
+    "route": "USE_LEGACY_APPROXIMATE",
+    "preflight": "FRENCH_DECLARED",
+    "editorDocWriterZero": true,
+    "presetInferred": false,
+    "manufacturingValidated": false,
+    "errors": []
+  }
+}

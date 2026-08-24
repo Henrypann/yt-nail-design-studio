@@ -35,12 +35,15 @@ import {
   TIER_ONE_EDITOR_SHAPES,
 } from '@/studio/editor/lib/material';
 import { FINGER_CODES, type FingerCode, type NailLength, type NailShape } from '@/lib/types';
+import type { FrenchUseContextV1 } from '@/integration/community-studio/french-use-context-v1';
+import { frenchUseContextMatchesTargetV1 } from '@/integration/community-studio/french-use-context-v1';
+import { frenchUseContextPortV1 } from '@/integration/community-studio/french-use-context-local';
 
 type PageState =
   | { kind: 'loading' }
   | { kind: 'bridge-warning'; designId: string }
   | { kind: 'blank-picker' }
-  | { kind: 'ready'; writer: 'v6' | 'v7'; internalEnabled?: boolean }
+  | { kind: 'ready'; writer: 'v6' | 'v7'; internalEnabled?: boolean; frenchUseContext?: FrenchUseContextV1 | null }
   | { kind: 'missing' }
   | { kind: 'save-error'; designId: string }
   | { kind: 'invalid'; unsupported?: boolean };
@@ -91,7 +94,13 @@ export default function EditorPage() {
         const currentState = editorV7Store.getState();
         const currentNail = currentState.doc?.nails[currentState.currentFinger];
         if (requestedStep && currentNail?.steps.some((step) => step.id === requestedStep)) currentState.selectStep(requestedStep);
-        return { kind: 'ready', writer: 'v7', internalEnabled: v7Enabled };
+        const loadedDoc = editorV7Store.getState().doc;
+        const frenchUseContextId = params.get('frenchUseContext');
+        const candidate = frenchUseContextId ? frenchUseContextPortV1.peek(frenchUseContextId) : null;
+        const frenchUseContext = candidate && loadedDoc && frenchUseContextMatchesTargetV1(candidate, loadedDoc)
+          ? candidate
+          : null;
+        return { kind: 'ready', writer: 'v7', internalEnabled: v7Enabled, frenchUseContext };
       }
       if (result === 'missing') return { kind: 'missing' };
       if (result === 'save_error' || result === 'busy') return { kind: 'save-error', designId };
@@ -170,7 +179,7 @@ export default function EditorPage() {
 
   if (state.kind === 'ready') {
     return state.writer === 'v7'
-      ? <EditorShellV7 internalEnabled={state.internalEnabled ?? false} />
+      ? <EditorShellV7 internalEnabled={state.internalEnabled ?? false} frenchUseContext={state.frenchUseContext ?? null} />
       : <EditorShellV6 />;
   }
 
