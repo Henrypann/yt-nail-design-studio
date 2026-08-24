@@ -1,0 +1,84 @@
+[
+  {
+    "viewport": {
+      "name": "390",
+      "width": 390,
+      "height": 844,
+      "compact": true
+    },
+    "triggerSize": {
+      "width": 294,
+      "height": 44
+    },
+    "minChoiceHeight": 56,
+    "before": {
+      "revision": 4,
+      "history": 0
+    },
+    "after": {
+      "revision": 5,
+      "history": 1,
+      "future": 0,
+      "pendingRevision": 5,
+      "otherFingerUnchanged": true,
+      "legacyVisible": false,
+      "legacyLocked": true,
+      "legacyWidth": 0.22,
+      "recipePreset": "soft",
+      "recipeFillColor": "#fef6f0",
+      "managedLocked": true,
+      "projectionLocked": true,
+      "projectionValid": true,
+      "selectedManagedStep": true,
+      "selectedManagedElement": true
+    },
+    "layout": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "dialogCount": 1
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 900,
+      "compact": false
+    },
+    "triggerSize": {
+      "width": 206.484375,
+      "height": 44
+    },
+    "minChoiceHeight": 56,
+    "before": {
+      "revision": 4,
+      "history": 0
+    },
+    "after": {
+      "revision": 5,
+      "history": 1,
+      "future": 0,
+      "pendingRevision": 5,
+      "otherFingerUnchanged": true,
+      "legacyVisible": false,
+      "legacyLocked": true,
+      "legacyWidth": 0.22,
+      "recipePreset": "soft",
+      "recipeFillColor": "#fef6f0",
+      "managedLocked": true,
+      "projectionLocked": true,
+      "projectionValid": true,
+      "selectedManagedStep": true,
+      "selectedManagedElement": true
+    },
+    "layout": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "dialogCount": 0
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

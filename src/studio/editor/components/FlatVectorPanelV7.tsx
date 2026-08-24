@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  AlertTriangle,
+  ArrowRight,
   Circle,
   Eraser,
   Focus,
@@ -13,7 +15,7 @@ import {
   Trash2,
   Waves,
 } from 'lucide-react';
-import { cx, useToast } from '@/design-system';
+import { Button, Modal, cx, useToast } from '@/design-system';
 import { PALETTE } from '../lib/material';
 import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { generateEditorV7Id } from '../v7/id';
@@ -25,6 +27,11 @@ import {
 } from '../v7/flat-vector';
 import { parseHexColorV7, rgbaToHexV7 } from '../v7/background';
 import { FLAT_TOOL_PANEL_MAP_V7, type FlatToolPanelModeV7 } from '../v7/flat-tool-panel-map';
+import {
+  FRENCH_RECIPE_PRESETS_V1,
+  createDefaultFrenchRecipeParametersV1,
+  type FrenchRecipeDefaultPresetV1,
+} from '../v7/french-recipe-v1';
 
 const TOOL_ITEMS: Array<{ tool: FlatVectorToolV7; label: string; icon: typeof MousePointer2 }> = [
   { tool: 'select', label: '选择/移动', icon: MousePointer2 },
@@ -38,6 +45,14 @@ const TOOL_ITEMS: Array<{ tool: FlatVectorToolV7; label: string; icon: typeof Mo
   { tool: 'region_mask', label: '区域遮罩', icon: Scissors },
   { tool: 'anchor', label: '锚点编辑', icon: Focus },
 ];
+
+const FRENCH_PRESET_COPY_V1: Record<FrenchRecipeDefaultPresetV1, { label: string; description: string }> = {
+  classic: { label: '经典', description: '平衡的弧形微笑线' },
+  micro: { label: '微法式', description: '更窄、更靠近甲尖' },
+  soft: { label: '柔和', description: '较缓的圆润弧线' },
+  deep: { label: '深法式', description: '更深的侧翼与弧线' },
+  pointed: { label: '尖角', description: '明确的 V 形中心' },
+};
 
 export type FlatVectorPanelVariantV7 = 'full' | 'resources' | 'inspector';
 
@@ -60,15 +75,21 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
   const removeElement = useEditorV7Store((state) => state.removeElement);
   const replaceElement = useEditorV7Store((state) => state.replaceFlatElement);
   const setElementOpacity = useEditorV7Store((state) => state.setFlatElementOpacity);
+  const confirmLegacyFrenchConversion = useEditorV7Store((state) => state.confirmLegacyFrenchConversion);
   const flatStep = step?.kind === 'flat_design' ? step : null;
   const selectedElement = flatStep?.elements.find((element) => element.id === selectedElementId) ?? null;
   const [opacityDraft, setOpacityDraft] = useState(selectedElement ? Math.round(selectedElement.opacity * 100) : 100);
   const [pathDraft, setPathDraft] = useState(selectedElement?.kind === 'vector_shape' ? selectedElement.pathData : selectedElement?.kind === 'region_mask' ? selectedElement.mask.pathData : '');
   const [frenchWidthDraft, setFrenchWidthDraft] = useState(selectedElement?.kind === 'french_edge' ? selectedElement.widthRatio : 0.22);
   const [frenchCurvatureDraft, setFrenchCurvatureDraft] = useState(selectedElement?.kind === 'french_edge' ? selectedElement.curvature : 0.35);
+  const [conversionOpen, setConversionOpen] = useState(false);
+  const [conversionPreset, setConversionPreset] = useState<FrenchRecipeDefaultPresetV1 | null>(null);
+  const [conversionColor, setConversionColor] = useState('#fffdf9');
   const lastOpacityCommit = useRef<number | null>(null);
   const lastFrenchWidthCommit = useRef<number | null>(null);
   const lastFrenchCurvatureCommit = useRef<number | null>(null);
+  const conversionTriggerRef = useRef<HTMLButtonElement>(null);
+  const conversionFirstChoiceRef = useRef<HTMLButtonElement>(null);
   const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && !flatStep.locked && geometryExact);
 
   useEffect(() => {
@@ -84,6 +105,15 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
     lastFrenchWidthCommit.current = selectedElement.widthRatio;
     lastFrenchCurvatureCommit.current = selectedElement.curvature;
   }, [selectedElement]);
+  useEffect(() => {
+    setConversionOpen(false);
+    setConversionPreset(null);
+  }, [currentFinger, selectedElement?.id]);
+  useEffect(() => {
+    if (!conversionOpen) return undefined;
+    const frame = requestAnimationFrame(() => conversionFirstChoiceRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [conversionOpen]);
 
   const colorHex = rgbaToHexV7(color);
   const editablePath = selectedElement?.kind === 'vector_shape' || selectedElement?.kind === 'region_mask';
@@ -150,6 +180,31 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
     if (resultToast(result)) lastCommit.current = value;
     else if (field === 'widthRatio') setFrenchWidthDraft(selectedElement.widthRatio);
     else setFrenchCurvatureDraft(selectedElement.curvature);
+  };
+
+  const closeConversion = () => {
+    setConversionOpen(false);
+    requestAnimationFrame(() => conversionTriggerRef.current?.focus());
+  };
+
+  const openConversion = () => {
+    if (selectedElement?.kind !== 'french_edge') return;
+    setConversionPreset(null);
+    setConversionColor(rgbaToHexV7(selectedElement.color));
+    setConversionOpen(true);
+  };
+
+  const commitLegacyFrenchConversion = () => {
+    if (!flatStep || selectedElement?.kind !== 'french_edge' || !conversionPreset || !canEditSelected) return;
+    const parameters = {
+      ...createDefaultFrenchRecipeParametersV1(conversionPreset),
+      fillColor: conversionColor,
+      fillOpacity: selectedElement.opacity,
+    };
+    const result = confirmLegacyFrenchConversion(currentFinger, flatStep.id, selectedElement.id, parameters);
+    if (!resultToast(result)) return;
+    setConversionOpen(false);
+    toast.success(`已转换为${FRENCH_PRESET_COPY_V1[conversionPreset].label}结构化法式；旧元素已隐藏并锁定为迁移证据。`);
   };
 
   if (!flatStep) return null;
@@ -233,6 +288,32 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
           </label>
           {selectedElement.kind === 'french_edge' && (
             <>
+              <section className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5" role="status" data-testid="v7-legacy-french-conversion-notice">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-700" />
+                  <div className="min-w-0">
+                    <p className="text-nano font-semibold text-amber-950">旧版近似法式</p>
+                    <p className="mt-1 text-nano leading-4 text-amber-900">当前元素只保存宽度、弧度和颜色，不能无损推导结构化微笑线。转换前外观与数据保持不变。</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-1 rounded-md bg-white/75 px-2 py-1.5 text-center text-nano text-amber-950" aria-label="旧版法式证据">
+                  <span><strong className="block font-semibold">宽度</strong>{Math.round(selectedElement.widthRatio * 100)}%</span>
+                  <span><strong className="block font-semibold">弧度</strong>{selectedElement.curvature.toFixed(2)}</span>
+                  <span><strong className="block font-semibold">颜色</strong><span className="font-mono">{rgbaToHexV7(selectedElement.color)}</span></span>
+                </div>
+                <button
+                  ref={conversionTriggerRef}
+                  type="button"
+                  disabled={!canEditSelected}
+                  aria-haspopup="dialog"
+                  onClick={openConversion}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-amber-300 bg-white px-3 text-nano font-semibold text-amber-950 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-45"
+                  data-testid="v7-legacy-french-convert"
+                >
+                  选择预设并转换 <ArrowRight size={14} />
+                </button>
+                {!geometryExact && <p className="text-nano leading-4 text-amber-900">当前甲型没有已签收的精确轮廓，转换保持停用且不会写入。</p>}
+              </section>
               <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">宽度<input type="range" min="0" max="1" step="0.01" value={frenchWidthDraft} disabled={!canEditSelected} onChange={(event) => setFrenchWidthDraft(Number(event.target.value))} onPointerUp={() => commitFrench('widthRatio')} onKeyUp={() => commitFrench('widthRatio')} onBlur={() => commitFrench('widthRatio')} className="h-11 accent-violet-600" /><span>{Math.round(frenchWidthDraft * 100)}%</span></label>
               <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">弧度<input type="range" min="-1" max="1" step="0.05" value={frenchCurvatureDraft} disabled={!canEditSelected} onChange={(event) => setFrenchCurvatureDraft(Number(event.target.value))} onPointerUp={() => commitFrench('curvature')} onKeyUp={() => commitFrench('curvature')} onBlur={() => commitFrench('curvature')} className="h-11 accent-violet-600" /><span>{frenchCurvatureDraft.toFixed(2)}</span></label>
             </>
@@ -250,6 +331,54 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
       {showInspector && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-2.5 py-2 text-nano leading-3.5 text-gray-500">
         橡皮和区域遮罩按 elements 顺序仅作用于其前面的内容，不会改写原路径。文字与素材的专属属性在下方检查器中编辑。
       </p>}
+
+      {selectedElement?.kind === 'french_edge' && <Modal
+        open={conversionOpen}
+        onClose={closeConversion}
+        title="转换旧版法式"
+        size="md"
+        closeOnOverlay
+        layer="workspace"
+        footer={<>
+          <Button type="button" variant="secondary" onClick={closeConversion} data-testid="v7-french-conversion-cancel">保留旧版</Button>
+          <Button type="button" disabled={!conversionPreset || !canEditSelected} onClick={commitLegacyFrenchConversion} data-testid="v7-french-conversion-confirm">确认转换</Button>
+        </>}
+      >
+        <div className="space-y-4" data-testid="v7-legacy-french-dialog">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-950">
+            旧宽度与弧度不会自动映射。请选择一个结构化预设；确认后系统新增锁定的配方投影，并把旧元素隐藏、锁定为迁移证据。取消或关闭不会修改设计。
+          </div>
+          <fieldset>
+            <legend className="text-xs font-semibold text-gray-800">1 · 选择结构化预设（必选）</legend>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {FRENCH_RECIPE_PRESETS_V1.map((preset, index) => {
+                const copy = FRENCH_PRESET_COPY_V1[preset];
+                const selected = conversionPreset === preset;
+                return <button
+                  ref={index === 0 ? conversionFirstChoiceRef : undefined}
+                  key={preset}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setConversionPreset(preset)}
+                  className={cx(
+                    'min-h-[56px] rounded-lg border px-2 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                    selected ? 'border-violet-500 bg-violet-50 text-violet-950' : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300',
+                  )}
+                  data-testid={`v7-french-preset-${preset}`}
+                >
+                  <strong className="block text-xs">{copy.label}</strong>
+                  <span className="mt-0.5 block text-nano leading-4 text-gray-500">{copy.description}</span>
+                </button>;
+              })}
+            </div>
+          </fieldset>
+          <label className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-700">
+            <span><strong className="block font-semibold text-gray-800">2 · 确认填充颜色</strong><span className="mt-0.5 block text-nano text-gray-500">默认显示旧元素颜色，可在确认前修改。</span></span>
+            <span className="flex items-center gap-2"><span className="font-mono text-nano">{conversionColor}</span><input type="color" value={conversionColor} onChange={(event) => setConversionColor(event.target.value)} aria-label="结构化法式填充颜色" className="h-10 w-11 rounded-lg border border-gray-300 bg-white p-1" data-testid="v7-french-conversion-color" /></span>
+          </label>
+          <p className="text-nano leading-4 text-gray-500">填充透明度将以当前可见值 {Math.round(selectedElement.opacity * 100)}% 明示写入；描边保持关闭。结构化参数不代表实物或制造验证。</p>
+        </div>
+      </Modal>}
     </div>
   );
 }

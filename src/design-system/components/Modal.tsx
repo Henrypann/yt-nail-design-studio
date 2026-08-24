@@ -13,6 +13,8 @@ export interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
   /** 点击遮罩是否关闭，默认 true */
   closeOnOverlay?: boolean;
+  /** 嵌套在工作区侧栏之上时使用；默认层级和 Esc 行为保持不变。 */
+  layer?: 'default' | 'workspace';
 }
 
 const sizeClasses = {
@@ -30,21 +32,31 @@ export function Modal({
   footer,
   size = 'md',
   closeOnOverlay = true,
+  layer = 'default',
 }: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key !== 'Escape') return;
+      if (layer === 'workspace') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+      onClose();
     };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    const capture = layer === 'workspace';
+    document.addEventListener('keydown', onKey, capture);
+    return () => document.removeEventListener('keydown', onKey, capture);
+  }, [layer, open, onClose]);
 
   if (!open) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 animate-fade-in"
+      className={cx(
+        'fixed inset-0 flex items-center justify-center bg-black/30 p-4 animate-fade-in',
+        layer === 'workspace' ? 'z-[200]' : 'z-50',
+      )}
       onMouseDown={(e) => {
         if (closeOnOverlay && e.target === e.currentTarget) onClose();
       }}

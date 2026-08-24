@@ -3,7 +3,7 @@
 Date: 2026-08-24
 Branch: `codex/w34-studio-french-track`
 Base: `main @ 3f0fb9bc1f39793d300bd4216c637584e23161c9`
-Checkpoint: explicit legacy conversion + recipe-managed projection (branch checkpoint)
+Checkpoint: explicit legacy conversion + visible confirmation + recipe-managed projection (branch checkpoint)
 
 ## Scope verified
 
@@ -20,6 +20,9 @@ Checkpoint: explicit legacy conversion + recipe-managed projection (branch check
 - `inspectFrenchRecipeProjectionV1` resolves the current document geometry tuple and recompiles from the recipe; an optional supplied geometry is only accepted when it matches that tuple. It rejects dangling references, ambiguous recipe ownership, hidden/unlocked/skipped managed steps, extra/unlocked elements, path/color/opacity/transform/stroke drift, and invalid geometry/parameters with visible diagnostics.
 - Conversion geometry is rebound to the current document finger/asset/revision and canonical registry; foreign-finger, foreign-asset, revision-drift, generated, forged, and registry-SHA-mismatched geometry fail closed. IDs follow the EditorDoc schema (max 128, `:` allowed) and node/recipe cross-domain collisions are rejected.
 - Store `confirmLegacyFrenchConversion` is spatial-gated and commits through the existing transaction path: read-only, busy, invalid geometry, invalid source, and compiler failures are writer-zero; success creates one revision/history entry and schedules the existing autosave.
+- The selected legacy inspector now discloses `旧版近似法式`, shows the preserved width/curvature/color evidence, and requires an explicit choice among the five structured presets before confirmation. It does not derive anchors from the legacy width/curvature. Color and current opacity are shown before writing; outline remains disabled.
+- Opening, configuring, cancelling, or pressing Escape is writer-zero. Confirmation hides/locks the legacy element, selects the new locked managed projection, and emits the existing success toast. Unsupported geometry keeps the action disabled and does not write.
+- The shared Modal now sits above the compact Editor workspace overlay and captures Escape before the underlying sidebar. This closes only the top dialog and restores focus to the conversion trigger; the preset targets are 56 px and the trigger is 44 px.
 
 ## Automated gates
 
@@ -28,20 +31,23 @@ Checkpoint: explicit legacy conversion + recipe-managed projection (branch check
 | `npm run test:editor-v7-french-contract` | PASS — default presets, custom round-trip, exact-key canonicalization, outline/cross-field fail-closed, instance, serialization |
 | `npm run test:editor-v7-french-migration` | PASS — V7 simple, V3/V6 arc/v/double, mixed, uncloneable preview, NaN/Infinity evidence, identity regression |
 | `npm run test:editor-v7-french-conversion` | PASS — pure no-mutation conversion, outline on/off, geometry/source/ID fail-closed matrix, full inspector tamper matrix, store writer-zero/undo/redo/save/reload, materialize/remix/scope no-dangling, release snapshot/manifest |
+| `npm run test:editor-v7-french-conversion:e2e` | PASS — 390×844 and 1280×900; intent/cancel/Escape writer-zero, focus restoration, 5 explicit presets, 44/56 px targets, one-revision confirmation, other-finger unchanged, locked valid projection, no horizontal overflow or runtime errors |
 | `npm run test:editor-v7-contract` | PASS — 2 valid and 34 invalid fixtures |
 | `npm run test:editor-v7-migrate` | PASS |
 | `npm run test:handdraw` | PASS — existing French, mirror, migration, and recipe regressions |
 | `npm run typecheck` | PASS |
-| `npm run build` | PASS — existing >500 kB chunk warning only |
+| `npm run build -- --outDir /tmp/nextgen-french-ui-build --emptyOutDir` | PASS — explicit temporary output avoids Desktop sync overhead; existing >500 kB chunk warning only |
 | `npm run build:integration` | PASS — existing >500 kB chunk warning only |
 | `git diff --check` | PASS |
 
 ## Acceptance boundary
 
-This remains a FRENCH-01 branch checkpoint, not a merged release. The dedicated tests now prove release snapshot/manifest preservation, independent/remix recipe remapping, and generic whole-nail copy-detached no-dangling behavior. It does not provide Editor UI, FRENCH-specific copy-detached recompilation, multi-finger French scope commands, or FRENCH-03 editing commands; those remain FRENCH-03 scope. No visual, physical, fit, manufacturing, deployment, or production claim is made.
+This remains a FRENCH-01 branch checkpoint, not a merged release. The dedicated tests now prove release snapshot/manifest preservation, independent/remix recipe remapping, generic whole-nail copy-detached no-dangling behavior, and the bounded legacy conversion confirmation UI. It does not provide three-anchor editing, preset re-editing, FRENCH-specific copy-detached recompilation, multi-finger French scope commands, or other FRENCH-03 editing commands; those remain FRENCH-03 scope. No physical, fit, manufacturing, deployment, or production claim is made.
+
+Codex inspected the generated 390 px and 1280 px before/after screenshots. The disclosure, preset layout, color confirmation, mobile overlay order, and converted locked step are visible without full-page horizontal overflow. This is local visual QA, not Product/Design/Nail Expert sign-off. Evidence is stored in `screenshots/` and `legacy-conversion-walkthrough-report.json`.
 
 The five default preset identities are conservative contract defaults for the planned 60 golden matrix. Product, Design/Nail Expert, and visual sign-off are still required before FRENCH-02 can claim accepted golden defaults. Passing parser tests is not that sign-off.
 
 The bounded Hermes/Claude rotation on 2026-08-21 produced no valid review because every configured model failed the required usage/model validation. This checkpoint is Codex-verified but not Claude-approved.
 
-Evidence tier: local contract/prototype tests. FRENCH-01 stays `IN PROGRESS`.
+Evidence tier: local contract/prototype tests + bounded browser E2E/visual QA. FRENCH-01 stays `IN PROGRESS` until owner sign-off.
