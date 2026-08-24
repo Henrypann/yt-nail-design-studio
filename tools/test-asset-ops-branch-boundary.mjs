@@ -6,7 +6,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const base = process.env.ASSET_BRANCH_BASE ?? 'main';
+const base = process.env.ASSET_BRANCH_BASE ?? '3f0fb9bc1f39793d300bd4216c637584e23161c9';
 const assetHead = process.env.ASSET_HEAD ?? 'HEAD';
 const frenchHead = process.env.FRENCH_HEAD ?? 'a1500407a73073bb93b27ae426f9f379904fd76a';
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
