@@ -21,7 +21,7 @@ PASS
 
 本 review 只证明分支代码/范围门，不替代 Product、Design、Marketing、Rights、Nail Expert 或 Manufacturing owner 签收。
 
-Worktree 补充：tracked clean；未跟踪 `dist 2/` 尚未处置，完整 clean/merge gate 未通过。
+Worktree 补充：13:05 后复核 `dist 2/` 为空目录，完整 `git status --short --branch` 立即返回 clean；未删除或隐藏目录。该临时扫描异常已解除，不再作为 Git merge gate。
 
 人工证据补充：用户于 2026-08-24 回复“1–6 通过”；仅记为所展示六张证据的快速视觉签收，不替代运营 owner、rights、制造或发布签收。
 
