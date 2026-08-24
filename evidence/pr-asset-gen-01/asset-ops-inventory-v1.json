@@ -1,0 +1,1676 @@
+{
+  "architectureBaseline": "v0.7.2",
+  "generatedFrom": [
+    "material-library/index.json",
+    "assets/hero-recipes/v0-7-2-four-look-sets.json"
+  ],
+  "looks": [
+    {
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "evidenceBoundary": "simulated/non-manufacturing",
+      "fingerCount": 10,
+      "id": "crimson-reliquary",
+      "manifestUrl": "assets/hero-recipes/crimson-reliquary/manifest.json",
+      "manufacturingValidated": false,
+      "missingFiles": [],
+      "references": [
+        {
+          "byteLength": 1659416,
+          "declaredPath": "look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/look-cover-16x9-v1.png",
+          "sha256": "3dd8ab248a5917b69387bf50d0eac866c27a5fdd1b6d5625092fade338f9c8d0"
+        },
+        {
+          "byteLength": 394,
+          "declaredPath": "flat/design-reference.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/flat/design-reference.svg",
+          "sha256": "6b76689433221e2f355bdf3d6e19fdae879772b97ad5675ac41d19d797429551"
+        },
+        {
+          "byteLength": 55973,
+          "declaredPath": "maps/crimson-reliquary-decal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-decal.png",
+          "sha256": "4983c8ae61bfc76ce9b66160afa07ec6cdf3dc7afb9e4f46f1e2808b36604ad7"
+        },
+        {
+          "byteLength": 19807,
+          "declaredPath": "maps/crimson-reliquary-normal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-normal.png",
+          "sha256": "bf3a206125d75faf1ba7cf332afb4997942c5250cdb2a5c31ac1544f60714be1"
+        },
+        {
+          "byteLength": 13655,
+          "declaredPath": "maps/crimson-reliquary-roughness.png",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-roughness.png",
+          "sha256": "1f77c414a11408125051f3d19a46eff82a229d948feafa520c3acb32750f0eb6"
+        },
+        {
+          "byteLength": 11452,
+          "declaredPath": "maps/crimson-reliquary-height.png",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/maps/crimson-reliquary-height.png",
+          "sha256": "fc85039e7080909b58d084059288df3fb0d89778a0833f7a49ace735b3df6b49"
+        },
+        {
+          "byteLength": 170276,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/gold-cross-chain/gold-cross-chain.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/gold-cross-chain/gold-cross-chain.web.glb",
+          "sha256": "53ea27212ff54dd7f290cb442147c1582966d9917ce9342d05f3d1f47389ea77"
+        },
+        {
+          "byteLength": 170276,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/dimensional-kit.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/crimson-reliquary/dimensional-kit.web.glb",
+          "sha256": "53ea27212ff54dd7f290cb442147c1582966d9917ce9342d05f3d1f47389ea77"
+        },
+        {
+          "byteLength": 3300,
+          "declaredPath": "recipe-spec.json",
+          "exists": true,
+          "path": "assets/hero-recipes/crimson-reliquary/recipe-spec.json",
+          "sha256": "26f24be9c6e66edb31095dacd463fb04c0d0a22885d30be3a38e12c3aeeeabf3"
+        }
+      ],
+      "revision": "1.0.0-simulated",
+      "status": "SIMULATED_LOOK_ASSET_PACK",
+      "visualSignoff": "candidate_pending_designer_trial"
+    },
+    {
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "evidenceBoundary": "simulated/non-manufacturing",
+      "fingerCount": 10,
+      "id": "honey-petal-glass",
+      "manifestUrl": "assets/hero-recipes/honey-petal-glass/manifest.json",
+      "manufacturingValidated": false,
+      "missingFiles": [],
+      "references": [
+        {
+          "byteLength": 1394414,
+          "declaredPath": "look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/look-cover-16x9-v1.png",
+          "sha256": "c813689b8e825bfcdb323415621fb33e427d78f009a27eb62173ad81f95b8813"
+        },
+        {
+          "byteLength": 388,
+          "declaredPath": "flat/design-reference.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/flat/design-reference.svg",
+          "sha256": "376bc65f28da9e084f7eac7a211187b83173de53586d56b0c25b144e241f0811"
+        },
+        {
+          "byteLength": 22341,
+          "declaredPath": "maps/honey-petal-glass-decal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-decal.png",
+          "sha256": "064fba280bb9042314cab33d831694cd1c69a73047d025b1bcd547f96657b450"
+        },
+        {
+          "byteLength": 13292,
+          "declaredPath": "maps/honey-petal-glass-normal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-normal.png",
+          "sha256": "ad500fc45f04c62929e9119d5233bc3f74b5f6695bac0ac0651ab62fcc2a0c7a"
+        },
+        {
+          "byteLength": 5620,
+          "declaredPath": "maps/honey-petal-glass-roughness.png",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-roughness.png",
+          "sha256": "b2667a3184ebe2525efca754183ab8ea5f49e1b380972fe383c061ba1cc30396"
+        },
+        {
+          "byteLength": 8124,
+          "declaredPath": "maps/honey-petal-glass-height.png",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/maps/honey-petal-glass-height.png",
+          "sha256": "15222615f6be76b56165a41c0ccac697aac2f9c55a18298d668ffa72fe31c6a3"
+        },
+        {
+          "byteLength": 36668,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/glass-flower-pearl/glass-flower-pearl.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/glass-flower-pearl/glass-flower-pearl.web.glb",
+          "sha256": "853327fcf4327750bc8a2dd7245d2d10f77675351bf79f0b56a88ae5fecea908"
+        },
+        {
+          "byteLength": 36668,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/dimensional-kit.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/honey-petal-glass/dimensional-kit.web.glb",
+          "sha256": "853327fcf4327750bc8a2dd7245d2d10f77675351bf79f0b56a88ae5fecea908"
+        },
+        {
+          "byteLength": 3432,
+          "declaredPath": "recipe-spec.json",
+          "exists": true,
+          "path": "assets/hero-recipes/honey-petal-glass/recipe-spec.json",
+          "sha256": "a0b6e617e087d9e2c988049d52f20565b452225cdd6225e30098a47365a02f77"
+        }
+      ],
+      "revision": "1.0.0-simulated",
+      "status": "SIMULATED_LOOK_ASSET_PACK",
+      "visualSignoff": "candidate_pending_designer_trial"
+    },
+    {
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "evidenceBoundary": "simulated/non-manufacturing",
+      "fingerCount": 10,
+      "id": "ivory-lace-crystal",
+      "manifestUrl": "assets/hero-recipes/ivory-lace-crystal/manifest.json",
+      "manufacturingValidated": false,
+      "missingFiles": [],
+      "references": [
+        {
+          "byteLength": 1460729,
+          "declaredPath": "look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/look-cover-16x9-v1.png",
+          "sha256": "9292a53fa9c364c55474e96acab7cad41abaf43688c36f6f3d7db8a909ccee81"
+        },
+        {
+          "byteLength": 600,
+          "declaredPath": "flat/design-reference.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/flat/design-reference.svg",
+          "sha256": "0f093c98a59633cfb32d081817bad32053e4ad9b7372b85c74e7df9761ee0bc1"
+        },
+        {
+          "byteLength": 54639,
+          "declaredPath": "maps/ivory-lace-crystal-decal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/maps/ivory-lace-crystal-decal.png",
+          "sha256": "4f30cf673db62a9b69008bfc8b9a5685fafb25cfc763f03cdd58490f2825b946"
+        },
+        {
+          "byteLength": 114035,
+          "declaredPath": "maps/ivory-lace-crystal-normal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/maps/ivory-lace-crystal-normal.png",
+          "sha256": "9857a7987bcc6687f93216b51e0fbe0c5dd223d55d407db6ba9d498072e0fb41"
+        },
+        {
+          "byteLength": 37173,
+          "declaredPath": "maps/ivory-lace-crystal-roughness.png",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/maps/ivory-lace-crystal-roughness.png",
+          "sha256": "bce4a58cd1d60b5088d1a696e2344c2d980ffdf3d537ed485778ec68770889a4"
+        },
+        {
+          "byteLength": 37106,
+          "declaredPath": "maps/ivory-lace-crystal-height.png",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/maps/ivory-lace-crystal-height.png",
+          "sha256": "d62c306f54b1cb3b2800776ee728470663af61b86e86f360ec5993f2cef6c9a5"
+        },
+        {
+          "byteLength": 27300,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/teardrop-pearl-cluster/teardrop-pearl-cluster.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/teardrop-pearl-cluster/teardrop-pearl-cluster.web.glb",
+          "sha256": "d69f5761e764d8e3929d9fd58a9630746165d083fda0ed75204cd8c0ce7ac80c"
+        },
+        {
+          "byteLength": 32036,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/ivory-relief-flower/ivory-relief-flower.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/ivory-relief-flower/ivory-relief-flower.web.glb",
+          "sha256": "3cc97f8495ebc643e6761657bf55aa1bdfe4706a46fcfd0ddb5b5a724c3eed70"
+        },
+        {
+          "byteLength": 29820,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/ivory-lace-applique/ivory-lace-applique.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/ivory-lace-applique/ivory-lace-applique.web.glb",
+          "sha256": "d122d3049e4bdfcd3e9d7e9c0511299297fa8fb9e5168b9031ef377eb014ec30"
+        },
+        {
+          "byteLength": 84304,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/dimensional-kit.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/ivory-lace-crystal/dimensional-kit.web.glb",
+          "sha256": "f9b26ae3de0ec4806062d1100b62a8dd708742e3a76b2316f3c8a1c06e7f202a"
+        },
+        {
+          "byteLength": 3863,
+          "declaredPath": "recipe-spec.json",
+          "exists": true,
+          "path": "assets/hero-recipes/ivory-lace-crystal/recipe-spec.json",
+          "sha256": "3c24db4e5bd2e2a2bddc9310ea3c80e4624a9fac629402a5f5f222afbe59b1ef"
+        }
+      ],
+      "revision": "1.0.0-simulated",
+      "status": "SIMULATED_LOOK_ASSET_PACK",
+      "visualSignoff": "candidate_pending_designer_trial"
+    },
+    {
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "evidenceBoundary": "simulated/non-manufacturing",
+      "fingerCount": 10,
+      "id": "leopard-gilded-nude",
+      "manifestUrl": "assets/hero-recipes/leopard-gilded-nude/manifest.json",
+      "manufacturingValidated": false,
+      "missingFiles": [],
+      "references": [
+        {
+          "byteLength": 1294696,
+          "declaredPath": "look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/look-cover-16x9-v1.png",
+          "sha256": "842f50ee687a1bbc9ef2c5df21559a18d077629677574105e2fe482caf8cc92e"
+        },
+        {
+          "byteLength": 423,
+          "declaredPath": "flat/design-reference.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/flat/design-reference.svg",
+          "sha256": "a3e8bdafbff42875e7f41b45e70fc73548faaa658b9bd6e195157951a8b47c9e"
+        },
+        {
+          "byteLength": 69406,
+          "declaredPath": "maps/leopard-gilded-nude-decal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-decal.png",
+          "sha256": "2c159c78de038c7d8f9c85af572dc67d5f8428fcaa4d3a0d1c726fafb0ad49dc"
+        },
+        {
+          "byteLength": 23405,
+          "declaredPath": "maps/leopard-gilded-nude-normal.png",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-normal.png",
+          "sha256": "9cf149709dfb65ec6bdc6025757548f25556ccb630820702ed3ddffa0bab384b"
+        },
+        {
+          "byteLength": 9565,
+          "declaredPath": "maps/leopard-gilded-nude-roughness.png",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-roughness.png",
+          "sha256": "c570a3dc44683ad8bd2d91de8413505d4ee57923e2a797e8eb25851437ec4b99"
+        },
+        {
+          "byteLength": 10185,
+          "declaredPath": "maps/leopard-gilded-nude-height.png",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/maps/leopard-gilded-nude-height.png",
+          "sha256": "c7c23fa5758563cc103342a2d1e9627f22ace61d19d029934e22da4ca5c6062e"
+        },
+        {
+          "byteLength": 40900,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/gilded-crystal-cluster/gilded-crystal-cluster.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/gilded-crystal-cluster/gilded-crystal-cluster.web.glb",
+          "sha256": "0c402f97e9b4d6770a890e31fdfe818865eba24d590b12e8276b3be4c33ee87e"
+        },
+        {
+          "byteLength": 40900,
+          "declaredPath": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/dimensional-kit.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/v0-7-2-four-looks/leopard-gilded-nude/dimensional-kit.web.glb",
+          "sha256": "0c402f97e9b4d6770a890e31fdfe818865eba24d590b12e8276b3be4c33ee87e"
+        },
+        {
+          "byteLength": 3367,
+          "declaredPath": "recipe-spec.json",
+          "exists": true,
+          "path": "assets/hero-recipes/leopard-gilded-nude/recipe-spec.json",
+          "sha256": "780403387c4e0e68b8858552f32cd343df24c7e18125119c650d27dc55ec05c4"
+        }
+      ],
+      "revision": "1.0.0-simulated",
+      "status": "SIMULATED_LOOK_ASSET_PACK",
+      "visualSignoff": "candidate_pending_designer_trial"
+    }
+  ],
+  "schemaVersion": "asset-ops-inventory-v1",
+  "summary": {
+    "classifications": {
+      "already_valid_legacy": 0,
+      "already_valid_simulated_pack": 7,
+      "candidate_only": 7,
+      "mapping_mismatch": 2,
+      "metadata_migration_required": 11,
+      "missing_binary": 0
+    },
+    "formalTemplateMetadataGap": true,
+    "fourLookSimulatedNonManufacturing": true,
+    "lookCount": 4,
+    "templateCount": 21
+  },
+  "templates": [
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_3d_waterdrop",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_3d_waterdrop",
+      "manifestUrl": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_3d_waterdrop/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only"
+      ],
+      "classification": "candidate_only",
+      "id": "t_butter_glaze_quiet_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_nude_gradient",
+      "manifestUrl": "material-library/templates/t_nude_gradient/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/butter-glaze-quiet/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/butter-glaze-quiet/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_nude_gradient"
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_cat_eye_nude",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_cat_eye_nude",
+      "manifestUrl": "material-library/templates/t_cat_eye_nude/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_cat_eye_nude/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_cat_eye_nude/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_checkerboard",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_checkerboard",
+      "manifestUrl": "material-library/templates/t_checkerboard/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_checkerboard/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_checkerboard/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_chrome_mirror",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_chrome_mirror",
+      "manifestUrl": "material-library/templates/t_chrome_mirror/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_chrome_mirror/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_chrome_mirror/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_classic_high_gloss",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_classic_high_gloss",
+      "manifestUrl": "material-library/templates/t_classic_high_gloss/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_classic_high_gloss/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_classic_high_gloss/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_dark_gradient",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_dark_gradient",
+      "manifestUrl": "material-library/templates/t_dark_gradient/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_dark_gradient/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_dark_gradient/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_french_white",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_french_white",
+      "manifestUrl": "material-library/templates/t_french_white/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_french_white/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_holiday_glitter",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_holiday_glitter",
+      "manifestUrl": "material-library/templates/t_holiday_glitter/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_holiday_glitter/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_holiday_glitter/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only",
+        "mapping_mismatch"
+      ],
+      "classification": "candidate_only",
+      "id": "t_liquid_chrome_statement_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_liquid_velvet_cat_eye",
+      "manifestUrl": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "mappingNotes": [
+        "render_template_id=t_chrome_mirror differs from manifest.template_id=t_liquid_velvet_cat_eye"
+      ],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_chrome_mirror"
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_liquid_velvet_cat_eye",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_liquid_velvet_cat_eye",
+      "manifestUrl": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": "SIMULATED",
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "id": "t_mercury_dew_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_liquid_velvet_cat_eye",
+      "manifestUrl": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/mercury-dew/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_liquid_velvet_cat_eye"
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only"
+      ],
+      "classification": "candidate_only",
+      "id": "t_micro_coquette_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_french_white",
+      "manifestUrl": "material-library/templates/t_french_white/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/micro-coquette/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/micro-coquette/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_french_white/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_french_white"
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_nude_gradient",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_nude_gradient",
+      "manifestUrl": "material-library/templates/t_nude_gradient/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_nude_gradient/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_nude_gradient/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only"
+      ],
+      "classification": "candidate_only",
+      "id": "t_pearl_tide_shell_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_3d_waterdrop",
+      "manifestUrl": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/pearl-tide-shell/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/pearl-tide-shell/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_3d_waterdrop"
+    },
+    {
+      "assetStatus": "SIMULATED",
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "id": "t_petal_pearl_bloom_simulated",
+      "manifestAssetStatus": "SIMULATED",
+      "manifestTemplateId": "t_petal_pearl_bloom_simulated",
+      "manifestUrl": "assets/hero-recipes/petal-pearl-bloom/manifest.json",
+      "mappingNotes": [
+        "legacy manifest has no template_id; identity taken from index id",
+        "manifest has no default thumbnail reference",
+        "legacy simulated pack has no formal shape pattern map; checked manifest.assets references"
+      ],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png"
+        },
+        {
+          "declaredPath": "look-cover-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png"
+        },
+        {
+          "declaredPath": "hero-detail-16x9-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/hero-detail-16x9-v1.png"
+        },
+        {
+          "declaredPath": "editorial-detail-4x5-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/editorial-detail-4x5-v1.png"
+        },
+        {
+          "declaredPath": "flat/petal-outline.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/flat/petal-outline.svg"
+        },
+        {
+          "declaredPath": "surface/petal-tint.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/surface/petal-tint.svg"
+        },
+        {
+          "declaredPath": "decorations/crystal-flower.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/decorations/crystal-flower.svg"
+        },
+        {
+          "declaredPath": "decorations/lavender-pearl.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/decorations/lavender-pearl.svg"
+        },
+        {
+          "declaredPath": "decorations/silver-stud-cluster.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/decorations/silver-stud-cluster.svg"
+        },
+        {
+          "declaredPath": "decorations/ruby-microbeads.svg",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-pearl-bloom/decorations/ruby-microbeads.svg"
+        },
+        {
+          "declaredPath": "/assets/glb/components/petal-pearl-bloom/crystal-flower/crystal-flower.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/petal-pearl-bloom/crystal-flower/crystal-flower.web.glb"
+        },
+        {
+          "declaredPath": "/assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/petal-pearl-bloom/lavender-pearl/lavender-pearl.web.glb"
+        },
+        {
+          "declaredPath": "/assets/glb/components/petal-pearl-bloom/silver-stud-cluster/silver-stud-cluster.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/petal-pearl-bloom/silver-stud-cluster/silver-stud-cluster.web.glb"
+        },
+        {
+          "declaredPath": "/assets/glb/components/petal-pearl-bloom/ruby-microbeads/ruby-microbeads.web.glb",
+          "exists": true,
+          "path": "assets/glb/components/petal-pearl-bloom/ruby-microbeads/ruby-microbeads.web.glb"
+        }
+      ],
+      "renderTemplateId": "t_petal_pearl_bloom_simulated"
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only"
+      ],
+      "classification": "candidate_only",
+      "id": "t_petal_veil_french",
+      "manifestAssetStatus": "CONCEPT",
+      "manifestTemplateId": "t_petal_veil_french",
+      "manifestUrl": "material-library/templates/t_petal_veil_french/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/petal-veil-french/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/petal-veil-french/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_petal_veil_french/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_petal_veil_french"
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only"
+      ],
+      "classification": "candidate_only",
+      "id": "t_sea_glass_chrome_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_liquid_velvet_cat_eye",
+      "manifestUrl": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/sea-glass-chrome/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/sea-glass-chrome/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_liquid_velvet_cat_eye"
+    },
+    {
+      "assetStatus": "SIMULATED",
+      "categories": [
+        "already_valid_simulated_pack"
+      ],
+      "classification": "already_valid_simulated_pack",
+      "id": "t_starfish_bloom_elegance_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_3d_waterdrop",
+      "manifestUrl": "material-library/templates/t_3d_waterdrop/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/starfish-bloom-elegance/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/starfish-bloom-elegance/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_3d_waterdrop/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_3d_waterdrop"
+    },
+    {
+      "assetStatus": "CONCEPT",
+      "categories": [
+        "candidate_only",
+        "mapping_mismatch"
+      ],
+      "classification": "candidate_only",
+      "id": "t_sunset_aura_glaze_concept",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_liquid_velvet_cat_eye",
+      "manifestUrl": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "mappingNotes": [
+        "render_template_id=t_nude_gradient differs from manifest.template_id=t_liquid_velvet_cat_eye"
+      ],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png",
+          "exists": true,
+          "path": "assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_liquid_velvet_cat_eye/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": "t_nude_gradient"
+    },
+    {
+      "assetStatus": null,
+      "categories": [
+        "metadata_migration_required"
+      ],
+      "classification": "metadata_migration_required",
+      "id": "t_y2k_ice",
+      "manifestAssetStatus": null,
+      "manifestTemplateId": "t_y2k_ice",
+      "manifestUrl": "material-library/templates/t_y2k_ice/manifest.json",
+      "mappingNotes": [],
+      "missingFiles": [],
+      "references": [
+        {
+          "declaredPath": "material-library/templates/t_y2k_ice/thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "thumbnails/default.png",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/thumbnails/default.png"
+        },
+        {
+          "declaredPath": "patterns/almond.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/almond.svg"
+        },
+        {
+          "declaredPath": "patterns/oval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/oval.svg"
+        },
+        {
+          "declaredPath": "patterns/coffin.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/coffin.svg"
+        },
+        {
+          "declaredPath": "patterns/squoval.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/squoval.svg"
+        },
+        {
+          "declaredPath": "patterns/round.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/round.svg"
+        },
+        {
+          "declaredPath": "patterns/square.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/square.svg"
+        },
+        {
+          "declaredPath": "patterns/stiletto.svg",
+          "exists": true,
+          "path": "material-library/templates/t_y2k_ice/patterns/stiletto.svg"
+        }
+      ],
+      "renderTemplateId": null
+    }
+  ]
+}

@@ -35,9 +35,11 @@ import {
   officialPgcProgress,
 } from '../data/content-repository';
 import { loadLookReadModels } from '../data/look-repository';
+import { loadCommunityAssetCapabilitiesV1 } from '../data/asset-capability-repository';
 import { loadCommunityTaxonomyV2 } from '../data/taxonomy-repository';
 import type { CommunityPublisherV1 } from '../domain/types';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
+import type { CommunityLookAssetCapabilityReadModelV1 } from '../domain/asset-capability-v1';
 import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import {
   createDefaultDiscoveryQueryState,
@@ -97,6 +99,7 @@ export function CommunityFeed({
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState<LoadState>('loading');
   const [lookModels, setLookModels] = useState<PublishedLookReadModelV1[]>([]);
+  const [assetCapabilities, setAssetCapabilities] = useState<Map<string, CommunityLookAssetCapabilityReadModelV1>>(new Map());
   const [publishers, setPublishers] = useState<CommunityPublisherV1[]>([]);
   const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
   const [progress, setProgress] = useState<{ ready: number; target: number; gap: number } | null>(null);
@@ -215,11 +218,12 @@ export function CommunityFeed({
     setState('loading');
     (async () => {
       try {
-        const [looks, pubs, index, taxV2] = await Promise.all([
+        const [looks, pubs, index, taxV2, capabilities] = await Promise.all([
           loadLookReadModels(),
           loadPublishers(),
           loadContentIndex(),
           loadCommunityTaxonomyV2(),
+          loadCommunityAssetCapabilitiesV1(),
         ]);
         if (cancelled) return;
         if (!taxV2.ok) {
@@ -229,6 +233,11 @@ export function CommunityFeed({
           );
         }
         setLookModels(looks);
+        setAssetCapabilities(new Map(
+          capabilities.ok
+            ? capabilities.index.entries.map((entry) => [entry.contentId, entry] as const)
+            : [],
+        ));
         setPublishers(pubs);
         setTaxonomyV2(taxV2.taxonomy);
         setProgress(officialPgcProgress(index));
@@ -414,6 +423,7 @@ export function CommunityFeed({
                       publisher={pubMap.get(look.publisherId)}
                       taxonomyV2={taxonomyV2}
                       browse={queryState.browse}
+                      assetCapability={assetCapabilities.get(look.lookId) ?? null}
                       onSave={(selected) => setSaveLook(selected)}
                     />
                   ))}

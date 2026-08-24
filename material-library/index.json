@@ -58,7 +58,7 @@
         }
       },
       "thumbnail_url": "assets/hero-recipes/petal-pearl-bloom/look-cover-16x9-v1.png",
-      "manifest_url": "assets/hero-recipes/petal-pearl-bloom/manifest.json",
+      "manifest_url": "material-library/templates/t_petal_pearl_bloom_simulated/manifest.json",
       "sort_order": -1.1
     },
     {
@@ -324,7 +324,7 @@
         }
       },
       "thumbnail_url": "assets/hero-recipes/sunset-aura-glaze/cover-16x9-1280x720-v1.png",
-      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "manifest_url": "material-library/templates/t_nude_gradient/manifest.json",
       "sort_order": -0.11
     },
     {
@@ -368,7 +368,7 @@
         }
       },
       "thumbnail_url": "assets/hero-recipes/liquid-chrome-statement/cover-16x9-1280x720-v1.png",
-      "manifest_url": "material-library/templates/t_liquid_velvet_cat_eye/manifest.json",
+      "manifest_url": "material-library/templates/t_chrome_mirror/manifest.json",
       "sort_order": -0.1
     },
     {
@@ -419,6 +419,7 @@
       "id": "t_liquid_velvet_cat_eye",
       "name": "裸透猫眼金属流线",
       "name_en": "Liquid Velvet Cat-eye",
+      "asset_status": "REAL",
       "style_tags": [
         "trending",
         "luxe",
@@ -493,6 +494,7 @@
       "id": "t_french_white",
       "name": "法式白边",
       "name_en": "French White Tip",
+      "asset_status": "REAL",
       "style_tags": [
         "minimal",
         "classic"
@@ -522,6 +524,7 @@
       "id": "t_nude_gradient",
       "name": "裸粉渐变",
       "name_en": "Nude Pink Gradient",
+      "asset_status": "REAL",
       "style_tags": [
         "sweet"
       ],
@@ -550,6 +553,7 @@
       "id": "t_cat_eye_nude",
       "name": "猫眼裸色",
       "name_en": "Cat Eye Nude",
+      "asset_status": "REAL",
       "style_tags": [
         "luxe"
       ],
@@ -578,6 +582,7 @@
       "id": "t_y2k_ice",
       "name": "Y2K 冰川",
       "name_en": "Y2K Glacier",
+      "asset_status": "REAL",
       "style_tags": [
         "cool"
       ],
@@ -606,6 +611,7 @@
       "id": "t_dark_gradient",
       "name": "暗夜渐变",
       "name_en": "Midnight Gradient",
+      "asset_status": "REAL",
       "style_tags": [
         "cool"
       ],
@@ -634,6 +640,7 @@
       "id": "t_chrome_mirror",
       "name": "镜面铬",
       "name_en": "Chrome Mirror",
+      "asset_status": "REAL",
       "style_tags": [
         "luxe"
       ],
@@ -662,6 +669,7 @@
       "id": "t_checkerboard",
       "name": "棋盘格",
       "name_en": "Checkerboard",
+      "asset_status": "REAL",
       "style_tags": [
         "retro"
       ],
@@ -690,6 +698,7 @@
       "id": "t_3d_waterdrop",
       "name": "3D 水滴",
       "name_en": "3D Waterdrop",
+      "asset_status": "REAL",
       "style_tags": [
         "sweet"
       ],
@@ -718,6 +727,7 @@
       "id": "t_classic_high_gloss",
       "name": "经典高光",
       "name_en": "Classic High Gloss",
+      "asset_status": "REAL",
       "style_tags": [
         "minimal"
       ],
@@ -744,6 +754,7 @@
       "id": "t_holiday_glitter",
       "name": "节日闪粉",
       "name_en": "Holiday Glitter",
+      "asset_status": "REAL",
       "style_tags": [
         "holiday"
       ],

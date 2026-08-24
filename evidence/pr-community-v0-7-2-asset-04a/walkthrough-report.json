@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-ASSET-04A",
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "screenshot": "evidence/pr-community-v0-7-2-asset-04a/screenshots/awaiting-input-390.png",
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "screenshot": null,
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "screenshot": null,
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "screenshot": "evidence/pr-community-v0-7-2-asset-04a/screenshots/awaiting-input-1280.png",
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "width": 1366,
+      "height": 900,
+      "screenshot": null,
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "screenshot": null,
+      "feedCount": 15,
+      "noOverflow": true,
+      "errors": []
+    }
+  ],
+  "failure": {
+    "visible": true,
+    "feedCount": 15,
+    "screenshot": "evidence/pr-community-v0-7-2-asset-04a/screenshots/config-failure-1280.png"
+  }
+}

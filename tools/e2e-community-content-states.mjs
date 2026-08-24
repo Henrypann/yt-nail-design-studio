@@ -12,11 +12,15 @@ page.on('console', (message) => { if (message.type() === 'error') errors.push(me
 
 try {
   await page.goto(`${baseURL}/`, { waitUntil: 'networkidle' });
-  assert.equal(await page.getByTestId('community-look-card').count(), 17);
+  assert.equal(
+    await page.getByTestId('community-look-card').count(),
+    15,
+    'public governance gate must keep the two blocked records out of the default feed',
+  );
 
   const ready = page.locator('[data-look-id="cc_mercury_dew"]');
   await ready.getByTestId('look-card-use').waitFor();
-  assert.equal(await ready.getByTestId('look-card-use').getAttribute('data-use-state'), 'LEGACY_READY');
+  assert.equal(await ready.getByTestId('look-card-use').getAttribute('data-use-state'), 'LEGACY_APPROXIMATE');
 
   const incomplete = page.locator('[data-look-id="cc_liquid_chrome_statement"]');
   const disabledUse = incomplete.getByTestId('look-card-use-disabled');

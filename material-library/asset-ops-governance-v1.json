@@ -1,0 +1,896 @@
+{
+  "schemaVersion": "asset-ops-governance-v1",
+  "architectureBaseline": "v0.7.2",
+  "generatedFrom": [
+    "material-library/index.json",
+    "assets/hero-recipes/v0-7-2-four-look-sets.json"
+  ],
+  "summary": {
+    "templateCount": 21,
+    "lookCount": 4,
+    "rightsPendingCount": 25,
+    "promotionBlockedCount": 25
+  },
+  "records": [
+    {
+      "recordId": "look:crimson-reliquary",
+      "subjectId": "crimson-reliquary",
+      "subjectType": "LOOK_ASSET_PACK",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "source:reference-02-layer-breakdown"
+      ],
+      "specRefs": [
+        "assets/hero-recipes/crimson-reliquary/recipe-spec.json"
+      ],
+      "manifestRefs": [
+        "assets/hero-recipes/crimson-reliquary/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "SIMULATED_PREVIEW_ONLY",
+        "MANUFACTURING_NOT_VALIDATED",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Look pack is a simulated preview with ten-finger allocation.",
+        "No fit, material, adhesion, print, manufacturing, or commercial-use evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "look:honey-petal-glass",
+      "subjectId": "honey-petal-glass",
+      "subjectType": "LOOK_ASSET_PACK",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "source:reference-04-layer-breakdown"
+      ],
+      "specRefs": [
+        "assets/hero-recipes/honey-petal-glass/recipe-spec.json"
+      ],
+      "manifestRefs": [
+        "assets/hero-recipes/honey-petal-glass/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "SIMULATED_PREVIEW_ONLY",
+        "MANUFACTURING_NOT_VALIDATED",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Look pack is a simulated preview with ten-finger allocation.",
+        "No fit, material, adhesion, print, manufacturing, or commercial-use evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "look:ivory-lace-crystal",
+      "subjectId": "ivory-lace-crystal",
+      "subjectType": "LOOK_ASSET_PACK",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "source:reference-03-layer-breakdown"
+      ],
+      "specRefs": [
+        "assets/hero-recipes/ivory-lace-crystal/recipe-spec.json"
+      ],
+      "manifestRefs": [
+        "assets/hero-recipes/ivory-lace-crystal/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "SIMULATED_PREVIEW_ONLY",
+        "MANUFACTURING_NOT_VALIDATED",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Look pack is a simulated preview with ten-finger allocation.",
+        "No fit, material, adhesion, print, manufacturing, or commercial-use evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "look:leopard-gilded-nude",
+      "subjectId": "leopard-gilded-nude",
+      "subjectType": "LOOK_ASSET_PACK",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "source:reference-01-layer-breakdown"
+      ],
+      "specRefs": [
+        "assets/hero-recipes/leopard-gilded-nude/recipe-spec.json"
+      ],
+      "manifestRefs": [
+        "assets/hero-recipes/leopard-gilded-nude/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "SIMULATED_PREVIEW_ONLY",
+        "MANUFACTURING_NOT_VALIDATED",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Look pack is a simulated preview with ten-finger allocation.",
+        "No fit, material, adhesion, print, manufacturing, or commercial-use evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_3d_waterdrop",
+      "subjectId": "t_3d_waterdrop",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_3d_waterdrop/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_butter_glaze_quiet_concept",
+      "subjectId": "t_butter_glaze_quiet_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/butter-glaze-quiet/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/butter-glaze-quiet/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_nude_gradient/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_cat_eye_nude",
+      "subjectId": "t_cat_eye_nude",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_cat_eye_nude/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_checkerboard",
+      "subjectId": "t_checkerboard",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_checkerboard/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_chrome_mirror",
+      "subjectId": "t_chrome_mirror",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_chrome_mirror/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_classic_high_gloss",
+      "subjectId": "t_classic_high_gloss",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_classic_high_gloss/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_dark_gradient",
+      "subjectId": "t_dark_gradient",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_dark_gradient/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_french_white",
+      "subjectId": "t_french_white",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_french_white/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_holiday_glitter",
+      "subjectId": "t_holiday_glitter",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_holiday_glitter/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_liquid_chrome_statement_concept",
+      "subjectId": "t_liquid_chrome_statement_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/liquid-chrome-statement/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/liquid-chrome-statement/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_chrome_mirror/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_liquid_velvet_cat_eye",
+      "subjectId": "t_liquid_velvet_cat_eye",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_liquid_velvet_cat_eye/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_mercury_dew_concept",
+      "subjectId": "t_mercury_dew_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md",
+        "recipe:mercury-dew@1.0.0"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/mercury-dew/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_liquid_velvet_cat_eye/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Preview is simulated and non-manufacturing.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_micro_coquette_concept",
+      "subjectId": "t_micro_coquette_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/micro-coquette/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/micro-coquette/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_french_white/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_nude_gradient",
+      "subjectId": "t_nude_gradient",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_nude_gradient/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_pearl_tide_shell_concept",
+      "subjectId": "t_pearl_tide_shell_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/pearl-tide-shell/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/pearl-tide-shell/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_3d_waterdrop/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_petal_pearl_bloom_simulated",
+      "subjectId": "t_petal_pearl_bloom_simulated",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "/assets/hero-recipes/petal-pearl-bloom/ASSET_SPEC.md",
+        "recipe:petal-pearl-bloom@1.0.0"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/petal-pearl-bloom/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_petal_pearl_bloom_simulated/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Preview is simulated and non-manufacturing.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_petal_veil_french",
+      "subjectId": "t_petal_veil_french",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/petal-veil-french/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/petal-veil-french/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_petal_veil_french/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_sea_glass_chrome_concept",
+      "subjectId": "t_sea_glass_chrome_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/sea-glass-chrome/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/sea-glass-chrome/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_liquid_velvet_cat_eye/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_starfish_bloom_elegance_concept",
+      "subjectId": "t_starfish_bloom_elegance_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "SIMULATED",
+      "sourceRefs": [
+        "/assets/hero-recipes/starfish-bloom-elegance/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/starfish-bloom-elegance/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_3d_waterdrop/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "SIMULATED_PREVIEW",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Preview is simulated and non-manufacturing.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_sunset_aura_glaze_concept",
+      "subjectId": "t_sunset_aura_glaze_concept",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "CONCEPT",
+      "sourceRefs": [
+        "/assets/hero-recipes/sunset-aura-glaze/ASSET_SPEC.md"
+      ],
+      "specRefs": [
+        "/assets/hero-recipes/sunset-aura-glaze/ASSET_SPEC.md"
+      ],
+      "manifestRefs": [
+        "material-library/templates/t_nude_gradient/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "DECLARED",
+        "spec": "PRESENT",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "CONCEPT",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "CONCEPT_ONLY",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Candidate concept is not a signed renderer or manufacturing definition.",
+        "No rights or commercial-use clearance is asserted."
+      ]
+    },
+    {
+      "recordId": "template:t_y2k_ice",
+      "subjectId": "t_y2k_ice",
+      "subjectType": "MATERIAL_TEMPLATE",
+      "lifecycleStatus": "REAL",
+      "sourceRefs": [],
+      "specRefs": [],
+      "manifestRefs": [
+        "material-library/templates/t_y2k_ice/manifest.json"
+      ],
+      "completeness": {
+        "binaries": "PRESENT",
+        "manifest": "PRESENT",
+        "source": "UNKNOWN",
+        "spec": "UNKNOWN",
+        "structure": "PRESENT"
+      },
+      "evidenceTier": "METADATA_ONLY",
+      "rightsStatus": "PENDING",
+      "rightsEvidenceRefs": [],
+      "capabilityStatus": "UNVERIFIED",
+      "capabilityEvidenceRefs": [],
+      "promotionStatus": "BLOCKED",
+      "blockingCodes": [
+        "RIGHTS_EVIDENCE_MISSING",
+        "CAPABILITY_EVIDENCE_MISSING",
+        "PROMOTION_NOT_AUTHORIZED"
+      ],
+      "limitations": [
+        "Asset metadata and references are present; no rights, capability, or production evidence is asserted."
+      ]
+    }
+  ]
+}

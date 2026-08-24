@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-ASSET-04B-INPUT",
+  "status": "AWAITING_OWNER_SELECTION",
+  "generatedFrom": {
+    "taxonomy": "public/community/taxonomy-v2.json",
+    "migration": "public/community/migration-manifest-v1.json",
+    "capability": "public/community/asset-capability-evidence-v1.json"
+  },
+  "selectionPolicy": "UNRANKED_GOVERNED_PUBLIC_CANDIDATES",
+  "candidates": [
+    {
+      "contentId": "cc_butter_glaze_quiet",
+      "title": "静谧黄油釉",
+      "titleEn": "Butter Glaze Quiet",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_liquid_chrome_statement",
+      "title": "液态铬光宣言",
+      "titleEn": "Liquid Chrome Statement",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_mercury_dew",
+      "title": "Mercury Dew",
+      "titleEn": "Mercury Dew",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "LEGACY_APPROXIMATE",
+      "cta": "USE_LEGACY_APPROXIMATE",
+      "technicalStatus": "APPROXIMATE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_micro_coquette",
+      "title": "Micro Coquette",
+      "titleEn": "Micro Coquette",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_pearl_tide",
+      "title": "Pearl Tide Shell",
+      "titleEn": "Pearl Tide Shell",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_petal_pearl_bloom",
+      "title": "花瓣珍珠绽放",
+      "titleEn": "Petal Pearl Bloom",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "UNAVAILABLE",
+      "cta": "UNAVAILABLE",
+      "technicalStatus": "UNAVAILABLE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_petal_veil",
+      "title": "Petal Veil French",
+      "titleEn": "Petal Veil French",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "LEGACY_APPROXIMATE",
+      "cta": "USE_LEGACY_APPROXIMATE",
+      "technicalStatus": "APPROXIMATE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_sea_glass_chrome",
+      "title": "海玻璃光影",
+      "titleEn": "Sea-Glass Chrome",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_starfish_bloom",
+      "title": "海星绽放",
+      "titleEn": "Starfish Bloom Elegance",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "cc_sunset_aura_glaze",
+      "title": "落日极光釉",
+      "titleEn": "Sunset Aura Glaze",
+      "sourceClass": "LEGACY_CONTENT_INDEX",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "ASSETS_INCOMPLETE",
+      "cta": "VIEW_ONLY",
+      "technicalStatus": "INCOMPLETE",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "look.v0-7-2.crimson-reliquary",
+      "title": "绯红圣物",
+      "titleEn": "Crimson Reliquary",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "VERSIONED_READY",
+      "cta": "USE_VERSIONED",
+      "technicalStatus": "EXACT",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "look.v0-7-2.honey-petal-glass",
+      "title": "蜂蜜玻璃花瓣",
+      "titleEn": "Honey Petal Glass",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "VERSIONED_READY",
+      "cta": "USE_VERSIONED",
+      "technicalStatus": "EXACT",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "look.v0-7-2.ivory-lace-crystal",
+      "title": "象牙蕾丝晶露",
+      "titleEn": "Ivory Lace Crystal",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "VERSIONED_READY",
+      "cta": "USE_VERSIONED",
+      "technicalStatus": "EXACT",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "look.v0-7-2.leopard-gilded-nude",
+      "title": "鎏金豹纹裸粉",
+      "titleEn": "Leopard Gilded Nude",
+      "sourceClass": "V0_7_2_LOOK_SET",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "VERSIONED_READY",
+      "cta": "USE_VERSIONED",
+      "technicalStatus": "EXACT",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    },
+    {
+      "contentId": "look.v7-1.petal-veil",
+      "title": "Petal Veil · 可编辑版本示范",
+      "titleEn": "Petal Veil · Editable Version Demo",
+      "sourceClass": "CANONICAL_DEMO",
+      "rightsStatus": "ORIGINAL",
+      "capabilityState": "VERSIONED_READY",
+      "cta": "USE_VERSIONED",
+      "technicalStatus": "EXACT",
+      "currentMakeable": false,
+      "manufacturingValidated": false
+    }
+  ],
+  "requiredOwnerInput": {
+    "banner": null,
+    "editorialSelections": [],
+    "collections": [],
+    "owner": null,
+    "reviewedAt": null,
+    "evidenceRefs": []
+  },
+  "prohibitions": [
+    "NO_AUTOMATIC_RANKING",
+    "NO_TRENDING_OR_PERSONALIZATION_CLAIM",
+    "NO_STARTER_SHELF_COPY",
+    "NO_MAKEABILITY_OR_MANUFACTURING_UPGRADE"
+  ]
+}

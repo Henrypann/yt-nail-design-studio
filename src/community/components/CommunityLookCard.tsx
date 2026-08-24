@@ -12,7 +12,8 @@
  * - Use/remix 动作 fail closed：`actionPermissions(look.discovery)`。
  *   PERSONAL_USE_ONLY 不渲染内容相关 Use/remix 动作，改为可见的非动作提示
  *   `personal-use-only-action-restricted`；discovery 为 null 时不提供 remix 动作。
- *   资产可用性（resolveStudioUseAvailabilityV1）语义保持不变。
+ *   资产可用性只消费 COMM-ASSET-03 strict capability read model；加载失败
+ *   或记录缺失时显示 unavailable，绝不回退 application/verification 推断。
  * - Use 是 canonical 详情链接：真实试用必须经过 Look 详情的 Studio 意图校验，
  *   卡片绝不直接写 Wizard/Editor store。
  * - Save 由父级（CommunityFeed）注入 `onSave`：卡片只上报保存意图，持久化由
@@ -33,11 +34,12 @@ import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-rea
 import type { CommunityPublisherV1 } from '../domain/types';
 import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import type { DiscoveryBrowseV2 } from '../domain/taxonomy-v2/presentation';
+import type { CommunityLookAssetCapabilityReadModelV1 } from '../domain/asset-capability-v1';
 import { actionPermissions } from '../domain/taxonomy-v2/governance';
-import { resolveStudioUseAvailabilityV1 } from '../domain/studio-use-availability';
 import { PublisherBadge } from './PublisherBadge';
-import { ApplicationBadge, VerificationBadge } from './CapabilityBadge';
+import { VerificationBadge } from './CapabilityBadge';
 import { DiscoveryCardTags, RightsBadge } from './CommunityDiscoveryMetadata';
+import { CommunityAssetCapabilityBadge } from './CommunityAssetCapability';
 
 interface Props {
   look: PublishedLookReadModelV1;
@@ -46,6 +48,8 @@ interface Props {
   taxonomyV2: CommunityTaxonomyV2;
   /** COMM-v0.7.2-TAX-04: current browse dimension (recommended has no priority). */
   browse: DiscoveryBrowseV2;
+  /** COMM-ASSET-03 strict capability; null means load/coverage failure. */
+  assetCapability: CommunityLookAssetCapabilityReadModelV1 | null;
   /** COMM-V7.1-03: 由 Feed 注入，打开 Save-to-Board 对话框。 */
   onSave?: (look: PublishedLookReadModelV1) => void;
 }
@@ -55,6 +59,7 @@ export function CommunityLookCard({
   publisher,
   taxonomyV2,
   browse,
+  assetCapability,
   onSave,
 }: Props) {
   const [searchParams] = useSearchParams();
@@ -68,14 +73,17 @@ export function CommunityLookCard({
   // COMM-v0.7.2-TAX-04: rights gate fail closed. PERSONAL_USE_ONLY and missing
   // discovery metadata both deny the content-specific Use/remix action.
   const permissions = discovery ? actionPermissions(discovery) : null;
-  const remixAllowed = permissions?.remix === true;
+  const remixAllowed = permissions?.remix === true && assetCapability?.permissions.remix === true;
   const personalUseOnly = discovery?.rights.status === 'PERSONAL_USE_ONLY';
-  const useAvailability = resolveStudioUseAvailabilityV1(look);
-  const useUnavailableTitle = useAvailability.state === 'ASSETS_INCOMPLETE'
+  const useEnabled = assetCapability?.cta === 'USE_VERSIONED'
+    || assetCapability?.cta === 'USE_LEGACY_APPROXIMATE';
+  const useUnavailableTitle = assetCapability?.capabilityState === 'ASSETS_INCOMPLETE'
     ? text('Studio 素材尚未补齐，暂不可使用', 'Studio assets are incomplete; Use is unavailable')
-    : useAvailability.state === 'INSPIRATION_ONLY'
+    : assetCapability?.capabilityState === 'INSPIRATION_ONLY'
       ? text('该 Look 仅供灵感参考', 'This Look is inspiration only')
-      : text('该版本依赖暂不可用', 'This version dependency is unavailable');
+      : assetCapability?.capabilityState === 'UNAVAILABLE'
+        ? text('该内容当前不可使用，请查看详情诊断', 'This Look is currently unavailable; open details for diagnostics')
+        : text('资产能力合同不可用', 'The asset capability contract is unavailable');
 
   return (
     <article
@@ -130,7 +138,7 @@ export function CommunityLookCard({
           </Link>
         </h3>
         <div className="mt-auto flex flex-wrap gap-1 pt-1">
-          <ApplicationBadge level={look.applicationLevel} />
+          <CommunityAssetCapabilityBadge capability={assetCapability} locale={locale} />
           <VerificationBadge level={look.verificationLevel} />
         </div>
 
@@ -166,12 +174,24 @@ export function CommunityLookCard({
             <Bookmark size={13} aria-hidden />
             {text('保存', 'Save')}
           </button>
-          {remixAllowed ? (
-            useAvailability.enabled ? (
+          {assetCapability === null ? (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title={useUnavailableTitle}
+              data-testid="look-card-use-disabled"
+              data-use-state="UNAVAILABLE"
+              className="inline-flex h-11 cursor-not-allowed items-center rounded-button border border-gray-200 bg-gray-100 px-2.5 text-xs font-medium text-gray-400"
+            >
+              {text('使用', 'Use')}
+            </button>
+          ) : remixAllowed ? (
+            useEnabled ? (
               <Link
                 to={detailHref}
                 data-testid="look-card-use"
-                data-use-state={useAvailability.state}
+                data-use-state={assetCapability.capabilityState}
                 className="inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-2.5 text-xs font-medium text-primary hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 {text('使用', 'Use')}
@@ -183,7 +203,7 @@ export function CommunityLookCard({
                 aria-disabled="true"
                 title={useUnavailableTitle}
                 data-testid="look-card-use-disabled"
-                data-use-state={useAvailability.state}
+                data-use-state={assetCapability.capabilityState}
                 className="inline-flex h-11 cursor-not-allowed items-center rounded-button border border-gray-200 bg-gray-100 px-2.5 text-xs font-medium text-gray-400"
               >
                 {text('使用', 'Use')}

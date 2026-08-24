@@ -771,7 +771,8 @@ test('card: strict taxonomy-v2 props only, no legacy taxonomy or legacy tag read
   assert.match(card, /remixAllowed/, 'remix gate derived from actionPermissions');
   assert.match(card, /look-card-save/, 'Save preserved');
   assert.match(card, /look-card-made/, 'Made evidence preserved');
-  assert.match(card, /resolveStudioUseAvailabilityV1/, 'asset/use availability semantics kept');
+  assert.match(card, /assetCapability/, 'asset/use availability consumes the strict ASSET-03 projection');
+  assert.doesNotMatch(card, /resolveStudioUseAvailabilityV1/, 'card does not infer availability from legacy fields');
   assert.match(card, /community-card-cover-fallback/, 'cover fallback kept');
   assert.match(card, /Routes\.communityLook\(look\.lookId\)/, 'canonical detail link kept');
 });

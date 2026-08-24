@@ -15,7 +15,8 @@
  *   动作与近似应用 modal 触发，改为可见的 `personal-use-only-action-restricted`
  *   提示；discovery 为 null 时同样不提供应用/二次创作动作。通用「进入 Studio」
  *   导航保持不变（它不应用/不 remix 本 Look）。
- * - Application / Verification 证据徽章保留为独立 legacy 证据，不是发现标签。
+ * - Application / Verification 保留为独立 legacy 证据，不是能力真源；
+ *   content-specific CTA 只消费严格 ASSET-03 capability read model。
  * - 禁止 import Wizard / Editor Store。
  */
 
@@ -29,21 +30,20 @@ import { CrossProductAction, CrossProductLink } from '@/app/CrossProductLink';
 import { useLocale } from '@/lib/i18n';
 import { getPublisherById } from '../data/content-repository';
 import { getLookReadModelById } from '../data/look-repository';
+import { loadCommunityAssetCapabilitiesV1 } from '../data/asset-capability-repository';
 import { loadCommunityTaxonomyV2 } from '../data/taxonomy-repository';
 import type { CommunityPublisherV1 } from '../domain/types';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
 import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
+import type { CommunityLookAssetCapabilityReadModelV1 } from '../domain/asset-capability-v1';
 import { actionPermissions } from '../domain/taxonomy-v2/governance';
-import {
-  canTryInStudio,
-  createStudioImportIntent,
-} from '../domain/studio-import-intent';
+import { createStudioImportIntent } from '../domain/studio-import-intent';
 import { PublisherBadge } from '../components/PublisherBadge';
 import { ApplicationBadge, VerificationBadge } from '../components/CapabilityBadge';
 import { DiscoveryDetailSection } from '../components/CommunityDiscoveryMetadata';
+import { CommunityAssetCapabilitySection } from '../components/CommunityAssetCapability';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
 import { createVersionedUseIntentForLookV1 } from '@/integration/community-studio/versioned-use-runtime';
-import { resolveStudioUseAvailabilityV1 } from '../domain/studio-use-availability';
 
 function EvidenceRow({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'missing' }) {
   return (
@@ -71,6 +71,8 @@ export default function CommunityLookPage() {
   const [look, setLook] = useState<PublishedLookReadModelV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
   const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
+  const [assetCapability, setAssetCapability] = useState<CommunityLookAssetCapabilityReadModelV1 | null | undefined>(undefined);
+  const [assetCapabilityIssueCodes, setAssetCapabilityIssueCodes] = useState<string[]>([]);
   /** TAX-04: taxonomy-v2 加载/解析失败的可见诊断（fail closed，不推断）。 */
   const [taxonomyV2Error, setTaxonomyV2Error] = useState<string | null>(null);
   /** TAX-04: fetch/runtime 加载失败的独立可见状态，绝不伪装成「内容缺失」。 */
@@ -85,11 +87,14 @@ export default function CommunityLookPage() {
     setLoadFailed(false);
     setCoverFailed(false);
     setTaxonomyV2Error(null);
+    setAssetCapability(undefined);
+    setAssetCapabilityIssueCodes([]);
     void (async () => {
       try {
-        const [lookModel, taxV2] = await Promise.all([
+        const [lookModel, taxV2, capabilities] = await Promise.all([
           getLookReadModelById(lookId),
           loadCommunityTaxonomyV2(),
+          loadCommunityAssetCapabilitiesV1(),
         ]);
         if (cancelled) return;
         setLook(lookModel);
@@ -99,6 +104,14 @@ export default function CommunityLookPage() {
           setTaxonomyV2Error(
             taxV2.issues.map((issue) => issue.code).join(','),
           );
+        }
+        if (capabilities.ok) {
+          const capability = capabilities.index.entries.find((entry) => entry.contentId === lookId) ?? null;
+          setAssetCapability(capability);
+          if (!capability) setAssetCapabilityIssueCodes(['capability_record_missing']);
+        } else {
+          setAssetCapability(null);
+          setAssetCapabilityIssueCodes(capabilities.issues.map((issue) => issue.code));
         }
         if (lookModel) {
           const pub = await getPublisherById(lookModel.publisherId);
@@ -167,22 +180,22 @@ export default function CommunityLookPage() {
   // TAX-04: rights gate fail closed — PERSONAL_USE_ONLY 与缺失 discovery 都
   // 拒绝内容相关的应用/二次创作动作；通用 Studio 导航不受影响。
   const permissions = discovery ? actionPermissions(discovery) : null;
-  const remixAllowed = permissions?.remix === true;
+  const remixAllowed = permissions?.remix === true && assetCapability?.permissions.remix === true;
   const personalUseOnly = discovery?.rights.status === 'PERSONAL_USE_ONLY';
-  const tryable = canTryInStudio(content);
   const legacy = look.readModelKind === 'LEGACY_PARTIAL';
   const canonical = look.readModelKind === 'CANONICAL';
   const evidence = look.evidence;
-  const useAvailability = resolveStudioUseAvailabilityV1(look);
   const localHandoffAvailable = canUseLocalStudioHandoff(window.location.origin);
   const crossOriginDisabledReason = localHandoffAvailable
     ? undefined
     : '跨域导入通道尚未配置；当前不会创建 Studio 导入意图。';
-  const useUnavailableMessage = useAvailability.state === 'ASSETS_INCOMPLETE'
+  const useUnavailableMessage = assetCapability?.capabilityState === 'ASSETS_INCOMPLETE'
     ? 'Studio 素材尚未补齐，暂不可使用'
-    : useAvailability.state === 'INSPIRATION_ONLY'
+    : assetCapability?.capabilityState === 'INSPIRATION_ONLY'
       ? '该 Look 仅供灵感参考，暂不可使用'
-      : '该版本依赖暂不可用，请稍后再试';
+      : assetCapability?.capabilityState === 'UNAVAILABLE'
+        ? '该内容当前不可用，请查看资产能力诊断'
+        : '资产能力合同不可用，已停止内容应用动作';
 
   const prepareLegacyIntent = (): { ok: true; href: string } | { ok: false } => {
     const result = createStudioImportIntent({
@@ -207,11 +220,8 @@ export default function CommunityLookPage() {
   };
 
   const onTryClick = () => {
-    if (!tryable || !useAvailability.enabled) return;
-    if (look.applicationLevel === 'APPROXIMATE') {
-      setApproxOpen(true);
-      return;
-    }
+    if (assetCapability?.cta !== 'USE_LEGACY_APPROXIMATE') return;
+    setApproxOpen(true);
   };
 
   const prepareVersionedIntent = (): { ok: true; href: string } | { ok: false } => {
@@ -260,8 +270,7 @@ export default function CommunityLookPage() {
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-2">
             <PublisherBadge publisher={publisher} />
-            {/* Application/Verification 是 legacy 证据徽章，不是发现/搜索标签。 */}
-            <ApplicationBadge level={look.applicationLevel} />
+            {/* Verification 只说明预览校验，不是 capability / makeability。 */}
             <VerificationBadge level={look.verificationLevel} />
           </div>
           <div>
@@ -295,14 +304,29 @@ export default function CommunityLookPage() {
             </div>
           )}
 
+          <CommunityAssetCapabilitySection
+            capability={assetCapability}
+            issueCodes={assetCapabilityIssueCodes}
+            locale={locale}
+          />
+
           <p className="text-nano leading-relaxed text-gray-500">
             预览通过 ≠ 可制造 ≠ 已下发生产。试用仅写入 Studio 导入意图，不会由 Community 直接改写 Wizard /
             Editor。
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {remixAllowed ? (
-              canonical && useAvailability.enabled ? (
+            {assetCapability === undefined ? (
+              <Button className="min-h-11" disabled variant="secondary" data-testid="community-asset-capability-action-loading">
+                资产能力加载中
+              </Button>
+            ) : assetCapability === null ? (
+              <div className="flex flex-col items-start gap-1" data-testid="community-asset-capability-action-restricted">
+                <Button className="min-h-11" disabled variant="secondary">使用</Button>
+                <p className="text-xs text-amber-700">资产能力合同不可用；内容应用动作保持关闭。</p>
+              </div>
+            ) : remixAllowed ? (
+              canonical && assetCapability.cta === 'USE_VERSIONED' ? (
                 <CrossProductAction
                   href={studioProductHref(Routes.designNew)}
                   prepareHref={prepareVersionedIntent}
@@ -312,36 +336,25 @@ export default function CommunityLookPage() {
                 >
                   使用此版本在 Studio 中定制
                 </CrossProductAction>
-              ) : tryable && useAvailability.enabled ? (
-                look.applicationLevel === 'APPROXIMATE' ? (
-                  <Button onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
+              ) : legacy && assetCapability.cta === 'USE_LEGACY_APPROXIMATE' ? (
+                  <Button className="min-h-11" onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
                     在 Studio 中试用（Legacy 近似）
                   </Button>
-                ) : (
-                  <CrossProductAction
-                    href={studioProductHref(Routes.designNew)}
-                    prepareHref={prepareLegacyIntent}
-                    disabledReason={crossOriginDisabledReason}
-                    data-testid="community-try-in-studio"
-                    className="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-                  >
-                    在 Studio 中试用
-                  </CrossProductAction>
-                )
               ) : (
                 <div className="flex flex-col items-start gap-1">
                   <Button
+                    className="min-h-11"
                     disabled
                     variant="secondary"
                     data-testid="community-use-disabled"
-                    data-use-state={useAvailability.state}
+                    data-use-state={assetCapability.capabilityState}
                     title={useUnavailableMessage}
                   >
                     使用
                   </Button>
                   <p
                     className="text-xs text-gray-500"
-                    data-testid={look.applicationLevel === 'INSPIRATION_ONLY'
+                    data-testid={assetCapability.capabilityState === 'INSPIRATION_ONLY'
                       ? 'community-inspiration-only'
                       : 'community-missing-asset'}
                   >
@@ -389,7 +402,7 @@ export default function CommunityLookPage() {
                 资产清单
               </a>
             )}
-            {crossOriginDisabledReason && remixAllowed && useAvailability.enabled && (
+            {crossOriginDisabledReason && remixAllowed && (assetCapability.cta === 'USE_VERSIONED' || assetCapability.cta === 'USE_LEGACY_APPROXIMATE') && (
               <p className="basis-full text-xs text-amber-700" data-testid="community-cross-origin-handoff-disabled">
                 {crossOriginDisabledReason}
               </p>
@@ -406,6 +419,11 @@ export default function CommunityLookPage() {
         <h2 className="text-sm font-semibold text-amber-900">
           {text('证据与兼容性', 'Evidence & compatibility')}
         </h2>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2" data-testid="community-legacy-application-evidence">
+          <span className="text-xs text-amber-800">{text('旧版应用标签（仅兼容证据）', 'Legacy application label (compatibility evidence only)')}</span>
+          <ApplicationBadge level={look.applicationLevel} />
+        </div>
 
         <div className="mt-2 space-y-1.5">
           <EvidenceRow
