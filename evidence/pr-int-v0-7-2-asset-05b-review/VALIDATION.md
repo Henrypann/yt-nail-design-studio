@@ -43,3 +43,7 @@ PASS
 该演练没有创建 merge commit，主工作树已核对恢复为原 `main @ 3f0fb9b` 与原有 dirty/untracked 状态；它不替代正式吸收后的 E2E 与 owner 门。
 
 后续 `5841b95` 新增 `test:community-home-owner-review`：当前 `AWAITING_INPUT` 必须完全空白，只允许 input pack 的 15 条候选，unknown ref 失败关闭，不推导 `PUBLISHED`；`c3a6856` 再把该门纳入 05A 联合矩阵。更新后的 package 三方门、typecheck 与 `build:integration` 均通过。
+
+## 最终 HEAD 批次
+
+在 `18df2da` 上再次执行 asset contract/inventory/governance、validate-assets、Starter Shelf/read preflight、Community capability/UI、Home、owner input check/review、combined handoff、branch boundary、typecheck、build、build:integration 与 diff check，全部 PASS；仅保留既有 Vite chunk-size warning。完整 `git status` clean。
