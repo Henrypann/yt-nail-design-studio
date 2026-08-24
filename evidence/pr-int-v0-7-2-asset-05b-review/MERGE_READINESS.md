@@ -1,6 +1,6 @@
 # INT-ASSET-05B｜Branch B Merge Readiness Review
 
-审查实现基线：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`；本轮门禁当前 HEAD 为 `5841b95baeeffb699d5f196f65fd956d561bd50b`。
+审查实现基线：`f928d4edc68cd8fcc46e4efe7639ce48c6bc75ea`；本轮门禁当前 HEAD 为 `c3a68561526c510f45fd31c60cd62b66b4e5ce69`。
 
 裁决：`READY FOR PRODUCT/OWNER REVIEW`，**尚不建议立即 merge**。
 
@@ -12,6 +12,7 @@
 - 与 Branch A 唯一文件交集为 `package.json`；以 `main @ 3f0fb9b`、Branch B `8ce6d19`、Branch A `a150040` 在临时 detached worktree 执行无提交三方合并，Git 可无冲突合并。组合态 typecheck、build、build:integration、French contract/compiler/conversion/commands/renderers、资产联合矩阵、Home 合同和带显式 `ASSET_HEAD` 的边界门均通过。随后 Branch B 增加 owner review 门，当前三方 package 门再次通过并可保留 16 条资产脚本与 12 条 French 脚本。实际吸收后仍须重跑双方门禁，不把演练等同正式 merge。
 - 与 main 用户 dirty/untracked 路径无交集：`AGENTS.md`、`.obsidian/`、`docs/architecture/`、Vite timestamp 均未被 Branch B 修改。
 - 全资产专项、Community 回归、typecheck、build、integration build、03B/04A 六视口均通过。
+- 05A 联合矩阵已纳入 04B 的 15 条 owner candidates 与 `AWAITING_INPUT_FAIL_CLOSED`，真实 owner 字段仍为空。
 
 ## Worktree 状态勘误与复核
 

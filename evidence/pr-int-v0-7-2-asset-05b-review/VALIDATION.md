@@ -42,4 +42,4 @@ PASS
 
 该演练没有创建 merge commit，主工作树已核对恢复为原 `main @ 3f0fb9b` 与原有 dirty/untracked 状态；它不替代正式吸收后的 E2E 与 owner 门。
 
-后续 `5841b95` 新增 `test:community-home-owner-review`：当前 `AWAITING_INPUT` 必须完全空白，只允许 input pack 的 15 条候选，unknown ref 失败关闭，不推导 `PUBLISHED`；更新后的 package 三方门与 `build:integration` 均再次通过。
+后续 `5841b95` 新增 `test:community-home-owner-review`：当前 `AWAITING_INPUT` 必须完全空白，只允许 input pack 的 15 条候选，unknown ref 失败关闭，不推导 `PUBLISHED`；`c3a6856` 再把该门纳入 05A 联合矩阵。更新后的 package 三方门、typecheck 与 `build:integration` 均通过。
