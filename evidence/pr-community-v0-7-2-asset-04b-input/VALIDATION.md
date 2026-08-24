@@ -22,6 +22,9 @@ CHECK PASS（byte-stable）
 npm run test:community-home-owner-input
 PASS
 
+npm run test:community-home-owner-review
+PASS（AWAITING_INPUT 保持空白；仅允许 15 条治理候选；unknown ref fail closed；不推导发布）
+
 git diff --check
 PASS
 ```

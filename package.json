@@ -57,6 +57,7 @@
     "generate:community-home-owner-input": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-community-home-owner-input.mjs",
     "generate:community-home-owner-input:update": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-community-home-owner-input.mjs --update",
     "test:community-home-owner-input": "node tools/test-community-home-owner-input.mjs",
+    "test:community-home-owner-review": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-home-owner-review.mjs",
     "test:gen-v7-1-04-backend-ports": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-gen-v7-1-04-backend-ports.mjs",
     "test:geometry-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-contract-v0-7-2.mjs",
     "test:geometry-v0-7-2-parity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-kernel-parity-v0-7-2.mjs",

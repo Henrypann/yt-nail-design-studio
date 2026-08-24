@@ -51,3 +51,5 @@
 3. Product/Design 与 rights 证据齐全后才允许 `PUBLISHED`。
 4. 不得把编辑精选称为“热门”“趋势”或“个性化推荐”。
 5. 不得复制 Studio Official Starter Shelf 身份，也不得升级可制作/制造声明。
+
+提交前运行 `npm run test:community-home-owner-review`。该门禁只接受 input pack 中的治理候选；未知 Look ID 失败关闭。当前仍为 `AWAITING_INPUT` 时，它同时要求配置保持完全空白，不会从候选顺序生成精选或发布状态。
