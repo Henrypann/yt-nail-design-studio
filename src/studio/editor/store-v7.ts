@@ -100,6 +100,10 @@ import { addMissingEditorWorkspacePersonalStepV7, type EditorWorkspacePersonalSt
 import { isExactEditorGeometryV7 } from './v7/geometry-registry';
 import type { EditorResourceModeV7 } from './v7/flat-tool-panel-map';
 import { EDITOR_V7_PRODUCTION_MIGRATION_RESOLVERS } from './v7/migration-resolvers';
+import { convertLegacyFrenchEdgeToRecipeV1 } from './v7/french-conversion-v1';
+import { resolveExactFrenchGeometryInputV1 } from './v7/french-geometry-input-v1';
+import { PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7 } from './v7/geometry-registry';
+import type { FrenchRecipeParametersV1 } from './v7/french-recipe-v1';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -193,6 +197,7 @@ export interface EditorV7State {
   setGlitterParameters(finger: FingerCode, parameters: EditorV7GlitterParametersV7): EditorV7ActionResult;
   applyBackgroundPaletteTheme(finger: FingerCode, theme: EditorV7PaletteThemeV7): EditorV7ActionResult;
   addStep(finger: FingerCode, step: ProcessStepV7, index: number): EditorV7ActionResult;
+  confirmLegacyFrenchConversion(finger: FingerCode, sourceStepId: string, sourceElementId: string, parameters: FrenchRecipeParametersV1): EditorV7ActionResult;
   addMissingPersonalStep(finger: FingerCode, kind: EditorWorkspacePersonalStepKindV7): EditorV7ActionResult;
   deleteStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
@@ -653,6 +658,35 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
           ? commitFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index))
           : commitSpatialFingerCommand(finger, (doc) => addEditorV7Step(doc, finger, step, index))
       ),
+      confirmLegacyFrenchConversion: (finger, sourceStepId, sourceElementId, parameters) =>
+        commitSpatialFingerCommand(finger, (doc) => {
+          const nail = doc.nails[finger];
+          const geometry = nail
+            ? resolveExactFrenchGeometryInputV1(nail.geometryRef, finger, PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7)
+            : null;
+          if (!geometry?.ok) {
+            return {
+              ok: false,
+              reason: 'geometry_unavailable',
+              message: geometry?.diagnostics.map((item) => `${item.path}: ${item.message}`).join('; ') ?? 'finger is unavailable',
+            };
+          }
+          const converted = convertLegacyFrenchEdgeToRecipeV1({
+            doc,
+            finger,
+            sourceStepId,
+            sourceElementId,
+            parameters,
+            geometry: geometry.geometry,
+            recipeInstanceId: idFactory('element'),
+            stepId: idFactory('step'),
+            fillElementId: idFactory('element'),
+            outlineElementId: idFactory('element'),
+          });
+          return converted.ok
+            ? { ok: true, doc: converted.doc, selectedStepId: converted.stepId, selectedElementId: converted.fillElementId }
+            : { ok: false, reason: 'not_allowed', message: converted.diagnostics.map((item) => `${item.path}: ${item.message}`).join('; ') };
+        }),
       addMissingPersonalStep: (finger, kind) => commitSpatialFingerCommand(finger, (doc) => addMissingEditorWorkspacePersonalStepV7(doc, finger, kind, idFactory)),
       deleteStep: (finger, stepId) => {
         const before = get();

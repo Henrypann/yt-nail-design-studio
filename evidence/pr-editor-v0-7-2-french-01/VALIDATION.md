@@ -1,9 +1,9 @@
 # EDITOR-v0.7.2-FRENCH-01 Validation
 
-Date: 2026-08-21
+Date: 2026-08-24
 Branch: `codex/w34-studio-french-track`
 Base: `main @ 3f0fb9bc1f39793d300bd4216c637584e23161c9`
-Checkpoint: FRENCH-01 contract/legacy-evidence foundation only (corrected parameter semantics)
+Checkpoint: explicit legacy conversion + recipe-managed projection (branch checkpoint)
 
 ## Scope verified
 
@@ -15,6 +15,11 @@ Checkpoint: FRENCH-01 contract/legacy-evidence foundation only (corrected parame
 - Existing V7 `french_edge(widthRatio, curvature, color)` remains frozen and readable. The recipe is not written into the legacy element.
 - V7 simple French and rich V3/V6 French are classified separately. Preview conversion does not infer preset, overall style, makeability, or manufacturing capability. Uncloneable input (`Symbol` / function / object with a non-cloneable value) returns `unavailable` with `source_not_cloneable` and does not throw or mutate.
 - Rich or mixed legacy payloads stay in migration evidence and are not flattened. Simple French `NaN` / `Infinity` is rejected with `Number.isFinite` before V7 content is created, with evidence retained. Double-line French remains unavailable in V1.
+- `convertLegacyFrenchEdgeToRecipeV1` requires an explicit, strictly parsed parameter object and exact signed geometry. It never infers preset or anchors from `widthRatio` / `curvature`.
+- Successful conversion keeps the legacy element as `visible:false, locked:true` inert evidence, inserts one adjacent locked `flat_design` step, creates one `RecipeInstanceV7`, and materializes only locked compiler fill/outline vector projections. The recipe is the sole active authoring truth.
+- `inspectFrenchRecipeProjectionV1` resolves the current document geometry tuple and recompiles from the recipe; an optional supplied geometry is only accepted when it matches that tuple. It rejects dangling references, ambiguous recipe ownership, hidden/unlocked/skipped managed steps, extra/unlocked elements, path/color/opacity/transform/stroke drift, and invalid geometry/parameters with visible diagnostics.
+- Conversion geometry is rebound to the current document finger/asset/revision and canonical registry; foreign-finger, foreign-asset, revision-drift, generated, forged, and registry-SHA-mismatched geometry fail closed. IDs follow the EditorDoc schema (max 128, `:` allowed) and node/recipe cross-domain collisions are rejected.
+- Store `confirmLegacyFrenchConversion` is spatial-gated and commits through the existing transaction path: read-only, busy, invalid geometry, invalid source, and compiler failures are writer-zero; success creates one revision/history entry and schedules the existing autosave.
 
 ## Automated gates
 
@@ -22,6 +27,7 @@ Checkpoint: FRENCH-01 contract/legacy-evidence foundation only (corrected parame
 |---|---|
 | `npm run test:editor-v7-french-contract` | PASS — default presets, custom round-trip, exact-key canonicalization, outline/cross-field fail-closed, instance, serialization |
 | `npm run test:editor-v7-french-migration` | PASS — V7 simple, V3/V6 arc/v/double, mixed, uncloneable preview, NaN/Infinity evidence, identity regression |
+| `npm run test:editor-v7-french-conversion` | PASS — pure no-mutation conversion, outline on/off, geometry/source/ID fail-closed matrix, full inspector tamper matrix, store writer-zero/undo/redo/save/reload, materialize/remix/scope no-dangling, release snapshot/manifest |
 | `npm run test:editor-v7-contract` | PASS — 2 valid and 34 invalid fixtures |
 | `npm run test:editor-v7-migrate` | PASS |
 | `npm run test:handdraw` | PASS — existing French, mirror, migration, and recipe regressions |
@@ -32,7 +38,7 @@ Checkpoint: FRENCH-01 contract/legacy-evidence foundation only (corrected parame
 
 ## Acceptance boundary
 
-This is still a FRENCH-01 foundation checkpoint, not the whole FRENCH-01 PR. It corrects authoring-parameter semantics only. It does not provide a compiler, derived `vector_shape` projection, Editor UI, store commands, release/import/materialize/scope checks, undo/save/reopen behavior, or any preview integration. No visual, physical, fit, manufacturing, deployment, or production claim is made.
+This remains a FRENCH-01 branch checkpoint, not a merged release. The dedicated tests now prove release snapshot/manifest preservation, independent/remix recipe remapping, and generic whole-nail copy-detached no-dangling behavior. It does not provide Editor UI, FRENCH-specific copy-detached recompilation, multi-finger French scope commands, or FRENCH-03 editing commands; those remain FRENCH-03 scope. No visual, physical, fit, manufacturing, deployment, or production claim is made.
 
 The five default preset identities are conservative contract defaults for the planned 60 golden matrix. Product, Design/Nail Expert, and visual sign-off are still required before FRENCH-02 can claim accepted golden defaults. Passing parser tests is not that sign-off.
 
