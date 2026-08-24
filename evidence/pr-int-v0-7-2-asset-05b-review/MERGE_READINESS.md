@@ -4,6 +4,8 @@
 
 裁决：`READY FOR PRODUCT/OWNER REVIEW`，**尚不建议立即 merge**。
 
+实际合入前按 `FAST_FORWARD_RUNBOOK.md` 重新核验；该 runbook 当前为 `DO NOT EXECUTE / owner-gated`。
+
 ## 已确认
 
 - Branch B 是 `main @ 3f0fb9b` 的直接后代，完整 stack 为 12 个实现/证据提交；禁止只 cherry-pick 后段 03B/04A/05A。
