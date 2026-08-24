@@ -53,6 +53,7 @@
     "test:community-asset-capability-ui:e2e": "node tools/walkthrough-community-asset-capability.mjs",
     "test:community-home-merchandising": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-home-merchandising.mjs",
     "test:community-home-merchandising:e2e": "node tools/walkthrough-community-home-merchandising.mjs",
+    "test:asset-ops-combined-handoff": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-asset-ops-combined-handoff.mjs",
     "test:gen-v7-1-04-backend-ports": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-gen-v7-1-04-backend-ports.mjs",
     "test:geometry-v0-7-2-contract": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-contract-v0-7-2.mjs",
     "test:geometry-v0-7-2-parity": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-geometry-kernel-parity-v0-7-2.mjs",

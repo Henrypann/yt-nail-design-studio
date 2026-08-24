@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "INT-v0.7.2-ASSET-05A",
+  "architectureBaseline": "v0.7.2",
+  "status": "PARTIAL_READY_BRANCH",
+  "domains": {
+    "inventory": {
+      "templateCount": 21,
+      "fourLookPackCount": 4,
+      "formalTemplateMetadataGap": false,
+      "fourLookManufacturingValidated": false
+    },
+    "governance": {
+      "recordCount": 25,
+      "rightsPendingCount": 25,
+      "promotionBlockedCount": 25,
+      "manifestPresentCount": 25,
+      "binariesPresentCount": 25
+    },
+    "starterShelf": {
+      "candidateDatasetCount": 10,
+      "preflightCaseCount": 70,
+      "exactIdentityCount": 63,
+      "unavailableCount": 7,
+      "usageScope": "LOCAL_CONCEPT_DRAFT_ONLY",
+      "rightsStatus": "PENDING",
+      "promotionStatus": "BLOCKED",
+      "manufacturingValidated": false
+    },
+    "communityCapability": {
+      "subjectCount": 24,
+      "versionedReadyCount": 5,
+      "legacyApproximateCount": 2,
+      "assetsIncompleteCount": 7,
+      "unavailableCount": 10,
+      "currentMakeableCount": 0,
+      "manufacturingValidatedCount": 0,
+      "canonicalLegacyBrowserEvidence": true
+    },
+    "homeMerchandising": {
+      "status": "AWAITING_INPUT",
+      "publishedBannerCount": 0,
+      "publishedEditorialSelectionCount": 0,
+      "publishedCollectionCount": 0,
+      "governedFeedPreservedCount": 15,
+      "viewportsValidated": 6
+    }
+  },
+  "ownerGates": [
+    {
+      "gateId": "RIGHTS_SOURCE_COMMERCIAL",
+      "owner": "rights-or-legal-owner",
+      "state": "UNKNOWN_INPUT_REQUIRED",
+      "blockingEvidence": "25/25 governance records remain PENDING"
+    },
+    {
+      "gateId": "STARTER_SHELF_PROMOTION",
+      "owner": "product-and-design-owner",
+      "state": "UNKNOWN_INPUT_REQUIRED",
+      "blockingEvidence": "10/10 candidates remain promotion BLOCKED"
+    },
+    {
+      "gateId": "HOME_EDITORIAL_CONTENT",
+      "owner": "marketing-or-community-owner",
+      "state": "UNKNOWN_INPUT_REQUIRED",
+      "blockingEvidence": "home merchandising remains AWAITING_INPUT"
+    },
+    {
+      "gateId": "PHYSICAL_OR_MANUFACTURING",
+      "owner": "nail-expert-and-manufacturing-owner",
+      "state": "NOT_VALIDATED",
+      "blockingEvidence": "no physical sample, fit, print, process or workcell evidence"
+    }
+  ],
+  "rollback": [
+    {
+      "scope": "home-merchandising",
+      "action": "keep or restore the checked-in AWAITING_INPUT config revision; the governed Feed remains available"
+    },
+    {
+      "scope": "community-capability-ui",
+      "action": "revert the ASSET-03B presentation commit without changing the 03A capability authority"
+    },
+    {
+      "scope": "official-starter-shelf",
+      "action": "keep promotion BLOCKED and petalVeilEnabled false; no candidate becomes a public starter"
+    },
+    {
+      "scope": "full-branch",
+      "action": "do not fast-forward Branch B; main remains unchanged"
+    }
+  ],
+  "evidenceRefs": [
+    "evidence/pr-asset-gen-02/asset-ops-inventory-v1-post-migration.json",
+    "material-library/asset-ops-governance-v1.json",
+    "evidence/pr-studio-v0-7-2-asset-02b/VALIDATION.md",
+    "evidence/pr-community-v0-7-2-asset-03a/asset-capability-report-v1.json",
+    "evidence/pr-community-v0-7-2-asset-03b/walkthrough-report.json",
+    "public/community/home-merchandising-v1.json",
+    "evidence/pr-community-v0-7-2-asset-04a/walkthrough-report.json"
+  ],
+  "claims": {
+    "integratedIntoMain": false,
+    "remotePushed": false,
+    "deployed": false,
+    "manufacturingValidated": false,
+    "productionReady": false
+  }
+}
