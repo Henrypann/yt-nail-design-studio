@@ -2,9 +2,12 @@
 
 import { Routes } from '@/app/routes';
 import type { PublishedLookV1 } from '@/community/domain/v7_1/design-content-model';
+import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/published-look-read-model';
 import {
   createVersionedStudioImportIntentV2,
+  type VersionedStudioImportIntentV2,
 } from '@/community/domain/v7_1/versioned-studio-intent';
+import type { EditorDocV7 } from '@/studio/editor/v7/model';
 import {
   BACKEND_OPERATIONS_V1,
   BACKEND_PERMISSIONS_V1,
@@ -31,6 +34,8 @@ import {
   getFourLookSetAuthorityByLookIdV0_7_2,
   getFourLookSetAuthorityByVersionIdV0_7_2,
 } from './v0-7-2-four-look-sets';
+import { createFrenchUseContextV1, type FrenchUseContextV1 } from './french-use-context-v1';
+import { frenchUseContextPortV1 } from './french-use-context-local';
 
 const persistence = createLocalVersionedUsePersistencePortV1();
 const persistenceIdentity = createLocalPrototypeIdentityAccessPortV1({
@@ -151,4 +156,33 @@ export async function consumeVersionedUseIntentV2(
     }
   }
   return result;
+}
+
+export function persistFrenchUseContextForVersionedResultV1(input: {
+  intent: VersionedStudioImportIntentV2;
+  look: CanonicalPublishedLookReadModelV1;
+  doc: EditorDocV7;
+}):
+  | { ok: true; context: FrenchUseContextV1 | null }
+  | { ok: false; reason: 'source_mismatch' | 'discovery_unavailable' | 'invalid_context' | 'storage_unavailable' } {
+  if (input.look.lookId !== input.intent.lookId
+    || input.look.designVersionId !== input.intent.designVersionId
+    || input.look.creatorProfileId !== input.intent.sourceCreatorProfileId) {
+    return { ok: false, reason: 'source_mismatch' };
+  }
+  const built = createFrenchUseContextV1({
+    contextId: `french.use.${input.intent.intentId}`,
+    route: 'CANONICAL_V2',
+    sourceId: input.intent.lookId,
+    sourceRevision: input.intent.designVersionId,
+    discovery: input.look.discovery,
+    targetDoc: input.doc,
+    nowMs: Date.now(),
+  });
+  if (!built.ok) {
+    return { ok: false, reason: built.reason === 'discovery_unavailable' ? 'discovery_unavailable' : 'invalid_context' };
+  }
+  if (!built.context) return { ok: true, context: null };
+  if (!frenchUseContextPortV1.save(built.context).ok) return { ok: false, reason: 'storage_unavailable' };
+  return { ok: true, context: built.context };
 }

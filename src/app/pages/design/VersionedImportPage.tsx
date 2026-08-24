@@ -18,8 +18,10 @@ import { sanitizeReturnTo } from '@/community/domain/studio-import-intent';
 import type { VersionedStudioImportIntentV2 } from '@/community/domain/v7_1/versioned-studio-intent';
 import {
   consumeVersionedUseIntentV2,
+  persistFrenchUseContextForVersionedResultV1,
   versionedIntentPortV2,
 } from '@/integration/community-studio/versioned-use-runtime';
+import { deriveFrenchUsePreflightV1 } from '@/integration/community-studio/french-use-context-v1';
 
 type PreflightState =
   | { kind: 'loading' }
@@ -92,15 +94,30 @@ export default function VersionedImportPage() {
   // publisher is only used above for an equality check and never replaces it.
   const creator = ready?.intent.sourceCreatorProfileId ?? '来源 Creator lineage 不可用';
   const assetCount = ready?.intent.assetRevisionRefs.length ?? 0;
+  const frenchPreflight = useMemo(
+    () => deriveFrenchUsePreflightV1(ready?.look?.discovery ?? null),
+    [ready?.look?.discovery],
+  );
 
   const action = async (mode: 'new' | 'current' | 'cancel') => {
-    if (!intentId || pending || state.kind !== 'ready') return;
+    const active = state.kind === 'ready' ? state : null;
+    if (!intentId || pending || !active) return;
     setPending(true);
     try {
       const result = await consumeVersionedUseIntentV2(intentId, mode);
       if (result.ok) {
+        let frenchUseContextId: string | null = null;
+        if (mode === 'new' && result.created && active.look?.readModelKind === 'CANONICAL') {
+          const persisted = persistFrenchUseContextForVersionedResultV1({
+            intent: active.intent,
+            look: active.look,
+            doc: result.doc,
+          });
+          if (persisted.ok) frenchUseContextId = persisted.context?.contextId ?? null;
+          else toast.warning('完整 Look 已创建；法式技法提示不可用，Studio 未自动添加任何法式预设。');
+        }
         navigate(mode === 'new' && result.created
-          ? `${Routes.designCanvas}?design=${encodeURIComponent(result.doc.designId)}`
+          ? `${Routes.designCanvas}?design=${encodeURIComponent(result.doc.designId)}${frenchUseContextId ? `&frenchUseContext=${encodeURIComponent(frenchUseContextId)}` : ''}`
           : mode === 'current'
             ? Routes.designNew
             : sanitizeReturnTo(result.returnTo, returnTo), { replace: true });
@@ -178,6 +195,21 @@ export default function VersionedImportPage() {
           {readiness.map((item) => <div key={item.label} className="flex items-start gap-2 rounded-panel border border-gray-100 bg-gray-50 px-3 py-2 text-xs"><CheckCircle2 size={14} className={cx(item.ok ? 'text-emerald-600' : 'text-amber-600')} /><span><strong className="font-medium text-gray-700">{item.label}</strong><br /><span className="text-gray-500">{item.value}</span></span></div>)}
         </div>
         <p className="mt-4 text-xs leading-relaxed text-gray-500">新建会复制为独立 EditorDocV7；不会初始化或覆盖当前 Quick Start 草稿。预检通过不代表可制造或已下发生产。</p>
+        <div
+          className="mt-3 rounded-panel border border-fuchsia-200 bg-fuchsia-50/60 p-3 text-xs text-fuchsia-950"
+          data-testid="french-use-preflight"
+          data-french-use-status={frenchPreflight.status}
+        >
+          <strong className="font-medium">法式技法提示</strong>
+          {frenchPreflight.status === 'FRENCH_DECLARED' ? (
+            <p className="mt-1 leading-relaxed">来源 discovery 明确包含「技法：法式」。导入的仍是完整 Look Remix；进入 Editor 后只会提示打开法式工具，不会猜测或自动写入经典、微、柔和、深或尖角预设。</p>
+          ) : frenchPreflight.status === 'NOT_FRENCH' ? (
+            <p className="mt-1 leading-relaxed">来源没有声明法式技法；Studio 不会根据标题、旧标签或画面外观猜测并打开法式工具。</p>
+          ) : (
+            <p className="mt-1 leading-relaxed text-amber-800">结构化 discovery 不可用；完整 Look 仍按固定版本预检，但法式工具提示保持关闭，不从 legacy 文案推断。</p>
+          )}
+          <p className="mt-1 text-nano text-fuchsia-800">此提示不代表当前可制作、物理验证或制造验证。</p>
+        </div>
         {ready.intent.assetRevisionRefs.length > 0 && (
           <div className="mt-3 rounded-panel border border-gray-100 bg-gray-50 p-3 text-xs text-gray-500" data-testid="versioned-import-assets">
             <strong className="font-medium text-gray-700">来源资产 refs</strong>
