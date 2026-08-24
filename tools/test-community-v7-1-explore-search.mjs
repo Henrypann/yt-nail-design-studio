@@ -488,7 +488,8 @@ const defaultState = () =>
   assert.doesNotMatch(card, /COMM-03/, 'Save no longer claims COMM-03 unavailability');
   assert.match(card, /look-card-use/, 'Use action present');
   assert.match(card, /look-card-use-disabled/, 'asset-incomplete Use action is disabled');
-  assert.match(card, /resolveStudioUseAvailabilityV1/, 'Use state comes from the domain projection');
+  assert.match(card, /assetCapability/, 'Use state comes from the strict ASSET-03 capability projection');
+  assert.doesNotMatch(card, /resolveStudioUseAvailabilityV1/, 'no legacy application/verification inference');
   assert.match(card, /look-card-made/, 'Made action present');
   assert.match(card, /Made.*—|—/, 'Made displays unavailable dash');
   assert.match(card, /community-card-cover-fallback/, 'cover fallback kept');

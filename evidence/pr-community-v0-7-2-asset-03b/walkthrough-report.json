@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-ASSET-03B",
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": "evidence/pr-community-v0-7-2-asset-03b/screenshots/home-capability-390.png",
+      "screenshot": "evidence/pr-community-v0-7-2-asset-03b/screenshots/versioned-390.png",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": null,
+      "screenshot": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": null,
+      "screenshot": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": "evidence/pr-community-v0-7-2-asset-03b/screenshots/home-capability-1280.png",
+      "screenshot": "evidence/pr-community-v0-7-2-asset-03b/screenshots/versioned-1280.png",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    },
+    {
+      "width": 1366,
+      "height": 900,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": null,
+      "screenshot": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "legacyHeight": 44,
+      "versionedHeight": 44,
+      "homeScreenshot": null,
+      "screenshot": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "noOverflow": true
+    }
+  ],
+  "failure": {
+    "visible": true,
+    "actionRestricted": true,
+    "screenshot": "evidence/pr-community-v0-7-2-asset-03b/screenshots/capability-failure-1280.png"
+  }
+}
