@@ -7,12 +7,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const base = process.env.ASSET_BRANCH_BASE ?? 'main';
+const assetHead = process.env.ASSET_HEAD ?? 'HEAD';
 const frenchHead = process.env.FRENCH_HEAD ?? 'a1500407a73073bb93b27ae426f9f379904fd76a';
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const lines = (value) => value ? value.split('\n').filter(Boolean).sort() : [];
 
-assert.doesNotThrow(() => git('merge-base', '--is-ancestor', base, 'HEAD'), 'Branch B must remain a descendant of main');
-const assetFiles = lines(git('diff', '--name-only', base));
+assert.doesNotThrow(() => git('merge-base', '--is-ancestor', base, assetHead), 'Branch B must remain a descendant of main');
+const assetFiles = lines(git('diff', '--name-only', `${base}..${assetHead}`));
 const frenchFiles = lines(git('diff', '--name-only', `${base}..${frenchHead}`));
 assert.ok(assetFiles.length > 0, 'Branch B diff must not be empty');
 
@@ -33,7 +34,7 @@ assert.deepEqual(overlap, ['package.json'], 'only package scripts may overlap Br
 const mergeDir = mkdtempSync(join(tmpdir(), 'asset-french-boundary-'));
 try {
   const basePackage = git('show', `${base}:package.json`);
-  const assetPackage = git('show', 'HEAD:package.json');
+  const assetPackage = git('show', `${assetHead}:package.json`);
   const frenchPackage = git('show', `${frenchHead}:package.json`);
   const basePath = join(mergeDir, 'base.json');
   const assetPath = join(mergeDir, 'asset.json');
