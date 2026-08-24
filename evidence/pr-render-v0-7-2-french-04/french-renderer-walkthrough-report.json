@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "reports": [
+    {
+      "viewport": 390,
+      "status": "passed",
+      "editorFlat": true,
+      "visibleUnavailable": true,
+      "finishComposite": true,
+      "customer2d": true,
+      "pbrMaterial": true,
+      "pbrRuntime": "ready",
+      "cameraChecks": 5,
+      "writerZero": true,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 1280,
+      "status": "passed",
+      "editorFlat": true,
+      "visibleUnavailable": true,
+      "finishComposite": true,
+      "customer2d": true,
+      "pbrMaterial": true,
+      "pbrRuntime": "ready",
+      "cameraChecks": 5,
+      "writerZero": true,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    }
+  ]
+}

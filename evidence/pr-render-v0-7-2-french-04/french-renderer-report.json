@@ -1,0 +1,21 @@
+{
+  "status": "automated-passed",
+  "canonicalCases": 60,
+  "consumerMatrix": 240,
+  "namedConsumerCalls": 240,
+  "structuredIdentity": true,
+  "legacyPassthrough": true,
+  "ordinaryPassthrough": true,
+  "unavailableDiagnostics": true,
+  "browserViewports": [390, 1280],
+  "browserPbrRuntimeReady": 2,
+  "cameraChecks": 10,
+  "writerZero": true,
+  "manufacturingValidated": false,
+  "visualSignoff": false,
+  "ownerSignoff": false,
+  "notes": [
+    "The 240 count is an automated coverage target across four consumers; it is not 240 visual approvals.",
+    "No physical PBR, Boolean, manufacturing, or production claim is made."
+  ]
+}

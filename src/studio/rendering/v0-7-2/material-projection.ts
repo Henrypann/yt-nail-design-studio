@@ -5,6 +5,7 @@ import {
 import { parseNailPathDataV7, resolveFlatElementMaskScopeV7 } from '@/studio/editor/v7/flat-vector';
 import type {
   BackgroundPayloadV7,
+  EditorDocV7,
   FlatDesignElementV7,
   NailDesignV7,
   PreviewFidelityV7,
@@ -18,6 +19,8 @@ import {
   createSurfaceEffectParticlesV7,
   normalizeSurfaceEffectDirectionV7,
 } from '@/studio/editor/v7/surface-effect';
+import { adaptFrenchFlatStepV1 } from '@/studio/editor/v7/french-render-adapter-v1';
+import type { RecipeInstanceV7 } from '@/studio/editor/v7/model';
 
 export const MATERIAL_PROJECTION_SCHEMA_V1 = 'material-projection-v1';
 export const MATERIAL_PROJECTION_WIDTH_V1 = 512;
@@ -241,6 +244,8 @@ function renderSurfaceEffect(
 export function createSingleNailMaterialProjectionV1(
   nail: NailDesignV7,
   readModel: CustomerNailPreviewReadModelV7,
+  recipeInstances: Record<string, RecipeInstanceV7> = {},
+  allNails?: EditorDocV7['nails'],
 ): SingleNailMaterialProjectionV1 {
   const backgroundStep = nail.steps[0];
   if (backgroundStep?.kind !== 'background') throw new Error(`Invalid V7 background contract for ${nail.finger}`);
@@ -260,15 +265,18 @@ export function createSingleNailMaterialProjectionV1(
   ];
 
   nail.steps.slice(1, -1).forEach((step, index) => {
-    if (!step.visible || step.skipped) return;
     if (step.kind === 'flat_design') {
+      const adapted = adaptFrenchFlatStepV1({ consumer: 'pbr-material', finger: nail.finger, nail, step, recipeInstances, allNails });
+      if (adapted.status === 'unavailable') { warnings.add(`French preview unavailable: ${adapted.diagnostics[0]}`); fidelity = maxFidelity(fidelity, 'unavailable'); return; }
+      if (!step.visible || step.skipped) return;
       projectedLayerKinds.add('flat_design');
-      const result = renderFlatStep(step, index, defs, warnings, omittedKinds);
+      const result = renderFlatStep(adapted.status === 'structured' ? adapted.step : step, index, defs, warnings, omittedKinds);
       body.push(result.artwork);
       if (result.unavailable) fidelity = maxFidelity(fidelity, 'unavailable');
       else if (result.approximate) fidelity = maxFidelity(fidelity, 'approximate');
       return;
     }
+    if (!step.visible || step.skipped) return;
     if (step.kind === 'surface_effect') {
       projectedLayerKinds.add('surface_effect');
       const result = renderSurfaceEffect(step, index, defs, warnings);

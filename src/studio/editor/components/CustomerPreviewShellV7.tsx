@@ -215,7 +215,7 @@ export function CustomerPreviewShellV7({
                     <button type="button" aria-label={`聚焦${fingerDisplayNameV7(finger)} ${finger}`} aria-current={finger === selectedFinger ? 'true' : undefined} onClick={() => focusFinger(finger)} className="flex min-h-11 min-w-0 flex-col items-center justify-end rounded-2xl px-0.5 py-1.5 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" data-finger={finger} data-finger-name={identity.name}>
                       <span className="mb-1 text-nano font-semibold text-body">{identity.handLabel}{identity.name}</span>
                       <div className="w-full" style={{ width: `${identity.previewWidth * 100}%` }}>
-                        <CustomerNailPreviewV7 nail={doc.nails[finger]} readModel={model} selected={finger === selectedFinger} presentation={presentation} visualProportion={{ width: identity.previewWidth, height: identity.previewHeight }} />
+                        <CustomerNailPreviewV7 nail={doc.nails[finger]} recipeInstances={doc.recipeInstances} allNails={doc.nails} readModel={model} selected={finger === selectedFinger} presentation={presentation} visualProportion={{ width: identity.previewWidth, height: identity.previewHeight }} />
                       </div>
                     </button>
                   );
@@ -230,10 +230,12 @@ export function CustomerPreviewShellV7({
                   <SingleNailPbrPreviewV072
                     nail={selectedNail}
                     readModel={selectedModel}
-                    fallback={<CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation="composite" />}
+                    recipeInstances={doc.recipeInstances}
+                    allNails={doc.nails}
+                    fallback={<CustomerNailPreviewV7 nail={selectedNail} recipeInstances={doc.recipeInstances} allNails={doc.nails} readModel={selectedModel} selected size="focus" presentation="composite" />}
                   />
                 </Suspense>
-              ) : <CustomerNailPreviewV7 nail={selectedNail} readModel={selectedModel} selected size="focus" presentation="2d" />}
+              ) : <CustomerNailPreviewV7 nail={selectedNail} recipeInstances={doc.recipeInstances} allNails={doc.nails} readModel={selectedModel} selected size="focus" presentation="2d" />}
               <div className="rounded-[24px] border border-white bg-white/75 p-4 shadow-[0_18px_55px_rgba(77,53,67,0.08)] sm:p-5" aria-live="polite" aria-atomic="true">
                 <p className="text-nano font-semibold uppercase tracking-[0.14em] text-primary">{fingerDisplayNameV7(selectedFinger)} · {selectedFinger} · Read-only detail</p>
                 <h1 className="mt-1 text-xl font-semibold text-gray-900">顾客沟通视图</h1>

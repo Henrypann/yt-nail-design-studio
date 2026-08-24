@@ -14,6 +14,7 @@ import { SURFACE_FINISH_LABELS_V7 } from '../v7/finish';
 import type { DimensionalDecorationV7, FlatDesignElementV7, ProcessStepV7, Transform2DV7 } from '../v7/model';
 import { createSurfaceEffectParticlesV7, rgbaCssV7, surfaceEffectMaskPathToCanvasV7 } from '../v7/surface-effect';
 import { combineGeometryPreviewFidelityV7 } from '../v7/geometry-registry';
+import { adaptFrenchFlatStepV1 } from '../v7/french-render-adapter-v1';
 
 const WIDTH = 100;
 const HEIGHT = 160;
@@ -83,6 +84,7 @@ export function V7FinishCompositeCanvas() {
   const nail = useEditorV7Store(selectCurrentNailV7);
   const step = useEditorV7Store(selectCurrentStepV7);
   const previewFinishType = useEditorV7Store((state) => state.previewFinishType);
+  const editorDoc = useEditorV7Store((state) => state.doc);
   if (!nail || step?.kind !== 'surface_finish') return null;
   const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const model = deriveFinishCompositeV7(nail, previewFinishType);
@@ -109,12 +111,21 @@ export function V7FinishCompositeCanvas() {
     : model.previewFinishType === 'matte'
       ? <rect width={WIDTH} height={HEIGHT} fill="#f8eee9" opacity={model.finishAppearance.veilOpacity} />
       : <><rect width={WIDTH} height={HEIGHT} fill="#f6efec" opacity={model.finishAppearance.veilOpacity} /><rect width={WIDTH} height={HEIGHT} fill={`url(#${frostedPatternId})`} opacity={model.finishAppearance.grainOpacity} /></>;
-  const middleSteps = nail.steps.slice(1, -1).filter((candidate) => candidate.visible && !candidate.skipped);
+  const middleSteps = nail.steps.slice(1, -1);
+  const adaptedMiddleSteps = middleSteps.map((candidate) => ({
+    candidate,
+    adapted: candidate.kind === 'flat_design'
+      ? adaptFrenchFlatStepV1({ consumer: 'finish-composite', finger: nail.finger, nail, step: candidate, recipeInstances: editorDoc?.recipeInstances ?? {}, allNails: editorDoc?.nails })
+      : null,
+  }));
+  const frenchFidelity = adaptedMiddleSteps.some(({ adapted }) => adapted?.status === 'unavailable')
+    ? 'unavailable'
+    : adaptedMiddleSteps.some(({ adapted }) => adapted?.status === 'structured') ? 'exact-source-derived' : 'not-applicable';
   const previewFidelity = combineGeometryPreviewFidelityV7(silhouette.fidelity, model.fidelity);
   const fidelityTone = previewFidelity === 'exact' ? 'border-success/25 bg-success-soft text-success' : previewFidelity === 'approximate' ? 'border-warning/25 bg-warning-soft text-warning' : 'border-gray-300 bg-gray-100 text-gray-600';
 
   return (
-    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(190px,0.9fr)_minmax(210px,1fr)] sm:items-center" data-testid="v7-finish-composite-canvas" data-preview-finish={model.previewFinishType} data-canonical-finish={model.canonicalFinishType} data-preview-only={String(model.previewOnly)} data-preview-fidelity={previewFidelity} data-active-step-count={model.activeStepIds.length}>
+    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(190px,0.9fr)_minmax(210px,1fr)] sm:items-center" data-testid="v7-finish-composite-canvas" data-preview-finish={model.previewFinishType} data-canonical-finish={model.canonicalFinishType} data-preview-only={String(model.previewOnly)} data-preview-fidelity={previewFidelity} data-french-fidelity={frenchFidelity} data-active-step-count={model.activeStepIds.length}>
       <div className="relative mx-auto aspect-[5/8] w-full max-w-[260px] rounded-[32px] border border-white bg-white/80 p-3 shadow-[0_26px_70px_rgba(77,53,67,0.2)]" style={{ transform: 'perspective(900px) rotateX(5deg) rotateY(-4deg)' }}>
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full overflow-visible" role="img" aria-label={`${nail.finger} ${SURFACE_FINISH_LABELS_V7[model.previewFinishType]}组合模拟预览`}>
           <defs>
@@ -126,7 +137,7 @@ export function V7FinishCompositeCanvas() {
           </defs>
           <g clipPath={`url(#${clipId})`}>
             {backgroundArtwork()}
-            {middleSteps.map((candidate, stepIndex) => <g key={candidate.id} data-composite-step-kind={candidate.kind}>{candidate.kind === 'flat_design' ? candidate.elements.map((element) => <Fragment key={element.id}>{renderFlatElement(element)}</Fragment>) : candidate.kind === 'surface_effect' ? renderEffectStep(candidate, `${rawId}-${stepIndex}`) : candidate.kind === 'dimensional_decoration' ? candidate.decorations.map((decoration) => <Fragment key={decoration.id}>{renderDecoration(decoration)}</Fragment>) : null}</g>)}
+            {adaptedMiddleSteps.map(({ candidate, adapted }, stepIndex) => { const renderCandidate = adapted?.status === 'structured' ? adapted.step : adapted?.status === 'unavailable' ? { ...candidate, elements: [] } : candidate; if (adapted?.status !== 'unavailable' && (!candidate.visible || candidate.skipped)) return null; return <g key={candidate.id} data-composite-step-kind={candidate.kind}>{renderCandidate.kind === 'flat_design' ? <>{adapted?.status === 'unavailable' && <text x="50" y="80" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text>}{renderCandidate.elements.map((element) => <Fragment key={element.id}>{renderFlatElement(element)}</Fragment>)}</> : renderCandidate.kind === 'surface_effect' ? renderEffectStep(renderCandidate, `${rawId}-${stepIndex}`) : renderCandidate.kind === 'dimensional_decoration' ? renderCandidate.decorations.map((decoration) => <Fragment key={decoration.id}>{renderDecoration(decoration)}</Fragment>) : null}</g>; })}
             {finishOverlay}
             <path d={silhouette.pathD} transform={silhouetteTransform(silhouette.viewBox)} fill="none" stroke="rgb(255 255 255 / .74)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
           </g>

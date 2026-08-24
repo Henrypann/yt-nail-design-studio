@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { cx } from '@/design-system';
-import type { NailDesignV7, ProcessStepV7 } from '@/studio/editor/v7/model';
+import type { EditorDocV7, NailDesignV7, ProcessStepV7, RecipeInstanceV7 } from '@/studio/editor/v7/model';
 import type { CustomerNailPreviewReadModelV7 } from '@/studio/editor/v7/customer-preview';
 import { resolveEditorGeometryV7 } from '@/studio/editor/v7/geometry-registry';
 import { resolvePromotedGeometryV2 } from '@/studio/geometry/v0-7-2/registry-v2';
@@ -272,10 +272,14 @@ export default function SingleNailPbrPreviewV072({
   nail,
   readModel,
   fallback,
+  recipeInstances = {},
+  allNails,
 }: {
   nail: NailDesignV7;
   readModel: CustomerNailPreviewReadModelV7;
   fallback: ReactNode;
+  recipeInstances?: Record<string, RecipeInstanceV7>;
+  allNails?: EditorDocV7['nails'];
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<SingleNailPbrRuntimeV072 | null>(null);
@@ -288,7 +292,7 @@ export default function SingleNailPbrPreviewV072({
   const promotion = useMemo(() => resolution.status === 'resolved'
     ? resolvePromotedGeometryV2({ shape: resolution.shape, length: resolution.length, consumer: 'single_nail_pbr' })
     : { status: 'unavailable' as const, reason: 'not_registered' as const, manufacturingValidated: false as const }, [resolution]);
-  const projection = useMemo(() => createSingleNailMaterialProjectionV1(nail, readModel), [nail, readModel]);
+  const projection = useMemo(() => createSingleNailMaterialProjectionV1(nail, readModel, recipeInstances, allNails), [allNails, nail, readModel, recipeInstances]);
   const textureAssetSet = useMemo(() => resolveRenderTextureAssetSetV1(nail), [nail]);
 
   useEffect(() => {

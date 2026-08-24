@@ -15,10 +15,12 @@ import { surfaceFinishPreviewAppearanceV7 } from '../v7/finish';
 import type {
   BackgroundPayloadV7,
   DimensionalDecorationV7,
+  EditorDocV7,
   FlatDesignElementV7,
   NailDesignV7,
   NailPointV7,
   ProcessStepV7,
+  RecipeInstanceV7,
   RegionMaskV7,
   RgbaColorV7,
   Transform2DV7,
@@ -33,6 +35,7 @@ import {
 } from '../v7/surface-effect';
 import { FlatContentArtworkV7 } from './FlatContentArtworkV7';
 import { fingerDisplayNameV7 } from '../v7/finger-identity';
+import { adaptFrenchFlatStepV1 } from '../v7/french-render-adapter-v1';
 
 const CANVAS_WIDTH = 100;
 const CANVAS_HEIGHT = 160;
@@ -184,6 +187,8 @@ export function CustomerNailPreviewV7({
   size = 'overview',
   presentation = '2d',
   visualProportion,
+  recipeInstances,
+  allNails,
 }: {
   nail: NailDesignV7;
   readModel: CustomerNailPreviewReadModelV7;
@@ -191,15 +196,19 @@ export function CustomerNailPreviewV7({
   size?: 'overview' | 'focus';
   presentation?: '2d' | 'composite';
   visualProportion?: { width: number; height: number };
+  recipeInstances?: Record<string, RecipeInstanceV7>;
+  allNails?: EditorDocV7['nails'];
 }) {
   const rawId = useId().replace(/:/g, '');
   const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const silhouetteTransform = silhouetteToCanvasTransform(silhouette.viewBox);
   const backgroundStep = nail.steps[0];
   if (backgroundStep.kind !== 'background') return null;
-  const flatSteps = nail.steps.filter((step): step is FlatStepV7 => step.kind === 'flat_design' && step.visible && !step.skipped);
+  const flatAdapters = nail.steps.filter((step): step is FlatStepV7 => step.kind === 'flat_design').map((candidate) => ({ candidate, adapted: adaptFrenchFlatStepV1({ consumer: 'customer-preview', finger: nail.finger, nail, step: candidate, recipeInstances: recipeInstances ?? {}, allNails }) }));
+  const unavailableFrench = flatAdapters.find(({ adapted }) => adapted.status === 'unavailable')?.adapted;
+  const renderFlatSteps = flatAdapters.filter(({ candidate }) => candidate.visible && !candidate.skipped).map(({ candidate, adapted }) => adapted.status === 'structured' ? adapted.step : adapted.status === 'unavailable' ? { ...candidate, elements: [] } : candidate);
   const activeMiddle = nail.steps.slice(1, -1).filter((step) => step.visible && !step.skipped);
-  const flatStepIndex = new Map(flatSteps.map((step, index) => [step.id, index]));
+  const flatStepIndex = new Map(renderFlatSteps.map((step, index) => [step.id, index]));
 
   const renderStepElements = (step: FlatStepV7, stepIndex: number) => {
     const stepMaskId = `${rawId}-step-${stepIndex}`;
@@ -218,7 +227,7 @@ export function CustomerNailPreviewV7({
   };
 
   return (
-    <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity} data-presentation={presentation}>
+    <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity} data-french-fidelity={unavailableFrench ? 'unavailable' : flatAdapters.some(({ adapted }) => adapted.status === 'structured') ? 'exact-source-derived' : 'not-applicable'} data-presentation={presentation}>
       <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', presentation === 'composite' && 'shadow-[0_24px_60px_rgba(77,53,67,0.2)]', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')} style={{ ...(presentation === 'composite' ? { transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)' } : {}), ...(visualProportion ? { aspectRatio: `${visualProportion.width * 5} / ${visualProportion.height * 8}` } : {}) }}>
         <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={`${nail.finger} 顾客${presentation === 'composite' ? '模拟 3D 组合' : ' 2D'}预览`}>
           <defs>
@@ -226,7 +235,7 @@ export function CustomerNailPreviewV7({
             <BackgroundDefs background={backgroundStep.background} rawId={rawId} />
             <linearGradient id={`${rawId}-gloss`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="white" stopOpacity="0.65" /><stop offset="0.28" stopColor="white" stopOpacity="0.08" /><stop offset="0.65" stopColor="white" stopOpacity="0" /></linearGradient>
             <pattern id={`${rawId}-frosted`} width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.55" fill="white" /><circle cx="3" cy="3" r="0.35" fill="#d9d4d2" /></pattern>
-            {flatSteps.map((step, stepIndex) => <Fragment key={`${step.id}-defs`}>
+            {renderFlatSteps.map((step, stepIndex) => <Fragment key={`${step.id}-defs`}>
               {step.mask && <mask id={`${rawId}-step-${stepIndex}`} maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="160"><rect width="100" height="160" fill={step.mask.inverted ? 'white' : 'black'} /><MaskShape mask={step.mask} tone={step.mask.inverted ? 'black' : 'white'} /></mask>}
               {step.elements.map((element, index) => {
                 if (element.kind === 'eraser_mask' || element.kind === 'region_mask') return null;
@@ -243,10 +252,11 @@ export function CustomerNailPreviewV7({
           <g clipPath={`url(#${rawId}-geometry)`}>
             <rect width="100" height="160" fill="#f5f5f6" />
             {backgroundStep.visible && <BackgroundArtwork background={backgroundStep.background} override={readModel.backgroundColorOverride} rawId={rawId} />}
+            {unavailableFrench && <g data-testid="customer-french-render-unavailable"><rect x="8" y="70" width="84" height="20" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="82" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text></g>}
             {presentation === '2d'
-              ? flatSteps.map((step, index) => <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, index)}</g>)
+              ? renderFlatSteps.map((step, index) => <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, index)}</g>)
               : activeMiddle.map((step, index) => step.kind === 'flat_design'
-                ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, flatStepIndex.get(step.id) ?? 0)}</g>
+                ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(renderFlatSteps.find((candidate) => candidate.id === step.id) ?? step, flatStepIndex.get(step.id) ?? 0)}</g>
                 : step.kind === 'surface_effect'
                   ? <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderSurfaceEffect(step, `${rawId}-effect-${index}`)}</g>
                   : step.kind === 'dimensional_decoration'

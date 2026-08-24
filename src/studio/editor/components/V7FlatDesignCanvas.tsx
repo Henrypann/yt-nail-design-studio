@@ -21,6 +21,7 @@ import {
   transformNailPointV7,
 } from '../v7/flat-vector';
 import { FlatContentArtworkV7, type FlatContentImportResolverV7 } from './FlatContentArtworkV7';
+import { adaptFrenchFlatStepV1 } from '../v7/french-render-adapter-v1';
 
 const CANVAS_WIDTH = 100;
 const CANVAS_HEIGHT = 160;
@@ -95,6 +96,7 @@ export function V7FlatDesignCanvas() {
   const svgRef = useRef<SVGSVGElement>(null);
   const nail = useEditorV7Store(selectCurrentNailV7);
   const step = useEditorV7Store(selectCurrentStepV7);
+  const editorDoc = useEditorV7Store((state) => state.doc);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const selectedElementId = useEditorV7Store((state) => state.selectedElementId);
   const activeTool = useEditorV7Store((state) => state.activeFlatTool);
@@ -146,6 +148,8 @@ export function V7FlatDesignCanvas() {
   }, [activeTool, gesture]);
 
   if (!nail || !flatStep || !background || !silhouette || !backgroundPreview) return null;
+  const frenchAdapter = adaptFrenchFlatStepV1({ consumer: 'editor-flat', finger: nail.finger, nail, step: flatStep, recipeInstances: editorDoc?.recipeInstances ?? {}, allNails: editorDoc?.nails });
+  const renderFlatStep = frenchAdapter.status === 'structured' ? frenchAdapter.step : frenchAdapter.status === 'unavailable' ? { ...flatStep, elements: [] } : flatStep;
 
   const report = (result: { ok: true } | { ok: false; message: string }) => {
     if (!result.ok) toast.error(result.message);
@@ -224,8 +228,8 @@ export function V7FlatDesignCanvas() {
   const renderWithOrderedMasks = (element: FlatDesignElementV7, index: number) => {
     let node = renderElement(effectiveElement(element), `${rawId}-${index}`, resolveFlatAsset);
     if (!node) return null;
-    const scope = resolveFlatElementMaskScopeV7(flatStep, index);
-    const regionMasks = scope.regionMaskIds.map((id) => flatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => item.id === id && item.kind === 'region_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => Boolean(item));
+    const scope = resolveFlatElementMaskScopeV7(renderFlatStep, index);
+    const regionMasks = scope.regionMaskIds.map((id) => renderFlatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => item.id === id && item.kind === 'region_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => Boolean(item));
     regionMasks.forEach((mask, maskIndex) => {
       node = <g key={`${mask.id}-wrap`} mask={`url(#${rawId}-region-${index}-${maskIndex})`}>{node}</g>;
     });
@@ -238,17 +242,17 @@ export function V7FlatDesignCanvas() {
   const anchors = livePath ? nailPathAnchorsV7(livePath) : [];
 
   return (
-    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(180px,0.9fr)_minmax(190px,1fr)] sm:items-center" data-testid="v7-flat-design-canvas" data-flat-tool={activeTool} data-silhouette-source={silhouette.source}>
+    <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(180px,0.9fr)_minmax(190px,1fr)] sm:items-center" data-testid="v7-flat-design-canvas" data-flat-tool={activeTool} data-silhouette-source={silhouette.source} data-french-fidelity={frenchAdapter.status === 'structured' ? frenchAdapter.fidelity : frenchAdapter.status === 'unavailable' ? 'unavailable' : 'not-applicable'}>
       <div className="relative mx-auto aspect-[5/8] w-full max-w-[260px] overflow-hidden rounded-[32px] border border-white bg-white/80 p-3 shadow-[0_20px_60px_rgba(77,53,67,0.14)] touch-none">
         <svg ref={svgRef} viewBox="0 0 100 160" className="h-full w-full select-none touch-none" role="img" aria-label={`${currentFinger} 平面设计画布`} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => { setGesture(null); setDraftTransform(null); }}>
           <defs>
             <clipPath id={clipId} clipPathUnits="userSpaceOnUse"><path d={silhouette.pathD} transform={silhouetteTransform} /></clipPath>
             {flatStep.mask && <mask id={stepMaskId} maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="160"><rect width="100" height="160" fill={flatStep.mask.inverted ? 'white' : 'black'} /><MaskShape mask={flatStep.mask} tone={flatStep.mask.inverted ? 'black' : 'white'} /></mask>}
-            {flatStep.elements.map((element, index) => {
+            {renderFlatStep.elements.map((element, index) => {
               if (element.kind === 'eraser_mask' || element.kind === 'region_mask') return null;
-              const scope = resolveFlatElementMaskScopeV7(flatStep, index);
-              const erasers = scope.eraserMaskIds.map((id) => flatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'eraser_mask' }> => item.id === id && item.kind === 'eraser_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'eraser_mask' }> => Boolean(item));
-              const regions = scope.regionMaskIds.map((id) => flatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => item.id === id && item.kind === 'region_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => Boolean(item));
+              const scope = resolveFlatElementMaskScopeV7(renderFlatStep, index);
+              const erasers = scope.eraserMaskIds.map((id) => renderFlatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'eraser_mask' }> => item.id === id && item.kind === 'eraser_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'eraser_mask' }> => Boolean(item));
+              const regions = scope.regionMaskIds.map((id) => renderFlatStep.elements.find((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => item.id === id && item.kind === 'region_mask')).filter((item): item is Extract<FlatDesignElementV7, { kind: 'region_mask' }> => Boolean(item));
               return (
                 <Fragment key={`${element.id}-masks`}>
                   {erasers.length > 0 && <mask id={`${rawId}-eraser-${index}`} maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="160"><rect width="100" height="160" fill="white" />{erasers.map((eraser) => <g key={eraser.id}>{transformedElement(eraser, <polyline points={canvasPolyline(eraser.path)} fill="none" stroke="black" strokeOpacity={eraser.opacity} strokeWidth={eraser.widthMm * MM_TO_CANVAS_UNITS} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />)}</g>)}</mask>}
@@ -260,7 +264,8 @@ export function V7FlatDesignCanvas() {
           <g clipPath={`url(#${clipId})`}>
             <rect width="100" height="160" fill="#f5f5f6" />
             {backgroundPreview.visible && <rect width="100" height="160" fill={rgba(backgroundPreview.color, backgroundPreview.alpha)} />}
-            {flatStep.visible && !flatStep.skipped && flatStep.elements.map(renderWithOrderedMasks)}
+            {frenchAdapter.status === 'unavailable' && <g data-testid="v7-french-render-unavailable"><rect x="4" y="70" width="92" height="22" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="83" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text></g>}
+            {flatStep.visible && !flatStep.skipped && renderFlatStep.elements.map(renderWithOrderedMasks)}
             {gesture?.mode === 'draw' && (activeTool === 'brush' || activeTool === 'eraser') && <polyline points={canvasPolyline(gesture.points)} fill="none" stroke={activeTool === 'eraser' ? '#ef4444' : rgba(color)} strokeDasharray={activeTool === 'eraser' ? '6 4' : undefined} strokeWidth={widthMm * MM_TO_CANVAS_UNITS} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
             {draftPath && <path d={canvasPath(draftPath)} fill={activeTool === 'line' || activeTool === 'region_mask' ? 'none' : rgba(color, 0.65)} stroke={activeTool === 'region_mask' ? '#7c3aed' : rgba(color)} strokeDasharray={activeTool === 'region_mask' ? '6 4' : undefined} strokeWidth={widthMm * MM_TO_CANVAS_UNITS} vectorEffect="non-scaling-stroke" />}
           </g>
