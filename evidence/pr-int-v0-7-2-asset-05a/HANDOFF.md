@@ -11,7 +11,7 @@
 | Studio Starter Shelf | 10 candidates × 7 shapes | 63 EXACT identity，7 Petal Pearl UNAVAILABLE；全部仅 `LOCAL_CONCEPT_DRAFT_ONLY` |
 | Community capability | 24 subjects | 5 versioned、2 legacy approximate、7 incomplete、10 unavailable；current-makeable=0 |
 | Community UI | 03B 六视口 | Canonical/Legacy/Incomplete/Unavailable 与失败关闭可见 |
-| Home merchandising | 04A 六视口 | `AWAITING_INPUT`；无虚构 Banner/精选/集合；15 条治理 Feed 保留 |
+| Home merchandising | 04A 六视口 + 04B owner gate | `AWAITING_INPUT`；无虚构 Banner/精选/集合；15 条治理 Feed 与 15 条 owner 候选分离，unknown ref fail closed |
 
 唯一机器可审计摘要为 `asset-ops-combined-matrix-v1.json`，专项测试从实际 inventory、ledger、preflight、capability 与两份浏览器报告重算上述数字。
 

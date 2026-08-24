@@ -104,6 +104,7 @@ assert.deepEqual(capabilityWalkthrough.failure.visible, true);
 
 const merchandising = await readJson('public/community/home-merchandising-v1.json');
 const merchandisingWalkthrough = await readJson('evidence/pr-community-v0-7-2-asset-04a/walkthrough-report.json');
+const ownerInput = await readJson('evidence/pr-community-v0-7-2-asset-04b-input/owner-input-pack-v1.json');
 assert.deepEqual(matrix.domains.homeMerchandising, {
   status: merchandising.status,
   publishedBannerCount: merchandising.banner === null ? 0 : 1,
@@ -111,9 +112,15 @@ assert.deepEqual(matrix.domains.homeMerchandising, {
   publishedCollectionCount: merchandising.collections.length,
   governedFeedPreservedCount: 15,
   viewportsValidated: merchandisingWalkthrough.viewports.length,
+  ownerInputCandidateCount: ownerInput.candidates.length,
+  ownerReviewGate: 'AWAITING_INPUT_FAIL_CLOSED',
 });
 assert.ok(merchandisingWalkthrough.viewports.every((entry) => entry.feedCount === 15 && entry.noOverflow));
 assert.equal(merchandisingWalkthrough.failure.feedCount, 15);
+assert.equal(ownerInput.status, 'AWAITING_OWNER_SELECTION');
+assert.equal(ownerInput.requiredOwnerInput.owner, null);
+assert.deepEqual(ownerInput.requiredOwnerInput.editorialSelections, []);
+assert.ok(ownerInput.candidates.every((candidate) => candidate.currentMakeable === false && candidate.manufacturingValidated === false));
 
 const writerZeroSources = [
   'src/community/domain/asset-capability-v1.ts',
@@ -126,4 +133,4 @@ for (const relative of writerZeroSources) {
   assert.doesNotMatch(source, /editorV7Store|wizardStore|localStorage\.setItem|sessionStorage\.setItem/);
 }
 
-console.log('test-asset-ops-combined-handoff: PASS (21+4 inventory, 25/25 governance, 63/7 shelf, 24 capability, 6+6 viewport evidence, owner Unknowns explicit)');
+console.log('test-asset-ops-combined-handoff: PASS (21+4 inventory, 25/25 governance, 63/7 shelf, 24 capability, 6+6 viewport evidence, 15 owner candidates fail closed, owner Unknowns explicit)');

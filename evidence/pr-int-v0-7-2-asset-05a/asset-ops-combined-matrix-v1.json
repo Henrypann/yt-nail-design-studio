@@ -43,7 +43,9 @@
       "publishedEditorialSelectionCount": 0,
       "publishedCollectionCount": 0,
       "governedFeedPreservedCount": 15,
-      "viewportsValidated": 6
+      "viewportsValidated": 6,
+      "ownerInputCandidateCount": 15,
+      "ownerReviewGate": "AWAITING_INPUT_FAIL_CLOSED"
     }
   },
   "ownerGates": [
@@ -97,7 +99,9 @@
     "evidence/pr-community-v0-7-2-asset-03a/asset-capability-report-v1.json",
     "evidence/pr-community-v0-7-2-asset-03b/walkthrough-report.json",
     "public/community/home-merchandising-v1.json",
-    "evidence/pr-community-v0-7-2-asset-04a/walkthrough-report.json"
+    "evidence/pr-community-v0-7-2-asset-04a/walkthrough-report.json",
+    "evidence/pr-community-v0-7-2-asset-04b-input/owner-input-pack-v1.json",
+    "evidence/pr-community-v0-7-2-asset-04b-input/VALIDATION.md"
   ],
   "claims": {
     "integratedIntoMain": false,

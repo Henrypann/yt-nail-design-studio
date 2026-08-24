@@ -4,15 +4,15 @@
 
 ## 验证范围
 
-- 从实际 inventory、governance ledger、Starter Shelf preflight、Community capability report、03B/04A browser report 重算联合矩阵。
-- 验证 21+4、25/25、63/7、24 subjects、两组 6 viewport 证据及 writer-zero 源码边界。
+- 从实际 inventory、governance ledger、Starter Shelf preflight、Community capability report、03B/04A browser report 与 04B owner input pack 重算联合矩阵。
+- 验证 21+4、25/25、63/7、24 subjects、两组 6 viewport、15 条 owner 候选 fail-closed 证据及 writer-zero 源码边界。
 - owner 门全部保留 `UNKNOWN_INPUT_REQUIRED / NOT_VALIDATED`；rollback 与完整分支合入顺序可审计。
 
 ## 执行门禁
 
 ```text
 npm run test:asset-ops-combined-handoff
-PASS（21+4 inventory、25/25 governance、63/7 shelf、24 capability、6+6 viewport evidence、owner Unknowns）
+PASS（21+4 inventory、25/25 governance、63/7 shelf、24 capability、6+6 viewport、15 owner candidates fail closed、owner Unknowns）
 
 npm run test:studio-official-starter-shelf
 PASS
