@@ -87,6 +87,8 @@
     "test:editor-v7-french-migration": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-french-migration.mjs",
     "test:editor-v7-french-compiler": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-french-compiler.mjs",
     "test:editor-v7-french-conversion": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-french-conversion.mjs",
+    "test:editor-v7-french-commands": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-editor-v7-french-commands.mjs",
+    "test:editor-v7-french-commands:e2e": "node tools/walkthrough-editor-v7-french-commands.mjs",
     "test:editor-v7-french-conversion:e2e": "node tools/walkthrough-editor-v7-french-conversion.mjs",
     "check:editor-v7-french-golden": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-editor-v7-french-golden.mjs --check",
     "update:editor-v7-french-golden": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/generate-editor-v7-french-golden.mjs --update",

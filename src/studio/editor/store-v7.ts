@@ -104,6 +104,7 @@ import { convertLegacyFrenchEdgeToRecipeV1 } from './v7/french-conversion-v1';
 import { resolveExactFrenchGeometryInputV1 } from './v7/french-geometry-input-v1';
 import { PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7 } from './v7/geometry-registry';
 import type { FrenchRecipeParametersV1 } from './v7/french-recipe-v1';
+import { createFrenchRecipeCommand, deleteFrenchRecipeCommand, updateFrenchRecipeCommand } from './v7/french-commands-v1';
 
 export type EditorV7SaveState = 'saved' | 'dirty' | 'saving' | 'error';
 export type EditorV7LoadResult = 'ok' | 'ok_with_warnings' | 'missing' | 'invalid' | 'unsupported' | 'save_error' | 'busy';
@@ -198,6 +199,9 @@ export interface EditorV7State {
   applyBackgroundPaletteTheme(finger: FingerCode, theme: EditorV7PaletteThemeV7): EditorV7ActionResult;
   addStep(finger: FingerCode, step: ProcessStepV7, index: number): EditorV7ActionResult;
   confirmLegacyFrenchConversion(finger: FingerCode, sourceStepId: string, sourceElementId: string, parameters: FrenchRecipeParametersV1): EditorV7ActionResult;
+  createFrenchRecipe(parameters: FrenchRecipeParametersV1): EditorV7ActionResult;
+  updateFrenchRecipe(stepId: string, parameters: FrenchRecipeParametersV1): EditorV7ActionResult;
+  deleteFrenchRecipe(stepId: string): EditorV7ActionResult;
   addMissingPersonalStep(finger: FingerCode, kind: EditorWorkspacePersonalStepKindV7): EditorV7ActionResult;
   deleteStep(finger: FingerCode, stepId: string): EditorV7ActionResult;
   moveStep(finger: FingerCode, stepId: string, targetIndex: number): EditorV7ActionResult;
@@ -334,7 +338,23 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
       if (unavailable) {
         return { ok: false, reason: 'geometry_unavailable', message: `spatial scope requires signed-off geometry for ${unavailable}` };
       }
-      return command(doc);
+      const result = command(doc);
+      return result;
+    });
+
+    const commitFrenchScopeCommand = (
+      command: (doc: EditorDocV7) => EditorV7CommandResult,
+    ): EditorV7ActionResult => commitCommand((doc) => {
+      const resolution = resolveEditorV7FingerScope(currentScope());
+      if (!resolution.ok) return command(doc);
+      const affected = new Set([get().currentFinger, ...resolution.targets.map((target) => target.finger)]);
+      const unavailable = [...affected].find((finger) => !isExactEditorGeometryV7(doc.nails[finger].geometryRef, finger));
+      if (unavailable) return { ok: false, reason: 'geometry_unavailable', message: `spatial scope requires signed-off geometry for ${unavailable}` };
+      const result = command(doc);
+      if (!result.ok) return result;
+      let detached = result.doc;
+      for (const target of resolution.targets) detached = detachLinkedEditorV7NailAfterEdit(detached, target.finger);
+      return { ...result, doc: detached };
     });
 
     const currentScope = (): EditorV7FingerScope => {
@@ -687,6 +707,9 @@ export function createEditorV7Store(dependencies: EditorV7RuntimeDependencies): 
             ? { ok: true, doc: converted.doc, selectedStepId: converted.stepId, selectedElementId: converted.fillElementId }
             : { ok: false, reason: 'not_allowed', message: converted.diagnostics.map((item) => `${item.path}: ${item.message}`).join('; ') };
         }),
+      createFrenchRecipe: (parameters) => commitFrenchScopeCommand((doc) => createFrenchRecipeCommand(doc, currentScope(), parameters, (kind: 'step' | 'element' | 'recipe') => idFactory(kind === 'recipe' ? 'element' : kind))),
+      updateFrenchRecipe: (stepId, parameters) => commitFrenchScopeCommand((doc) => updateFrenchRecipeCommand(doc, currentScope(), parameters, get().currentFinger, stepId, (kind: 'step' | 'element' | 'recipe') => idFactory(kind === 'recipe' ? 'element' : kind))),
+      deleteFrenchRecipe: (stepId) => commitFrenchScopeCommand((doc) => deleteFrenchRecipeCommand(doc, currentScope(), get().currentFinger, stepId)),
       addMissingPersonalStep: (finger, kind) => commitSpatialFingerCommand(finger, (doc) => addMissingEditorWorkspacePersonalStepV7(doc, finger, kind, idFactory)),
       deleteStep: (finger, stepId) => {
         const before = get();

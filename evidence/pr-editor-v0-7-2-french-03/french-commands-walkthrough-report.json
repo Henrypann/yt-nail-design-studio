@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "reports": [
+    {
+      "viewport": 390,
+      "mode": "full-task",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "mirrorOneTransaction": true,
+      "independentRecipeIds": true,
+      "projectionValid": true,
+      "pointerBlurOneTransaction": true,
+      "singleOverride": true,
+      "saveReload": true,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 768,
+      "mode": "layout-focus-cancel",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 1024,
+      "mode": "layout-focus-cancel",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 1280,
+      "mode": "full-task",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "mirrorOneTransaction": true,
+      "independentRecipeIds": true,
+      "projectionValid": true,
+      "pointerBlurOneTransaction": true,
+      "singleOverride": true,
+      "saveReload": true,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 1366,
+      "mode": "layout-focus-cancel",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    },
+    {
+      "viewport": 1440,
+      "mode": "layout-focus-cancel",
+      "status": "passed",
+      "minTargetHeight": 44,
+      "overflow": false,
+      "consoleErrors": 0,
+      "pageErrors": 0
+    }
+  ]
+}

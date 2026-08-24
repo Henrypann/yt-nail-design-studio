@@ -18,10 +18,8 @@ import {
 import { Button, Modal, cx, useToast } from '@/design-system';
 import { PALETTE } from '../lib/material';
 import { selectCurrentGeometryExactV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
-import { generateEditorV7Id } from '../v7/id';
 import { flatElementLabelV7 } from '../v7/flat-content-assets';
 import {
-  createFrenchFlatElementV7,
   isValidNailPathDataV7,
   type FlatVectorToolV7,
 } from '../v7/flat-vector';
@@ -30,6 +28,9 @@ import { FLAT_TOOL_PANEL_MAP_V7, type FlatToolPanelModeV7 } from '../v7/flat-too
 import {
   FRENCH_RECIPE_PRESETS_V1,
   createDefaultFrenchRecipeParametersV1,
+  parseFrenchRecipeInstanceV1,
+  parseFrenchRecipeParametersV1,
+  serializeFrenchRecipeParametersV1,
   type FrenchRecipeDefaultPresetV1,
 } from '../v7/french-recipe-v1';
 
@@ -60,7 +61,10 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
   const toast = useToast();
   const step = useEditorV7Store(selectCurrentStepV7);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
+  const fingerScope = useEditorV7Store((state) => state.fingerScope);
+  const selectedFingers = useEditorV7Store((state) => state.selectedFingers);
   const selectedElementId = useEditorV7Store((state) => state.selectedElementId);
+  const doc = useEditorV7Store((state) => state.doc);
   const activeTool = useEditorV7Store((state) => state.activeFlatTool);
   const color = useEditorV7Store((state) => state.activeFlatColor);
   const widthMm = useEditorV7Store((state) => state.activeFlatWidthMm);
@@ -71,7 +75,11 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
   const setColor = useEditorV7Store((state) => state.setActiveFlatColor);
   const setWidthMm = useEditorV7Store((state) => state.setActiveFlatWidthMm);
   const selectElement = useEditorV7Store((state) => state.selectElement);
-  const addElement = useEditorV7Store((state) => state.addElement);
+  const createFrenchRecipe = useEditorV7Store((state) => state.createFrenchRecipe);
+  const setFingerScope = useEditorV7Store((state) => state.setFingerScope);
+  const toggleSelectedFinger = useEditorV7Store((state) => state.toggleSelectedFinger);
+  const updateFrenchRecipe = useEditorV7Store((state) => state.updateFrenchRecipe);
+  const deleteFrenchRecipe = useEditorV7Store((state) => state.deleteFrenchRecipe);
   const removeElement = useEditorV7Store((state) => state.removeElement);
   const replaceElement = useEditorV7Store((state) => state.replaceFlatElement);
   const setElementOpacity = useEditorV7Store((state) => state.setFlatElementOpacity);
@@ -85,12 +93,28 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
   const [conversionOpen, setConversionOpen] = useState(false);
   const [conversionPreset, setConversionPreset] = useState<FrenchRecipeDefaultPresetV1 | null>(null);
   const [conversionColor, setConversionColor] = useState('#fffdf9');
+  const [frenchDraft, setFrenchDraft] = useState<ReturnType<typeof createDefaultFrenchRecipeParametersV1> | null>(null);
+  const [createFrenchOpen, setCreateFrenchOpen] = useState(false);
+  const [createPreset, setCreatePreset] = useState<FrenchRecipeDefaultPresetV1>('classic');
+  const [createColor, setCreateColor] = useState('#fffdf9');
+  const [createOpacity, setCreateOpacity] = useState(100);
+  const [deleteFrenchOpen, setDeleteFrenchOpen] = useState(false);
   const lastOpacityCommit = useRef<number | null>(null);
   const lastFrenchWidthCommit = useRef<number | null>(null);
   const lastFrenchCurvatureCommit = useRef<number | null>(null);
+  const lastManagedCommit = useRef<string | null>(null);
   const conversionTriggerRef = useRef<HTMLButtonElement>(null);
   const conversionFirstChoiceRef = useRef<HTMLButtonElement>(null);
-  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && !flatStep.locked && geometryExact);
+  const createFrenchTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const createFrenchFirstChoiceRef = useRef<HTMLButtonElement>(null);
+  const managedCandidate = selectedElement?.kind === 'vector_shape' && flatStep?.recipeInstanceId ? flatStep : null;
+  const managedRecipe = managedCandidate?.recipeInstanceId ? doc?.recipeInstances[managedCandidate.recipeInstanceId] : null;
+  const parsedManagedInstance = managedRecipe ? parseFrenchRecipeInstanceV1(managedRecipe) : null;
+  const managedFrench = parsedManagedInstance?.ok ? managedCandidate : null;
+  const parsedManaged = parsedManagedInstance?.ok ? parsedManagedInstance.parameters : null;
+  const managedSerialization = parsedManaged ? serializeFrenchRecipeParametersV1(parsedManaged) : null;
+  const canEdit = Boolean(flatStep && flatStep.visible && !flatStep.skipped && !readOnly && !switching && geometryExact && (!flatStep.locked || managedFrench));
+  const canEditManaged = Boolean(managedFrench && parsedManaged && flatStep?.visible && !flatStep.skipped && !readOnly && !switching && geometryExact);
 
   useEffect(() => {
     const next = selectedElement ? Math.round(selectedElement.opacity * 100) : 100;
@@ -110,10 +134,19 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
     setConversionPreset(null);
   }, [currentFinger, selectedElement?.id]);
   useEffect(() => {
+    setFrenchDraft(parsedManaged ? structuredClone(parsedManaged) : null);
+    lastManagedCommit.current = managedSerialization;
+  }, [managedRecipe?.instanceId, managedSerialization]);
+  useEffect(() => {
     if (!conversionOpen) return undefined;
     const frame = requestAnimationFrame(() => conversionFirstChoiceRef.current?.focus());
     return () => cancelAnimationFrame(frame);
   }, [conversionOpen]);
+  useEffect(() => {
+    if (!createFrenchOpen) return undefined;
+    const timer = window.setTimeout(() => createFrenchFirstChoiceRef.current?.focus(), 0);
+    return () => window.clearTimeout(timer);
+  }, [createFrenchOpen]);
 
   const colorHex = rgbaToHexV7(color);
   const editablePath = selectedElement?.kind === 'vector_shape' || selectedElement?.kind === 'region_mask';
@@ -133,17 +166,85 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
     return result.ok;
   };
 
-  const selectTool = (tool: FlatVectorToolV7) => {
+  const closeCreateFrench = () => {
+    setCreateFrenchOpen(false);
+    queueMicrotask(() => createFrenchTriggerRef.current?.isConnected && createFrenchTriggerRef.current.focus());
+  };
+
+  const selectTool = (tool: FlatVectorToolV7, trigger?: HTMLButtonElement) => {
     if (tool === 'french') {
       if (!flatStep || !canEdit) return;
-      const element = createFrenchFlatElementV7(generateEditorV7Id('element'), color);
-      if (resultToast(addElement(currentFinger, flatStep.id, element))) {
-        setActiveTool('select');
-        selectElement(element.id);
-      }
+      createFrenchTriggerRef.current = trigger ?? null;
+      setCreatePreset('classic');
+      setCreateFrenchOpen(true);
       return;
     }
     setActiveTool(tool);
+  };
+
+  const commitCreateFrench = () => {
+    if (fingerScope === 'selected' && selectedFingers.length === 0) { toast.error('请选择至少一根手指'); return; }
+    const base = createDefaultFrenchRecipeParametersV1(createPreset);
+    const result = createFrenchRecipe({ ...base, fillColor: createColor, fillOpacity: createOpacity / 100 });
+    if (resultToast(result)) { closeCreateFrench(); setActiveTool('select'); }
+  };
+
+  const commitManagedFrench = (next: typeof frenchDraft): boolean => {
+    if (!next || !managedFrench || !managedFrench.recipeInstanceId || !canEditManaged) return false;
+    const parsed = parseFrenchRecipeParametersV1(next);
+    if (!parsed.ok) {
+      toast.error(parsed.diagnostics.map((item) => `${item.path}: ${item.message}`).join('; '));
+      setFrenchDraft(parsedManaged ? structuredClone(parsedManaged) : null);
+      lastManagedCommit.current = managedSerialization;
+      return false;
+    }
+    if (parsed.serialization === managedSerialization || parsed.serialization === lastManagedCommit.current) return true;
+    lastManagedCommit.current = parsed.serialization;
+    const result = updateFrenchRecipe(managedFrench.id, parsed.parameters);
+    if (resultToast(result)) return true;
+    lastManagedCommit.current = managedSerialization;
+    setFrenchDraft(parsedManaged ? structuredClone(parsedManaged) : null);
+    return false;
+  };
+
+  const updateManagedGeometryDraft = (patch: Partial<NonNullable<typeof frenchDraft>>) => {
+    if (!frenchDraft) return;
+    const next = { ...frenchDraft, ...patch, preset: 'custom' as const };
+    setFrenchDraft(next);
+  };
+  const updateManagedAppearanceDraft = (patch: Partial<NonNullable<typeof frenchDraft>>) => {
+    if (frenchDraft) setFrenchDraft({ ...frenchDraft, ...patch });
+  };
+  const commitManagedDraft = () => commitManagedFrench(frenchDraft);
+  const managedSeparation = 0.01;
+  const managedWingMin = frenchDraft?.variant === 'smooth' ? (frenchDraft.centerV + managedSeparation) : 0.02;
+  const managedWingMax = frenchDraft?.variant === 'pointed' ? (frenchDraft.centerV - managedSeparation) : 0.72;
+  const clampManagedWing = (value: number) => Math.max(managedWingMin, Math.min(managedWingMax, value));
+  const managedAnchorChange = (field: 'leftWingV' | 'centerV' | 'rightWingV', value: number) => {
+    if (!frenchDraft) return;
+    if (field === 'centerV') {
+      const min = frenchDraft.variant === 'pointed' ? Math.max(frenchDraft.leftWingV, frenchDraft.rightWingV) + managedSeparation : 0.02;
+      const max = frenchDraft.variant === 'smooth' ? Math.min(frenchDraft.leftWingV, frenchDraft.rightWingV) - managedSeparation : 0.72;
+      updateManagedGeometryDraft({ centerV: Math.max(min, Math.min(max, value)) });
+      return;
+    }
+    const bounded = clampManagedWing(value);
+    if (frenchDraft.balanceLocked) updateManagedGeometryDraft({ leftWingV: bounded, rightWingV: bounded });
+    else updateManagedGeometryDraft({ [field]: bounded } as Partial<NonNullable<typeof frenchDraft>>);
+  };
+  const managedTipWidth = frenchDraft ? (frenchDraft.leftWingV + frenchDraft.rightWingV) / 2 : 0.22;
+  const managedTipWidthChange = (value: number) => {
+    if (!frenchDraft) return;
+    if (frenchDraft.balanceLocked) {
+      const bounded = clampManagedWing(value);
+      updateManagedGeometryDraft({ leftWingV: bounded, rightWingV: bounded });
+      return;
+    }
+    const delta = value - managedTipWidth;
+    updateManagedGeometryDraft({
+      leftWingV: clampManagedWing(frenchDraft.leftWingV + delta),
+      rightWingV: clampManagedWing(frenchDraft.rightWingV + delta),
+    });
   };
 
   const commitOpacity = () => {
@@ -223,7 +324,7 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
             type="button"
             disabled={!canEdit && tool !== 'select'}
             aria-pressed={activeTool === tool}
-            onClick={() => selectTool(tool)}
+            onClick={(event) => selectTool(tool, event.currentTarget)}
             className={cx(
               'flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-2 text-left text-nano focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40',
               activeTool === tool ? 'border-violet-500 bg-violet-600 text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300',
@@ -281,11 +382,29 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
       {showInspector && selectedElement && (
         <div className="space-y-2 rounded-lg border border-violet-200 bg-white p-2.5">
           <div className="flex items-center gap-2 text-nano font-semibold text-violet-800"><Hand size={13} />所选：{flatElementLabelV7(selectedElement)}</div>
-          <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">
+          {!managedFrench && <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">
             透明度
             <input type="range" min="0" max="100" step="1" value={opacityDraft} disabled={!canEditSelected} onChange={(event) => setOpacityDraft(Number(event.target.value))} onPointerUp={commitOpacity} onKeyUp={commitOpacity} onBlur={commitOpacity} className="h-11 w-full accent-violet-600 disabled:opacity-40" />
             <span className="w-9 text-right tabular-nums">{opacityDraft}%</span>
-          </label>
+          </label>}
+          {managedFrench && frenchDraft && (
+            <section className="space-y-2 rounded-lg border border-violet-200 bg-violet-50/60 p-2.5" data-testid="v7-managed-french-panel">
+              <div className="flex items-center justify-between gap-2"><strong className="text-nano text-violet-900">结构化法式 · 单独配方实例</strong><button type="button" disabled={!canEditManaged} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-error hover:bg-red-50 disabled:opacity-40" aria-label="删除结构化法式" onClick={() => setDeleteFrenchOpen(true)}><Trash2 size={14} /></button></div>
+              <div className="grid grid-cols-4 gap-1.5">{(['current', 'selected', 'mirror', 'all'] as const).map((scope) => <button key={scope} type="button" disabled={!canEditManaged} className={cx('min-h-11 rounded-lg border px-1 text-nano disabled:opacity-40', fingerScope === scope ? 'border-violet-500 bg-violet-100 font-semibold' : 'border-gray-200 bg-white')} onClick={() => setFingerScope(scope)} data-testid={`v7-managed-french-scope-${scope}`}>{scope === 'current' ? '当前' : scope === 'selected' ? '已选' : scope === 'mirror' ? '镜像' : '十指'}</button>)}</div>
+              {fingerScope === 'selected' && <div className="grid grid-cols-5 gap-1">{(['L1','L2','L3','L4','L5','R1','R2','R3','R4','R5'] as const).map((finger) => <button key={finger} type="button" disabled={!canEditManaged} aria-pressed={selectedFingers.includes(finger)} onClick={() => toggleSelectedFinger(finger)} className={cx('min-h-11 rounded border text-nano disabled:opacity-40', selectedFingers.includes(finger) ? 'border-violet-500 bg-violet-100 font-semibold' : 'border-gray-200 bg-white')}>{finger}</button>)}</div>}
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                {FRENCH_RECIPE_PRESETS_V1.map((preset) => <button key={preset} type="button" disabled={!canEditManaged} className={cx('min-h-11 rounded-lg border px-2 text-left text-nano disabled:opacity-40', frenchDraft.preset === preset ? 'border-violet-500 bg-white font-semibold text-violet-900' : 'border-gray-200 bg-white text-gray-600')} onClick={() => { const next = { ...frenchDraft, ...createDefaultFrenchRecipeParametersV1(preset), fillColor: frenchDraft.fillColor, fillOpacity: frenchDraft.fillOpacity, outlineColor: frenchDraft.outlineColor }; setFrenchDraft(next); if (commitManagedFrench(next)) toast.success('已重置几何，保留颜色与透明度'); }} data-testid={`v7-managed-french-preset-${preset}`}>{FRENCH_PRESET_COPY_V1[preset].label}</button>)}
+              </div>
+              <label className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-2 text-nano text-gray-700">填充颜色<input type="color" disabled={!canEditManaged} value={frenchDraft.fillColor} onChange={(event) => updateManagedAppearanceDraft({ fillColor: event.target.value })} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-9 w-11 rounded border p-1 disabled:opacity-40" data-testid="v7-managed-french-color" /></label>
+              <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">透明度<input type="range" min="0" max="1" step="0.01" disabled={!canEditManaged} value={frenchDraft.fillOpacity} onChange={(event) => updateManagedAppearanceDraft({ fillOpacity: Number(event.target.value) })} onPointerUp={commitManagedDraft} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-11 w-full accent-violet-600 disabled:opacity-40" data-testid="v7-managed-french-opacity" /><span>{Math.round(frenchDraft.fillOpacity * 100)}%</span></label>
+              <label className="flex min-h-11 items-center gap-2 text-nano text-gray-700"><input type="checkbox" disabled={!canEditManaged} checked={frenchDraft.balanceLocked} onChange={(event) => { const locked = event.target.checked; const next = locked ? { ...frenchDraft, balanceLocked: true, rightWingV: frenchDraft.leftWingV, preset: 'custom' as const } : { ...frenchDraft, balanceLocked: false, preset: 'custom' as const }; setFrenchDraft(next); commitManagedFrench(next); }} className="h-5 w-5" />锁定左右平衡</label>
+              <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">甲尖宽度<input type="range" min={managedWingMin} max={managedWingMax} step="0.01" disabled={!canEditManaged} value={managedTipWidth} onChange={(event) => managedTipWidthChange(Number(event.target.value))} onPointerUp={commitManagedDraft} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-11 w-full accent-violet-600 disabled:opacity-40" data-testid="v7-managed-french-tip-width" /><span>{managedTipWidth.toFixed(2)}</span></label>
+              <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">左翼<input type="range" min={managedWingMin} max={managedWingMax} step="0.01" disabled={!canEditManaged} value={frenchDraft.leftWingV} onChange={(event) => managedAnchorChange('leftWingV', Number(event.target.value))} onPointerUp={commitManagedDraft} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-11 w-full accent-violet-600 disabled:opacity-40" data-testid="v7-managed-french-left-wing" /><span>{frenchDraft.leftWingV.toFixed(2)}</span></label>
+              <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">中心<input type="range" min={frenchDraft.variant === 'pointed' ? Math.max(frenchDraft.leftWingV, frenchDraft.rightWingV) + managedSeparation : 0.02} max={frenchDraft.variant === 'smooth' ? Math.min(frenchDraft.leftWingV, frenchDraft.rightWingV) - managedSeparation : 0.72} step="0.01" disabled={!canEditManaged} value={frenchDraft.centerV} onChange={(event) => managedAnchorChange('centerV', Number(event.target.value))} onPointerUp={commitManagedDraft} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-11 w-full accent-violet-600 disabled:opacity-40" data-testid="v7-managed-french-center" /><span>{frenchDraft.centerV.toFixed(2)}</span></label>
+              <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">右翼<input type="range" min={managedWingMin} max={managedWingMax} step="0.01" disabled={!canEditManaged} value={frenchDraft.rightWingV} onChange={(event) => managedAnchorChange('rightWingV', Number(event.target.value))} onPointerUp={commitManagedDraft} onBlur={commitManagedDraft} onKeyDown={(event) => { if (event.key === 'Enter') commitManagedDraft(); }} className="h-11 w-full accent-violet-600 disabled:opacity-40" data-testid="v7-managed-french-right-wing" /><span>{frenchDraft.rightWingV.toFixed(2)}</span></label>
+              <p className="text-nano leading-4 text-gray-500">预设切换会重置三点几何但保留颜色与透明度；锚点调整后标记为 custom。镜像与全十指操作由当前范围一次提交。</p>
+            </section>
+          )}
           {selectedElement.kind === 'french_edge' && (
             <>
               <section className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5" role="status" data-testid="v7-legacy-french-conversion-notice">
@@ -318,7 +437,7 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
               <label className="grid grid-cols-[auto_1fr_auto] items-center gap-2 text-nano text-gray-600">弧度<input type="range" min="-1" max="1" step="0.05" value={frenchCurvatureDraft} disabled={!canEditSelected} onChange={(event) => setFrenchCurvatureDraft(Number(event.target.value))} onPointerUp={() => commitFrench('curvature')} onKeyUp={() => commitFrench('curvature')} onBlur={() => commitFrench('curvature')} className="h-11 accent-violet-600" /><span>{frenchCurvatureDraft.toFixed(2)}</span></label>
             </>
           )}
-          {editablePath && (
+          {!managedFrench && editablePath && (
             <div>
               <label className="text-nano font-semibold text-gray-600" htmlFor="v7-path-data">nail-local 路径 / 锚点</label>
               <textarea id="v7-path-data" value={pathDraft} disabled={!canEditSelected} onChange={(event) => setPathDraft(event.target.value)} onBlur={commitPath} rows={3} className="mt-1 w-full resize-y rounded-lg border border-gray-300 px-2 py-1.5 font-mono text-nano leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45" />
@@ -379,6 +498,21 @@ export function FlatVectorPanelV7({ variant = 'full', panelMode }: { variant?: F
           <p className="text-nano leading-4 text-gray-500">填充透明度将以当前可见值 {Math.round(selectedElement.opacity * 100)}% 明示写入；描边保持关闭。结构化参数不代表实物或制造验证。</p>
         </div>
       </Modal>}
+      <Modal open={createFrenchOpen} onClose={closeCreateFrench} title="添加结构化法式" size="md" closeOnOverlay layer="workspace" footer={<><Button type="button" variant="secondary" onClick={closeCreateFrench}>取消</Button><Button type="button" disabled={!canEdit || (fingerScope === 'selected' && selectedFingers.length === 0)} onClick={commitCreateFrench} data-testid="v7-managed-french-create-confirm">确认添加</Button></>}>
+        <div className="space-y-3" data-testid="v7-managed-french-create-dialog">
+          <p className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-nano leading-4 text-violet-900">选择一个结构化预设；确认前不会写入 revision/history/autosave。预设会决定初始几何，之后可用专用检查器调整。</p>
+          <fieldset><legend className="text-nano font-semibold text-gray-800">法式预设（必选）</legend><div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{FRENCH_RECIPE_PRESETS_V1.map((preset, index) => <button ref={index === 0 ? createFrenchFirstChoiceRef : undefined} autoFocus={index === 0} key={preset} type="button" aria-pressed={createPreset === preset} onClick={() => setCreatePreset(preset)} className={cx('min-h-[56px] rounded-lg border px-2 text-left text-nano', createPreset === preset ? 'border-violet-500 bg-violet-50 font-semibold' : 'border-gray-200 bg-white')} data-testid={`v7-managed-french-create-preset-${preset}`}>{FRENCH_PRESET_COPY_V1[preset].label}<span className="mt-0.5 block text-nano font-normal text-gray-500">{FRENCH_PRESET_COPY_V1[preset].description}</span></button>)}</div></fieldset>
+          <fieldset><legend className="text-nano font-semibold text-gray-800">作用范围</legend><div className="mt-2 grid grid-cols-4 gap-1.5">{(['current', 'selected', 'mirror', 'all'] as const).map((scope) => <button key={scope} type="button" className={cx('min-h-11 rounded-lg border px-2 text-nano', fingerScope === scope ? 'border-violet-500 bg-violet-100 font-semibold' : 'border-gray-200 bg-white')} onClick={() => setFingerScope(scope)} data-testid={`v7-managed-french-create-scope-${scope}`}>{scope === 'current' ? '当前指' : scope === 'selected' ? '已选指' : scope === 'mirror' ? '镜像' : '十指全部'}</button>)}</div>{fingerScope === 'selected' && <div className="mt-2 grid grid-cols-5 gap-1">{(['L1','L2','L3','L4','L5','R1','R2','R3','R4','R5'] as const).map((finger) => <button key={finger} type="button" aria-pressed={selectedFingers.includes(finger)} onClick={() => toggleSelectedFinger(finger)} className={cx('min-h-11 rounded border text-nano', selectedFingers.includes(finger) ? 'border-violet-500 bg-violet-100 font-semibold' : 'border-gray-200 bg-white')}>{finger}</button>)}</div>}</fieldset>
+          <label className="flex min-h-11 items-center justify-between rounded-lg border border-gray-200 bg-white px-2 text-nano">填充颜色<input type="color" value={createColor} onChange={(event) => setCreateColor(event.target.value)} className="h-11 w-11 rounded border p-1" data-testid="v7-managed-french-create-color" /></label>
+          <label className="grid min-h-11 grid-cols-[auto_1fr_auto] items-center gap-2 text-nano">透明度<input type="range" min="0" max="100" step="1" value={createOpacity} onChange={(event) => setCreateOpacity(Number(event.target.value))} className="h-11 w-full accent-violet-600" data-testid="v7-managed-french-create-opacity" /><span>{createOpacity}%</span></label>
+          {fingerScope === 'selected' && selectedFingers.length === 0 && <p role="alert" className="text-nano text-error">已选范围为空，确认按钮保持禁用。</p>}
+          {!canEdit && <p role="alert" className="text-nano text-error">当前为只读、切换中或几何未签收状态，创建保持禁用且不会写入。</p>}
+          <p className="text-nano text-gray-500">颜色与透明度均为草稿，确认前不会修改文档。</p>
+        </div>
+      </Modal>
+      <Modal open={deleteFrenchOpen} onClose={() => setDeleteFrenchOpen(false)} title="删除结构化法式？" size="sm" layer="workspace" footer={<><Button type="button" variant="secondary" onClick={() => setDeleteFrenchOpen(false)}>取消</Button><Button type="button" variant="danger" disabled={!canEditManaged} onClick={() => { if (resultToast(deleteFrenchRecipe(managedFrench?.id ?? ''))) setDeleteFrenchOpen(false); }}>确认删除</Button></>}>
+        <p className="text-sm leading-5 text-gray-700">这会按当前作用范围删除对应 recipe、step 和投影；取消不会写入。</p>
+      </Modal>
     </div>
   );
 }
