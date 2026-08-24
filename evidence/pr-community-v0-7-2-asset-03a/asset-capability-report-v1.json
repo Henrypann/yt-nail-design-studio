@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "contractRef": "COMM-v0.7.2-ASSET-03A",
+  "baselineCommit": "5b2b725292efa09d1a377d36c33daba86cf300cd",
+  "snapshotAt": "2026-08-24T00:00:00.000Z",
+  "evidenceSource": "public/community/asset-capability-evidence-v1.json",
+  "migrationAuthority": "public/community/migration-manifest-v1.json",
+  "coverage": {
+    "expected": 24,
+    "actual": 24,
+    "missing": 0,
+    "orphan": 0,
+    "duplicate": 0
+  },
+  "sourceClasses": {
+    "LEGACY_CONTENT_INDEX": 18,
+    "CANONICAL_DEMO": 1,
+    "V0_7_2_LOOK_SET": 4,
+    "CREATOR_V1_FIXTURE": 1
+  },
+  "capabilityStates": {
+    "VERSIONED_READY": [
+      "look.v0-7-2.crimson-reliquary",
+      "look.v0-7-2.honey-petal-glass",
+      "look.v0-7-2.ivory-lace-crystal",
+      "look.v0-7-2.leopard-gilded-nude",
+      "look.v7-1.petal-veil"
+    ],
+    "LEGACY_APPROXIMATE": [
+      "cc_mercury_dew",
+      "cc_petal_veil"
+    ],
+    "INSPIRATION_ONLY": [],
+    "ASSETS_INCOMPLETE": [
+      "cc_butter_glaze_quiet",
+      "cc_liquid_chrome_statement",
+      "cc_micro_coquette",
+      "cc_pearl_tide",
+      "cc_sea_glass_chrome",
+      "cc_starfish_bloom",
+      "cc_sunset_aura_glaze"
+    ],
+    "UNAVAILABLE": [
+      "cc_draft_internal_gate",
+      "cc_petal_pearl_bloom",
+      "cc_pugc_kai_circuit",
+      "cc_pugc_kai_mirror",
+      "cc_pugc_kai_oxblood",
+      "cc_pugc_luna_blush",
+      "cc_pugc_luna_pearl",
+      "cc_pugc_mio_gallery",
+      "cc_pugc_mio_jewel",
+      "look.creator-fixture.petal-veil"
+    ]
+  },
+  "gates": {
+    "currentMakeableCount": 0,
+    "manufacturingValidatedCount": 0,
+    "rightsPendingPublicUseCount": 0,
+    "editorDocWrites": 0,
+    "uiChanges": 0
+  },
+  "evidenceMeaning": {
+    "EXACT": "Immutable DesignVersion, EditorDoc SHA-256 and preview SHA-256 identity lineage is complete. It does not mean exact visual fidelity or manufacturing validation.",
+    "APPROXIMATE": "An explicit legacy template asset reference exists without an immutable DesignVersion and EditorDoc SHA-256 chain.",
+    "INCOMPLETE": "The look may remain visible but no explicit editable asset lineage is available.",
+    "UNAVAILABLE": "Use is blocked by rights/publication governance or an explicit technical decision gap. No automatic fallback is allowed."
+  },
+  "status": "READY_BRANCH_PROTOTYPE",
+  "manufacturingValidated": false
+}
