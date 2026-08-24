@@ -23,7 +23,7 @@ PASS
 
 Worktree 补充：13:05 后复核 `dist 2/` 为空目录，完整 `git status --short --branch` 立即返回 clean；未删除或隐藏目录。该临时扫描异常已解除，不再作为 Git merge gate。
 
-人工证据补充：用户于 2026-08-24 回复“1–6 通过”；仅记为所展示六张证据的快速视觉签收，不替代运营 owner、rights、制造或发布签收。
+人工证据勘误：用户于 2026-08-24 回复“1–6 通过”对应 Branch A French 关键截图，不计入 Asset/Home 04A 签收。Asset Product/Design owner 门仍开放。
 
 ## A+B 无提交组合演练
 

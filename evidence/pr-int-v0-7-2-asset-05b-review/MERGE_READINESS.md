@@ -24,7 +24,7 @@
 
 ## 仍阻止“立即 merge”的门
 
-1. 用户已于 2026-08-24 明确回复“1–6 通过”，可记录为本轮所展示六张可见证据的快速视觉签收；它不替代 Marketing/Community owner 的内容选择，也不升级为发布签收。
+1. Product/Design 尚未单独签收 04A Home 等待态；用户回复“1–6 通过”对应 Branch A French 关键截图，不归入 Asset/Home 证据。
 2. Marketing/Community owner 尚未填写 04B Banner、精选、集合与双语理由；Home 当前保持 `AWAITING_INPUT`。
 3. 25/25 rights 仍 `PENDING`，10/10 Starter candidates promotion 仍 `BLOCKED`。
 4. Hermes/Claude 外部审查此前没有通过 usage/model fail-closed 校验，不能记为外审通过。
