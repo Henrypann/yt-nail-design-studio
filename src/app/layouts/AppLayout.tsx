@@ -36,7 +36,7 @@ interface NavGroup {
 /** 登录后全局布局：侧栏 + 顶栏（门店名纯文本 / 通知 / 用户名 / 退出）
  *  v1.5.1：侧栏支持收起/展开（持久化 localStorage，收起后仅图标 + tooltip） */
 export function AppLayout() {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const navigate = useNavigate();
   const location = useLocation();
   const session = readData<SessionInfo>(StorageKeys.session) ?? {};
@@ -127,8 +127,8 @@ export function AppLayout() {
       icon: Palette,
       items: [
         { to: Routes.studio, label: 'Studio Home', end: true },
-        { to: designNewFresh(), label: text('新建设计', 'New design') },
-        { to: Routes.designs, label: text('我的设计', 'My designs'), end: true },
+        { to: designNewFresh(), label: t('app.newDesign') },
+        { to: Routes.designs, label: t('app.myDesigns'), end: true },
       ],
     },
     {
@@ -142,23 +142,23 @@ export function AppLayout() {
     ...(hasRegisteredHardware ? [
       {
         key: 'customers',
-        label: text('客户管理', 'Customers'),
+        label: t('app.customers'),
         icon: Users,
         items: [
           { to: Routes.dashboard, label: 'Dashboard' },
-          { to: Routes.customers, label: text('客户列表', 'Customer list'), end: true },
-          { to: Routes.customerNew, label: text('新建客户', 'New customer') },
+          { to: Routes.customers, label: t('customer.customerList'), end: true },
+          { to: Routes.customerNew, label: t('customer.newCustomer') },
         ],
       },
     ] satisfies NavGroup[] : []),
     {
       key: 'devices',
-      label: text('设备管理', 'Devices'),
+      label: t('app.devices'),
       icon: Monitor,
       items: [
-        { to: Routes.deviceBind, label: text('设备绑定', 'Bind device') },
+        { to: Routes.deviceBind, label: t('device.bindDevice') },
         ...(hasRegisteredHardware
-          ? [{ to: Routes.devices, label: text('我的设备', 'My devices'), end: true }]
+          ? [{ to: Routes.devices, label: t('device.myDevices'), end: true }]
           : []),
       ],
     },
@@ -171,7 +171,7 @@ export function AppLayout() {
           type="button"
           tabIndex={-1}
           className="fixed inset-0 z-40 bg-gray-950/25 backdrop-blur-[1px]"
-          aria-label="关闭 Studio 导航"
+          aria-label={t('nav.closeStudio')}
           onClick={() => {
             setWorkspaceNavOpen(false);
             queueMicrotask(() => workspaceNavTriggerRef.current?.focus());
@@ -184,7 +184,7 @@ export function AppLayout() {
         ref={workspaceNavRef}
         role={workspaceNavOverlay ? 'dialog' : undefined}
         aria-modal={workspaceNavOverlay ? true : undefined}
-        aria-label={workspaceNavOverlay ? 'Studio 导航' : undefined}
+        aria-label={workspaceNavOverlay ? t('nav.studioNavigation') : undefined}
         onKeyDown={trapWorkspaceNavFocus}
         data-debug-id="app.layout.sidebar"
         data-creative-workspace={creativeWorkspace ? 'true' : 'false'}
@@ -201,13 +201,13 @@ export function AppLayout() {
             sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4',
           )}
         >
-          {!sidebarCollapsed && <span className="text-sm font-bold text-primary">Nail Design Studio</span>}
+          {!sidebarCollapsed && <span className="text-sm font-bold text-primary">{t('app.nailDesignStudio')}</span>}
           {(!compactViewport || creativeWorkspace) && (
             <button
               ref={workspaceNavTriggerRef}
               onClick={toggleCollapsed}
-              title={sidebarCollapsed ? '展开导航' : '收起导航'}
-              aria-label={sidebarCollapsed ? '展开导航' : '收起导航'}
+              title={sidebarCollapsed ? t('nav.expand') : t('nav.collapse')}
+              aria-label={sidebarCollapsed ? t('nav.expand') : t('nav.collapse')}
               aria-expanded={!sidebarCollapsed}
               className={cx('rounded-button p-1.5 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700', creativeWorkspace && 'min-h-11 min-w-11')}
             >
@@ -275,26 +275,26 @@ export function AppLayout() {
           className="flex h-14 items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 sm:px-6"
         >
           <span className="min-w-0 truncate text-sm font-medium text-gray-800">
-            {session.storeName ?? '未命名门店'}
+            {session.storeName ?? t('app.unnamedStore')}
           </span>
           <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <LanguageToggle />
             <button
               className="rounded-button p-2 text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
-              aria-label={text('通知', 'Notifications')}
+              aria-label={t('app.notifications')}
             >
               <Bell size={16} />
             </button>
             <span className="hidden text-sm text-gray-700 lg:inline">
-              {session.userName ?? text('美甲师', 'Nail artist')}
+              {session.userName ?? t('app.nailArtist')}
             </span>
             <button
               onClick={handleLogout}
-              aria-label={text('退出', 'Sign out')}
+              aria-label={t('app.signOut')}
               className="flex items-center gap-1 rounded-button px-2 py-1.5 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
             >
               <LogOut size={13} />
-              <span className="hidden sm:inline">{text('退出', 'Sign out')}</span>
+              <span className="hidden sm:inline">{t('app.signOut')}</span>
             </button>
           </div>
         </header>

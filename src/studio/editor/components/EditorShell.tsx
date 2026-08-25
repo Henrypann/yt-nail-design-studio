@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
 import { NailCanvas } from './NailCanvas';
 import { EditorTopBar } from './EditorTopBar';
@@ -23,6 +24,7 @@ import { useEditorStore } from '../store';
 const ONBOARDING_KEY = 'nail-studio:editor-onboarding-complete:v1';
 
 export function EditorShell() {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const doc = useEditorStore((s) => s.doc);
   const readOnly = useEditorStore((s) => s.readOnly);
@@ -97,11 +99,10 @@ export function EditorShell() {
         <div className="flex shrink-0 items-center justify-between border-b border-info/20 bg-info-soft px-4 py-2">
           <p className="flex items-center gap-2 text-xs text-info">
             <ShieldAlert size={14} />
-            设计已{status === 'confirmed' ? '被标记「顾客已确认」' : '提交生产'}，冻结为只读。
-            如需修改，请返回设计列表「基于已确认设计创建新版本」。
+            {t(status === 'confirmed' ? 'editor.extra.confirmedFrozen' : 'editor.extra.submittedFrozen')}
           </p>
           <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
-            返回设计列表
+            {t('editor.extra.backDesigns')}
           </Button>
         </div>
       )}

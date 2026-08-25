@@ -1,5 +1,6 @@
 import { EyeOff, Info, Sparkles } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import {
   createGlitterPreviewParticlesV7,
@@ -28,6 +29,7 @@ function silhouetteTransform(viewBox: string): string {
 }
 
 export function V7SurfaceEffectCanvas() {
+  const { t } = useLocale();
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const nail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
@@ -98,15 +100,15 @@ export function V7SurfaceEffectCanvas() {
           </g>
           {effect.previewFidelity === 'unavailable' && maskPath && <g clipPath={`url(#${clipId})`}><path d={maskPath} fill="none" stroke="#936b78" strokeWidth="1.4" strokeDasharray="4 3" /></g>}
         </svg>
-        {(!selectedStep.visible || selectedStep.skipped) && <div className="absolute inset-3 flex items-center justify-center rounded-[24px] bg-white/82 text-xs font-semibold text-gray-600 backdrop-blur-sm"><EyeOff size={15} className="mr-2" />{selectedStep.skipped ? '此效果已跳过' : '此效果已隐藏'}</div>}
+        {(!selectedStep.visible || selectedStep.skipped) && <div className="absolute inset-3 flex items-center justify-center rounded-[24px] bg-white/82 text-xs font-semibold text-gray-600 backdrop-blur-sm"><EyeOff size={15} className="mr-2" />{selectedStep.skipped ? t('editorV7.surfaceEffect.skipped') : t('editorV7.surfaceEffect.hidden')}</div>}
       </div>
 
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/90 p-4 shadow-sm">
-        <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Surface Effect · 2D</p></div>
+        <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">{t('editorV7.surfaceEffect.title')}</p></div>
         <h2 className="mt-2 text-lg font-semibold text-gray-900">{SURFACE_EFFECT_LABELS_V7[effect.effectType]}</h2>
         <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', fidelityTone)}>{SURFACE_EFFECT_FIDELITY_LABELS_V7[previewFidelity]}</div>
-        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体预览已相应降级。</p>}
-        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" /><p>{effect.previewFidelity === 'unavailable' ? '当前 adapter 无法表达此效果，画布保留遮罩边界与数据。' : '这是由结构化参数派生的编辑态 2D 预览。'} 不代表最终 3D、材料性能或物理可制造性。</p></div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">{t('editorV7.surfaceEffect.shapeWarning', { fidelity: silhouette.fidelity === 'approximate' ? t('editorV7.surfaceEffect.shapeApproximate') : t('editorV7.surfaceEffect.shapeFallback') })}</p>}
+        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" /><p>{effect.previewFidelity === 'unavailable' ? t('editorV7.surfaceEffect.unavailableNotice') : t('editorV7.surfaceEffect.derivedNotice')} {t('editorV7.surfaceEffect.notManufacturing')}</p></div>
       </div>
     </div>
   );

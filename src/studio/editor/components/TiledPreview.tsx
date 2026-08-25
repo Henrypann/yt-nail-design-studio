@@ -18,7 +18,7 @@ import { resolveFingerData, isFingerUnlocked } from '../lib/model';
 import { useEditorStore } from '../store';
 
 export function TiledPreview(props: { onClose: () => void; presentation?: boolean }) {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const { onClose, presentation = false } = props;
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
@@ -72,10 +72,6 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
 
   const unlockedCount = FINGER_CODES.filter((f) => isFingerUnlocked(doc, f)).length;
   const syncMode = unlockedCount === 0;
-  const hasBrush = FINGER_CODES.some((f) =>
-    resolveFingerData(doc, f).pattern.some((el) => el.kind === 'brush' || el.kind === 'french_edge'),
-  );
-
   const exportPng = async () => {
     if (!doc) return;
     setExporting(true);
@@ -84,9 +80,9 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
       if (!svg) throw new Error('compose failed');
       const png = await svgToPngDataUrl(svg, 1500, 880);
       downloadDataUrl(png, `十指平铺预览_${doc.shape}_${view}.png`);
-      toast.success('十指平铺 PNG 已导出');
+      toast.success(t('editorV7.tiled.exported'));
     } catch {
-      toast.error('导出失败。请重试。');
+      toast.error(t('editorV7.tiled.exportFailed'));
     } finally {
       setExporting(false);
     }
@@ -100,20 +96,20 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-gray-900">
-            {presentation ? '顾客确认展示' : '十指平铺预览'}
+            {presentation ? t('editorV7.tiled.customer') : t('editorV7.tiled.title')}
           </h2>
           <span className="text-nano text-gray-400">
-            {presentation ? '全屏只读 · Esc 退出' : 'Back 手背'}
+            {presentation ? t('editorV7.tiled.fullscreen') : t('editorV7.tiled.back')}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="secondary" loading={exporting} onClick={exportPng}>
             <Download size={13} />
-            导出 PNG
+            {t('editorV7.tiled.export')}
           </Button>
           <Button size="sm" variant="ghost" onClick={onClose}>
             <X size={14} />
-            返回单甲
+            {t('editorV7.tiled.single')}
           </Button>
         </div>
       </header>
@@ -121,18 +117,18 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
       <main className="flex flex-1 items-center justify-center overflow-auto p-6">
         {failAll ? (
           <div className="flex flex-col items-center gap-3 rounded-card border border-gray-200 bg-white px-10 py-12">
-            <p className="text-sm font-medium text-gray-800">预览渲染失败</p>
-            <p className="text-xs text-gray-500">渲染服务异常或超时（MOCK 场景注入）。</p>
+            <p className="text-sm font-medium text-gray-800">{t('editorV7.tiled.failed')}</p>
+            <p className="text-xs text-gray-500">{t('editorV7.tiled.failedDetail')}</p>
             <Button
               size="sm"
               variant="secondary"
               onClick={() => {
                 setReloadTick((t) => t + 1);
-                toast.info('已重新请求渲染');
+                toast.info(t('editorV7.tiled.refreshRequested'));
               }}
             >
               <RefreshCw size={13} />
-              刷新
+              {t('editorV7.tiled.refresh')}
             </Button>
           </div>
         ) : (
@@ -170,8 +166,8 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                         className="flex flex-col items-center justify-center gap-1 rounded-panel bg-gray-100"
                         style={{ height: `${176 * displayRatio}px`, width: `${96 * displayRatio}px` }}
                       >
-                        <span className="text-lg">⚠️</span>
-                        <span className="text-nano text-gray-500">渲染失败</span>
+                        <span className="text-lg" aria-hidden="true">{'⚠️'}</span>
+                        <span className="text-nano text-gray-500">{t('editorV7.tiled.renderFailed')}</span>
                       </div>
                     ) : (
                       <svg
@@ -185,13 +181,13 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
                   </div>
                   <span className="flex flex-wrap items-center justify-center gap-1 text-nano text-gray-500">
                     <span className="font-medium tnum">{finger}</span>
-                    {!presentation && isMaster && <span title="主视觉指">💗</span>}
+                    {!presentation && isMaster && <span title={t('editorV7.tiled.master')} aria-hidden="true">{'💗'}</span>}
                     {!presentation && (isUnlocked ? (
-                      <span title="已解锁独立编辑">🔓</span>
+                      <span title={t('editorV7.tiled.unlocked')} aria-hidden="true">{'🔓'}</span>
                     ) : syncMode ? (
-                      <span title="十指同步">🔗</span>
+                      <span title={t('editorV7.tiled.sync')} aria-hidden="true">{'🔗'}</span>
                     ) : null)}
-                    {!presentation && hasStroke && <span title="含手绘">✏️</span>}
+                    {!presentation && hasStroke && <span title={t('editorV7.tiled.brush')} aria-hidden="true">{'✏️'}</span>}
                   </span>
                 </button>
               );
@@ -204,13 +200,13 @@ export function TiledPreview(props: { onClose: () => void; presentation?: boolea
         <span>
           {presentation
             ? `${shapeName(doc.shape, locale)} · ${lengthName(doc.length, locale)} · ${doc.lengthPreset}`
-            : `点击指位切换编辑指并返回单甲画布${hasBrush ? ' · 导出 PNG 含手绘/法式' : ''}`}
+            : `${t('editor.extra.exportHandPaint')}`}
         </span>
         <span className="text-nano text-gray-400">
           {presentation
             ? `设计号 ${doc.designId}`
             : syncMode
-            ? '● 十指同步模式'
+            ? t('editor.extra.syncTenFingers')
             : `○ 逐指解锁（${unlockedCount} 指独立）`}
           {!presentation && ` · 当前 ${currentFinger}`}
         </span>

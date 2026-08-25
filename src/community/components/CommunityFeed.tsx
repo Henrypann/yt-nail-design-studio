@@ -95,7 +95,7 @@ export function CommunityFeed({
   lockedSource?: SourceFilter;
   showOfficialProgress?: boolean;
 }) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState<LoadState>('loading');
   const [lookModels, setLookModels] = useState<PublishedLookReadModelV1[]>([]);
@@ -315,7 +315,7 @@ export function CommunityFeed({
         <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>
         {showOfficialProgress && progress && (
           <p className="mt-1 text-nano text-gray-400" data-testid="official-pgc-progress">
-            官方 PGC Metadata Ready {progress.ready}/{progress.target}（缺口 {progress.gap} 仅校验可见，不展示假卡）
+            {t('community.pgcMetadataReady', { ready: progress.ready, target: progress.target, gap: progress.gap })}
           </p>
         )}
       </header>
@@ -333,9 +333,9 @@ export function CommunityFeed({
           className="flex flex-col items-center gap-3 py-12"
           data-testid="community-feed-feedback-load-failed"
         >
-          <p className="text-sm text-gray-500">{text('内容加载失败', 'Failed to load content')}</p>
+          <p className="text-sm text-gray-500">{t('app.failedLoadContent')}</p>
           <Button className="min-h-11" size="sm" variant="secondary" onClick={() => setRetry((k) => k + 1)}>
-            {text('重试', 'Retry')}
+            {t('app.retry')}
           </Button>
         </div>
       )}
@@ -377,10 +377,7 @@ export function CommunityFeed({
                   className="rounded-card border border-amber-200 bg-amber-50 px-4 py-3"
                 >
                   <p className="text-xs font-medium text-amber-800">
-                    {text(
-                      '该链接包含无法在不扩展现有筛选能力的情况下应用的条件（不会自动清除）。',
-                      'This link contains conditions that cannot be applied without widening the current filters (never auto-cleared).',
-                    )}
+                    {t('app.linkContainsConditionsCannotBeAppliedWithoutWideningCurrentFiltersNeverAutoCleared')}
                   </p>
                   <ul className="mt-2 space-y-2">
                     {queryResult.incompatible.map((issue, index) => (
@@ -397,7 +394,7 @@ export function CommunityFeed({
                         <button
                           type="button"
                           data-testid={`remove-incompatible-${issue.key}`}
-                          aria-label={text('移除不兼容条件', 'Remove incompatible condition')}
+                          aria-label={t('app.removeIncompatibleCondition')}
                           onClick={() => removeIncompatibleIssue(issue)}
                           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-amber-100 hover:text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
@@ -439,16 +436,10 @@ export function CommunityFeed({
                       data-testid="community-feed-feedback-invalid-link"
                     >
                       <p className="text-sm font-medium text-gray-800">
-                        {text(
-                          '该链接包含无法应用的条件，未显示任何内容',
-                          'This link contains conditions that cannot be applied, so nothing is shown',
-                        )}
+                        {t('app.linkContainsConditionsCannotBeAppliedSoNothingShown')}
                       </p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {text(
-                          '不兼容条件已在上方逐条列出；只有显式移除这些条件后才能查看结果（不会自动清除或放宽）。',
-                          'The incompatible conditions are listed above; only explicitly removing them can reveal results (never auto-cleared or widened).',
-                        )}
+                        {t('app.incompatibleConditionsListedAboveOnlyExplicitlyRemovingThemCanRevealResultsNeverAutoClearedWidened')}
                       </p>
                     </div>
                   ) : emptyFeedbackKind === 'rights-restricted' ? (
@@ -457,19 +448,13 @@ export function CommunityFeed({
                       data-testid="community-feed-feedback-rights-restricted"
                     >
                       <p className="text-sm font-medium text-gray-800">
-                        {text(
-                          '所选权利状态不会出现在公开内容中',
-                          'The selected rights status never appears in public content',
-                        )}
+                        {t('app.selectedRightsStatusNeverAppearsPublicContent')}
                       </p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {text(
-                          'PENDING（待定）版权内容不会进入公开首页/搜索/推荐；清除该筛选即可查看已发布内容。',
-                          'PENDING copyright content never enters public home/search/recommendations; clear this filter to see published looks.',
-                        )}
+                        {t('app.pendingCopyrightContentNeverEntersPublicHomeSearchRecommendationsClearFilterSeePublishedLooks')}
                       </p>
                       <Button className="mt-4 min-h-11" size="sm" variant="secondary" onClick={resetToDefault}>
-                        {text('清除筛选', 'Clear filters')}
+                        {t('app.clearFilters')}
                       </Button>
                     </div>
                   ) : emptyFeedbackKind === 'access-denied' ? (
@@ -478,26 +463,20 @@ export function CommunityFeed({
                       data-testid="community-feed-feedback-access-denied"
                     >
                       <p className="text-sm font-medium text-gray-800">
-                        {text(
-                          '当前没有可公开访问的内容',
-                          'No publicly accessible content is available',
-                        )}
+                        {t('app.noPubliclyAccessibleContentAvailable')}
                       </p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {text(
-                          '所有候选内容都未通过公开出版/版权门禁；不会自动扩大筛选范围。',
-                          'Every candidate failed the public publication/permission gate; the filter scope is never widened automatically.',
-                        )}
+                        {t('app.everyCandidateFailedPublicPublicationPermissionGateFilterScopeNeverWidenedAutomatically')}
                       </p>
                     </div>
                   ) : (
                     <div className="mx-auto max-w-md" data-testid="community-feed-feedback-empty">
-                      <p className="text-sm font-medium text-gray-800">{text('没有匹配的已发布内容', 'No matching published looks')}</p>
+                      <p className="text-sm font-medium text-gray-800">{t('app.noMatchingPublishedLooks')}</p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {text('草稿与未发布内容不会出现在 Explore。', 'Drafts and unpublished content never appear in Explore.')}
+                        {t('app.draftsUnpublishedContentNeverAppearExplore')}
                       </p>
                       <Button className="mt-4 min-h-11" size="sm" variant="secondary" onClick={resetToDefault}>
-                        {text('清除筛选', 'Clear filters')}
+                        {t('app.clearFilters')}
                       </Button>
                     </div>
                   )}
@@ -522,14 +501,14 @@ export function CommunityFeed({
                   className="rounded-card border border-dashed border-gray-200 bg-white px-4 py-10 text-center"
                   data-testid="community-creators-empty"
                 >
-                  <p className="text-sm font-medium text-gray-800">{text('没有匹配的创作者', 'No matching creators')}</p>
+                  <p className="text-sm font-medium text-gray-800">{t('app.noMatchingCreators')}</p>
                   <Button
                     className="mt-4 min-h-11"
                     size="sm"
                     variant="secondary"
                     onClick={() => applyState({ ...queryState, q: '' })}
                   >
-                    {text('清除搜索', 'Clear search')}
+                    {t('app.clearSearch')}
                   </Button>
                 </div>
               )}
@@ -537,10 +516,7 @@ export function CommunityFeed({
           )}
 
           <p className="pt-2 text-center text-nano text-gray-400">
-            {text(
-              'Feed 不加载 Three.js · 预览通过 ≠ 可制造 · Made 需要已验证的 Real Result / 履约记录（当前不可用）· Demo 创作者仅 Integration 可见',
-              'Feed does not load Three.js · Preview ≠ manufacturable · Made requires a verified Real Result / fulfillment record (unavailable) · Demo creators visible in Integration only',
-            )}
+            {t('app.feedDoesNotLoadThreeJsPreviewManufacturableMadeRequiresVerifiedRealResultFulfillmentRecordUnavailableDemoCreatorsVisibleIntegrationOnly')}
           </p>
         </>
       )}
@@ -560,7 +536,7 @@ export function CommunityFeed({
 
 /** Looks / Creators 可访问 tabs（WAI-ARIA tabs 模式，方向键切换）。 */
 function ExploreTabs({ tab, onChange }: { tab: ExploreTab; onChange: (tab: ExploreTab) => void }) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const refs = useRef<Partial<Record<ExploreTab, HTMLButtonElement | null>>>({});
   const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, current: ExploreTab) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
@@ -572,7 +548,7 @@ function ExploreTabs({ tab, onChange }: { tab: ExploreTab; onChange: (tab: Explo
   return (
     <div
       role="tablist"
-      aria-label={text('搜索范围', 'Search scope')}
+      aria-label={t('app.searchScope')}
       className="inline-flex items-center gap-1 rounded-card border border-gray-200 bg-white p-1"
       data-testid="community-explore-tabs"
     >
@@ -599,7 +575,7 @@ function ExploreTabs({ tab, onChange }: { tab: ExploreTab; onChange: (tab: Explo
               active ? 'bg-primary-soft text-primary' : 'text-gray-600 hover:bg-gray-50',
             )}
           >
-            {value === 'looks' ? text('款式', 'Looks') : text('创作者', 'Creators')}
+            {value === 'looks' ? t('app.looks') : t('app.creators2')}
           </button>
         );
       })}

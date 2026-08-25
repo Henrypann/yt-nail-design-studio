@@ -10,6 +10,7 @@
  */
 
 import { Button, useToast, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { AlertTriangle, ArrowRight, CheckCircle2, ChevronDown, LibraryBig, Presentation, SlidersHorizontal } from 'lucide-react';
 import { TenFingerPreview } from '@/studio/preview/TenFingerPreview';
 import { TiledNailsPreview } from '@/studio/preview/TiledNailsPreview';
@@ -35,9 +36,9 @@ import { PetalVeilPresentationMode } from './PetalVeilPresentationMode';
 import { WizardPanelOverlay } from './WizardPanelOverlay';
 
 const VIEW_TABS: { key: WizardViewMode; label: string }[] = [
-  { key: 'ensemble', label: '整体搭配 · Back 手背' },
-  { key: 'tiled', label: '十指平铺' },
-  { key: 'single', label: '单指细节' },
+  { key: 'ensemble', label: 'wizard.viewEnsemble' },
+  { key: 'tiled', label: 'wizard.viewTiled' },
+  { key: 'single', label: 'wizard.viewSingle' },
 ];
 
 type WizardLayoutMode = 'full' | 'compact' | 'focus' | 'tablet';
@@ -53,6 +54,7 @@ function layoutModeForWidth(width: number): WizardLayoutMode {
 
 export function StepTwo() {
   const toast = useToast();
+  const { t } = useLocale();
   const s = useWizardStore();
   const readOnly = s.status !== 'draft';
   const [shapeNames, setShapeNames] = useState<{ shape: string; length: string; mm: number } | null>(null);
@@ -156,21 +158,21 @@ export function StepTwo() {
       if (st().saveState !== 'saved') {
         const saved = await st().saveNow();
         if (!saved) {
-          toast.error('保存失败，无法进入 Editor。请重试。');
+          toast.error(t('wizard.editorSaveFailed'));
           return;
         }
       }
       const result = openBridge(st().designId);
       if (!result.ok) {
         const message = result.reason === 'editor_doc_unsupported'
-          ? '画布来自更高版本，当前版本不会覆盖。'
+          ? t('wizard.editorHigherVersion')
           : result.reason === 'editor_doc_invalid'
-            ? '画布数据无效，原始数据已保留。'
+            ? t('wizard.editorInvalidData')
             : result.reason === 'save_failed'
-              ? '画布保存失败，未进行跳转。'
+              ? t('wizard.editorSaveFailedShort')
               : result.reason === 'v7_content_not_supported'
-                ? `该设计暂不能无损转换到 V7：${result.message ?? '请更换受支持的模板或效果。'}`
-              : '设计数据缺失，无法打开自由画布。';
+                ? `${t('wizard.editorUnsupported')}: ${result.message ?? t('wizard.editorTrySupported')}`
+              : t('wizard.editorMissing');
         toast.error(message);
       }
     } finally {
@@ -191,11 +193,11 @@ export function StepTwo() {
 
   const detailPanel = petalP0 ? (
     <div className="rounded-card border border-gray-200 bg-white p-4">
-      <p className="text-sm font-medium text-gray-900">R4 · Signature 重音指</p>
+      <p className="text-sm font-medium text-gray-900">{t('wizard.signatureFinger')}</p>
       <p className="mt-1 text-xs leading-relaxed text-gray-500">
-        五瓣低浮雕花 · 0.18mm · UV 0.62 / 0.56。其余九指固定为奶雾微法式。
+        {t('wizard.signatureDetail')}
       </p>
-      <p className="mt-3 text-nano text-warning">Canonical Fixture 待人工视觉签收 · 制造未验证</p>
+      <p className="mt-3 text-nano text-warning">{t('wizard.canonicalPending')}</p>
     </div>
   ) : (
     <FingerDetailPanel
@@ -224,9 +226,9 @@ export function StepTwo() {
   const inspectorContent = (
     <div className="flex h-full min-h-0 flex-col">
       {(layoutMode === 'compact' || layoutMode === 'focus' || layoutMode === 'tablet') && (
-        <div className="mb-2 flex shrink-0 rounded-xl border border-hairline bg-surface-soft p-1" role="tablist" aria-label="参数与单指详情">
-          <button type="button" role="tab" aria-selected={inspectorTab === 'finger'} onClick={() => setInspectorTab('finger')} className={cx('min-h-11 flex-1 rounded-lg px-2 text-xs font-semibold', inspectorTab === 'finger' ? 'bg-white text-primary shadow-sm' : 'text-mute')}>单指详情</button>
-          <button type="button" role="tab" aria-selected={inspectorTab === 'params'} onClick={() => setInspectorTab('params')} className={cx('min-h-11 flex-1 rounded-lg px-2 text-xs font-semibold', inspectorTab === 'params' ? 'bg-white text-primary shadow-sm' : 'text-mute')}>参数</button>
+        <div className="mb-2 flex shrink-0 rounded-xl border border-hairline bg-surface-soft p-1" role="tablist" aria-label={t('wizard.inspectorTabs')}>
+          <button type="button" role="tab" aria-selected={inspectorTab === 'finger'} onClick={() => setInspectorTab('finger')} className={cx('min-h-11 flex-1 rounded-lg px-2 text-xs font-semibold', inspectorTab === 'finger' ? 'bg-white text-primary shadow-sm' : 'text-mute')}>{t('wizard.viewSingle')}</button>
+          <button type="button" role="tab" aria-selected={inspectorTab === 'params'} onClick={() => setInspectorTab('params')} className={cx('min-h-11 flex-1 rounded-lg px-2 text-xs font-semibold', inspectorTab === 'params' ? 'bg-white text-primary shadow-sm' : 'text-mute')}>{t('wizard.params')}</button>
         </div>
       )}
       <div className={cx('min-h-0', layoutMode === 'full' ? 'flex flex-1 flex-col gap-3' : 'flex-1 overflow-y-auto')}>
@@ -255,8 +257,8 @@ export function StepTwo() {
             <>
               <div className="flex items-center justify-between rounded-panel border border-gray-200 bg-white px-4 py-2 text-xs text-gray-600">
                 <span>
-                  当前方案：{shapeNames?.shape} · {shapeNames?.length}（{shapeNames?.mm}mm）
-                  {s.templateName ? ` · 模板「${s.templateName}」` : ''}（模板与参数已保留）
+                  {t('wizard.currentPlanSummary', { shape: shapeNames?.shape ?? '', length: shapeNames?.length ?? '', mm: shapeNames?.mm ?? '' })}
+                  {s.templateName ? ` · ${t('wizard.templateQuoted', { name: s.templateName })}` : ''}{t('wizard.templateParamsRetained')}
                 </span>
               </div>
               <div className="rounded-card border border-gray-200 bg-white p-4">
@@ -278,20 +280,20 @@ export function StepTwo() {
                         onClick={() => void handleReapply()}
                         className="rounded-button border border-error/30 bg-white px-2 py-1 transition-colors duration-fast hover:bg-error-soft"
                       >
-                        重试
+                        {t('common.retry')}
                       </button>
                     </div>
                   )}
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" onClick={s.cancelEditShapeLength} disabled={s.applying}>
-                      取消
+                      {t('common.cancel')}
                     </Button>
                     <Button
                       loading={s.applying}
                       disabled={!s.shape || !s.length}
                       onClick={handleReapply}
                     >
-                      {s.applying ? '生成预览中…' : '应用 → 重新生成'}
+                      {s.applying ? t('wizard.generatingPreview') : t('wizard.applyRegenerate')}
                     </Button>
                   </div>
                 </div>
@@ -303,7 +305,7 @@ export function StepTwo() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 {!libraryDocked && (
                   <Button data-testid="wizard-template-trigger" size="sm" variant="secondary" className="min-h-11" aria-haspopup="dialog" onClick={(event) => openOverlay('library', event.currentTarget)}>
-                    <LibraryBig size={14} />官方模板
+                    <LibraryBig size={14} />{t('wizard.officialTemplates')}
                   </Button>
                 )}
                 <div className="flex rounded-button border border-gray-200 bg-white p-0.5" role="tablist">
@@ -320,14 +322,14 @@ export function StepTwo() {
                           : 'text-gray-500 hover:text-gray-800',
                       )}
                     >
-                      {tab.label}
+                      {t(tab.label as 'wizard.viewEnsemble' | 'wizard.viewTiled' | 'wizard.viewSingle')}
                     </button>
                   ))}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {!inspectorDocked && (
                     <Button data-testid="wizard-inspector-trigger" size="sm" variant="secondary" className="min-h-11" aria-haspopup="dialog" onClick={(event) => openOverlay('inspector', event.currentTarget)}>
-                      <SlidersHorizontal size={14} />{s.selectedFinger ?? '单指'} 详情/参数
+                      <SlidersHorizontal size={14} />{s.selectedFinger ?? t('wizard.singleFinger')} {t('wizard.detailParams')}
                     </Button>
                   )}
                   {/* 指尖观察方向（UI 瞬态，整体搭配视图专用）：整幅组合画布 180° 旋转，不改设计数据 */}
@@ -335,7 +337,7 @@ export function StepTwo() {
                     <div
                       className="flex rounded-button border border-gray-200 bg-white p-0.5"
                       role="group"
-                      aria-label="指尖观察方向"
+                      aria-label={t('wizard.tipOrientation')}
                       data-testid="tip-orientation-toggle"
                     >
                       {(['up', 'down'] as const).map((o) => (
@@ -343,7 +345,7 @@ export function StepTwo() {
                           key={o}
                           type="button"
                           aria-pressed={s.tipOrientation === o}
-                          aria-label={o === 'up' ? '指尖朝上' : '指尖朝下'}
+                          aria-label={o === 'up' ? t('wizard.tipsUp') : t('wizard.tipsDown')}
                           onClick={() => s.setTipOrientation(o)}
                           className={cx(
                             'rounded-button px-2.5 py-1 text-xs transition-colors duration-fast',
@@ -352,18 +354,18 @@ export function StepTwo() {
                               : 'text-gray-500 hover:text-gray-800',
                           )}
                         >
-                          {o === 'up' ? '指尖朝上' : '指尖朝下'}
+                          {o === 'up' ? t('wizard.tipsUp') : t('wizard.tipsDown')}
                         </button>
                       ))}
                     </div>
                   )}
                   <span className="hidden text-nano text-gray-400 xl:inline">
-                    {petalP0 ? 'Canonical Three.js PBR · 双击 R4 看单指细节' : 'NailSlot V2 标定（back-v2.1.0）· 双击指甲看单指细节'}
+                    {petalP0 ? t('wizard.petalRendererHint') : t('wizard.nailSlotRendererHint')}
                   </span>
                   <span className="relative">
-                    <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title="全屏只读展示，适合把屏幕转向顾客（Esc 退出）">
+                    <Button size="sm" variant="secondary" onClick={() => setPresentOpen(true)} title={t('wizard.presentationTitle')}>
                       <Presentation size={13} />
-                      顾客展示
+                      {t('wizard.customerPresentation')}
                     </Button>
                   </span>
                 </div>
@@ -453,15 +455,15 @@ export function StepTwo() {
             {editorCompatibility.ok ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
           </span>
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-ink">{editorCompatibility.ok ? `Editor V7 资产预检通过 · ${editorCompatibility.items.length}/${editorCompatibility.items.length}` : '暂不能进入 Editor V7'}</p>
+            <p className="truncate text-xs font-semibold text-ink">{editorCompatibility.ok ? t('wizard.editorPreflightPassed', { count: editorCompatibility.items.length }) : t('wizard.editorUnavailable')}</p>
             <button type="button" data-testid="wizard-editor-v7-preflight-toggle" className="inline-flex min-h-11 min-w-11 items-center gap-1 text-nano font-medium text-primary hover:text-primary-hover" aria-haspopup="dialog" aria-expanded={overlayPanel === 'preflight'} onClick={(event) => openOverlay('preflight', event.currentTarget)}>
-              查看兼容详情 <ChevronDown size={12} />
+              {t('wizard.viewCompatibility')} <ChevronDown size={12} />
             </button>
           </div>
         </div>
         <div className="hidden min-w-0 flex-1 xl:block">
-          <p className="text-xs font-semibold text-ink">进入专业 Editor 继续精修</p>
-          <p className="truncate text-nano text-mute">保留当前甲型与十指方案，进入 V7 图层、画布与预览工作区。</p>
+          <p className="text-xs font-semibold text-ink">{t('wizard.enterEditorTitle')}</p>
+          <p className="truncate text-nano text-mute">{t('wizard.enterEditorDescription')}</p>
         </div>
         <Button
           size="md"
@@ -470,27 +472,27 @@ export function StepTwo() {
           className="min-h-11 shrink-0 px-4 text-sm"
           title={
             readOnly
-              ? '设计已冻结只读，不可进入自由画布编辑'
+              ? t('wizard.editorFrozen')
               : !bridged && !editorCompatibility.ok
                 ? editorCompatibility.message
               : bridged
-                ? '该设计已有 Editor 文档，点击继续编辑'
-                : '首次创建 Editor 文档（创建后模板不可再切换）'
+                ? t('wizard.editorContinue')
+                : t('wizard.editorCreate')
           }
           onClick={() => void handleOpenBridge()}
         >
-          进入 Editor
+          {t('wizard.enterEditor')}
           <ArrowRight size={17} />
         </Button>
       </footer>}
 
-      <WizardPanelOverlay open={overlayPanel === 'library'} title="官方模板" side="left" onClose={closeOverlay}>
+      <WizardPanelOverlay open={overlayPanel === 'library'} title={t('wizard.officialTemplates')} side="left" onClose={closeOverlay}>
         <div className="h-[calc(100dvh-80px)] min-h-0"><TemplateGallery /></div>
       </WizardPanelOverlay>
-      <WizardPanelOverlay open={overlayPanel === 'inspector'} title="参数与单指详情" side="bottom" onClose={closeOverlay}>
+      <WizardPanelOverlay open={overlayPanel === 'inspector'} title={t('wizard.inspectorTabs')} side="bottom" onClose={closeOverlay}>
         <div className="min-h-[320px]">{inspectorContent}</div>
       </WizardPanelOverlay>
-      <WizardPanelOverlay open={overlayPanel === 'preflight'} title="Editor V7 资产兼容详情" side="bottom" onClose={closeOverlay}>
+      <WizardPanelOverlay open={overlayPanel === 'preflight'} title={t('wizard.editorCompatibility')} side="bottom" onClose={closeOverlay}>
         <div className="space-y-3" data-testid="wizard-editor-v7-preflight">
           <p className="text-xs leading-5 text-body">{editorCompatibility.ok ? editorCompatibility.warning : editorCompatibility.message}</p>
           <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
@@ -498,7 +500,7 @@ export function StepTwo() {
               <div key={item.id} className="rounded-xl border border-hairline bg-surface-soft px-3 py-2" data-fidelity={item.fidelity}>
                 <dt className="text-nano text-mute">{item.label}</dt>
                 <dd className="mt-0.5 text-nano font-semibold text-body">{item.value}</dd>
-                <p className={cx('mt-1 text-nano', item.fidelity === 'unavailable' ? 'text-warning' : item.fidelity === 'approximate' ? 'text-violet-600' : 'text-success')}>{item.fidelity === 'exact' ? '可编辑' : item.fidelity === 'approximate' ? '模拟/近似' : '不可用'}</p>
+                <p className={cx('mt-1 text-nano', item.fidelity === 'unavailable' ? 'text-warning' : item.fidelity === 'approximate' ? 'text-violet-600' : 'text-success')}>{item.fidelity === 'exact' ? t('wizard.editable') : item.fidelity === 'approximate' ? t('wizard.simulatedApproximate') : t('status.unavailable')}</p>
               </div>
             ))}
           </dl>

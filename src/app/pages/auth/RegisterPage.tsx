@@ -6,6 +6,7 @@ import { Routes } from '@/app/routes';
 import { createAccount } from '@/platform/accounts';
 import { CodeVerification } from '@/platform/CodeVerification';
 import { isLoggedIn, writeSession } from '@/platform/session';
+import { useLocale } from '@/lib/i18n';
 
 const STORE_NAME_MIN = 2;
 const STORE_NAME_MAX = 30;
@@ -24,6 +25,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const { t } = useLocale();
   const state = (location.state ?? {}) as RegisterLocationState;
 
   const [step, setStep] = useState<1 | 2>(state.verified && state.email ? 2 : 1);
@@ -39,7 +41,7 @@ export default function RegisterPage() {
   const handleFinish = () => {
     const name = storeName.trim();
     if (name.length < STORE_NAME_MIN || name.length > STORE_NAME_MAX) {
-      setStoreNameError(`门店名称需为 ${STORE_NAME_MIN}–${STORE_NAME_MAX} 个字符`);
+      setStoreNameError(t('auth.storeNameLength', { min: STORE_NAME_MIN, max: STORE_NAME_MAX }));
       return;
     }
     setSubmitting(true);
@@ -50,7 +52,7 @@ export default function RegisterPage() {
         userName: account.userName,
         email: account.email,
       });
-      toast.success('注册成功，欢迎！');
+      toast.success(t('auth.registrationSuccess'));
       navigate(Routes.studio, { replace: true });
     }, 400);
   };
@@ -60,7 +62,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-[400px]">
         <div className="rounded-card border border-gray-200 bg-white p-8 shadow-float animate-fade-in">
           <header className="mb-6">
-            <h1 className="text-xl font-bold text-primary">注册 · 智能美甲 Studio</h1>
+            <h1 className="text-xl font-bold text-primary">{t('auth.registerTitle')}</h1>
             {/* 步骤指示 */}
             <div className="mt-3 flex items-center gap-2 text-xs">
               <span
@@ -72,7 +74,7 @@ export default function RegisterPage() {
                 1
               </span>
               <span className={step === 1 ? 'font-medium text-gray-800' : 'text-gray-400'}>
-                验证邮箱
+                {t('auth.verifyEmail')}
               </span>
               <span className="mx-1 h-px flex-1 bg-gray-200" />
               <span
@@ -84,7 +86,7 @@ export default function RegisterPage() {
                 2
               </span>
               <span className={step === 2 ? 'font-medium text-gray-800' : 'text-gray-400'}>
-                门店名称
+                {t('auth.storeName')}
               </span>
             </div>
           </header>
@@ -95,18 +97,18 @@ export default function RegisterPage() {
                 setEmail(verifiedEmail);
                 setStep(2);
               }}
-              verifyLabel="下一步"
+              verifyLabel={t('auth.next')}
             />
           ) : (
             <div className="flex flex-col gap-4 animate-fade-in">
-              <Input label="邮箱" value={email} disabled />
+              <Input label={t('auth.email')} value={email} disabled />
               <Input
-                label="门店名称"
-                placeholder={`${STORE_NAME_MIN}–${STORE_NAME_MAX} 个字符`}
+                label={t('auth.storeName')}
+                placeholder={t('auth.storeNamePlaceholder', { min: STORE_NAME_MIN, max: STORE_NAME_MAX })}
                 value={storeName}
                 maxLength={STORE_NAME_MAX + 10}
                 error={storeNameError ?? undefined}
-                helper="仅用于顶栏与首页展示"
+                helper={t('auth.storeNameHelper')}
                 autoFocus
                 onChange={(e) => {
                   setStoreName(e.target.value);
@@ -119,11 +121,11 @@ export default function RegisterPage() {
               <div className="flex gap-2">
                 {!(state.verified && state.email) && (
                   <Button variant="ghost" onClick={() => setStep(1)} disabled={submitting}>
-                    上一步
+                    {t('auth.previous')}
                   </Button>
                 )}
                 <Button onClick={handleFinish} loading={submitting} className="flex-1">
-                  完成注册
+                  {t('auth.completeRegistration')}
                 </Button>
               </div>
             </div>

@@ -1,34 +1,16 @@
 import { cx } from '@/design-system';
+import { useLocale, type MessageKey } from '@/lib/i18n';
 import type { EditorToolIdV7 } from '../v7/registry';
 
-const TOOL_LABELS: Record<EditorToolIdV7, string> = {
-  select: '选择',
-  background_fill: '铺色',
-  color_picker: '取色',
-  gradient: '渐变',
-  brush: '画笔',
-  eraser: '橡皮擦',
-  shape: '形状',
-  french: '法式',
-  text: '文字',
-  import_2d: '导入 2D',
-  mask: '遮罩',
-  cat_eye: '猫眼',
-  glitter: '闪粉',
-  mirror: '镜面',
-  ink_bloom: '晕染',
-  relief: '浮雕 2.5D',
-  attachment: '立体饰品',
-  finish_picker: '封层选择',
-  preview_3d: '最终 3D 预览',
-};
+const TOOL_KEYS: Record<EditorToolIdV7, MessageKey> = { select: 'editorV7.tool.select', background_fill: 'editorV7.gate.backgroundFill', color_picker: 'editorV7.gate.colorPicker', gradient: 'editorV7.gate.gradient', brush: 'editorV7.tool.brush', eraser: 'editorV7.gate.eraser', shape: 'editorV7.tool.shape', french: 'editorV7.tool.french', text: 'editorV7.tool.text', import_2d: 'editorV7.tool.assets', mask: 'editorV7.gate.mask', cat_eye: 'editorV7.gate.catEye', glitter: 'editorV7.gate.glitter', mirror: 'editorV7.gate.mirror', ink_bloom: 'editorV7.gate.inkBloom', relief: 'editorV7.gate.relief', attachment: 'editorV7.gate.attachment', finish_picker: 'editorV7.gate.finishPicker', preview_3d: 'editorV7.gate.preview3d' };
 
 export function V7StepToolGate({ tools, compact = false }: { tools: readonly EditorToolIdV7[]; compact?: boolean }) {
+  const { t } = useLocale();
   return (
     <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/80 p-2.5" data-testid="v7-tool-gate">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-500">适用工具</p>
-        <span className="text-nano text-gray-400">后续 PR 开放创作</span>
+        <p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-500">{t('editorV7.gate.applicableTools')}</p>
+        <span className="text-nano text-gray-400">{t('editorV7.gate.futureCreation')}</span>
       </div>
       <div className={cx('mt-2 flex flex-wrap gap-1.5', compact && 'gap-1')}>
         {tools.map((tool) => (
@@ -36,11 +18,11 @@ export function V7StepToolGate({ tools, compact = false }: { tools: readonly Edi
             key={tool}
             type="button"
             disabled
-            aria-label={`${TOOL_LABELS[tool]}，尚未开放`}
-            title="当前 PR 只验证步骤与工具权限；具体创作将在后续 PR 开放"
+            aria-label={`${t(TOOL_KEYS[tool])}，${t('editorV7.gate.notOpen')}`}
+            title={t('editorV7.gate.permissionOnly')}
             className="min-h-8 rounded-full border border-gray-200 bg-white px-2.5 text-nano text-gray-500 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {TOOL_LABELS[tool]}
+            {t(TOOL_KEYS[tool])}
           </button>
         ))}
       </div>

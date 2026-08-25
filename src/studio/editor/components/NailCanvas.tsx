@@ -43,7 +43,7 @@ interface FrenchDrag {
 interface MercuryDrag { index: 0 | 1 | 2; anchors: [{ u: number; v: number }, { u: number; v: number }, { u: number; v: number }]; }
 
 export function NailCanvas() {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
   const readOnly = useEditorStore((s) => s.readOnly);
@@ -302,7 +302,7 @@ export function NailCanvas() {
       setLiveStroke({
         id: genId('el_brush'),
         kind: 'brush',
-        ...createLayerMeta('手绘笔画', fingerData?.pattern.length ?? 0),
+        ...createLayerMeta(t('editor.extra.handPaintStroke'), fingerData?.pattern.length ?? 0),
         points: [p],
         color: brushColor,
         size: brushSize,
@@ -312,7 +312,7 @@ export function NailCanvas() {
       setLiveEraser({
         id: genId('el_eraser'),
         kind: 'eraser',
-        ...createLayerMeta('擦除蒙版', fingerData?.pattern.length ?? 0),
+        ...createLayerMeta(t('editor.extra.eraseMask'), fingerData?.pattern.length ?? 0),
         points: [p],
         size: eraserSize,
       });
@@ -468,12 +468,12 @@ export function NailCanvas() {
           data-testid="edit-french-curve"
         >
           <MousePointer2 size={13} />
-          {selectedClassic ? text('正在编辑法式曲线', 'Editing French curve') : text('编辑法式曲线', 'Edit French curve')}
+          {selectedClassic ? t('app.editingFrenchCurve') : t('app.editFrenchCurve')}
         </button>
       )}
       {selectedClassic && (
         <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-panel border border-primary/20 bg-white/95 px-3 py-2 text-center text-nano text-gray-600 shadow-float">
-          {text('拖动甲面上的左翼、中心、右翼三个粉色控制点', 'Drag the left, center and right pink handles on the nail')}
+          {t('app.dragLeftCenterRightPinkHandlesNail')}
         </div>
       )}
 
@@ -481,10 +481,10 @@ export function NailCanvas() {
         type="button"
         onClick={fitCanvas}
         className="absolute right-3 top-3 flex items-center gap-1 rounded-button border border-gray-200 bg-white/95 px-2 py-1.5 text-nano text-gray-600 shadow-float hover:text-primary"
-        title="适合画布"
+        title={t('editor.extra.fitCanvas')}
       >
         <Maximize2 size={12} />
-        {text('适合画布', 'Fit')}
+        {t('app.fit')}
       </button>
 
       {/* 画布状态条 */}
@@ -492,9 +492,9 @@ export function NailCanvas() {
         <span className="tnum">{Math.round(zoom * 100)}%</span>
         <span className="flex items-center gap-1">
           <Hand size={12} />
-          {text('空格 + 拖拽平移 · 滚轮缩放', 'Space + drag to pan · Wheel to zoom')}
+          {t('app.spaceDragPanWheelZoom')}
         </span>
-        {readOnly && <span className="font-medium text-info">只读（已冻结）</span>}
+        {readOnly && <span className="font-medium text-info">{t('editor.extra.readOnlyFrozen')}</span>}
       </div>
     </div>
   );

@@ -8,40 +8,43 @@ import type {
   CommunityPublisherV1,
   VerificationLevel,
 } from '../domain/types';
+import { localizedLabel, type LegacyLocale, type Locale } from '@/lib/i18n';
 
-export function publisherBadgeLabel(pub: CommunityPublisherV1 | null | undefined): string {
-  if (!pub) return '未知发布者';
-  if (pub.verification === 'OFFICIAL' || pub.type === 'OFFICIAL') return '官方';
-  if (pub.verification === 'DEMO_VERIFIED_CREATOR' || pub.demo) return '认证创作者 · Demo';
-  if (pub.verification === 'VERIFIED_CREATOR') return '认证创作者';
+type LabelLocale = Locale | LegacyLocale;
+
+export function publisherBadgeLabel(pub: CommunityPublisherV1 | null | undefined, locale: LabelLocale = 'zh-CN'): string {
+  if (!pub) return localizedLabel('未知发布者', 'Unknown publisher', locale);
+  if (pub.verification === 'OFFICIAL' || pub.type === 'OFFICIAL') return localizedLabel('官方', 'Official', locale);
+  if (pub.verification === 'DEMO_VERIFIED_CREATOR' || pub.demo) return localizedLabel('认证创作者 · Demo', 'Verified creator · Demo', locale);
+  if (pub.verification === 'VERIFIED_CREATOR') return localizedLabel('认证创作者', 'Verified creator', locale);
   return pub.displayName;
 }
 
-export function applicationBadgeLabel(level: ApplicationLevel): string {
+export function applicationBadgeLabel(level: ApplicationLevel, locale: LabelLocale = 'zh-CN'): string {
   switch (level) {
     case 'INSPIRATION_ONLY':
-      return '灵感参考';
+      return localizedLabel('灵感参考', 'Inspiration only', locale);
     case 'APPROXIMATE':
-      return '近似应用';
+      return localizedLabel('近似应用', 'Approximate application', locale);
     case 'STRUCTURED_EDITABLE':
-      return '可编辑';
+      return localizedLabel('可编辑', 'Structured editable', locale);
     case 'REPRODUCIBLE':
-      return '可复现';
+      return localizedLabel('可复现', 'Reproducible', locale);
     default:
       return level;
   }
 }
 
-export function verificationBadgeLabel(level: VerificationLevel): string {
+export function verificationBadgeLabel(level: VerificationLevel, locale: LabelLocale = 'zh-CN'): string {
   switch (level) {
     case 'CONCEPT':
-      return '概念效果';
+      return localizedLabel('概念效果', 'Concept', locale);
     case 'RENDER_VERIFIED':
-      return '已验证预览';
+      return localizedLabel('已验证预览', 'Render verified', locale);
     case 'SAMPLE_VERIFIED':
-      return '已打样';
+      return localizedLabel('已打样', 'Sample verified', locale);
     case 'PRODUCTION_VERIFIED':
-      return '已验证制作';
+      return localizedLabel('已验证制作', 'Production verified', locale);
     default:
       return level;
   }
@@ -51,12 +54,13 @@ export function cardBadgeSummary(
   content: CommunityContentV1,
   pub: CommunityPublisherV1 | null | undefined,
   styleLabel?: string,
+  locale: LabelLocale = 'zh-CN',
 ): { publisher: string; style?: string; topic?: string; trust: string } {
   const topic = content.effectIds[0] ?? content.moodIds[0] ?? content.occasionIds[0];
   return {
-    publisher: publisherBadgeLabel(pub),
+    publisher: publisherBadgeLabel(pub, locale),
     style: styleLabel,
     topic,
-    trust: applicationBadgeLabel(content.applicationLevel),
+    trust: applicationBadgeLabel(content.applicationLevel, locale),
   };
 }

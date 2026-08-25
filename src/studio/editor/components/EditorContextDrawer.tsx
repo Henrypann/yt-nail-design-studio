@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Check, ImagePlus, X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
+import type { MessageKey } from '@/lib/i18n';
 import { LOOK_PRESETS, PALETTE } from '../lib/material';
 import { createLayerMeta, genId } from '../lib/model';
 import { BRUSH_PRESET_SIZES, useEditorStore, type BrushPreset } from '../store';
@@ -18,10 +19,10 @@ const LOOK_NAME_EN: Record<keyof typeof RECIPE_BY_LOOK, string> = {
   'nude-gradient': 'Nude gradient',
 };
 
-const BRUSH_PRESETS: { id: BrushPreset; label: string }[] = [
-  { id: 'fine', label: '细线' },
-  { id: 'standard', label: '标准' },
-  { id: 'thick', label: '粗线' },
+const BRUSH_PRESETS: { id: BrushPreset; label: MessageKey }[] = [
+  { id: 'fine', label: 'editor.extra.thin' },
+  { id: 'standard', label: 'editor.extra.standard' },
+  { id: 'thick', label: 'editor.extra.thick' },
 ];
 
 export function EditorContextDrawer(props: {
@@ -31,7 +32,7 @@ export function EditorContextDrawer(props: {
   onOpenInspector: (tab: 'design' | 'layers' | 'check') => void;
   onFinishOnboarding: () => void;
 }) {
-  const { locale, text } = useLocale();
+  const { locale, t } = useLocale();
   const fileRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const tool = useEditorStore((state) => state.tool);
@@ -47,7 +48,7 @@ export function EditorContextDrawer(props: {
 
   const importFile = (file: File) => {
     if (!/image\/(png|jpeg|svg\+xml)/.test(file.type)) {
-      toast.warning('仅支持 PNG / JPG / SVG');
+      toast.warning(t('editor.extra.uploadTypes'));
       return;
     }
     const reader = new FileReader();
@@ -67,9 +68,9 @@ export function EditorContextDrawer(props: {
           });
         });
         props.onOpenInspector('layers');
-        toast.success('图片已加入图案分区');
+        toast.success(t('editor.extra.imageAdded'));
       };
-      image.onerror = () => toast.error('图片解析失败');
+      image.onerror = () => toast.error(t('editor.extra.imageParseFailed'));
       image.src = dataUrl;
     };
     reader.readAsDataURL(file);
@@ -84,29 +85,29 @@ export function EditorContextDrawer(props: {
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-xs font-semibold text-gray-900">
           {props.active === 'looks'
-            ? text('款式预设', 'LOOK PRESETS')
+            ? t('app.lookPresets')
             : props.active === 'draw'
-              ? text('绘制工具', 'DRAW TOOLS')
+              ? t('app.drawTools')
               : props.active === 'components'
-                ? text('组件', 'COMPONENTS')
-                : text('导入素材', 'IMPORT')}
+                ? t('app.components')
+                : t('app.import')}
         </h2>
-        <button onClick={props.onClose} aria-label="收起工具面板" className="text-gray-400 hover:text-gray-700">
+        <button onClick={props.onClose} aria-label={t('editor.extra.collapseTools')} className="text-gray-400 hover:text-gray-700">
           <X size={14} />
         </button>
       </header>
 
       {props.onboardingOpen && (
         <section className="mb-3 rounded-panel border border-primary/20 bg-primary-soft p-3" data-testid="editor-onboarding">
-          <p className="text-xs font-semibold text-primary">{text('第一次设计 · 3 步', 'FIRST DESIGN · 3 STEPS')}</p>
+          <p className="text-xs font-semibold text-primary">{t('app.firstDesign3Steps')}</p>
           <ol className="mt-2 flex flex-col gap-2 text-nano text-gray-700">
-            <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('layers')}>{text('1. 选择一个款式预设', '1. Choose a look preset')}</button></li>
-            <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('design')}>{text('2. 调整甲型、长度、颜色和表面', '2. Adjust shape, length, color and finish')}</button></li>
-            <li><span>{text('3. 在底部选择当前指，并明确选择“仅当前指”或“十指同步”', '3. Select a nail below, then choose CURRENT or ALL 10')}</span></li>
+            <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('layers')}>{t('app.1ChooseLookPreset')}</button></li>
+            <li><button className="text-left hover:text-primary" onClick={() => props.onOpenInspector('design')}>{t('app.2AdjustShapeLengthColorFinish')}</button></li>
+            <li><span>{t('app.3SelectNailBelowThenChooseCurrentAll10')}</span></li>
           </ol>
           <Button size="sm" variant="ghost" className="mt-2 w-full" onClick={props.onFinishOnboarding}>
             <Check size={12} />
-            {text('跳过 / 我已了解', 'Skip / Got it')}
+            {t('app.skipGotIt')}
           </Button>
         </section>
       )}
@@ -121,20 +122,20 @@ export function EditorContextDrawer(props: {
                 const result = applyRecipe(RECIPE_BY_LOOK[look.id as keyof typeof RECIPE_BY_LOOK]);
                 if (result === 'ok') {
                   props.onOpenInspector('layers');
-                  toast.success(text(`已应用「${look.name}」`, `${LOOK_NAME_EN[look.id as keyof typeof RECIPE_BY_LOOK]} applied`));
+                  toast.success(t('app.lookNameEnLookIdAsKeyofTypeofRecipeByLookApplied', { look_name: look.name, LOOK_NAME_EN_look_id_as_keyof_typeof_RECIPE_BY_LOOK_: LOOK_NAME_EN[look.id as keyof typeof RECIPE_BY_LOOK] }));
                 }
               }}
               className="rounded-card border border-gray-200 bg-white px-3 py-2.5 text-left transition-all hover:border-primary hover:shadow-float disabled:opacity-40"
             >
               <span className="block text-sm font-medium text-gray-900">
-                {locale === 'en' ? LOOK_NAME_EN[look.id as keyof typeof RECIPE_BY_LOOK] : look.name}
+                {locale === 'en-US' ? LOOK_NAME_EN[look.id as keyof typeof RECIPE_BY_LOOK] : look.name}
               </span>
               <span className="mt-0.5 block text-nano text-gray-400">
                 {look.id === 'solid-color'
-                  ? text('纯底色 · 无图案元素', 'Base color · No pattern layer')
+                  ? t('app.baseColorNoPatternLayer')
                   : look.id === 'classic-french'
-                    ? text('应用后直接在画布拖动三个粉色控制点', 'Apply, then drag the 3 pink handles on canvas')
-                    : text('结构化纵向渐变', 'Structured vertical gradient')}
+                    ? t('app.applyThenDrag3PinkHandlesCanvas')
+                    : t('app.structuredVerticalGradient')}
               </span>
             </button>
           ))}
@@ -170,7 +171,7 @@ export function EditorContextDrawer(props: {
                       brushPreset === preset.id ? 'bg-primary-soft text-primary' : 'bg-white text-gray-600',
                     )}
                   >
-                    {preset.label}
+                    {t(preset.label)}
                   </button>
                 ))}
               </div>
@@ -186,7 +187,7 @@ export function EditorContextDrawer(props: {
                 ))}
               </div>
               <label className="text-nano text-gray-500">
-                线宽 {brushSize}（{BRUSH_PRESET_SIZES[brushPreset]} 预设）
+                {t('editor.extra.lineWidth')} {brushSize}（{BRUSH_PRESET_SIZES[brushPreset]} {t('editor.extra.presetSuffix')}
                 <input type="range" min={2} max={30} value={brushSize} onChange={(event) => setBrush({ size: Number(event.target.value) })} className="w-full accent-primary" />
               </label>
             </>
@@ -196,9 +197,9 @@ export function EditorContextDrawer(props: {
 
       {props.active === 'components' && (
         <div className="rounded-card border border-gray-200 bg-white p-3 text-xs text-gray-600">
-          附件属于独立制造分区。请在右侧“图层”中添加、排序和调整高度。
+          {t('editor.extra.attachmentsHint')}
           <Button size="sm" variant="secondary" className="mt-3 w-full" onClick={() => props.onOpenInspector('layers')}>
-            打开附件分区
+            {t('editor.extra.openAttachments')}
           </Button>
         </div>
       )}
@@ -206,9 +207,9 @@ export function EditorContextDrawer(props: {
       {props.active === 'import' && (
         <div className="flex flex-col items-center rounded-card border border-dashed border-gray-300 bg-white p-5 text-center">
           <ImagePlus size={24} className="text-gray-400" />
-          <p className="mt-2 text-xs text-gray-600">导入 PNG / JPG / SVG 到图案分区</p>
+          <p className="mt-2 text-xs text-gray-600">{t('editor.extra.importArtwork')}</p>
           <Button size="sm" variant="secondary" className="mt-3" disabled={readOnly} onClick={() => fileRef.current?.click()}>
-            选择文件
+            {t('editor.extra.chooseFile')}
           </Button>
           <input
             ref={fileRef}

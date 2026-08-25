@@ -13,7 +13,7 @@ import { communityInternalHref, studioReturnPath } from '@/community/lib/entry-l
 import { CrossProductLink } from '@/app/CrossProductLink';
 
 export function CommunityLayout() {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const [searchParams] = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const studioReturn = studioReturnPath(searchParams);
@@ -22,27 +22,27 @@ export function CommunityLayout() {
   const navItems = [
     {
       to: communityInternalHref(Routes.community, searchParams),
-      label: text('发现', 'Discover'),
+      label: t('app.discover'),
       end: true,
     },
     {
       to: communityInternalHref(Routes.communitySearch, searchParams),
-      label: text('搜索', 'Search'),
+      label: t('app.search'),
       end: true,
     },
     {
       to: communityInternalHref(Routes.communityOfficial, searchParams),
-      label: text('官方', 'Official'),
+      label: t('app.official'),
       end: true,
     },
     {
       to: communityInternalHref(Routes.communityCreators, searchParams),
-      label: text('认证创作者', 'Creators'),
+      label: t('app.creators'),
       end: true,
     },
     {
       to: communityInternalHref(Routes.communityBoards, searchParams),
-      label: text('Nail Board', 'Nail Board'),
+      label: t('app.nailBoard'),
       end: true,
     },
   ] as const;
@@ -54,7 +54,7 @@ export function CommunityLayout() {
           <button
             type="button"
             className="rounded-button p-2 text-gray-600 lg:hidden"
-            aria-label={text('菜单', 'Menu')}
+            aria-label={t('app.menu')}
             onClick={() => setMobileOpen((v) => !v)}
           >
             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -62,10 +62,10 @@ export function CommunityLayout() {
           <div className="flex min-w-0 items-center gap-2">
             <Compass size={16} className="shrink-0 text-primary" />
             <span className="truncate text-sm font-bold text-gray-900">
-              Nail Lover Community
+              {t('app.nailLoverCommunity')}
             </span>
           </div>
-          <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Community">
+          <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label={t('app.communityNavigation')}>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -91,22 +91,22 @@ export function CommunityLayout() {
               className="hidden min-h-10 items-center gap-1.5 rounded-button border border-primary/20 bg-primary-soft px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary/15 lg:inline-flex"
             >
               <Sparkles size={13} aria-hidden />
-              {text('创作者工作台', 'Creator Studio')}
+              {t('app.creatorStudio')}
             </Link>
-            <div className="hidden items-center gap-1 lg:flex" aria-label={text('账号', 'Account')}>
+            <div className="hidden items-center gap-1 lg:flex" aria-label={t('app.account')}>
               <Link
                 to={Routes.login}
                 data-testid="community-login-entry"
                 className="inline-flex min-h-10 items-center justify-center rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
-                {text('登录', 'Log in')}
+                {t('app.log')}
               </Link>
               <Link
                 to={Routes.register}
                 data-testid="community-register-entry"
                 className="inline-flex min-h-10 items-center justify-center rounded-button border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-primary-soft hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
-                {text('注册', 'Sign up')}
+                {t('app.signUp')}
               </Link>
             </div>
             <LanguageToggle />
@@ -116,13 +116,13 @@ export function CommunityLayout() {
               className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-button bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover"
             >
               <Palette size={13} />
-              {text('进入 Nail Design Studio', 'Open Nail Design Studio')}
+              {t('app.openNailDesignStudio')}
               <ArrowUpRight size={13} />
             </CrossProductLink>
           </div>
         </div>
         {mobileOpen && (
-          <nav className="border-t border-gray-100 px-4 py-2 lg:hidden" aria-label="Community mobile">
+          <nav className="border-t border-gray-100 px-4 py-2 lg:hidden" aria-label={t('app.communityMobileNavigation')}>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -147,7 +147,7 @@ export function CommunityLayout() {
                 className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-primary/20 bg-primary-soft px-3 text-sm font-semibold text-primary"
               >
                 <Sparkles size={15} aria-hidden />
-                {text('创作者工作台', 'Creator Studio')}
+                {t('app.creatorStudio')}
               </Link>
               <Link
                 to={Routes.login}
@@ -156,7 +156,7 @@ export function CommunityLayout() {
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700"
               >
                 <LogIn size={15} aria-hidden />
-                {text('登录', 'Log in')}
+                {t('app.log')}
               </Link>
               <Link
                 to={Routes.register}
@@ -165,7 +165,7 @@ export function CommunityLayout() {
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button bg-primary px-3 text-sm font-semibold text-primary-foreground"
               >
                 <UserPlus size={15} aria-hidden />
-                {text('注册', 'Sign up')}
+                {t('app.signUp')}
               </Link>
             </div>
           </nav>
@@ -175,10 +175,7 @@ export function CommunityLayout() {
         <Outlet />
       </main>
       <footer className="border-t border-gray-200/70 py-3 text-center text-nano text-gray-400">
-        {text(
-          '灵感参考 · 预览通过 ≠ 可制造 · 开放上传尚未启用',
-          'Inspiration only · Preview ≠ manufacturable · Upload not enabled',
-        )}
+        {t('app.inspirationOnlyPreviewManufacturableUploadNotEnabled')}
       </footer>
     </div>
   );

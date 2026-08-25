@@ -63,7 +63,7 @@ export function CommunityLookCard({
   onSave,
 }: Props) {
   const [searchParams] = useSearchParams();
-  const { locale, text } = useLocale();
+  const { locale, legacyLocale, t } = useLocale();
   const [coverFailed, setCoverFailed] = useState(false);
   const detailHref = communityInternalHref(
     Routes.communityLook(look.lookId),
@@ -78,12 +78,12 @@ export function CommunityLookCard({
   const useEnabled = assetCapability?.cta === 'USE_VERSIONED'
     || assetCapability?.cta === 'USE_LEGACY_APPROXIMATE';
   const useUnavailableTitle = assetCapability?.capabilityState === 'ASSETS_INCOMPLETE'
-    ? text('Studio 素材尚未补齐，暂不可使用', 'Studio assets are incomplete; Use is unavailable')
+    ? t('app.studioAssetsIncompleteUseUnavailable')
     : assetCapability?.capabilityState === 'INSPIRATION_ONLY'
-      ? text('该 Look 仅供灵感参考', 'This Look is inspiration only')
+      ? t('app.lookInspirationOnly')
       : assetCapability?.capabilityState === 'UNAVAILABLE'
-        ? text('该内容当前不可使用，请查看详情诊断', 'This Look is currently unavailable; open details for diagnostics')
-        : text('资产能力合同不可用', 'The asset capability contract is unavailable');
+        ? t('app.lookCurrentlyUnavailableOpenDetailsDiagnostics')
+        : t('app.assetCapabilityContractUnavailable');
 
   return (
     <article
@@ -103,7 +103,7 @@ export function CommunityLookCard({
               className="flex h-full w-full items-center justify-center text-nano text-gray-400"
               data-testid="community-card-cover-fallback"
             >
-              封面暂不可用
+              {t('community.coverUnavailable')}
             </div>
           ) : (
             <img
@@ -138,14 +138,14 @@ export function CommunityLookCard({
           </Link>
         </h3>
         <div className="mt-auto flex flex-wrap gap-1 pt-1">
-          <CommunityAssetCapabilityBadge capability={assetCapability} locale={locale} />
+          <CommunityAssetCapabilityBadge capability={assetCapability} locale={legacyLocale} />
           <VerificationBadge level={look.verificationLevel} />
         </div>
 
         {/* 可见动作：Save / Use（权利允许且资产依赖完整时可用）/ Made（无 RealResult 时不可用） */}
         <div
           role="group"
-          aria-label={text('Look 操作', 'Look actions')}
+          aria-label={t('app.lookActions')}
           className="mt-1 flex flex-wrap items-center gap-1.5 border-t border-gray-100 pt-2"
         >
           {discovery && (
@@ -160,19 +160,12 @@ export function CommunityLookCard({
             disabled={!onSave}
             aria-disabled={!onSave}
             data-testid="look-card-save"
-            title={text(
-              onSave
-                ? '保存到 Nail Board（引用款式，不复制设计内容）'
-                : '保存到 Nail Board 需要注入 onSave（当前不可用）',
-              onSave
-                ? 'Save to Nail Boards (reference only, never a content copy)'
-                : 'Save to Nail Boards needs an injected onSave (currently unavailable)',
-            )}
+            title={onSave ? t('community.boardSaveReference') : t('community.boardSaveUnavailable')}
             onClick={() => onSave?.(look)}
             className="inline-flex h-11 items-center gap-1 rounded-button border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400"
           >
             <Bookmark size={13} aria-hidden />
-            {text('保存', 'Save')}
+            {t('app.save')}
           </button>
           {assetCapability === null ? (
             <button
@@ -184,7 +177,7 @@ export function CommunityLookCard({
               data-use-state="UNAVAILABLE"
               className="inline-flex h-11 cursor-not-allowed items-center rounded-button border border-gray-200 bg-gray-100 px-2.5 text-xs font-medium text-gray-400"
             >
-              {text('使用', 'Use')}
+              {t('app.use')}
             </button>
           ) : remixAllowed ? (
             useEnabled ? (
@@ -194,7 +187,7 @@ export function CommunityLookCard({
                 data-use-state={assetCapability.capabilityState}
                 className="inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-2.5 text-xs font-medium text-primary hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
-                {text('使用', 'Use')}
+                {t('app.use')}
               </Link>
             ) : (
               <button
@@ -206,7 +199,7 @@ export function CommunityLookCard({
                 data-use-state={assetCapability.capabilityState}
                 className="inline-flex h-11 cursor-not-allowed items-center rounded-button border border-gray-200 bg-gray-100 px-2.5 text-xs font-medium text-gray-400"
               >
-                {text('使用', 'Use')}
+                {t('app.use')}
               </button>
             )
           ) : personalUseOnly ? (
@@ -214,26 +207,20 @@ export function CommunityLookCard({
               data-testid="personal-use-only-action-restricted"
               className="inline-flex h-11 items-center rounded-button border border-amber-300 bg-amber-50 px-2.5 text-xs font-medium text-amber-700"
             >
-              {text('仅限个人使用 · 不提供使用/二次创作', 'Personal use only · no Use/remix action')}
+              {t('app.personalUseOnlyNoUseRemixAction')}
             </span>
           ) : null}
           <span
             data-testid="look-card-made"
-            title={text(
-              'Made 需要已验证的 RealResult / 履约记录，当前无证据（不可用）',
-              'Made requires a verified RealResult / fulfillment record — no evidence available',
-            )}
+            title={t('app.madeRequiresVerifiedRealresultFulfillmentRecordNoEvidenceAvailable')}
             className="inline-flex h-11 items-center gap-1 rounded-button border border-dashed border-gray-200 px-2.5 text-xs font-medium text-gray-400"
           >
             <Hammer size={13} aria-hidden />
-            {text('已制作', 'Made')} —
+            {t('app.made')} —
           </span>
         </div>
         <p className="sr-only">
-          {text(
-            '保存将款式作为引用加入 Nail Board（legacy 款式为未版本化灵感参考）。Made 不可用：当前内容没有已验证的 RealResult / 履约记录。',
-            'Save adds the look as a reference to a Nail Board (legacy looks are unversioned inspiration references). Made is unavailable: this content has no verified RealResult / fulfillment record.',
-          )}
+          {t('app.saveAddsLookAsReferenceNailBoardLegacyLooksUnversionedInspirationReferencesMadeUnavailableContentHasNoVerifiedRealresultFulfillmentRecord')}
         </p>
       </div>
     </article>

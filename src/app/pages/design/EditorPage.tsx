@@ -59,7 +59,7 @@ function editorPageStateForLoadResult(result: EditorLoadResult, designId: string
 }
 
 export default function EditorPage() {
-  const { locale } = useLocale();
+  const { locale, legacyLocale, t } = useLocale();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const loadV6 = useEditorV6Store((s) => s.load);
@@ -186,26 +186,26 @@ export default function EditorPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-lg font-semibold text-gray-900">Studio Editor</h1>
-        <p className="mt-0.5 text-xs text-gray-500">甲型轮廓内 2D 自由画布 · 十指编排 · 顾客展示</p>
+        <h1 className="text-lg font-semibold text-gray-900">{t('editor.pageTitle')}</h1>
+        <p className="mt-0.5 text-xs text-gray-500">{t('editor.pageDescription')}</p>
       </header>
 
       {(state.kind === 'missing' || state.kind === 'loading') && (
         <EmptyState
-          title={state.kind === 'loading' ? '正在加载画布…' : '没有找到对应的设计'}
+          title={state.kind === 'loading' ? t('editor.canvasLoading') : t('editor.designMissing')}
           description={
             state.kind === 'missing'
-              ? '设计可能已被删除，或尚未通过 Wizard / 空白画布创建。'
+              ? t('editor.designMissingDescription')
               : undefined
           }
           action={
             state.kind === 'missing' ? (
               <div className="flex gap-2">
                 <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
-                  返回设计列表
+                  {t('design.backToList')}
                 </Button>
                 <Button size="sm" onClick={() => setState({ kind: 'blank-picker' })}>
-                  空白画布新建
+                  {t('editor.blankCanvasCreate')}
                 </Button>
               </div>
             ) : undefined
@@ -215,15 +215,15 @@ export default function EditorPage() {
       )}
       {state.kind === 'invalid' && (
         <EmptyState
-          title={state.unsupported ? '设计来自更高版本' : '设计数据无法读取'}
+          title={state.unsupported ? t('editor.higherVersion') : t('editor.dataUnreadable')}
           description={
             state.unsupported
-              ? '当前版本不会覆盖这份设计。请使用创建它的新版 Studio 打开。'
-              : '原始 Editor 数据已保留，没有被空白画布覆盖。请返回列表后恢复或复制备份。'
+              ? t('editor.higherVersionDescription')
+              : t('editor.dataUnreadableDescription')
           }
           action={
             <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
-              返回设计列表
+              {t('design.backToList')}
             </Button>
           }
           className="min-h-[320px]"
@@ -231,19 +231,19 @@ export default function EditorPage() {
       )}
       {state.kind === 'save-error' && (
         <EmptyState
-          title="当前设计尚未安全保存"
-          description="Studio 保留了内存中的设计，没有切换或覆盖目标文档。请检查浏览器存储后重试。"
+          title={t('editor.saveError')}
+          description={t('editor.saveErrorDescription')}
           action={
             <div className="flex gap-2">
               <Button size="sm" variant="secondary" onClick={() => navigate(Routes.designs)}>
-                返回设计列表
+                {t('design.backToList')}
               </Button>
               {state.designId && (
                 <Button
                   size="sm"
                   onClick={() => void loadPersistedDesign(state.designId).then(setState)}
                 >
-                  重试打开
+                  {t('editor.retryOpen')}
                 </Button>
               )}
             </div>
@@ -256,18 +256,18 @@ export default function EditorPage() {
       <Modal
         open={state.kind === 'bridge-warning'}
         onClose={() => navigate(Routes.designs)}
-        title="打开自由画布"
+        title={t('editor.openFreeCanvas')}
         closeOnOverlay={false}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => navigate(Routes.designs)}>
-              取消，返回列表
+              {t('editor.cancelBackToList')}
             </Button>
             <Button
               size="sm"
               onClick={() => state.kind === 'bridge-warning' && acknowledgeBridge(state.designId)}
             >
-              我已了解，进入自由画布
+              {t('editor.acknowledgeOpenCanvas')}
             </Button>
           </>
         }
@@ -292,28 +292,28 @@ export default function EditorPage() {
       <Modal
         open={state.kind === 'blank-picker'}
         onClose={() => navigate(Routes.designs)}
-        title="空白画布新建"
+        title={t('editor.blankCanvasCreate')}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => navigate(Routes.designs)}>
-              取消
+              {t('common.cancel')}
             </Button>
             <Button size="sm" onClick={() => void createBlank()}>
-              创建空白画布
+              {t('editor.createBlankCanvas')}
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-3">
           <div>
-            <p className="mb-1.5 text-xs font-medium text-gray-700">甲型</p>
+            <p className="mb-1.5 text-xs font-medium text-gray-700">{t('shape.title')}</p>
             <div className="grid grid-cols-3 gap-1.5">
               {TIER_ONE_EDITOR_SHAPES.map((capability) => {
                 const enabled = isEditorShapeEnabled(capability);
                 const selected = blankShape === capability.id;
                 const compatibility = getShapeLengthCompatibility(capability.id, blankLength);
-                const hint = compatibilityTitle(compatibility, locale);
-                const badge = compatibilityLabel(compatibility, locale);
+                const hint = compatibilityTitle(compatibility, legacyLocale);
+                const badge = compatibilityLabel(compatibility, legacyLocale);
                 return (
                   <button
                     key={capability.id}
@@ -342,13 +342,13 @@ export default function EditorPage() {
             </div>
           </div>
           <div>
-            <p className="mb-1.5 text-xs font-medium text-gray-700">长度</p>
+            <p className="mb-1.5 text-xs font-medium text-gray-700">{t('length.title')}</p>
             <div className="grid grid-cols-4 gap-1.5">
               {LENGTHS.map((l) => {
                 const selected = blankLength === l;
                 const compatibility = getShapeLengthCompatibility(blankShape, l);
-                const hint = compatibilityTitle(compatibility, locale);
-                const badge = compatibilityLabel(compatibility, locale);
+                const hint = compatibilityTitle(compatibility, legacyLocale);
+                const badge = compatibilityLabel(compatibility, legacyLocale);
                 return (
                   <button
                     key={l}

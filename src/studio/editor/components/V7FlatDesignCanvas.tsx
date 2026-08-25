@@ -1,6 +1,7 @@
 import { Fragment, useId, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { EyeOff, Info, Lock } from 'lucide-react';
 import { useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { resolveBackgroundPreviewModelV7, resolveBackgroundSilhouetteV7 } from '../v7/background';
 import { generateEditorV7Id } from '../v7/id';
@@ -91,6 +92,7 @@ function MaskShape({ mask, tone }: { mask: RegionMaskV7; tone: string }) {
 }
 
 export function V7FlatDesignCanvas() {
+  const { t } = useLocale();
   const toast = useToast();
   const rawId = useId().replace(/:/g, '');
   const svgRef = useRef<SVGSVGElement>(null);
@@ -167,7 +169,7 @@ export function V7FlatDesignCanvas() {
         : createVectorFlatElementV7({ id, pathData: draftPath, color, appearance: activeTool === 'line' ? 'stroke' : 'fill', strokeWidthMm: widthMm });
     }
     if (!element) {
-      toast.error('绘制距离太短，未创建元素。');
+      toast.error(t('editorV7.flatCanvas.shortDrawing'));
       return;
     }
     if (report(addElement(currentFinger, flatStep.id, element))) selectElement(element.id);
@@ -264,7 +266,7 @@ export function V7FlatDesignCanvas() {
           <g clipPath={`url(#${clipId})`}>
             <rect width="100" height="160" fill="#f5f5f6" />
             {backgroundPreview.visible && <rect width="100" height="160" fill={rgba(backgroundPreview.color, backgroundPreview.alpha)} />}
-            {frenchAdapter.status === 'unavailable' && <g data-testid="v7-french-render-unavailable"><rect x="4" y="70" width="92" height="22" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="83" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text></g>}
+            {frenchAdapter.status === 'unavailable' && <g data-testid="v7-french-render-unavailable"><rect x="4" y="70" width="92" height="22" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="83" textAnchor="middle" fontSize="4" fill="#9f2f2f">{t('editorV7.flatCanvas.frenchUnavailable')}</text></g>}
             {flatStep.visible && !flatStep.skipped && renderFlatStep.elements.map(renderWithOrderedMasks)}
             {gesture?.mode === 'draw' && (activeTool === 'brush' || activeTool === 'eraser') && <polyline points={canvasPolyline(gesture.points)} fill="none" stroke={activeTool === 'eraser' ? '#ef4444' : rgba(color)} strokeDasharray={activeTool === 'eraser' ? '6 4' : undefined} strokeWidth={widthMm * MM_TO_CANVAS_UNITS} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
             {draftPath && <path d={canvasPath(draftPath)} fill={activeTool === 'line' || activeTool === 'region_mask' ? 'none' : rgba(color, 0.65)} stroke={activeTool === 'region_mask' ? '#7c3aed' : rgba(color)} strokeDasharray={activeTool === 'region_mask' ? '6 4' : undefined} strokeWidth={widthMm * MM_TO_CANVAS_UNITS} vectorEffect="non-scaling-stroke" />}
@@ -276,26 +278,26 @@ export function V7FlatDesignCanvas() {
             return <circle key={`${index}-${anchor.u}-${anchor.v}`} cx={displayPoint.u * CANVAS_WIDTH} cy={displayPoint.v * CANVAS_HEIGHT} r="3.4" fill="white" stroke="#7c3aed" strokeWidth="1.4" className="cursor-crosshair" onPointerDown={(event) => { event.stopPropagation(); if (!canEdit || selectedElement.locked) return; svgRef.current?.setPointerCapture(event.pointerId); setGesture({ mode: 'anchor', pointerId: event.pointerId, anchorIndex: index, element: selectedElement, pathData: selectedElement.pathData }); }} />;
           })}
         </svg>
-        {flatStep.locked && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><Lock size={12} />当前步骤已锁定</span>}
-        {!flatStep.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><EyeOff size={12} />当前步骤已隐藏</span>}
+        {flatStep.locked && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><Lock size={12} />{t('editorV7.flatCanvas.locked')}</span>}
+        {!flatStep.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-2 text-nano text-white"><EyeOff size={12} />{t('editorV7.flatCanvas.hidden')}</span>}
       </div>
 
       <div className="min-w-0 space-y-3">
         <div>
-          <p className="text-nano font-semibold uppercase tracking-[0.14em] text-violet-500">2D SVG 矢量编辑</p>
+          <p className="text-nano font-semibold uppercase tracking-[0.14em] text-violet-500">{t('editorV7.flatCanvas.title')}</p>
           <h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {flatStep.name}</h2>
-          <p className="mt-1 text-nano text-gray-500">{flatStep.elements.length} 个元素 · 工具：{activeTool}</p>
+          <p className="mt-1 text-nano text-gray-500">{flatStep.elements.length} {t('editorV7.flatCanvas.elementTool')}{activeTool}</p>
         </div>
         <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5 text-nano leading-4 text-violet-800">
           <Info size={13} className="mr-1.5 inline -translate-y-px" />
-          所有 pointer 坐标先转换为 u/v 0–1 再写入 EditorDoc；SVG 仅是派生视图。
+          {t('editorV7.flatCanvas.pointerHint')}
         </div>
         <dl className="grid grid-cols-2 gap-2 text-nano">
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">Geometry clip</dt><dd className="mt-1 font-semibold text-gray-800">{silhouette.source === 'product' ? '已签收 2D 轮廓' : silhouette.source === 'generated' ? '生成轮廓（近似）' : '通用回退轮廓'}</dd></div>
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">遮罩策略</dt><dd className="mt-1 font-semibold text-gray-800">非破坏 · 顺序生效</dd></div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">{t('editorV7.flatCanvas.geometryClip')}</dt><dd className="mt-1 font-semibold text-gray-800">{silhouette.source === 'product' ? t('editorV7.flatCanvas.signedOutline') : silhouette.source === 'generated' ? t('editorV7.flatCanvas.generatedOutline') : t('editorV7.flatCanvas.genericOutline')}</dd></div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">{t('editorV7.flatCanvas.maskStrategy')}</dt><dd className="mt-1 font-semibold text-gray-800">{t('editorV7.flatCanvas.orderedMask')}</dd></div>
         </dl>
         <p className="rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2 text-nano leading-4 text-gray-500">
-          参数图形在创建时显式物化为 canonical pathData；V7 当前合同不保存矩形/圆/星形的额外参数字段。
+          {t('editorV7.flatCanvas.parametricHint')}
         </p>
       </div>
     </div>

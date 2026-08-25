@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Grid3X3, RotateCcw, X } from 'lucide-react';
 import { Button, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { resolveFingerData } from '../lib/model';
 import { useEditorStore } from '../store';
 
@@ -54,6 +55,7 @@ function heatColor(heightMm: number): string {
 }
 
 export function Nail3DCheck(props: { onClose: () => void }) {
+  const { t } = useLocale();
   const { onClose } = props;
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
@@ -202,9 +204,9 @@ export function Nail3DCheck(props: { onClose: () => void }) {
     <div className="fixed inset-0 z-40 flex flex-col bg-gray-950 animate-fade-in">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-5">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-semibold text-gray-100">3D 单甲检查 · {currentFinger}</h2>
+          <h2 className="text-sm font-semibold text-gray-100">{t('editorV7.nail3d.title', { finger: currentFinger })}</h2>
           <span className="rounded-button border border-warning/40 bg-warning/15 px-2 py-0.5 text-nano font-medium text-warning">
-            原型期几何与热力图为 MOCK · 只读
+            {t('editorV7.nail3d.mock')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -217,7 +219,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
               )}
             >
               <Box size={12} />
-              实体
+              {t('editorV7.nail3d.solid')}
             </button>
             <button
               onClick={() => setWireframe(true)}
@@ -227,7 +229,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
               )}
             >
               <Grid3X3 size={12} />
-              线框
+              {t('editorV7.nail3d.wireframe')}
             </button>
           </div>
           <Button
@@ -239,11 +241,11 @@ export function Nail3DCheck(props: { onClose: () => void }) {
             }}
           >
             <RotateCcw size={13} />
-            固定侧视机位
+            {t('editorV7.nail3d.sideView')}
           </Button>
           <Button size="sm" variant="secondary" onClick={onClose}>
             <X size={14} />
-            返回设计
+            {t('editorV7.nail3d.back')}
           </Button>
         </div>
       </header>
@@ -262,7 +264,7 @@ export function Nail3DCheck(props: { onClose: () => void }) {
       </main>
 
       <footer className="flex h-10 shrink-0 items-center justify-center border-t border-white/10 text-nano text-gray-400">
-        拖拽旋转检查浮雕高度与边缘刮手 · 3D 视图是检查工具，不可编辑 · 正式几何由算法组工艺映射引擎产出
+        {t('editorV7.nail3d.footer')}
       </footer>
     </div>
   );

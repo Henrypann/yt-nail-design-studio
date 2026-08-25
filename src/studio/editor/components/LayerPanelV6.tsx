@@ -10,7 +10,7 @@ import { resolveTaxonomyEntry, taxonomyLabel } from '@/studio/shared/nail-taxono
 
 const LEGACY_DEFAULT_LAYER_NAMES = new Set([
   'Base surface', 'Base Surface', 'Draw', '2D Art', 'Attachment',
-  '底色/表面', '手绘', '二维素材', '附件', '饰品', '立体结构', '配方层',
+  'Base surface', 'Draw', '2D Art', 'Attachment', 'Gem', 'Relief', 'Recipe',
 ]);
 
 function layerLabel(layer: EditorLayerV6, locale: Locale): string {
@@ -23,7 +23,7 @@ function layerLabel(layer: EditorLayerV6, locale: Locale): string {
 }
 
 export function LayerPanelV6() {
-  const { locale, text } = useLocale();
+  const { locale, t } = useLocale();
   // Subscribe through the selector so changing currentFinger rerenders the
   // panel even when the document object itself has not changed.
   const nail = useEditorV6Store(selectCurrentNail);
@@ -43,12 +43,12 @@ export function LayerPanelV6() {
   return (
     <div className="flex flex-col gap-1 p-2" data-debug-id="studio.editor.layer-panel-v6">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-medium text-gray-500">{text('图层', 'Layers')}</h3>
+        <h3 className="text-xs font-medium text-gray-500">{t('app.layers2')}</h3>
         {!readOnly && (
           <button
             className="rounded px-1.5 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             onClick={() => createLayerOnCurrent('builtin.draw', taxonomyLabel('layer', 'builtin.draw', locale))}
-            title={text('添加手绘图层', 'Add hand-paint layer')}
+            title={t('app.addHandPaintLayer')}
           >
             +
           </button>
@@ -73,7 +73,7 @@ export function LayerPanelV6() {
                 e.stopPropagation();
                 if (!readOnly) toggleLayerVisibleOnCurrent(layer.id);
               }}
-              title={layer.visible ? '隐藏' : '显示'}
+              title={layer.visible ? t('editor.extra.hide') : t('editor.extra.show')}
             >
               {layer.visible ? '👁' : '—'}
             </span>
@@ -85,7 +85,7 @@ export function LayerPanelV6() {
                 e.stopPropagation();
                 if (!readOnly) toggleLayerLockedOnCurrent(layer.id);
               }}
-              title={layer.locked ? '解锁' : '锁定'}
+              title={layer.locked ? t('editor.extra.unlock') : t('editor.extra.lock')}
             >
               {layer.locked ? '🔒' : '—'}
             </span>
@@ -107,7 +107,7 @@ export function LayerPanelV6() {
                     e.stopPropagation();
                     reorderLayerOnCurrent(layer.id, 'up');
                   }}
-                  title="上移"
+                  title={t('editor.extra.moveUp')}
                 >
                   ↑
                 </span>
@@ -117,7 +117,7 @@ export function LayerPanelV6() {
                     e.stopPropagation();
                     reorderLayerOnCurrent(layer.id, 'down');
                   }}
-                  title="下移"
+                  title={t('editor.extra.moveDown')}
                 >
                   ↓
                 </span>
@@ -127,7 +127,7 @@ export function LayerPanelV6() {
                     e.stopPropagation();
                     deleteLayerOnCurrent(layer.id);
                   }}
-                  title="删除"
+                  title={t('editor.extra.delete')}
                 >
                   ×
                 </span>

@@ -9,7 +9,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { ToastProvider } from '@/design-system';
-import { LocaleProvider } from '@/lib/i18n';
+import { LocaleProvider, useLocale } from '@/lib/i18n';
 import { StudioLayout } from './layouts/StudioLayout';
 import { CommunityLayout } from './layouts/CommunityLayout';
 import { LegacyRoutes, legacyCommunityPathTarget, legacyStudioPathTarget, Routes } from './routes';
@@ -85,12 +85,13 @@ function LegacyProductPathRedirect({ surface }: { surface: 'community' | 'studio
  * rendered, so the Wizard store/draft recovery effects never run.
  */
 function DesignNewRoute() {
+  const { t } = useLocale();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   if (params.has('versionedIntent')) {
     return <Navigate replace to={`${Routes.designImport}${location.search}${location.hash}`} />;
   }
-  return <Suspense fallback={<div className="p-6 text-sm text-gray-500">正在打开快速建稿…</div>}><LazyWizardPage /></Suspense>;
+  return <Suspense fallback={<div className="p-6 text-sm text-gray-500">{t('wizard.loading')}</div>}><LazyWizardPage /></Suspense>;
 }
 
 function OfficialTemplatesRedirect() {

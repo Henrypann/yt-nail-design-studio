@@ -16,40 +16,32 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Link2 } from 'lucide-react';
 import { Button, Modal, cx } from '@/design-system';
-import { useLocale } from '@/lib/i18n';
+import {useLocale, type MessageKey} from '@/lib/i18n';
 import type { NailBoardVisibilityV1 } from '../domain/v7_1/nail-board';
 
 const OPTIONS: ReadonlyArray<{
   value: NailBoardVisibilityV1;
   icon: 'private' | 'unlisted' | 'public';
-  labelZh: string;
-  labelEn: string;
-  hintZh: string;
-  hintEn: string;
+  labelKey: MessageKey;
+  hintKey: MessageKey;
 }> = [
   {
     value: 'PRIVATE',
     icon: 'private',
-    labelZh: '仅自己可见',
-    labelEn: 'Private',
-    hintZh: '默认。只有你能查看与编辑，无法生成匿名分享链接。',
-    hintEn: 'Default. Only you can view and edit. Never anonymously shareable.',
+    labelKey: 'community.visibility.private',
+    hintKey: 'community.visibility.privateHint',
   },
   {
     value: 'UNLISTED',
     icon: 'unlisted',
-    labelZh: '不公开（链接分享）',
-    labelEn: 'Unlisted',
-    hintZh: '通过不可猜测的分享链接只读查看，不会被公开索引。',
-    hintEn: 'Read-only via an unguessable share link; not publicly indexed.',
+    labelKey: 'community.visibility.unlisted',
+    hintKey: 'community.visibility.unlistedHint',
   },
   {
     value: 'PUBLIC',
     icon: 'public',
-    labelZh: '公开',
-    labelEn: 'Public',
-    hintZh: '链接即可阅读，仍不可被匿名编辑。需要显式确认。',
-    hintEn: 'Readable by link; still non-editable anonymously. Requires explicit confirmation.',
+    labelKey: 'community.visibility.public',
+    hintKey: 'community.visibility.publicHint',
   },
 ];
 
@@ -61,7 +53,7 @@ interface Props {
 }
 
 export function NailBoardVisibilityControl({ visibility, onChange, disabled }: Props) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const [pendingPublic, setPendingPublic] = useState(false);
 
   const select = (next: NailBoardVisibilityV1) => {
@@ -86,7 +78,7 @@ export function NailBoardVisibilityControl({ visibility, onChange, disabled }: P
       data-testid="nail-board-visibility-control"
     >
       <legend className="text-xs font-medium text-gray-700">
-        {text('可见性', 'Visibility')}
+        {t('app.visibility')}
       </legend>
       {OPTIONS.map((option) => {
         const active = visibility === option.value;
@@ -118,9 +110,9 @@ export function NailBoardVisibilityControl({ visibility, onChange, disabled }: P
                 ) : (
                   <Eye size={14} aria-hidden className="text-gray-500" />
                 )}
-                {text(option.labelZh, option.labelEn)}
+                {t(option.labelKey)}
               </span>
-              <span className="text-xs text-gray-500">{text(option.hintZh, option.hintEn)}</span>
+              <span className="text-xs text-gray-500">{t(option.hintKey)}</span>
             </span>
           </label>
         );
@@ -129,12 +121,12 @@ export function NailBoardVisibilityControl({ visibility, onChange, disabled }: P
       <Modal
         open={pendingPublic}
         onClose={() => setPendingPublic(false)}
-        title={text('公开此 Board？', 'Make this board public?')}
+        title={t('app.makeBoardPublic')}
         size="sm"
         footer={
           <>
             <Button variant="ghost" className="min-h-11" onClick={() => setPendingPublic(false)}>
-              {text('取消', 'Cancel')}
+              {t('app.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -142,16 +134,13 @@ export function NailBoardVisibilityControl({ visibility, onChange, disabled }: P
               data-testid="nail-board-public-confirm"
               onClick={confirmPublic}
             >
-              {text('确认公开', 'Confirm public')}
+              {t('app.confirmPublic')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-700">
-          {text(
-            '公开后，任何拿到链接的人都可以只读查看此 Board（仍不可匿名编辑）。公开内容可能被收录与索引，且此操作会保留分享链接的公开可读性。确认继续？',
-            'Once public, anyone with the link can view this board read-only (never edit anonymously). Public content may be indexed, and share links stay readable. Continue?',
-          )}
+          {t('app.oncePublicAnyoneLinkCanViewBoardReadOnlyNeverEditAnonymouslyPublicContentMayBeIndexedShareLinksStayReadableContinue')}
         </p>
       </Modal>
     </fieldset>

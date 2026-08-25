@@ -14,7 +14,7 @@ import { PublisherBadge } from './PublisherBadge';
 
 export function CommunityCreatorCard({ publisher }: { publisher: CommunityPublisherV1 }) {
   const [searchParams] = useSearchParams();
-  const { text } = useLocale();
+  const { t } = useLocale();
   const profileHref = communityInternalHref(
     Routes.communityProfile(publisher.handle),
     searchParams,
@@ -50,7 +50,7 @@ export function CommunityCreatorCard({ publisher }: { publisher: CommunityPublis
           <p className="line-clamp-2 text-xs leading-relaxed text-gray-600">{publisher.bio}</p>
         )}
         <span className="mt-auto pt-1 text-nano font-medium text-primary">
-          {text('查看主页', 'View profile')} →
+          {t('app.viewProfile')} →
         </span>
       </Link>
     </article>

@@ -16,6 +16,7 @@ import {
   type FlatAssetRepositoryV7,
 } from '../v7/flat-content-repository';
 import { OfficialTemplatePatternV7 } from './OfficialTemplatePatternV7';
+import { useLocale } from '@/lib/i18n';
 
 /**
  * V7-10 shared flat content artwork renderer (designer canvas AND customer
@@ -101,6 +102,7 @@ function FlatContentImportV7({
   element: Extract<FlatDesignElementV7, { kind: 'image_2d' }>;
   resolveImported: FlatContentImportResolverV7;
 }) {
+  const { t } = useLocale();
   const [state, setState] = useState<ImportResolveStateV7>({ status: 'pending' });
   const { asset } = element;
   const refKey = `${asset.assetId}@${asset.revision}#${asset.sha256}`;
@@ -117,7 +119,7 @@ function FlatContentImportV7({
         else setState({ status: 'missing' });
       })
       .catch(() => {
-        if (!cancelled) setState({ status: 'corrupt', message: '素材解析失败' });
+        if (!cancelled) setState({ status: 'corrupt', message: t('editor.extra.assetParseFailed') });
       });
     return () => {
       cancelled = true;
@@ -147,7 +149,7 @@ function FlatContentImportV7({
     <g data-flat-content-kind="image" data-flat-content-status="import" data-resolver-status={state.status}>
       <rect x="8" y="8" width="84" height="144" rx="6" fill="#f7f4f2" stroke="#d8cfca" strokeWidth="1" strokeDasharray="4 3" />
       <text x="50" y="72" textAnchor="middle" fontSize="8" fill="#8a7f7a">
-        {state.status === 'pending' ? '素材解析中…' : state.status === 'missing' ? '素材缺失' : '素材损坏'}
+        {state.status === 'pending' ? t('editor.extra.assetChecking') : state.status === 'missing' ? t('editor.extra.assetMissing') : t('editor.extra.assetCorrupt')}
       </text>
       <text x="50" y="86" textAnchor="middle" fontSize="6" fill="#a89d97" data-testid="flat-asset-short-id">
         {shortAssetIdV7(asset.assetId)}

@@ -12,6 +12,7 @@ import {
   validateNotes,
 } from '@/platform/customers';
 import { useRequireAuth } from '@/platform/session';
+import { useLocale } from '@/lib/i18n';
 
 type Mode = 'full' | 'quick';
 
@@ -36,6 +37,7 @@ export default function CustomerNewPage() {
   const session = useRequireAuth();
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useLocale();
 
   const [mode, setMode] = useState<Mode>('full');
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -90,7 +92,7 @@ export default function CustomerNewPage() {
       toast.error(result.error);
       return;
     }
-    toast.success(`客户「${result.customer.name}」已创建。`);
+    toast.success(t('customer.created', { name: result.customer.name }));
     navigate(Routes.customerDetail(result.customer.id), { replace: true });
   };
 
@@ -110,7 +112,7 @@ export default function CustomerNewPage() {
   const handleQuickSubmit = () => {
     if (!validate('quick')) return;
     if (!quickPrivacyConsent) {
-      toast.warning('请先勾选「客户已阅读并同意隐私政策」。');
+      toast.warning(t('customer.privacyWarning'));
       return;
     }
     if (hasDuplicateName(form.name)) {
@@ -123,16 +125,16 @@ export default function CustomerNewPage() {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-4 animate-fade-in" data-debug-id="app.customers.new">
       <header>
-        <h1 className="text-lg font-semibold text-gray-900">新建客户</h1>
+        <h1 className="text-lg font-semibold text-gray-900">{t('customer.newCustomer')}</h1>
         <p className="mt-0.5 text-xs text-gray-500">
-          完整建档记录偏好与过敏信息；快速建档仅需姓名，其余可后补。
+          {t('customer.newDescription')}
         </p>
       </header>
 
       <Tabs
         items={[
-          { key: 'full', label: '完整建档' },
-          { key: 'quick', label: '快速建档' },
+          { key: 'full', label: t('customer.fullMode') },
+          { key: 'quick', label: t('customer.quickMode') },
         ]}
         activeKey={mode}
         onChange={(key) => {
@@ -143,8 +145,8 @@ export default function CustomerNewPage() {
 
       <Card padding="lg" className="flex flex-col gap-4">
         <Input
-          label="姓名 *"
-          placeholder="2–60 个字符"
+          label={t('customer.nameRequired')}
+          placeholder={t('customer.namePlaceholder')}
           value={form.name}
           error={errors.name}
           autoFocus
@@ -153,19 +155,19 @@ export default function CustomerNewPage() {
 
         {mode === 'full' && (
           <>
-            <Input
-              label="邮箱"
+              <Input
+                label={t('customer.email')}
               type="email"
-              placeholder="选填，同一门店内唯一"
+                placeholder={t('customer.optionalSameStore')}
               value={form.email}
               error={errors.email}
               onChange={(e) => setField('email', e.target.value)}
             />
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">过敏/安全备注</label>
+              <label className="text-xs font-medium text-gray-700">{t('customer.allergyNotes')}</label>
               <textarea
                 className="min-h-[72px] rounded-button border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 transition-colors duration-fast hover:border-gray-400 focus:border-primary focus:outline-none"
-                placeholder="选填，如：对丙酮过敏"
+                placeholder={t('customer.allergyPlaceholder')}
                 value={form.allergyNotes}
                 maxLength={NOTES_MAX + 50}
                 onChange={(e) => setField('allergyNotes', e.target.value)}
@@ -178,10 +180,10 @@ export default function CustomerNewPage() {
               </p>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">偏好备注</label>
+              <label className="text-xs font-medium text-gray-700">{t('customer.preferenceNotes')}</label>
               <textarea
                 className="min-h-[72px] rounded-button border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 transition-colors duration-fast hover:border-gray-400 focus:border-primary focus:outline-none"
-                placeholder="选填，如：偏爱短甲、不喜欢亮片"
+                placeholder={t('customer.preferencePlaceholder')}
                 value={form.preferenceNotes}
                 maxLength={NOTES_MAX + 50}
                 onChange={(e) => setField('preferenceNotes', e.target.value)}
@@ -205,7 +207,7 @@ export default function CustomerNewPage() {
               className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-700">
-              客户已阅读并同意隐私政策 <span className="text-error">*</span>
+              {t('customer.privacyInline')} <span className="text-error">*</span>
             </span>
           </label>
         )}
@@ -215,13 +217,13 @@ export default function CustomerNewPage() {
       <div className="sticky bottom-0 z-10 -mx-1 border-t border-gray-200 bg-white/95 px-1 py-3 backdrop-blur-sm">
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={() => navigate(Routes.customers)}>
-            取消
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={mode === 'full' ? handleFullSubmit : handleQuickSubmit}
             loading={submitting}
           >
-            {mode === 'full' ? '提交' : '创建客户'}
+            {mode === 'full' ? t('customer.submit') : t('customer.create')}
           </Button>
         </div>
       </div>
@@ -230,11 +232,11 @@ export default function CustomerNewPage() {
       <Modal
         open={duplicateOpen}
         onClose={() => setDuplicateOpen(false)}
-        title="同名客户提醒"
+        title={t('customer.duplicateTitle')}
         footer={
           <>
             <Button variant="secondary" onClick={() => setDuplicateOpen(false)}>
-              返回修改
+              {t('customer.returnEdit')}
             </Button>
             <Button
               onClick={() => {
@@ -248,38 +250,38 @@ export default function CustomerNewPage() {
                 }
               }}
             >
-              仍要创建
+              {t('customer.createAnyway')}
             </Button>
           </>
         }
       >
-        <p>门店内已有同名客户「{form.name.trim()}」。确认创建吗？</p>
+        <p>{t('customer.duplicateText', { name: form.name.trim() })}</p>
       </Modal>
 
       {/* 隐私政策同意弹窗（完整建档提交时） */}
       <Modal
         open={privacyOpen}
         onClose={() => setPrivacyOpen(false)}
-        title="客户隐私同意"
+        title={t('customer.privacyTitle')}
         closeOnOverlay={false}
         footer={
           <>
             <Button variant="secondary" onClick={() => setPrivacyOpen(false)}>
-              取消
+              {t('common.cancel')}
             </Button>
             <Button
               disabled={!privacyConsent}
               loading={submitting}
               onClick={() => doCreate({ privacyConsent, twinConsent })}
             >
-              确认并创建
+              {t('customer.confirmCreate')}
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-3">
           <p className="text-xs leading-relaxed text-gray-500">
-            创建客户档案前，请确认已取得客户本人的以下同意：
+            {t('customer.privacyDescription')}
           </p>
           <label className="flex cursor-pointer items-start gap-2 rounded-panel border border-gray-200 px-3 py-2.5 transition-colors duration-fast hover:bg-gray-50">
             <input
@@ -289,7 +291,7 @@ export default function CustomerNewPage() {
               className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-800">
-              客户已阅读并同意隐私政策 <span className="text-error">*（必选）</span>
+            {t('customer.privacyRequired')} <span className="text-error">{t('customer.requiredMark')}</span>
             </span>
           </label>
           <label className="flex cursor-pointer items-start gap-2 rounded-panel border border-gray-200 px-3 py-2.5 transition-colors duration-fast hover:bg-gray-50">
@@ -300,7 +302,7 @@ export default function CustomerNewPage() {
               className="mt-0.5 accent-primary"
             />
             <span className="text-xs text-gray-800">
-              客户同意保存 Nail Twin 扫描数据（可选，未同意则不保存 Twin 数据）
+            {t('customer.twinOptional')}
             </span>
           </label>
         </div>

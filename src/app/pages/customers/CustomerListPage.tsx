@@ -13,6 +13,7 @@ import {
 import { favoriteShape, SHAPE_LABEL } from '@/platform/designs';
 import { useRequireAuth } from '@/platform/session';
 import { twinListLabel } from '@/platform/twin';
+import { useLocale } from '@/lib/i18n';
 
 function formatDate(iso?: string): string {
   if (!iso) return '—';
@@ -33,6 +34,7 @@ export default function CustomerListPage() {
   const session = useRequireAuth();
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useLocale();
   const flags = useMockScenarios((s) => s.flags);
   const customers = useCustomerStore((s) => s.customers);
 
@@ -50,7 +52,7 @@ export default function CustomerListPage() {
   useEffect(() => {
     if (isScenarioOn(flags, 'load.networkFail') && !networkFailToastShown.current) {
       networkFailToastShown.current = true;
-      toast.error('网络连接失败。请检查网络后重试。');
+      toast.error(t('customer.networkFailed'));
     }
     if (!isScenarioOn(flags, 'load.networkFail')) {
       networkFailToastShown.current = false;
@@ -72,25 +74,25 @@ export default function CustomerListPage() {
     <div className="flex flex-col gap-4 animate-fade-in" data-debug-id="app.customers.list">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">客户列表</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{t('customer.listTitle')}</h1>
           <p className="mt-0.5 text-xs text-gray-500">
-            共 {activeCustomers.length} 位客户 · 按最近到店排序
+            {t('customer.listSummary', { count: activeCustomers.length })}
           </p>
         </div>
         <Button size="sm" onClick={() => navigate(Routes.customerNew)}>
           <Plus size={14} />
-          新建客户
+          {t('customer.newCustomer')}
         </Button>
       </header>
 
       <div className="relative max-w-[320px]">
         <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <Input
-          placeholder="搜索姓名或邮箱…"
+          placeholder={t('customer.searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-8"
-          aria-label="搜索客户"
+          aria-label={t('customer.searchLabel')}
         />
       </div>
 
@@ -98,11 +100,11 @@ export default function CustomerListPage() {
         <SkeletonRows rows={4} />
       ) : loadTimeout ? (
         <EmptyState
-          title="加载超时"
-          description="客户列表加载超过 10 秒未完成。请检查网络后刷新重试。"
+          title={t('customer.loadTimeoutTitle')}
+          description={t('customer.loadTimeoutDescription')}
           action={
             <Button size="sm" variant="secondary" onClick={() => window.location.reload()}>
-              刷新
+              {t('customer.refresh')}
             </Button>
           }
           className="min-h-[240px]"
@@ -110,21 +112,21 @@ export default function CustomerListPage() {
       ) : activeCustomers.length === 0 ? (
         <EmptyState
           illustration={<CustomersIllustration />}
-          title="还没有客户。创建你的第一位客户吧"
+          title={t('customer.emptyTitle')}
           action={
             <Button size="sm" onClick={() => navigate(Routes.customerNew)}>
-              新建客户
+              {t('customer.newCustomer')}
             </Button>
           }
           className="min-h-[320px]"
         />
       ) : visible.length === 0 ? (
         <EmptyState
-          title="未找到匹配的客户。"
-          description="换个关键词试试，或者新建一位客户。"
+          title={t('customer.noMatchTitle')}
+          description={t('customer.noMatchDescription')}
           action={
             <Button size="sm" variant="secondary" onClick={() => navigate(Routes.customerNew)}>
-              新建客户
+              {t('customer.newCustomer')}
             </Button>
           }
           className="min-h-[240px]"
@@ -134,14 +136,14 @@ export default function CustomerListPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs text-gray-500">
-                <th className="px-4 py-2.5 font-medium">姓名</th>
-                <th className="px-4 py-2.5 font-medium">邮箱</th>
-                <th className="px-4 py-2.5 font-medium">常用甲型</th>
-                <th className="px-4 py-2.5 font-medium">最近到店</th>
+                <th className="px-4 py-2.5 font-medium">{t('customer.name')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('customer.email')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('customer.favoriteShape')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('customer.lastVisit')}</th>
                 <th className="px-4 py-2.5 font-medium">
-                  Twin 状态 <Badge variant="warning" className="ml-1 text-nano">MOCK</Badge>
+                  {t('customer.twinStatus')} <Badge variant="warning" className="ml-1 text-nano">{t('customer.mock')}</Badge>
                 </th>
-                <th className="px-4 py-2.5 font-medium text-right">操作</th>
+                <th className="px-4 py-2.5 font-medium text-right">{t('customer.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -171,7 +173,7 @@ export default function CustomerListPage() {
                           navigate(designNewFresh(customer.id));
                         }}
                       >
-                        新建设计
+                        {t('customer.newDesign')}
                       </Button>
                     </td>
                   </tr>
@@ -184,7 +186,7 @@ export default function CustomerListPage() {
 
       {!loading && !loadTimeout && activeCustomers.length > 0 && (
         <p className="text-xs text-gray-400">
-          找不到客户？去 <Link to={Routes.customerNew} className="text-primary hover:underline">新建客户</Link>
+          {t('customer.createHint')} <Link to={Routes.customerNew} className="text-primary hover:underline">{t('customer.newCustomer')}</Link>
         </p>
       )}
     </div>

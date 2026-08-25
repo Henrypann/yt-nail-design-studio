@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { FlipHorizontal2, Heart, Lock, LockOpen, RotateCcw } from 'lucide-react';
 import { Button, Modal, cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { FingerCode } from '@/lib/types';
 import { FINGER_CODES } from '@/lib/types';
 import { isFingerUnlocked } from '../lib/model';
@@ -13,12 +14,10 @@ import type { MirrorMode } from '../lib/mirror';
 import { oppositeFinger } from '../lib/mirror';
 import { useEditorStore } from '../store';
 
-const FINGER_LABEL: Record<FingerCode, string> = {
-  L1: '左拇指', L2: '左食指', L3: '左中指', L4: '左无名指', L5: '左小指',
-  R1: '右拇指', R2: '右食指', R3: '右中指', R4: '右无名指', R5: '右小指',
-};
+const FINGER_LABEL: Record<FingerCode, string> = { L1: 'L1', L2: 'L2', L3: 'L3', L4: 'L4', L5: 'L5', R1: 'R1', R2: 'R2', R3: 'R3', R4: 'R4', R5: 'R5' };
 
 export function FingerPanel() {
+  const { t } = useLocale();
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
   const readOnly = useEditorStore((s) => s.readOnly);
@@ -42,9 +41,9 @@ export function FingerPanel() {
   return (
     <section className="rounded-panel border border-gray-200 bg-white p-3">
       <header className="mb-2 flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-gray-800">十指编排</h3>
+        <h3 className="text-xs font-semibold text-gray-800">{t('editorV7.finger.title')}</h3>
         <span className="text-nano text-gray-400">
-          {syncMode ? '● 十指同步' : `○ 逐指解锁（${unlocked.length} 指独立）`}
+          {syncMode ? t('editorV7.finger.sync') : t('editorV7.finger.unlocked', { count: unlocked.length })}
         </span>
       </header>
 
@@ -56,7 +55,7 @@ export function FingerPanel() {
           return (
             <button
               key={f}
-              title={`${FINGER_LABEL[f]}${isMaster ? ' · 主视觉指' : ''}${isUnlocked ? ' · 已解锁' : ''}`}
+              title={`${FINGER_LABEL[f]}${isMaster ? ` · ${t('editorV7.finger.master')}` : ''}${isUnlocked ? ` · ${t('editorV7.finger.unlockedLabel')}` : ''}`}
               onClick={() => setCurrentFinger(f)}
               onDoubleClick={() => !readOnly && setMasterFinger(f)}
               className={cx(
@@ -77,8 +76,7 @@ export function FingerPanel() {
       </div>
 
       <p className="mt-2 text-nano leading-4 text-gray-400">
-        当前编辑：{currentFinger}（{FINGER_LABEL[currentFinger]}）
-        {isFingerUnlocked(doc, currentFinger) ? ' · 独立数据' : ' · 与十指同步'}；双击指位设为主视觉指
+        {t('editorV7.finger.currentSummary', { finger: currentFinger, label: FINGER_LABEL[currentFinger], state: isFingerUnlocked(doc, currentFinger) ? t('editorV7.finger.independent') : t('editorV7.finger.synced'), hint: t('editorV7.finger.masterHint') })}
       </p>
 
       {!readOnly && (
@@ -86,36 +84,36 @@ export function FingerPanel() {
           <Button
             size="sm"
             variant="secondary"
-            title={`镜像 ${currentFinger} → ${oppositeFinger(currentFinger)}`}
+            title={t('editorV7.finger.mirrorTitle', { from: currentFinger, to: oppositeFinger(currentFinger) })}
             onClick={() => setMirrorConfirm('opposite')}
           >
             <FlipHorizontal2 size={12} />
-            镜像对侧
+            {t('editorV7.finger.mirrorOpposite')}
           </Button>
           <Button
             size="sm"
             variant="ghost"
-            title="左手 L1–L5 批量镜像到右手"
+            title={t('editorV7.finger.leftMirrorTitle')}
             onClick={() => setMirrorConfirm('leftToRight')}
           >
             <FlipHorizontal2 size={12} />
-            左手→右手
+            {t('editorV7.finger.mirrorLeftRight')}
           </Button>
           {isFingerUnlocked(doc, currentFinger) ? (
             <Button size="sm" variant="secondary" onClick={() => setConfirmLock(currentFinger)}>
               <Lock size={12} />
-              重新锁定 {currentFinger}
+              {t('editorV7.finger.lockAgain', { finger: currentFinger })}
             </Button>
           ) : (
             <Button size="sm" variant="secondary" onClick={() => unlockFinger(currentFinger)}>
               <LockOpen size={12} />
-              解锁 {currentFinger} 独立编辑
+              {t('editorV7.finger.unlock', { finger: currentFinger })}
             </Button>
           )}
           {unlocked.length > 0 && (
             <Button size="sm" variant="ghost" onClick={() => setConfirmReset(true)}>
               <RotateCcw size={12} />
-              全部重置
+              {t('editorV7.finger.reset')}
             </Button>
           )}
         </div>
@@ -125,11 +123,11 @@ export function FingerPanel() {
       <Modal
         open={confirmLock !== null}
         onClose={() => setConfirmLock(null)}
-        title={`重新锁定 ${confirmLock ?? ''}？`}
+        title={t('editorV7.finger.lockTitle', { finger: confirmLock ?? '' })}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setConfirmLock(null)}>
-              取消
+              {t('editorV7.finger.cancel')}
             </Button>
             <Button
               variant="danger"
@@ -139,13 +137,13 @@ export function FingerPanel() {
                 setConfirmLock(null);
               }}
             >
-              丢弃独立数据并锁定
+              {t('editorV7.finger.discardLock')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-600">
-          {confirmLock} 的独立编辑内容将被丢弃，该指回到十指同步数据。此操作可通过撤销（⌘Z）恢复。
+          {t('editorV7.finger.lockDescription', { finger: confirmLock ?? '' })}
         </p>
       </Modal>
 
@@ -153,11 +151,11 @@ export function FingerPanel() {
       <Modal
         open={confirmReset}
         onClose={() => setConfirmReset(false)}
-        title="全部重置为十指同步？"
+        title={t('editorV7.finger.resetTitle')}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
-              取消
+              {t('editorV7.finger.cancel')}
             </Button>
             <Button
               variant="danger"
@@ -167,13 +165,13 @@ export function FingerPanel() {
                 setConfirmReset(false);
               }}
             >
-              清除全部解锁
+              {t('editorV7.finger.clearUnlock')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-600">
-          将清除 {unlocked.length} 个解锁指的独立数据，全部手指回到主视觉指同步数据。此操作可通过撤销（⌘Z）恢复。
+          {t('editorV7.finger.resetDescription', { count: unlocked.length })}
         </p>
       </Modal>
 
@@ -183,13 +181,13 @@ export function FingerPanel() {
         onClose={() => setMirrorConfirm(null)}
         title={
           mirrorConfirm === 'leftToRight'
-            ? '镜像整手到右手？'
-            : `镜像到对侧指 ${oppositeFinger(currentFinger)}？`
+            ? t('editorV7.finger.mirrorHandTitle')
+            : t('editorV7.finger.mirrorOppositeTitle', { finger: oppositeFinger(currentFinger) })
         }
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setMirrorConfirm(null)}>
-              取消
+              {t('editorV7.finger.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -197,21 +195,21 @@ export function FingerPanel() {
               onClick={() => {
                 if (mirrorConfirm === 'opposite') {
                   mirrorToOpposite(mirrorMode);
-                  toast.success(`已镜像到 ${oppositeFinger(currentFinger)}`);
+                  toast.success(t('editorV7.finger.mirrored', { finger: oppositeFinger(currentFinger) }));
                 } else if (mirrorConfirm === 'leftToRight') {
                   mirrorLeftHandToRight(mirrorMode);
-                  toast.success('左手五指已镜像到右手');
+                  toast.success(t('editorV7.finger.handMirrored'));
                 }
                 setMirrorConfirm(null);
               }}
             >
-              确认镜像
+              {t('editorV7.finger.confirmMirror')}
             </Button>
           </>
         }
       >
         <p className="mb-3 text-sm text-gray-600">
-          将覆盖目标指的图案层内容。拇指 L1/R1 会自动做角度补偿。
+          {t('editorV7.finger.mirrorDescription')}
         </p>
         <div className="flex flex-col gap-2">
           <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
@@ -221,7 +219,7 @@ export function FingerPanel() {
               checked={mirrorMode === 'pattern-only'}
               onChange={() => setMirrorMode('pattern-only')}
             />
-            仅图案层（底色不变）
+            {t('editorV7.finger.patternOnly')}
           </label>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
             <input
@@ -230,7 +228,7 @@ export function FingerPanel() {
               checked={mirrorMode === 'include-base'}
               onChange={() => setMirrorMode('include-base')}
             />
-            含底色（图案 + 底色一并复制）
+            {t('editorV7.finger.includeBase')}
           </label>
         </div>
       </Modal>

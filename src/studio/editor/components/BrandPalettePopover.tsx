@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import {
   loadBrandPalette,
   pushRecentColor,
@@ -16,6 +17,7 @@ type BrandFilter = 'all' | 'OPI' | 'CND' | 'Essie';
 
 export function BrandPalettePopover(props: { onClose: () => void }) {
   const { onClose } = props;
+  const { t } = useLocale();
   const setBrush = useEditorStore((s) => s.setBrush);
   const brushColor = useEditorStore((s) => s.brushColor);
   const [colors, setColors] = useState<BrandPaletteColor[]>([]);
@@ -52,12 +54,12 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
       data-testid="brand-palette-popover"
     >
       <header className="flex items-center justify-between border-b border-gray-100 px-2 py-1.5">
-        <span className="text-nano font-semibold text-gray-800">品牌色板</span>
+        <span className="text-nano font-semibold text-gray-800">{t('editorV7.palette.title')}</span>
         <button
           type="button"
           onClick={onClose}
           className="rounded-button p-0.5 text-gray-400 hover:bg-gray-100"
-          aria-label="关闭色板"
+          aria-label={t('editorV7.palette.close')}
         >
           <X size={14} />
         </button>
@@ -74,14 +76,14 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
               brand === b ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-50',
             )}
           >
-            {b === 'all' ? '全部' : b}
+            {b === 'all' ? t('editorV7.palette.all') : b}
           </button>
         ))}
       </div>
 
       <input
         type="search"
-        placeholder="搜索色名/HEX"
+        placeholder={t('editorV7.palette.search')}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="mx-2 mt-1.5 rounded-button border border-gray-200 px-2 py-1 text-nano"
@@ -89,7 +91,7 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
 
       <div className="max-h-48 overflow-y-auto p-2">
         {loading ? (
-          <p className="py-4 text-center text-nano text-gray-400">加载中…</p>
+          <p className="py-4 text-center text-nano text-gray-400">{t('editorV7.palette.loading')}</p>
         ) : (
           <div className="grid grid-cols-6 gap-1">
             {filtered.map((c) => (
@@ -111,7 +113,7 @@ export function BrandPalettePopover(props: { onClose: () => void }) {
         )}
       </div>
       <p className="border-t border-gray-100 px-2 py-1 text-nano text-gray-400">
-        {filtered.length} 色 · 异步加载
+        {t('editorV7.palette.count', { count: filtered.length })}
       </p>
     </div>
   );

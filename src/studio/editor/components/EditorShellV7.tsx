@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKe
 import { useBlocker, useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, Redo2, Save, ShieldAlert, Undo2, UserRound, Waves } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
 import { communityProductHref } from '@/app/product-navigation';
 import { CrossProductLink } from '@/app/CrossProductLink';
@@ -27,24 +28,18 @@ import type { EditorWorkspacePersonalStepKindV7 } from '../v7/workspace-step-fac
 import type { FrenchUseContextV1 } from '@/integration/community-studio/french-use-context-v1';
 import { FRENCH_RECIPE_ID_V1 } from '../v7/french-recipe-v1';
 
-const SAVE_LABEL = {
-  saved: '已保存',
-  dirty: '有未保存更改',
-  saving: '正在保存…',
-  error: '保存失败，可重试',
-} as const;
-
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function customerPreviewAvailabilityV7(
   saveState: 'saved' | 'dirty' | 'saving' | 'error',
   switching: boolean,
+  t: ReturnType<typeof useLocale>['t'],
 ): { enabled: boolean; description: string } {
-  if (switching) return { enabled: false, description: '正在安全切换设计' };
-  if (saveState === 'dirty') return { enabled: false, description: '请先保存当前更改' };
-  if (saveState === 'saving') return { enabled: false, description: '正在保存，完成后可预览' };
-  if (saveState === 'error') return { enabled: false, description: '保存失败，请重试后再预览' };
-  return { enabled: true, description: '顾客只读预览可用 · 不可变审批 Snapshot 待 STUDIO-V7.1-04' };
+  if (switching) return { enabled: false, description: t('editorV7.shell.preview.switching') };
+  if (saveState === 'dirty') return { enabled: false, description: t('editorV7.shell.preview.dirty') };
+  if (saveState === 'saving') return { enabled: false, description: t('editorV7.shell.preview.saving') };
+  if (saveState === 'error') return { enabled: false, description: t('editorV7.shell.preview.error') };
+  return { enabled: true, description: t('editorV7.shell.preview.ready') };
 }
 
 export function EditorShellV7({
@@ -54,6 +49,7 @@ export function EditorShellV7({
   internalEnabled: boolean;
   frenchUseContext?: FrenchUseContextV1 | null;
 }) {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const toast = useToast();
   const doc = useEditorV7Store((state) => state.doc);
@@ -91,7 +87,7 @@ export function EditorShellV7({
   const stageContextTriggerRef = useRef<HTMLButtonElement | null>(null);
   const guidedStartRef = useRef<HTMLButtonElement>(null);
   const guideFocusRequestedRef = useRef(false);
-  const customerPreviewAvailability = customerPreviewAvailabilityV7(saveState, switching);
+  const customerPreviewAvailability = customerPreviewAvailabilityV7(saveState, switching, t);
 
   useEffect(() => {
     setTitleDraft(doc?.title ?? '');
@@ -194,7 +190,7 @@ export function EditorShellV7({
       return;
     }
     setLeaving(false);
-    toast.error('设计尚未安全保存，已留在当前页面。请重试保存后再离开。');
+    toast.error(t('editorV7.shell.toast.unsafeExit'));
   }, [leaving, navigate, switching, toast, unload]);
 
   const blocker = useBlocker(() => {
@@ -212,7 +208,7 @@ export function EditorShellV7({
       }
       setLeaving(false);
       blocker.reset();
-      toast.error('设计尚未安全保存，已留在当前页面。请重试保存后再离开。');
+      toast.error(t('editorV7.shell.toast.unsafeExit'));
     });
   }, [blocker, leaving, toast, unload]);
 
@@ -319,7 +315,7 @@ export function EditorShellV7({
 
   const saveNow = async () => {
     const result = await save();
-    if (result === 'error') toast.error(saveError ?? 'V7 保存失败，请重试。');
+    if (result === 'error') toast.error(saveError ?? t('editorV7.shell.toast.saveFailed'));
   };
 
   const openGeometryContext = (trigger: HTMLButtonElement) => {
@@ -488,7 +484,7 @@ export function EditorShellV7({
   const openFrenchFromUseContext = (trigger: HTMLButtonElement) => {
     const tool = resolveWorkspaceTool('french');
     if (!tool?.enabled) {
-      toast.info('当前指的法式工具不可直接打开；Studio 未修改 geometry 或自动创建法式配方。');
+    toast.info(t('editorV7.shell.toast.frenchUnavailable'));
       return;
     }
     requestWorkspaceTool(tool, trigger);
@@ -527,38 +523,38 @@ export function EditorShellV7({
               className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-button px-3 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:min-h-0 lg:min-w-0"
             >
               <ArrowLeft size={14} />
-              <span className="sm:hidden">来源</span>
-              <span className="hidden sm:inline">查看来源 Look</span>
+              <span className="sm:hidden">{t('editorV7.shell.source')}</span>
+              <span className="hidden sm:inline">{t('editorV7.shell.sourceLook')}</span>
             </CrossProductLink>
           ) : (
             <Button size="sm" variant="ghost" data-testid="editor-return-designs" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={leaving || switching || saveState === 'saving'} loading={leaving} onClick={() => void requestExit(Routes.designs)}>
               <ArrowLeft size={14} />
-              <span className="sm:hidden">列表</span>
-              <span className="hidden sm:inline">设计列表</span>
+              <span className="sm:hidden">{t('editorV7.shell.list')}</span>
+              <span className="hidden sm:inline">{t('editorV7.shell.designList')}</span>
             </Button>
           )}
-          <span className="hidden rounded-full bg-gray-900 px-2 py-1 text-nano font-semibold uppercase tracking-[0.14em] text-white sm:inline-flex">Editor V7</span>
+          <span className="hidden rounded-full bg-gray-900 px-2 py-1 text-nano font-semibold uppercase tracking-[0.14em] text-white sm:inline-flex">{t('editorV7.shell.brand')}</span>
           {communitySource && (
             <span
               className="min-w-0 flex-1 truncate rounded-full border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-nano font-medium text-fuchsia-800 sm:flex-none"
               data-testid="editor-remix-disclosure"
-              title={`Remix · 来源版本 ${communitySource.revision}`}
+              title={t('editorV7.shell.remixRevision', { revision: communitySource.revision ?? '' })}
             >
-              Remix · 来源版本 {communitySource.revision}
+              {t('editorV7.shell.remixRevision', { revision: communitySource.revision ?? '' })}
             </span>
           )}
           <span
             className={cx('ml-auto shrink-0 text-nano sm:ml-0', saveState === 'error' ? 'text-error' : saveState === 'dirty' ? 'text-warning' : 'text-gray-500')}
             role="status"
           >
-            {SAVE_LABEL[saveState]}
+            {t(`editorV7.shell.save.${saveState}` as 'editorV7.shell.save.saved' | 'editorV7.shell.save.dirty' | 'editorV7.shell.save.saving' | 'editorV7.shell.save.error')}
           </span>
         </div>
         <div className="flex min-w-0 items-center gap-1.5 sm:contents">
           <input
           value={titleDraft}
           disabled={readOnly || switching}
-          aria-label="设计名称"
+          aria-label={t('editorV7.shell.designName')}
           onChange={(event) => setTitleDraft(event.target.value)}
           onBlur={commitTitle}
           onKeyDown={(event) => {
@@ -570,25 +566,25 @@ export function EditorShellV7({
           }}
             className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 text-sm font-semibold text-gray-900 hover:border-gray-200 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:text-gray-600 sm:min-w-[140px]"
           />
-          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title="撤销（⌘Z）" aria-label="撤销">
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || historyCount === 0} onClick={() => undo()} title={t('editorV7.shell.undo')} aria-label={t('editorV7.shell.undo')}>
             <Undo2 size={14} />
           </Button>
-          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title="重做（⇧⌘Z）" aria-label="重做">
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" disabled={readOnly || switching || futureCount === 0} onClick={() => redo()} title={t('editorV7.shell.redo')} aria-label={t('editorV7.shell.redo')}>
             <Redo2 size={14} />
           </Button>
-          <Button size="sm" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} aria-label={saveState === 'error' ? '重试保存' : '保存'} onClick={() => void saveNow()}>
-            <Save size={14} /><span className="hidden sm:inline">{saveState === 'error' ? '重试保存' : '保存'}</span>
+          <Button size="sm" className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0" variant={saveState === 'error' ? 'primary' : 'secondary'} disabled={readOnly || switching || saveState === 'saving'} loading={saveState === 'saving'} aria-label={saveState === 'error' ? t('editorV7.shell.retrySave') : t('editorV7.shell.save')} onClick={() => void saveNow()}>
+            <Save size={14} /><span className="hidden sm:inline">{saveState === 'error' ? t('editorV7.shell.retrySave') : t('editorV7.shell.save')}</span>
           </Button>
           <Button
             size="sm"
             className="min-h-11 min-w-11 shrink-0 lg:min-h-0 lg:min-w-0"
             variant="secondary"
             disabled={saveState !== 'saved' || switching}
-            title={saveState === 'saved' ? '打开顾客只读预览' : '请等待设计安全保存后再预览'}
-            aria-label="打开顾客只读预览"
+            title={saveState === 'saved' ? t('editorV7.shell.openCustomerPreview') : t('editorV7.shell.waitSavePreview')}
+            aria-label={t('editorV7.shell.openCustomerPreview')}
             onClick={(event) => openCustomerPreview(event.currentTarget)}
           >
-            <UserRound size={14} /><span className="hidden sm:inline">顾客预览</span>
+            <UserRound size={14} /><span className="hidden sm:inline">{t('editorV7.shell.customerPreview')}</span>
           </Button>
         </div>
       </header>
@@ -596,20 +592,20 @@ export function EditorShellV7({
       {readOnly && (
         <div className="flex items-start gap-2 border-b border-info/20 bg-info-soft px-3 py-2 text-xs text-info" role="status">
           <ShieldAlert size={14} className="mt-0.5 shrink-0" />
-          <span>{internalEnabled ? '当前 V7 设计处于只读状态；选择与折叠仍可使用。' : 'V7 内测开关未开启：已使用 V7 reader 安全打开，V6 writer 不会接触这份文档。'}</span>
+          <span>{internalEnabled ? t('editorV7.shell.readOnlyInternal') : t('editorV7.shell.readOnlyReader')}</span>
         </div>
       )}
 
       {switching && (
         <div className="border-b border-info/20 bg-info-soft px-3 py-2 text-xs text-info" role="status">
-          正在安全保存并切换设计，编辑操作已暂时停用。
+          {t('editorV7.shell.switchingNotice')}
         </div>
       )}
 
       {saveState === 'error' && (
         <div className="flex items-center justify-between gap-3 border-b border-error/20 bg-red-50 px-3 py-2 text-xs text-error" role="alert">
-          <span className="flex min-w-0 items-center gap-2"><AlertCircle size={14} className="shrink-0" /><span className="truncate">{saveError ?? '保存失败，内存中的修改仍然保留。'}</span></span>
-          <Button size="sm" variant="secondary" onClick={() => void saveNow()}>重试</Button>
+          <span className="flex min-w-0 items-center gap-2"><AlertCircle size={14} className="shrink-0" /><span className="truncate">{saveError ?? t('editorV7.shell.saveErrorRetained')}</span></span>
+          <Button size="sm" variant="secondary" onClick={() => void saveNow()}>{t('editorV7.shell.retry')}</Button>
         </div>
       )}
 
@@ -621,10 +617,10 @@ export function EditorShellV7({
         >
           <Waves size={15} className="shrink-0 text-fuchsia-700" />
           <div className="min-w-[220px] flex-1">
-            <strong>来源声明「技法：法式」</strong>
-            <span className="ml-1">已导入完整 Look Remix；尚未选择预设，也没有自动写入结构化法式。</span>
-            <span className="ml-1 text-fuchsia-700">不代表当前可制作或制造验证。</span>
-            {frenchUseContext.diagnostics.length > 0 && <span className="ml-1 text-amber-800">诊断：{frenchUseContext.diagnostics.join('；')}</span>}
+            <strong>{t('editorV7.shell.frenchTitle')}</strong>
+            <span className="ml-1">{t('editorV7.shell.frenchDescription')}</span>
+            <span className="ml-1 text-fuchsia-700">{t('editorV7.shell.notManufacturing')}</span>
+            {frenchUseContext.diagnostics.length > 0 && <span className="ml-1 text-amber-800">{t('editorV7.shell.diagnostics', { details: frenchUseContext.diagnostics.join('；') })}</span>}
           </div>
           {frenchUseContext.action === 'OFFER_OPEN_FRENCH_TOOL' ? (
             <Button
@@ -634,10 +630,10 @@ export function EditorShellV7({
               data-testid="french-use-open-tool"
               onClick={(event) => openFrenchFromUseContext(event.currentTarget)}
             >
-              打开法式工具（不自动添加）
+              {t('editorV7.shell.openFrench')}
             </Button>
           ) : (
-            <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-nano text-amber-800">需先处理甲型/长度诊断</span>
+            <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-nano text-amber-800">{t('editorV7.shell.shapeLengthDiagnostics')}</span>
           )}
         </div>
       )}
@@ -662,14 +658,14 @@ export function EditorShellV7({
       {stageContext === 'customer' && (
         <EditorStageContextNoticeV7
           context="customer"
-          title="顾客只读预览尚不可进入"
+          title={t('editorV7.shell.customerUnavailable')}
           description={customerPreviewAvailability.description}
           details={[
-            { label: '当前设计', value: doc.designId },
-            { label: '修订', value: String(doc.revision) },
-            { label: '起始指位', value: currentFinger },
+            { label: t('editorV7.shell.design'), value: doc.designId },
+            { label: t('editorV7.shell.revision'), value: String(doc.revision) },
+            { label: t('editorV7.shell.startFinger'), value: currentFinger },
           ]}
-          disclaimer="预览只读且不生成 ConfirmationSnapshot；保存成功后再次激活该阶段。"
+          disclaimer={t('editorV7.shell.previewDisclaimer')}
           onDismiss={closeStageContext}
         />
       )}
@@ -693,8 +689,8 @@ export function EditorShellV7({
         <EditorWorkspaceSidebarV7 compact={!desktopWorkspace} open={workspacePanelOpen} tab={workspacePanelTab} onTabChange={setWorkspacePanelTab} onClose={closeWorkspacePanel} />
 
         {!desktopWorkspace && resourcesOpen && <>
-          <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label="关闭资源" onClick={closeResources} />
-          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label="当前层工具与参数" onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-hairline bg-surface shadow-modal min-[800px]:inset-y-0 min-[800px]:left-16 min-[800px]:right-auto min-[800px]:h-full min-[800px]:max-h-none min-[800px]:w-[min(360px,42vw)] min-[800px]:rounded-none" data-overlay-open="true">
+          <button type="button" className="absolute inset-0 z-30 bg-gray-950/20 backdrop-blur-[1px]" aria-label={t('editorV7.shell.closeResources')} onClick={closeResources} />
+          <aside ref={resourceDialogRef} role="dialog" aria-modal="true" aria-label={t('editorV7.shell.currentTools')} onKeyDown={trapResourceFocus} className="absolute inset-x-0 bottom-0 z-40 max-h-[70dvh] min-h-[320px] overflow-hidden rounded-t-2xl border border-hairline bg-surface shadow-modal min-[800px]:inset-y-0 min-[800px]:left-16 min-[800px]:right-auto min-[800px]:h-full min-[800px]:max-h-none min-[800px]:w-[min(360px,42vw)] min-[800px]:rounded-none" data-overlay-open="true">
             <EditorResourceDrawerV7 onClose={closeResources} />
           </aside>
         </>}

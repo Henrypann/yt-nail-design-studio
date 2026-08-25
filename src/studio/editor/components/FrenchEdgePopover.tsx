@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { FRENCH_VARIANT_LABELS } from '../lib/french-edge';
 import type { FrenchEdgeVariant } from '../lib/model';
 import { useEditorStore } from '../store';
@@ -31,6 +32,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
   const { onClose } = props;
   const insertFrenchEdge = useEditorStore((s) => s.insertFrenchEdge);
   const toast = useToast();
+  const { t } = useLocale();
 
   const [variant, setVariant] = useState<FrenchEdgeVariant>('arc');
   const [fillColor, setFillColor] = useState('#FFFFFF');
@@ -47,15 +49,15 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
       strokeWidth,
     });
     if (result === 'ok') {
-      toast.success(`已添加法式 · ${FRENCH_VARIANT_LABELS[variant]}`);
+      toast.success(t('editorV7.frenchPopover.added', { variant: FRENCH_VARIANT_LABELS[variant] }));
       onClose();
       return;
     }
     if (result === 'no-silhouette') {
-      toast.error('当前甲型轮廓不可用，无法生成法式边');
+      toast.error(t('editorV7.frenchPopover.noSilhouette'));
       return;
     }
-    toast.warning('只读模式，无法编辑');
+    toast.warning(t('editorV7.frenchPopover.readOnly'));
   };
 
   return (
@@ -64,12 +66,12 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
       data-testid="french-edge-popover"
     >
       <header className="flex items-center justify-between border-b border-gray-100 px-2 py-1.5">
-        <span className="text-nano font-semibold text-gray-800">法式边模板</span>
+        <span className="text-nano font-semibold text-gray-800">{t('editorV7.frenchPopover.title')}</span>
         <button
           type="button"
           onClick={onClose}
           className="rounded-button p-0.5 text-gray-400 hover:bg-gray-100"
-          aria-label="关闭法式边"
+          aria-label={t('editorV7.frenchPopover.close')}
         >
           <X size={14} />
         </button>
@@ -108,7 +110,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
 
       <div className="flex flex-col gap-2 border-t border-gray-100 px-2 py-2">
         <label className="flex items-center justify-between text-nano text-gray-500">
-          <span>甲尖颜色</span>
+          <span>{t('editorV7.frenchPopover.fillColor')}</span>
           <input
             type="color"
             value={fillColor}
@@ -117,7 +119,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
           />
         </label>
         <label className="flex cursor-pointer items-center justify-between text-nano text-gray-500">
-          <span>{variant === 'double' ? '双线边线（必选）' : '添加金属细边'}</span>
+          <span>{variant === 'double' ? t('editorV7.frenchPopover.doubleOutline') : t('editorV7.frenchPopover.metalOutline')}</span>
           <input
             type="checkbox"
             checked={outlineEnabled || variant === 'double'}
@@ -129,7 +131,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
         {(outlineEnabled || variant === 'double') && (
           <>
             <label className="flex items-center justify-between text-nano text-gray-500">
-              <span>边线颜色</span>
+              <span>{t('editorV7.frenchPopover.strokeColor')}</span>
               <input
                 type="color"
                 value={strokeColor}
@@ -138,7 +140,7 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
               />
             </label>
             <label className="text-nano text-gray-400">
-              细边宽度 {strokeWidth}
+              {t('editorV7.frenchPopover.strokeWidth', { width: strokeWidth })}
               <input
                 type="range"
                 min={2}
@@ -151,13 +153,13 @@ export function FrenchEdgePopover(props: { onClose: () => void }) {
           </>
         )}
         <p className="text-nano leading-4 text-gray-400">
-          甲尖色块会自动贴合当前甲型外轮廓，添加后可微调微笑线深度。
+          {t('editorV7.frenchPopover.description')}
         </p>
       </div>
 
       <div className="border-t border-gray-100 p-2">
         <Button size="sm" variant="primary" className="w-full" onClick={onAdd}>
-          一键添加
+          {t('editorV7.frenchPopover.add')}
         </Button>
       </div>
     </div>

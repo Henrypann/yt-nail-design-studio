@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Badge, Button, Card, Input, Modal, Spinner, cx, useToast } from '@/design-system';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
+import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
 import {
   acquireBindLock,
@@ -56,18 +57,19 @@ type ErrorKind =
   | 'concurrent'
   | 'tokenExpired';
 
-const STEP_LABELS = ['选择路径', '发现设备', '输入 WiFi', '配网中', '命名设备', '绑定完成'];
+const STEP_LABEL_KEYS = ['device.choosePath', 'device.discovered', 'device.wifiPassword', 'device.provisioning', 'device.deviceAlias', 'device.bindSuccess'] as const;
 
-const PATH_CARDS: { path: BindPath; icon: typeof Bluetooth; title: string; desc: string }[] = [
-  { path: 'bluetooth', icon: Bluetooth, title: '蓝牙配网', desc: '浏览器蓝牙直连，推荐近距离' },
-  { path: 'mobile', icon: Smartphone, title: '手机辅助配网', desc: '手机扫码辅助输入 WiFi' },
-  { path: 'usb', icon: Usb, title: 'USB 数据线配网', desc: 'USB 线连接电脑和设备' },
-  { path: 'lan', icon: Radar, title: '局域网发现', desc: '自动扫描同局域网内设备' },
+const PATH_CARDS: { path: BindPath; icon: typeof Bluetooth; titleKey: 'device.bluetoothPath' | 'device.mobilePath' | 'device.usbPath' | 'device.lanPath'; descKey: 'device.bluetoothPathHint' | 'device.mobilePathHint' | 'device.usbPathHint' | 'device.lanPathHint' }[] = [
+  { path: 'bluetooth', icon: Bluetooth, titleKey: 'device.bluetoothPath', descKey: 'device.bluetoothPathHint' },
+  { path: 'mobile', icon: Smartphone, titleKey: 'device.mobilePath', descKey: 'device.mobilePathHint' },
+  { path: 'usb', icon: Usb, titleKey: 'device.usbPath', descKey: 'device.usbPathHint' },
+  { path: 'lan', icon: Radar, titleKey: 'device.lanPath', descKey: 'device.lanPathHint' },
 ];
 
 export function BindWizard() {
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useLocale();
   const flags = useMockScenarios((s) => s.flags);
   const addDevice = useDevicesStore((s) => s.addDevice);
   const deviceCount = useDevicesStore((s) => s.devices.length);
@@ -95,7 +97,7 @@ export function BindWizard() {
 
   /* 刷新恢复提示（5 分钟 TTL 内） */
   useEffect(() => {
-    if (restored) toast.info('已恢复上次未完成的配网进度。');
+    if (restored) toast.info(t('device.resume'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -194,11 +196,11 @@ export function BindWizard() {
     (nextSsid: string, nextPassword: string) => {
       if (!device) return;
       if (!nextSsid.trim()) {
-        setInlineError('请输入 WiFi 名称（SSID）');
+        setInlineError(t('device.wifiName'));
         return;
       }
       if (!nextPassword) {
-        setInlineError('请输入 WiFi 密码');
+        setInlineError(t('device.wifiPassword'));
         return;
       }
       setInlineError('');
@@ -208,7 +210,7 @@ export function BindWizard() {
         !acquireBindLock(device.deviceCode)
       ) {
         setError('concurrent');
-        toast.warning('设备正在被其他操作绑定中。');
+      toast.warning(t('device.concurrent'));
         return;
       }
       setError(null);
@@ -235,7 +237,7 @@ export function BindWizard() {
     setAlias(finalAlias);
     setError(null);
     setStep(6);
-    toast.success(`「${finalAlias}」绑定成功。`);
+    toast.success(t('device.boundAlias', { alias: finalAlias }));
   };
 
   /** 取消配网（二次确认后） */
@@ -292,9 +294,9 @@ export function BindWizard() {
   const copyMobileUrl = async () => {
     try {
       await navigator.clipboard.writeText(mobileUrl);
-      toast.info('链接已复制，发送到手机打开即可。');
+      toast.info(t('device.linkCopied'));
     } catch {
-      toast.warning('复制失败，请手动选择链接复制。');
+      toast.warning(t('toast.copyFailed'));
     }
   };
 
@@ -304,9 +306,9 @@ export function BindWizard() {
     <div className="flex flex-col gap-4" data-debug-id="app.devices.bind-wizard">
       <header className="flex items-center gap-2">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">设备绑定</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{t('device.wizardTitle')}</h1>
           <p className="mt-0.5 text-xs text-gray-500">
-            蓝牙 / 手机辅助 / USB / 局域网发现，每次仅配网一台设备
+            {t('device.wizardSubtitle')}
           </p>
         </div>
         <Badge variant="warning" className="ml-1">MOCK IOT</Badge>
@@ -314,7 +316,7 @@ export function BindWizard() {
 
       {/* 步骤条 */}
       <ol className="flex items-center gap-1">
-        {STEP_LABELS.map((label, i) => {
+        {STEP_LABEL_KEYS.map((key, i) => { const label = t(key);
           const n = (i + 1) as BindStep;
           const done = n < step;
           const current = n === step;
@@ -339,7 +341,7 @@ export function BindWizard() {
               >
                 {label}
               </span>
-              {i < STEP_LABELS.length - 1 && <span className="mx-1 h-px flex-1 bg-gray-200" />}
+              {i < STEP_LABEL_KEYS.length - 1 && <span className="mx-1 h-px flex-1 bg-gray-200" />}
             </li>
           );
         })}
@@ -349,10 +351,10 @@ export function BindWizard() {
         {/* Step 1 · 选择路径 */}
         {step === 1 && (
           <div className="animate-fade-in">
-            <h2 className="text-sm font-semibold text-gray-900">选择配网方式</h2>
-            <p className="mt-0.5 text-xs text-gray-500">选择一种方式连接你的设备。</p>
+            <h2 className="text-sm font-semibold text-gray-900">{t('device.choosePath')}</h2>
+            <p className="mt-0.5 text-xs text-gray-500">{t('device.choosePathHint')}</p>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              {PATH_CARDS.map(({ path: p, icon: Icon, title, desc }) => (
+              {PATH_CARDS.map(({ path: p, icon: Icon, titleKey, descKey }) => (
                 <button
                   key={p}
                   onClick={() => {
@@ -369,8 +371,8 @@ export function BindWizard() {
                     <Icon size={20} className="text-gray-500 transition-colors duration-fast group-hover:text-primary" />
                     <Badge variant="warning" className="text-[10px]">MOCK IOT</Badge>
                   </span>
-                  <span className="text-sm font-medium text-gray-900">{title}</span>
-                  <span className="text-xs text-gray-500">{desc}</span>
+                  <span className="text-sm font-medium text-gray-900">{t(titleKey)}</span>
+                  <span className="text-xs text-gray-500">{t(descKey)}</span>
                 </button>
               ))}
             </div>
@@ -383,12 +385,12 @@ export function BindWizard() {
             {error === 'discoverTimeout' ? (
               <>
                 <p className="text-sm font-medium text-gray-900">
-                  未发现设备。请确认设备已通电并靠近。
+                  {t('device.discoverFailed')}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
-                  <Button size="sm" onClick={retryError}>重试</Button>
+                  <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
                   <Button size="sm" variant="secondary" onClick={() => { setError(null); setStep(1); }}>
-                    换一种方式
+                    {t('device.tryAnother')}
                   </Button>
                 </div>
               </>
@@ -396,9 +398,9 @@ export function BindWizard() {
               <>
                 <Spinner size={28} />
                 <p className="text-sm font-medium text-gray-900">
-                  正在通过「{path ? BIND_PATH_LABEL[path] : ''}」搜索设备…
+                  {t('device.searching', { path: path ? BIND_PATH_LABEL[path] : '' })}
                 </p>
-                <p className="text-xs text-gray-500">请保持设备通电并处于配网模式（最长等待 15 秒）。</p>
+                <p className="text-xs text-gray-500">{t('device.discoveryHint')}</p>
               </>
             )}
           </div>
@@ -412,13 +414,13 @@ export function BindWizard() {
               error === 'tokenExpired' ? (
                 <div className="mt-4 flex flex-col items-center gap-3 py-6 text-center">
                   <p className="text-sm font-medium text-gray-900">
-                    链接已过期。请重新发起手机辅助配网。
+                    {t('device.linkExpired')}
                   </p>
-                  <Button size="sm" onClick={retryError}>重新生成链接</Button>
+                  <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
                 </div>
               ) : (
                 <div className="mt-4 flex flex-col items-center gap-3 py-4 text-center">
-                  <p className="text-sm font-medium text-gray-900">用手机打开以下链接输入 WiFi</p>
+                  <p className="text-sm font-medium text-gray-900">{t('device.openMobile')}</p>
                   <div className="flex w-full max-w-[440px] items-center gap-2 rounded-panel border border-gray-200 bg-gray-50 px-3 py-2">
                     <span className="min-w-0 flex-1 truncate text-left text-xs text-gray-600 tnum">
                       {mobileUrl}
@@ -426,7 +428,7 @@ export function BindWizard() {
                     <button
                       onClick={copyMobileUrl}
                       className="shrink-0 rounded-button p-1.5 text-gray-500 transition-colors duration-fast hover:bg-gray-200 hover:text-gray-800"
-                      aria-label="复制链接"
+                      aria-label={t('app.copy')}
                     >
                       <Copy size={14} />
                     </button>
@@ -437,47 +439,47 @@ export function BindWizard() {
                     rel="noreferrer"
                     className="text-xs text-primary hover:underline"
                   >
-                    在新窗口打开（模拟手机）→
+                    {t('device.openWindow')}
                   </a>
                   <p className="flex items-center gap-1.5 text-xs text-gray-500">
                     <Loader2 size={12} className="animate-spin-slow" />
-                    等待手机提交 WiFi…（链接 5 分钟内有效）
+                    {t('device.waitingMobile')}
                   </p>
                   <button
                     onClick={() => setUseLocalWifi(true)}
                     className="text-xs text-gray-500 underline-offset-2 transition-colors duration-fast hover:text-gray-800 hover:underline"
                   >
-                    手机不方便？改用电脑输入 WiFi
+                    {t('device.switchComputer')}
                   </button>
                 </div>
               )
             ) : (
               <div className="mt-4 flex max-w-[400px] flex-col gap-3">
                 <Input
-                  label="WiFi 名称（SSID）"
+                  label={t('device.wifiName')}
                   value={ssid}
                   onChange={(e) => setSsid(e.target.value)}
-                  placeholder="例如：NailStudio-5G"
+                  placeholder={t('device.wifiNamePlaceholder')}
                   autoComplete="off"
                 />
                 <Input
-                  label="WiFi 密码"
+                  label={t('device.wifiPassword')}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="请输入 WiFi 密码"
-                  helper="密码仅用于本次配网，不会被保存。"
+                  placeholder={t('device.wifiPasswordPlaceholder')}
+                  helper={t('device.wifiHelper')}
                   autoComplete="new-password"
                 />
                 {inlineError && <p className="text-xs text-error">{inlineError}</p>}
                 <div className="mt-1">
-                  <Button onClick={() => startProvisioning(ssid, password)}>开始配网</Button>
+                  <Button onClick={() => startProvisioning(ssid, password)}>{t('device.startProvision')}</Button>
                 </div>
               </div>
             )}
             {error === 'concurrent' && (
               <p className="mt-3 text-xs text-warning">
-                设备正在被其他操作绑定中。请稍后再试，或关闭其他绑定页面。
+                {t('device.concurrent')}
               </p>
             )}
           </div>
@@ -488,15 +490,15 @@ export function BindWizard() {
           <div className="flex animate-fade-in flex-col items-center gap-4 py-10 text-center">
             {error === 'wifiWrong' ? (
               <>
-                <p className="text-sm font-medium text-gray-900">WiFi 密码错误。请重新输入。</p>
-                <Button size="sm" onClick={retryError}>重试</Button>
+                <p className="text-sm font-medium text-gray-900">{t('device.wifiWrong')}</p>
+                <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
               </>
             ) : error === 'joinTimeout' ? (
               <>
                 <p className="text-sm font-medium text-gray-900">
-                  设备连接超时。请检查 WiFi 信号和路由器。
+                  {t('device.joinTimeout')}
                 </p>
-                <Button size="sm" onClick={retryError}>重试</Button>
+                <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
               </>
             ) : (
               <>
@@ -510,7 +512,7 @@ export function BindWizard() {
                   <p className="mt-2 text-sm font-medium text-gray-900 tnum">{progress}%</p>
                 </div>
                 <p className="text-xs text-gray-500">
-                  正在配网，请勿关闭设备电源或断开连接…
+                  {t('device.provisioning')}
                 </p>
               </>
             )}
@@ -524,23 +526,23 @@ export function BindWizard() {
             {error === 'alreadyBound' ? (
               <div className="mt-4 flex flex-col items-start gap-3 py-4">
                 <p className="text-sm font-medium text-error">
-                  此设备已在其他门店绑定。如需转移请联系客服。
+                  {t('device.alreadyBound')}
                 </p>
                 <Button size="sm" variant="secondary" onClick={() => setCancelOpen(true)}>
-                  取消配网
+                  {t('device.cancelBind')}
                 </Button>
               </div>
             ) : (
               <div className="mt-4 flex max-w-[400px] flex-col gap-3">
                 <Input
-                  label="设备别名"
+                  label={t('device.deviceAlias')}
                   value={alias}
                   onChange={(e) => setAlias(e.target.value)}
                   placeholder={`${DEVICE_TYPE_LABEL[device.type]}-${String(deviceCount + 1).padStart(2, '0')}`}
-                  helper="给设备起一个好认的名字，例如「前台扫描仪」。"
+                  helper={t('device.aliasHelper')}
                 />
                 <div className="mt-1">
-                  <Button onClick={finalizeBind}>完成绑定</Button>
+                  <Button onClick={finalizeBind}>{t('device.finishBind')}</Button>
                 </div>
               </div>
             )}
@@ -551,17 +553,14 @@ export function BindWizard() {
         {step === 6 && device && (
           <div className="flex animate-fade-in flex-col items-center gap-3 py-8 text-center">
             <CheckCircle2 size={40} className="text-success" />
-            <p className="text-base font-semibold text-gray-900">绑定成功</p>
+            <p className="text-base font-semibold text-gray-900">{t('device.bindSuccess')}</p>
             <Card className="w-full max-w-[360px] text-left" padding="md">
               <dl className="flex flex-col gap-1.5 text-xs">
-                <Row k="设备别名" v={alias} />
-                <Row k="设备类型" v={DEVICE_TYPE_LABEL[device.type]} />
-                <Row k="设备代码" v={device.deviceCode} mono />
-                <Row k="配网方式" v={BIND_PATH_LABEL[device.foundVia]} />
+                <Row k={t('device.deviceAlias')} v={alias} /><Row k={t('device.type')} v={DEVICE_TYPE_LABEL[device.type]} /><Row k={t('device.deviceCode')} v={device.deviceCode} mono /><Row k={t('device.bindMethod')} v={BIND_PATH_LABEL[device.foundVia]} />
               </dl>
             </Card>
             <div className="mt-2 flex items-center gap-2">
-              <Button onClick={() => navigate(Routes.devices)}>查看我的设备</Button>
+              <Button onClick={() => navigate(Routes.devices)}>{t('device.viewDevices')}</Button>
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -577,7 +576,7 @@ export function BindWizard() {
                   setProgress(0);
                 }}
               >
-                再绑定一台
+                {t('device.bindAnother')}
               </Button>
             </div>
           </div>
@@ -590,12 +589,12 @@ export function BindWizard() {
           <div>
             {step > 1 && (
               <Button variant="ghost" size="sm" onClick={goBack}>
-                ← 上一步
+                {t('device.backStep')}
               </Button>
             )}
           </div>
           <Button variant="ghost" size="sm" onClick={() => setCancelOpen(true)}>
-            取消配网
+                {t('device.cancelBind')}
           </Button>
         </div>
       )}
@@ -604,19 +603,19 @@ export function BindWizard() {
       <Modal
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
-        title="取消配网"
+        title={t('device.cancelBind')}
         footer={
           <>
             <Button variant="secondary" size="sm" onClick={() => setCancelOpen(false)}>
-              继续配网
+              {t('device.continueBind')}
             </Button>
             <Button variant="danger" size="sm" onClick={confirmCancel}>
-              确认取消
+              {t('device.confirmCancel')}
             </Button>
           </>
         }
       >
-        确定取消配网吗？已进行的进度不会保留。
+        {t('device.cancelText')}
       </Modal>
     </div>
   );
@@ -624,11 +623,12 @@ export function BindWizard() {
 
 /** 已发现设备摘要条 */
 function DeviceChip({ device }: { device: DiscoveredDevice }) {
+  const { t } = useLocale();
   return (
     <div className="flex items-center gap-2 rounded-panel border border-gray-200 bg-gray-50 px-3 py-2">
       <Wifi size={14} className="text-success" />
       <span className="text-xs text-gray-700">
-        已发现设备 <span className="font-medium tnum">{device.deviceCode}</span>
+        {t('device.discovered')} <span className="font-medium tnum">{device.deviceCode}</span>
         （{DEVICE_TYPE_LABEL[device.type]}）
       </span>
       <Badge variant="warning" className="ml-auto text-[10px]">MOCK IOT</Badge>

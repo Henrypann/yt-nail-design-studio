@@ -52,6 +52,7 @@ export interface BackPlatePreviewProps {
   rawId: string;
   svgRef: RefObject<SVGSVGElement>;
   fingerLabel: (fc: FingerCode) => string;
+  ariaLabel: string;
 }
 
 export function BackPlatePreview({
@@ -80,6 +81,7 @@ export function BackPlatePreview({
   rawId,
   svgRef,
   fingerLabel,
+  ariaLabel,
 }: BackPlatePreviewProps) {
   const uv = contentUvTransform(widthMm, lengthMm);
   return (
@@ -89,7 +91,7 @@ export function BackPlatePreview({
       className={fitContainer ? 'block h-full w-full select-none' : 'block w-full select-none'}
       preserveAspectRatio="xMidYMid meet"
       role="img"
-      aria-label="十指预览（手背视图 · NailSlot V2 标定线稿）"
+      aria-label={ariaLabel}
       data-calibration={plate.calibrationVersion}
     >
       {/* 第一层：签收线稿 plate（dataURL 内联，保证离屏 PNG 导出一致） */}

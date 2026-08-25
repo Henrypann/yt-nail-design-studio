@@ -6,18 +6,14 @@
 
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Badge, Button, Modal } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { runRiskChecks, type RiskReport } from '../lib/risk';
 import { useEditorStore } from '../store';
 
-const CODE_LABEL = {
-  attachment_count: '附件数量',
-  height_exceed: '高度超限',
-  edge_near: '边缘邻近',
-} as const;
-
 export function RiskScreen(props: { open: boolean; onClose: () => void }) {
   const { open, onClose } = props;
+  const { t } = useLocale();
   const doc = useEditorStore((s) => s.doc);
   const flags = useMockScenarios((s) => s.flags);
 
@@ -32,21 +28,21 @@ export function RiskScreen(props: { open: boolean; onClose: () => void }) {
       size="lg"
       footer={
         <Button size="sm" variant="secondary" onClick={onClose}>
-          关闭
+          {t('editorV7.risk.close')}
         </Button>
       }
     >
       <div className="flex flex-col gap-3" data-debug-id="studio.editor.risk-screen">
         <p className="text-nano text-gray-400">
-          附件参数级检查（数量 / 高度 / 边缘邻近）· 原型期规则为 Mock，接入真实 Pipeline 后入口位置不变。
+          {t('editorV7.risk.description')}
         </p>
         {report.issues.length === 0 ? (
           <div className="flex items-start gap-2 rounded-panel border border-success/20 bg-success-soft p-3">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-success" />
             <div>
-              <p className="text-sm font-medium text-success">未发现参数级风险</p>
+              <p className="text-sm font-medium text-success">{t('editorV7.risk.none')}</p>
               <p className="mt-0.5 text-xs text-gray-600">
-                当前十指附件数量、高度（0.05–0.30mm）与边缘距离均在建议范围内（Mock 检查）。
+                {t('editorV7.risk.noneDetail')}
               </p>
             </div>
           </div>
@@ -61,10 +57,10 @@ export function RiskScreen(props: { open: boolean; onClose: () => void }) {
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-gray-800">
                     <Badge variant="warning" className="tnum">{issue.finger}</Badge>
-                    <Badge variant="gray">{CODE_LABEL[issue.code]}</Badge>
+                  <Badge variant="gray">{t(`editorV7.risk.${issue.code === 'attachment_count' ? 'attachmentCount' : issue.code === 'height_exceed' ? 'heightExceed' : 'edgeNear'}` as const)}</Badge>
                     {issue.message}
                   </p>
-                  <p className="mt-1 text-xs text-gray-600">建议：{issue.suggestion}</p>
+                  <p className="mt-1 text-xs text-gray-600">{t('editorV7.risk.suggestion', { suggestion: issue.suggestion })}</p>
                 </div>
               </li>
             ))}

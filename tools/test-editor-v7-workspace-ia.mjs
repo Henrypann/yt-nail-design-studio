@@ -43,7 +43,7 @@ const clone = (value) => structuredClone(value);
     ['customer', false],
   ]);
   assert.equal(stages.find((stage) => stage.id === 'geometry').state, 'configured');
-  assert.match(stages.find((stage) => stage.id === 'geometry').description, /产品轮廓/);
+  assert.equal(stages.find((stage) => stage.id === 'geometry').descriptionKey, 'editorV7.workspace.stage.geometryExact');
   assert.equal(stages.find((stage) => stage.id === 'customer').state, 'empty');
   assert.equal(stages.find((stage) => stage.id === 'finish').state, 'configured');
   assert.deepEqual(stages.find((stage) => stage.id === 'personalize').lanes.map((lane) => lane.id), [
@@ -71,9 +71,13 @@ const clone = (value) => structuredClone(value);
   const personal = stages.find((stage) => stage.id === 'personalize');
   assert.equal(personal.count, middle.length);
   assert.equal(personal.active, true);
-  assert.match(personal.description, new RegExp(`${middle.length} 个步骤`));
-  assert.match(personal.description, /跳过/);
-  assert.match(personal.description, /隐藏/);
+  assert.equal(personal.descriptionKey, 'editorV7.workspace.stage.personalizeSummary');
+  assert.deepEqual(personal.descriptionParams, {
+    total: middle.length,
+    active: middle.filter((step) => step.visible && !step.skipped).length,
+    skipped: middle.filter((step) => step.skipped).length,
+    hidden: middle.filter((step) => !step.visible).length,
+  });
   assert.equal(personal.state, 'attention');
   assert.equal(editorWorkspaceStageForStepV7(selected), 'personalize');
   const lanes = deriveEditorWorkspaceStepLanesV7(nail, selected.id);

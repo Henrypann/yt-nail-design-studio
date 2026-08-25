@@ -32,7 +32,7 @@ interface Props {
 }
 
 export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: Props) {
-  const { locale, text } = useLocale();
+  const { locale, t } = useLocale();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const advCount = advancedFilterCount(filters);
 
@@ -82,9 +82,9 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
       <div className="flex flex-wrap gap-1.5">
         {(
           [
-            ['all', text('全部', 'All')],
-            ['official', text('官方', 'Official')],
-            ['creators', text('认证创作者', 'Creators')],
+            ['all', t('app.all')],
+            ['official', t('app.official')],
+            ['creators', t('app.creators')],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -118,7 +118,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             !filters.style ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
           )}
         >
-          {text('全部风格', 'All styles')}
+          {t('app.allStyles')}
         </button>
         {taxonomy.mainStyles.map((s) => (
           <button
@@ -152,7 +152,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             !filters.color ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600',
           )}
         >
-          {text('全部颜色', 'All colors')}
+          {t('app.allColors')}
         </button>
         {taxonomy.colors.map((c) => (
           <button
@@ -186,11 +186,11 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           onClick={() => setDrawerOpen((v) => !v)}
         >
           <SlidersHorizontal size={13} aria-hidden />
-          {text('筛选', 'Filters')}
+          {t('app.filters')}
           {advCount > 0 ? ` · ${advCount}` : ''}
         </Button>
         <span className="text-nano text-gray-500">
-          {resultCount} {text('个结果', 'results')}
+          {resultCount} {t('app.results2')}
         </span>
         {hasActiveFilters && (
           <button
@@ -198,7 +198,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             className="min-h-11 rounded-button px-2 text-nano text-primary hover:underline"
             onClick={clearAll}
           >
-            {text('清除筛选', 'Clear filters')}
+            {t('app.clearFilters')}
           </button>
         )}
       </div>
@@ -212,11 +212,11 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
         >
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-medium text-gray-800">
-              {text('结构化筛选', 'Structured filters')}
+              {t('app.structuredFilters')}
             </h3>
             <button
               type="button"
-              aria-label={text('关闭筛选', 'Close filters')}
+              aria-label={t('app.closeFilters')}
               onClick={() => setDrawerOpen(false)}
               className="min-h-11 min-w-11 rounded-button p-2 text-gray-500 hover:bg-gray-100"
             >
@@ -225,7 +225,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           </div>
 
           <FilterChips
-            title={text('甲型', 'Shape')}
+            title={t('app.shape')}
             values={filters.shape ? [filters.shape] : []}
             options={SHAPE_OPTIONS}
             namespace="shape"
@@ -234,7 +234,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             testIdPrefix="community-filter-shape"
           />
           <FilterChips
-            title={text('长度', 'Length')}
+            title={t('app.length')}
             values={filters.length ? [filters.length] : []}
             options={LENGTH_OPTIONS}
             namespace="geometry-length"
@@ -243,7 +243,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             testIdPrefix="community-filter-length"
           />
           <FilterGroup
-            title={text('场景', 'Occasion')}
+            title={t('app.occasion')}
             items={taxonomy.occasions}
             namespace="community-occasion"
             locale={locale}
@@ -251,7 +251,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             onToggle={(id) => toggleMulti('occasion', id)}
           />
           <FilterGroup
-            title={text('效果', 'Effect')}
+            title={t('app.effect')}
             items={taxonomy.effects}
             namespace="community-effect"
             locale={locale}
@@ -259,7 +259,7 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
             onToggle={(id) => toggleMulti('effect', id)}
           />
           <FilterGroup
-            title={text('情绪', 'Mood')}
+            title={t('app.mood')}
             items={taxonomy.moods}
             namespace="community-mood"
             locale={locale}
@@ -268,38 +268,38 @@ export function CommunityFilters({ taxonomy, filters, onChange, resultCount }: P
           />
           <div className="flex flex-wrap gap-2">
             <label className="text-nano text-gray-500">
-              {text('应用能力', 'Application')}
+              {t('app.application')}
               <select
                 className="ml-1 min-h-11 rounded border border-gray-200 px-1 text-xs"
                 value={filters.application ?? ''}
                 onChange={(e) => onChange({ ...filters, application: e.target.value || null })}
               >
-                <option value="">{text('全部', 'All')}</option>
-                <option value="INSPIRATION_ONLY">{text('灵感参考', 'Inspiration')}</option>
-                <option value="APPROXIMATE">{text('近似应用', 'Approximate')}</option>
-                <option value="STRUCTURED_EDITABLE">{text('可编辑', 'Editable')}</option>
-                <option value="REPRODUCIBLE">{text('可复现', 'Reproducible')}</option>
+                <option value="">{t('app.all')}</option>
+                <option value="INSPIRATION_ONLY">{t('app.inspiration')}</option>
+                <option value="APPROXIMATE">{t('app.approximate')}</option>
+                <option value="STRUCTURED_EDITABLE">{t('app.editable')}</option>
+                <option value="REPRODUCIBLE">{t('app.reproducible')}</option>
               </select>
             </label>
             <label className="text-nano text-gray-500">
-              {text('验证证据', 'Verification')}
+              {t('app.verification')}
               <select
                 className="ml-1 min-h-11 rounded border border-gray-200 px-1 text-xs"
                 value={filters.verification ?? ''}
                 onChange={(e) => onChange({ ...filters, verification: e.target.value || null })}
               >
-                <option value="">{text('全部', 'All')}</option>
-                <option value="CONCEPT">{text('概念效果', 'Concept')}</option>
-                <option value="RENDER_VERIFIED">{text('已验证预览', 'Render verified')}</option>
+                <option value="">{t('app.all')}</option>
+                <option value="CONCEPT">{t('app.concept')}</option>
+                <option value="RENDER_VERIFIED">{t('app.renderVerified')}</option>
               </select>
             </label>
           </div>
           <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-2">
             <Button className="min-h-11" size="sm" variant="ghost" onClick={clearAdvanced}>
-              {text('清除高级筛选', 'Clear advanced')}
+              {t('app.clearAdvanced')}
             </Button>
             <Button className="min-h-11" size="sm" variant="ghost" onClick={clearAll}>
-              {text('重置全部', 'Reset all')}
+              {t('app.resetAll')}
             </Button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Info, Lock, Trash2, Unlock } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { generateEditorV7Id } from '../v7/id';
 import type { DimensionalDecorationV7, Transform2DV7 } from '../v7/model';
 import {
@@ -37,6 +38,7 @@ function CommitRange({ label, value, min, max, step, unit = '', disabled, onComm
 }
 
 export function DimensionalDecorationPanelV7() {
+  const { t } = useLocale();
   const toast = useToast();
   const step = useEditorV7Store(selectCurrentStepV7);
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
@@ -55,12 +57,12 @@ export function DimensionalDecorationPanelV7() {
   const report = (result: EditorV7ActionResult) => { if (!result.ok) toast.error(result.message); return result; };
   const addPreset = (archetype: DimensionalDecorationArchetypeV7) => {
     const decoration = createDimensionalDecorationV7(archetype, generateEditorV7Id('element'));
-    if (!decoration) { toast.error('3D asset registry 当前不可用，未创建饰品。'); return; }
+    if (!decoration) { toast.error(t('editorV7.decoration.assetUnavailable')); return; }
     report(addElement(currentFinger, step.id, decoration));
   };
   const replace = (next: DimensionalDecorationV7) => report(replaceDecoration(currentFinger, step.id, next.id, next));
   const setTransform = (patch: Partial<Transform2DV7>) => {
-    if (!selected) return { ok: false, reason: 'not_found', message: 'decoration not selected' } as EditorV7ActionResult;
+    if (!selected) return { ok: false, reason: 'not_found', message: t('editorV7.decoration.notSelected') } as EditorV7ActionResult;
     const transform = { ...selected.transform, ...patch };
     return replace({ ...selected, transform, ...(selected.kind === 'attachment_3d' && patch.position ? { anchor: patch.position } : {}) });
   };
@@ -69,21 +71,21 @@ export function DimensionalDecorationPanelV7() {
 
   return (
     <div className="mt-2 space-y-3 rounded-xl border border-primary/15 bg-primary-soft/30 p-3" data-testid="v7-dimensional-decoration-panel">
-      <div><div className="flex items-center gap-2"><Box size={14} className="text-primary" /><p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-600">立体装饰 · 2D/2.5D</p></div><p className="mt-1 text-nano leading-4 text-gray-500">高度与锚点写入 {currentFinger} canonical step；投影只由参数派生。</p></div>
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-white p-1" aria-label="立体装饰预设">
-        {ARCHETYPES.map((archetype) => <button key={archetype} type="button" disabled={!canMutateStep} onClick={() => addPreset(archetype)} className="min-h-11 rounded-lg px-2 text-nano font-medium text-gray-600 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45">+ {DIMENSIONAL_DECORATION_LABELS_V7[archetype]}</button>)}
+      <div><div className="flex items-center gap-2"><Box size={14} className="text-primary" /><p className="text-nano font-semibold uppercase tracking-[0.12em] text-gray-600">{t('editorV7.decoration.title')}</p></div><p className="mt-1 text-nano leading-4 text-gray-500">{t('editorV7.decoration.description', { finger: currentFinger })}</p></div>
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-white p-1" aria-label={t('editorV7.decoration.presets')}>
+        {ARCHETYPES.map((archetype) => <button key={archetype} type="button" disabled={!canMutateStep} onClick={() => addPreset(archetype)} className="min-h-11 rounded-lg px-2 text-nano font-medium text-gray-600 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-45">{t('common.add')} {DIMENSIONAL_DECORATION_LABELS_V7[archetype]}</button>)}
       </div>
-      {!selected && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-3 py-4 text-center text-nano text-gray-500">添加或选择一个装饰后编辑高度、锚点和投影。</p>}
+      {!selected && <p className="rounded-lg border border-dashed border-gray-300 bg-white px-3 py-4 text-center text-nano text-gray-500">{t('editorV7.decoration.empty')}</p>}
       {selected && <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-3">
-        <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-semibold text-gray-800">{dimensionalDecorationLabelV7(selected)}</p><p className="mt-0.5 max-w-[180px] truncate text-nano text-gray-400">{selected.kind === 'attachment_3d' ? selected.asset.assetId : selected.materialRef?.materialId}</p></div><div className="flex gap-1"><button type="button" aria-label={selected.locked ? '解锁装饰' : '锁定装饰'} disabled={!canMutateStep} onClick={() => report(setElementFlag(currentFinger, step.id, selected.id, 'locked', !selected.locked))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200">{selected.locked ? <Lock size={14} /> : <Unlock size={14} />}</button><button type="button" aria-label="删除装饰" disabled={!canEditSelected} onClick={() => report(removeElement(currentFinger, step.id, selected.id))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200 text-error disabled:opacity-35"><Trash2 size={14} /></button></div></div>
-        <CommitRange label="高度" value={selected.heightMm} min={0.05} max={10} step={0.01} unit=" mm" disabled={!canEditSelected} onCommit={(heightMm) => replace({ ...selected, heightMm })} />
-        <CommitRange label="锚点 X" value={selected.transform.position.u} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(u) => setTransform({ position: { ...selected.transform.position, u } })} />
-        <CommitRange label="锚点 Y" value={selected.transform.position.v} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(v) => setTransform({ position: { ...selected.transform.position, v } })} />
-        <CommitRange label="缩放" value={selected.transform.scaleX} min={0.25} max={2} step={0.01} disabled={!canEditSelected} onCommit={(scale) => setTransform({ scaleX: scale, scaleY: scale })} />
-        <CommitRange label="旋转" value={selected.transform.rotationDeg} min={-180} max={180} step={1} unit="°" disabled={!canEditSelected} onCommit={(rotationDeg) => setTransform({ rotationDeg })} />
+        <div className="flex items-center justify-between gap-2"><div><p className="text-xs font-semibold text-gray-800">{dimensionalDecorationLabelV7(selected)}</p><p className="mt-0.5 max-w-[180px] truncate text-nano text-gray-400">{selected.kind === 'attachment_3d' ? selected.asset.assetId : selected.materialRef?.materialId}</p></div><div className="flex gap-1"><button type="button" aria-label={selected.locked ? t('editorV7.decoration.unlock') : t('editorV7.decoration.lock')} disabled={!canMutateStep} onClick={() => report(setElementFlag(currentFinger, step.id, selected.id, 'locked', !selected.locked))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200">{selected.locked ? <Lock size={14} /> : <Unlock size={14} />}</button><button type="button" aria-label={t('editorV7.decoration.delete')} disabled={!canEditSelected} onClick={() => report(removeElement(currentFinger, step.id, selected.id))} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-200 text-error disabled:opacity-35"><Trash2 size={14} /></button></div></div>
+        <CommitRange label={t('editorV7.decoration.height')} value={selected.heightMm} min={0.05} max={10} step={0.01} unit=" mm" disabled={!canEditSelected} onCommit={(heightMm) => replace({ ...selected, heightMm })} />
+        <CommitRange label={t('editorV7.decoration.anchorX')} value={selected.transform.position.u} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(u) => setTransform({ position: { ...selected.transform.position, u } })} />
+        <CommitRange label={t('editorV7.decoration.anchorY')} value={selected.transform.position.v} min={0} max={1} step={0.01} disabled={!canEditSelected} onCommit={(v) => setTransform({ position: { ...selected.transform.position, v } })} />
+        <CommitRange label={t('editorV7.decoration.scale')} value={selected.transform.scaleX} min={0.25} max={2} step={0.01} disabled={!canEditSelected} onCommit={(scale) => setTransform({ scaleX: scale, scaleY: scale })} />
+        <CommitRange label={t('editorV7.decoration.rotation')} value={selected.transform.rotationDeg} min={-180} max={180} step={1} unit="°" disabled={!canEditSelected} onCommit={(rotationDeg) => setTransform({ rotationDeg })} />
         {fidelity && <div className={cx('inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', fidelityTone)}>{DIMENSIONAL_FIDELITY_LABELS_V7[fidelity]}</div>}
       </div>}
-      <p className="rounded-lg border border-info/20 bg-info-soft px-2.5 py-2 text-nano leading-4 text-info"><Info size={12} className="mr-1 inline" />2.5D 阴影与模拟 mesh 只用于编辑预览；不代表材料、装配或物理可制造性。</p>
+      <p className="rounded-lg border border-info/20 bg-info-soft px-2.5 py-2 text-nano leading-4 text-info"><Info size={12} className="mr-1 inline" />{t('editorV7.decoration.disclaimer')}</p>
     </div>
   );
 }

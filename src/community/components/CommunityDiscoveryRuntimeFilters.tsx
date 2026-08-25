@@ -23,7 +23,7 @@
 import { useState } from 'react';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { cx } from '@/design-system';
-import { useLocale } from '@/lib/i18n';
+import {useLocale, localizedLabel, type MessageKey} from '@/lib/i18n';
 import { DEFAULT_RECOMMENDATION_CHANNEL } from '../domain/taxonomy-v2/contract';
 import type { CommunityTaxonomyV2 } from '../domain/taxonomy-v2/types';
 import type { TaxonomyDimensionV2 } from '../domain/taxonomy-v2/contract';
@@ -41,9 +41,9 @@ interface CommunityDiscoveryRuntimeFiltersProps {
 }
 
 const SOURCE_CHIPS = [
-  { id: 'all', zh: '全部', en: 'All' },
-  { id: 'official', zh: '官方', en: 'Official' },
-  { id: 'creators', zh: '创作者', en: 'Creators' },
+  { id: 'all', labelKey: 'app.all' },
+  { id: 'official', labelKey: 'app.official' },
+  { id: 'creators', labelKey: 'app.creators' },
 ] as const;
 
 type AuxKey = 'lengthIds' | 'makeabilityIds' | 'rightsIds' | 'techniqueIds';
@@ -51,20 +51,18 @@ type AuxKey = 'lengthIds' | 'makeabilityIds' | 'rightsIds' | 'techniqueIds';
 interface AuxGroupConfig {
   dimension: TaxonomyDimensionV2;
   field: AuxKey;
-  zh: string;
-  en: string;
+  labelKey: MessageKey;
 }
 
 const AUX_GROUPS: AuxGroupConfig[] = [
-  { dimension: 'LENGTH', field: 'lengthIds', zh: '长度', en: 'Length' },
+  { dimension: 'LENGTH', field: 'lengthIds', labelKey: 'app.length' },
   {
     dimension: 'MAKEABILITY',
     field: 'makeabilityIds',
-    zh: '可制作性',
-    en: 'Makeability',
+    labelKey: 'app.application',
   },
-  { dimension: 'RIGHTS', field: 'rightsIds', zh: '版权', en: 'Rights' },
-  { dimension: 'TECHNIQUE', field: 'techniqueIds', zh: '技法', en: 'Technique' },
+  { dimension: 'RIGHTS', field: 'rightsIds', labelKey: 'app.rights' },
+  { dimension: 'TECHNIQUE', field: 'techniqueIds', labelKey: 'app.technique' },
 ];
 
 export function CommunityDiscoveryRuntimeFilters({
@@ -74,7 +72,7 @@ export function CommunityDiscoveryRuntimeFilters({
   onChange,
   onRemoveMarker,
 }: CommunityDiscoveryRuntimeFiltersProps) {
-  const { text } = useLocale();
+  const { t, locale } = useLocale();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const canonicalTags = Object.values(taxonomy.dimensions).flatMap(
@@ -83,12 +81,12 @@ export function CommunityDiscoveryRuntimeFilters({
 
   const markerLabel = (marker: DiscoveryCompatibilityMarkerV2): string => {
     if (marker.canonicalValue === 'technique:french') {
-      return text('技法：法式', 'Technique: French');
+      return t('app.techniqueFrench');
     }
     const tag = canonicalTags.find(
       (candidate) => candidate.id === marker.canonicalValue,
     );
-    return tag ? text(tag.labels['zh-CN'], tag.labels.en) : marker.canonicalValue;
+    return tag ? localizedLabel(tag.labels['zh-CN'], tag.labels.en, locale) : marker.canonicalValue;
   };
 
   const toggleAuxId = (group: AuxGroupConfig, id: string): void => {
@@ -215,7 +213,7 @@ export function CommunityDiscoveryRuntimeFilters({
                   : 'border-gray-200 bg-white text-gray-600',
               )}
             >
-              {text(chip.zh, chip.en)}
+              {t(chip.labelKey)}
             </button>
           );
         })}
@@ -233,11 +231,11 @@ export function CommunityDiscoveryRuntimeFilters({
               className="inline-flex items-center gap-1 rounded-full border border-primary-soft bg-primary-soft/40 py-1 pl-3 pr-1"
             >
               <span className="text-xs font-medium text-primary">
-                {text(chip.zh, chip.en)}
+                {localizedLabel(chip.zh, chip.en, locale)}
               </span>
               <button
                 type="button"
-                aria-label={text('移除条件', 'Remove condition')}
+                aria-label={t('app.removeCondition')}
                 data-testid={`remove-condition-${chip.id}`}
                 onClick={() => removeAuxId(chip.group, chip.id)}
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -260,7 +258,7 @@ export function CommunityDiscoveryRuntimeFilters({
               <span className="text-xs">{markerLabel(marker)}</span>
               <button
                 type="button"
-                aria-label={text('移除条件', 'Remove condition')}
+                aria-label={t('app.removeCondition')}
                 onClick={() => onRemoveMarker(marker)}
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
@@ -287,7 +285,7 @@ export function CommunityDiscoveryRuntimeFilters({
             )}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-            {text('筛选', 'Filters')}
+            {t('app.filters')}
             {activeAuxCount > 0 && (
               <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-soft px-1 text-[10px] font-medium text-primary">
                 {activeAuxCount}
@@ -301,21 +299,18 @@ export function CommunityDiscoveryRuntimeFilters({
               onClick={clearAll}
               className="inline-flex min-h-11 items-center rounded-full border border-gray-200 bg-white px-3 text-xs text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              {text('清除全部条件', 'Clear all conditions')}
+              {t('app.clearAllConditions')}
             </button>
           )}
         </div>
         <p className="flex items-center gap-1.5 text-xs text-gray-500">
           <span data-testid="community-runtime-condition-summary">
-            {text(
-              `${activeConditionCount} 个筛选条件`,
-              `${activeConditionCount} active condition${activeConditionCount === 1 ? '' : 's'}`,
-            )}
+            {t('app.activeconditioncountActiveConditionActiveconditioncount1S', { activeConditionCount: activeConditionCount, activeConditionCount_____1_________s_: activeConditionCount === 1 ? '' : 's' })}
           </span>
           <span aria-hidden="true">·</span>
           <span>
             <span data-testid="community-runtime-result-count">{resultCount}</span>
-            {text(' 个结果', ' results')}
+            {t('app.results')}
           </span>
         </p>
       </div>
@@ -328,7 +323,7 @@ export function CommunityDiscoveryRuntimeFilters({
           {AUX_GROUPS.map((group) => (
             <div key={group.dimension} className="space-y-2">
               <h3 className="text-xs font-medium text-gray-700">
-                {text(group.zh, group.en)}
+                {t(group.labelKey)}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {taxonomy.dimensions[group.dimension].tags.map((tag) => {
@@ -347,7 +342,7 @@ export function CommunityDiscoveryRuntimeFilters({
                           : 'border-gray-200 bg-white text-gray-600',
                       )}
                     >
-                      {text(tag.labels['zh-CN'], tag.labels.en)}
+                      {localizedLabel(tag.labels['zh-CN'], tag.labels.en, locale)}
                     </button>
                   );
                 })}
@@ -369,7 +364,7 @@ export function CommunityDiscoveryRuntimeFilters({
               }
               className="inline-flex min-h-11 items-center justify-center rounded-full px-3 text-xs text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              {text('清除筛选', 'Clear filters')}
+              {t('app.clearFilters')}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { Fragment, useId, type ReactNode } from 'react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import {
   createGlitterPreviewParticlesV7,
   representativeBackgroundColorV7,
@@ -34,7 +35,7 @@ import {
   surfaceEffectMaskPathToCanvasV7,
 } from '../v7/surface-effect';
 import { FlatContentArtworkV7 } from './FlatContentArtworkV7';
-import { fingerDisplayNameV7 } from '../v7/finger-identity';
+import { fingerDisplayNameForLocaleV7 } from '../v7/finger-identity';
 import { adaptFrenchFlatStepV1 } from '../v7/french-render-adapter-v1';
 
 const CANVAS_WIDTH = 100;
@@ -43,15 +44,15 @@ const MM_TO_CANVAS_UNITS = 8;
 type FlatStepV7 = Extract<ProcessStepV7, { kind: 'flat_design' }>;
 
 const FIDELITY_LABEL = {
-  exact: '已签收 2D 轮廓',
-  approximate: '含近似预览',
-  unavailable: '预览不可用',
+  exact: 'editorV7.preview.fidelityExact',
+  approximate: 'editorV7.preview.fidelityApproximate',
+  unavailable: 'editorV7.preview.fidelityUnavailable',
 } as const;
 
 const FIDELITY_SHORT_LABEL = {
-  exact: '已签收',
-  approximate: '近似',
-  unavailable: '注意',
+  exact: 'editorV7.preview.fidelityExactShort',
+  approximate: 'editorV7.preview.fidelityApproximateShort',
+  unavailable: 'editorV7.preview.fidelityUnavailableShort',
 } as const;
 
 function rgba(color: RgbaColorV7, opacity = 1): string {
@@ -199,6 +200,7 @@ export function CustomerNailPreviewV7({
   recipeInstances?: Record<string, RecipeInstanceV7>;
   allNails?: EditorDocV7['nails'];
 }) {
+  const { t, locale } = useLocale();
   const rawId = useId().replace(/:/g, '');
   const silhouette = resolveBackgroundSilhouetteV7(nail.geometryRef, nail.finger);
   const silhouetteTransform = silhouetteToCanvasTransform(silhouette.viewBox);
@@ -229,7 +231,7 @@ export function CustomerNailPreviewV7({
   return (
     <div className={cx('relative flex flex-col items-center', size === 'focus' ? 'gap-4' : 'gap-2')} data-testid="customer-nail-preview" data-finger={nail.finger} data-fidelity={readModel.fidelity} data-french-fidelity={unavailableFrench ? 'unavailable' : flatAdapters.some(({ adapted }) => adapted.status === 'structured') ? 'exact-source-derived' : 'not-applicable'} data-presentation={presentation}>
       <div className={cx('relative aspect-[5/8] w-full overflow-hidden rounded-[28px] border bg-white shadow-[0_18px_50px_rgba(77,53,67,0.12)]', selected ? 'border-primary ring-2 ring-primary/20' : 'border-white', presentation === 'composite' && 'shadow-[0_24px_60px_rgba(77,53,67,0.2)]', size === 'focus' ? 'max-w-[300px] p-3' : 'max-w-[150px] p-2')} style={{ ...(presentation === 'composite' ? { transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)' } : {}), ...(visualProportion ? { aspectRatio: `${visualProportion.width * 5} / ${visualProportion.height * 8}` } : {}) }}>
-        <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={`${nail.finger} 顾客${presentation === 'composite' ? '模拟 3D 组合' : ' 2D'}预览`}>
+        <svg viewBox="0 0 100 160" className="h-full w-full" role="img" aria-label={presentation === 'composite' ? t('editorV7.customerPreview.ariaComposite', { finger: nail.finger }) : t('editorV7.customerPreview.aria2d', { finger: nail.finger })}>
           <defs>
             <clipPath id={`${rawId}-geometry`} clipPathUnits="userSpaceOnUse"><path d={silhouette.pathD} transform={silhouetteTransform} /></clipPath>
             <BackgroundDefs background={backgroundStep.background} rawId={rawId} />
@@ -252,7 +254,7 @@ export function CustomerNailPreviewV7({
           <g clipPath={`url(#${rawId}-geometry)`}>
             <rect width="100" height="160" fill="#f5f5f6" />
             {backgroundStep.visible && <BackgroundArtwork background={backgroundStep.background} override={readModel.backgroundColorOverride} rawId={rawId} />}
-            {unavailableFrench && <g data-testid="customer-french-render-unavailable"><rect x="8" y="70" width="84" height="20" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="82" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text></g>}
+            {unavailableFrench && <g data-testid="customer-french-render-unavailable"><rect x="8" y="70" width="84" height="20" rx="4" fill="#fff5f5" stroke="#d46b6b" /><text x="50" y="82" textAnchor="middle" fontSize="4" fill="#9f2f2f">{t('editorV7.customerPreview.frenchUnavailable')}</text></g>}
             {presentation === '2d'
               ? renderFlatSteps.map((step, index) => <g key={step.id} data-preview-step-kind={step.kind} data-preview-step-order={index}>{renderStepElements(step, index)}</g>)
               : activeMiddle.map((step, index) => step.kind === 'flat_design'
@@ -266,10 +268,10 @@ export function CustomerNailPreviewV7({
           </g>
           <g transform={silhouetteTransform} pointerEvents="none"><path d={silhouette.pathD} fill="none" stroke="#6f625f" strokeWidth="1" vectorEffect="non-scaling-stroke" /></g>
         </svg>
-        {(readModel.backgroundScenarioActive || readModel.finishScenarioActive) && <span className="absolute right-2 top-2 rounded-full bg-violet-600 px-2 py-1 text-nano font-semibold text-white">临时比较</span>}
+        {(readModel.backgroundScenarioActive || readModel.finishScenarioActive) && <span className="absolute right-2 top-2 rounded-full bg-violet-600 px-2 py-1 text-nano font-semibold text-white">{t('editorV7.customerPreview.temporary')}</span>}
       </div>
       <div className="flex items-center gap-1.5 text-center">
-        <span className="whitespace-nowrap text-xs font-semibold text-gray-900">{fingerDisplayNameV7(nail.finger)} <span className="font-normal text-gray-400">{nail.finger}</span></span>
+        <span className="whitespace-nowrap text-xs font-semibold text-gray-900">{fingerDisplayNameForLocaleV7(nail.finger, locale)} <span className="font-normal text-gray-400">{nail.finger}</span></span>
         <span title={FIDELITY_LABEL[readModel.fidelity]} className={cx('whitespace-nowrap rounded-full px-1.5 py-0.5 text-nano', readModel.fidelity === 'unavailable' ? 'bg-warning-soft text-warning' : readModel.fidelity === 'approximate' ? 'bg-violet-50 text-violet-700' : 'bg-success-soft text-success')}>
           {size === 'overview' ? <><span className="sm:hidden">{FIDELITY_SHORT_LABEL[readModel.fidelity]}</span><span className="hidden sm:inline">{FIDELITY_LABEL[readModel.fidelity]}</span></> : FIDELITY_LABEL[readModel.fidelity]}
         </span>

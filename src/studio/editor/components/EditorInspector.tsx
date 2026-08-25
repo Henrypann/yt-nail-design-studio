@@ -17,14 +17,14 @@ import { RecipeInspector } from './RecipeInspector';
 
 export type InspectorTab = 'design' | 'layers' | 'check';
 
-const LENGTHS: { id: LengthPreset; label: string; extension: string }[] = [
-  { id: 'natural', label: '本甲长度', extension: '+0mm' },
-  { id: 'short-extension', label: '短延长', extension: '+4mm' },
-  { id: 'medium', label: '中长度', extension: '+8mm' },
-  { id: 'long', label: '长', extension: '+12mm' },
+const LENGTHS: { id: LengthPreset; label: import('@/lib/i18n').MessageKey; extension: string }[] = [
+  { id: 'natural', label: 'editor.extra.nailLength', extension: '+0mm' },
+  { id: 'short-extension', label: 'editor.extra.shortExtension', extension: '+4mm' },
+  { id: 'medium', label: 'editor.extra.mediumLength', extension: '+8mm' },
+  { id: 'long', label: 'editor.extra.longLength', extension: '+12mm' },
 ];
 function DesignInspector() {
-  const { locale, text } = useLocale();
+  const { locale, legacyLocale, t } = useLocale()
   const doc = useEditorStore((state) => state.doc);
   const readOnly = useEditorStore((state) => state.readOnly);
   const commit = useEditorStore((state) => state.commit);
@@ -39,17 +39,17 @@ function DesignInspector() {
       data-debug-id="studio.editor.inspector.design"
     >
       <p className="rounded-button bg-info-soft px-2 py-1.5 text-nano leading-relaxed text-info">
-        {text('甲型、长度和表面属于整套设计；颜色遵循底部“编辑范围”。', 'Shape, length and surface apply to the set. Color follows EDIT SCOPE below.')}
+        {t('app.shapeLengthSurfaceApplySetColorFollowsEditScopeBelow')}
       </p>
       <section>
-        <p className="mb-2 text-nano font-medium text-gray-700">NAIL SHAPE</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{t('editor.extra.nailShape')}</p>
         <div className="grid grid-cols-3 gap-1.5">
           {TIER_ONE_EDITOR_SHAPES.map((capability) => {
             const enabled = isEditorShapeEnabled(capability);
             const selected = doc.shape === capability.id;
             const compatibility = getShapeLengthCompatibility(capability.id, doc.length);
-            const hint = compatibilityTitle(compatibility, locale);
-            const badge = compatibilityLabel(compatibility, locale);
+            const hint = compatibilityTitle(compatibility, legacyLocale);
+            const badge = compatibilityLabel(compatibility, legacyLocale);
             return (
             <button
               key={capability.id}
@@ -72,10 +72,10 @@ function DesignInspector() {
             );
           })}
         </div>
-        <p className="mt-1 text-nano text-gray-400">Almond / Oval / Coffin available. Squoval / Square remain gated until geometry sign-off.</p>
+        <p className="mt-1 text-nano text-gray-400">{t('editor.extra.shapeAvailability')}</p>
       </section>
       <section>
-        <p className="mb-2 text-nano font-medium text-gray-700">{text('长度 · 扫描相对值', 'LENGTH · RELATIVE TO SCAN')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{t('app.lengthRelativeScan')}</p>
         <div className="grid grid-cols-2 gap-1.5">
           {LENGTHS.map((length) => {
             const selected = doc.lengthPreset === length.id;
@@ -83,8 +83,8 @@ function DesignInspector() {
               doc.shape,
               GEOMETRY_LENGTH_BY_PRESET[length.id],
             );
-            const hint = compatibilityTitle(compatibility, locale);
-            const badge = compatibilityLabel(compatibility, locale);
+            const hint = compatibilityTitle(compatibility, legacyLocale);
+            const badge = compatibilityLabel(compatibility, legacyLocale);
             return (
               <button
                 key={length.id}
@@ -104,7 +104,7 @@ function DesignInspector() {
                 )}
               >
                 <span>
-                  {taxonomyLabel('design-length', length.id, locale, { zh: length.label })}
+                  {taxonomyLabel('design-length', length.id, locale, { zh: t(length.label) })}
                   {!selected && badge && <span aria-hidden="true" className="ml-1 text-nano opacity-75">{badge}</span>}
                 </span>
                 <span className="tnum opacity-65">{length.extension}</span>
@@ -112,10 +112,10 @@ function DesignInspector() {
             );
           })}
         </div>
-        <p className="mt-1 text-nano text-gray-400">{text('无扫描时回退为 14 / 18 / 22 / 26mm。', 'Fallback without scan: 14 / 18 / 22 / 26mm.')}</p>
+        <p className="mt-1 text-nano text-gray-400">{t('app.fallbackWithoutScan14182226Mm')}</p>
       </section>
       <section>
-        <p className="mb-2 text-nano font-medium text-gray-700">{text('色彩预设', 'COLOR PRESETS')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{t('app.colorPresets')}</p>
         <div className="grid grid-cols-5 gap-1">
           {COLOR_PRESETS.map((color) => (
             <button
@@ -135,7 +135,7 @@ function DesignInspector() {
         </div>
       </section>
       <section>
-        <p className="mb-2 text-nano font-medium text-gray-700">{text('表面预设', 'SURFACE')}</p>
+        <p className="mb-2 text-nano font-medium text-gray-700">{t('app.surface')}</p>
         <div className="grid grid-cols-2 gap-1.5">
           {SURFACE_PRESETS.map((surface) => {
             const available = surface.id === 'gloss' || surface.id === 'matte';
@@ -179,11 +179,11 @@ export function EditorInspector(props: {
   onTabChange: (tab: InspectorTab) => void;
   onOpenRisk: () => void;
 }) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const tabs: { id: InspectorTab; label: string }[] = [
-    { id: 'design', label: text('设计', 'DESIGN') },
-    { id: 'layers', label: text('图层', 'LAYERS') },
-    { id: 'check', label: text('检查', 'CHECK') },
+    { id: 'design', label: t('app.design') },
+    { id: 'layers', label: t('app.layers') },
+    { id: 'check', label: t('app.check') },
   ];
   return (
     <aside className="flex w-80 shrink-0 flex-col border-l border-gray-200 bg-gray-50" data-testid="editor-inspector">
@@ -209,17 +209,17 @@ export function EditorInspector(props: {
         {props.tab === 'check' && (
           <div className="flex flex-col gap-3" data-debug-id="studio.editor.inspector.check">
             <section className="rounded-panel border border-gray-200 bg-white p-3">
-              <h3 className="text-xs font-semibold text-gray-800">二维风险检查</h3>
+              <h3 className="text-xs font-semibold text-gray-800">{t('editor.extra.riskCheck')}</h3>
               <p className="mt-1 text-nano leading-relaxed text-gray-500">
-                当前只检查附件数量、高度参数和边缘距离。结果不等于生产可行。
+                {t('editor.extra.riskDescription')}
               </p>
               <Button size="sm" variant="secondary" className="mt-3 w-full" onClick={props.onOpenRisk}>
                 <ScanSearch size={13} />
-                P0 风险筛查 · MOCK
+                {t('editor.extra.riskMock')}
               </Button>
             </section>
             <section className="rounded-panel border border-dashed border-gray-200 bg-white p-3 text-nano text-gray-500">
-              猫眼、极光、丝绸和三维模拟属于 E3+，本轮未以占位效果冒充完成。
+              {t('editor.extra.riskBoundary')}
             </section>
           </div>
         )}

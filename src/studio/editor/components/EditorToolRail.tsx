@@ -10,17 +10,17 @@ export function EditorToolRail(props: {
   onSelect: (section: EditorToolSection) => void;
   onToggleDrawer: () => void;
 }) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const items = [
-    { id: 'looks', label: text('款式', 'Looks'), icon: Sparkles },
-    { id: 'draw', label: text('绘制', 'Draw'), icon: Brush },
-    { id: 'components', label: text('组件', 'Parts'), icon: Gem },
-    { id: 'import', label: text('导入', 'Import'), icon: ImagePlus },
+    { id: 'looks', label: t('app.looks'), icon: Sparkles },
+    { id: 'draw', label: t('app.draw'), icon: Brush },
+    { id: 'components', label: t('app.parts'), icon: Gem },
+    { id: 'import', label: t('app.import2'), icon: ImagePlus },
   ] as const;
   return (
     <nav
       className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3"
-      aria-label="Editor 工具"
+      aria-label={t('editor.extra.editorTools')}
       data-debug-id="studio.editor.tool-rail"
     >
       {items.map((item) => (
@@ -44,7 +44,7 @@ export function EditorToolRail(props: {
       ))}
       <button
         type="button"
-        title={props.drawerOpen ? text('收起工具面板', 'Collapse tools') : text('展开工具面板', 'Expand tools')}
+        title={props.drawerOpen ? t('app.collapseTools') : t('app.expandTools')}
         onClick={props.onToggleDrawer}
         className="mt-auto flex h-9 w-9 items-center justify-center rounded-button text-gray-400 hover:bg-gray-100 hover:text-gray-700"
       >

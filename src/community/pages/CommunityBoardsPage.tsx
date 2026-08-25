@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { FolderHeart, Globe2, Link2, Loader2, LockKeyhole, Plus, Sparkles } from 'lucide-react';
 import { Button, Input, Modal, cx } from '@/design-system';
 import { Routes } from '@/app/routes';
-import { useLocale } from '@/lib/i18n';
+import {useLocale, type MessageKey} from '@/lib/i18n';
 import type { NailBoardV1, NailBoardVisibilityV1 } from '../domain/v7_1/nail-board';
 import type { PublishedLookReadModelV1 } from '../domain/v7_1/published-look-read-model';
 import { LOCAL_DEMO_IDENTITY_ID, createBrowserBoardRepository } from '../data/board-repository';
@@ -18,10 +18,10 @@ import { loadLookReadModels } from '../data/look-repository';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-const VISIBILITY_LABEL: Record<NailBoardVisibilityV1, { zh: string; en: string }> = {
-  PRIVATE: { zh: '仅自己可见', en: 'Private' },
-  UNLISTED: { zh: '不公开', en: 'Unlisted' },
-  PUBLIC: { zh: '公开', en: 'Public' },
+const VISIBILITY_LABEL: Record<NailBoardVisibilityV1, MessageKey> = {
+  PRIVATE: 'community.visibility.private',
+  UNLISTED: 'community.visibility.unlistedShort',
+  PUBLIC: 'community.visibility.public',
 };
 
 function VisibilityIcon({ visibility }: { visibility: NailBoardVisibilityV1 }) {
@@ -98,7 +98,7 @@ function BoardCoverMosaic({
 }
 
 export default function CommunityBoardsPage() {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const repository = useMemo(() => createBrowserBoardRepository(), []);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [boards, setBoards] = useState<NailBoardV1[]>([]);
@@ -155,7 +155,7 @@ export default function CommunityBoardsPage() {
       setTitle('');
       setCreateOpen(false);
     } catch (error) {
-      setCreateError(error instanceof Error ? error.message : text('创建失败，请重试。', 'Create failed. Retry.'));
+      setCreateError(error instanceof Error ? error.message : t('app.createFailedRetry'));
     } finally {
       setCreating(false);
     }
@@ -166,13 +166,13 @@ export default function CommunityBoardsPage() {
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="mb-1 text-nano font-semibold uppercase tracking-[0.18em] text-primary/80">
-            {text('你的灵感收藏', 'Your inspiration library')}
+            {t('app.inspirationLibrary')}
           </p>
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
-            {text('Nail Boards', 'Nail Boards')}
+            {t('app.nailBoards')}
           </h1>
           <p className="mt-1 max-w-xl text-sm leading-6 text-gray-500">
-            {text('把喜欢的美甲款式收进主题画板，让下一次设计从灵感开始。', 'Collect nail looks into visual boards and begin every design with inspiration.')}
+            {t('app.collectNailLooksIntoVisualBoardsBeginEveryDesignInspiration')}
           </p>
         </div>
         <Button
@@ -182,12 +182,12 @@ export default function CommunityBoardsPage() {
           data-testid="boards-create-open"
         >
           <Plus size={16} aria-hidden />
-          {text('新建 Board', 'New board')}
+          {t('app.newBoard')}
         </Button>
       </header>
 
       {loadState === 'loading' && (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4" aria-label={text('正在加载画板', 'Loading boards')}>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4" aria-label={t('app.loadingBoards2')}>
           {[0, 1, 2].map((item) => (
             <div key={item} className="overflow-hidden rounded-[20px] border border-gray-100 bg-white">
               <div className="aspect-[4/3] animate-pulse bg-gray-100" />
@@ -203,9 +203,9 @@ export default function CommunityBoardsPage() {
 
       {loadState === 'error' && (
         <div className="flex flex-col items-start gap-3 rounded-card border border-gray-200 bg-white p-6">
-          <p className="text-sm text-gray-600">{text('Board 列表加载失败。', 'Failed to load boards.')}</p>
+          <p className="text-sm text-gray-600">{t('app.failedLoadBoards')}</p>
           <Button size="sm" variant="secondary" className="min-h-11" onClick={() => setRetry((key) => key + 1)}>
-            {text('重试', 'Retry')}
+            {t('app.retry')}
           </Button>
         </div>
       )}
@@ -214,10 +214,7 @@ export default function CommunityBoardsPage() {
         <>
           {storageCorrupted && (
             <div className="rounded-button border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800" data-testid="boards-storage-corrupted">
-              {text(
-                '本地存储已损坏：为避免覆盖，写入已停止。请手动清除浏览器本地数据后重试。',
-                'Local storage is corrupted: writes are disabled to avoid overwriting it. Clear browser local data and retry.',
-              )}
+              {t('app.localStorageCorruptedWritesDisabledAvoidOverwritingItClearBrowserLocalDataRetry')}
             </div>
           )}
 
@@ -226,19 +223,19 @@ export default function CommunityBoardsPage() {
               <div className="pointer-events-none absolute -left-12 -top-20 h-48 w-48 rounded-full bg-white/50 blur-2xl" />
               <div className="pointer-events-none absolute -bottom-20 right-0 h-52 w-52 rounded-full bg-[#ddc7d1]/35 blur-3xl" />
               <FolderHeart size={28} className="relative mx-auto text-[#8f6879]" aria-hidden />
-              <p className="relative mt-3 text-base font-semibold text-gray-900">{text('从第一张灵感开始', 'Start with your first inspiration')}</p>
+              <p className="relative mt-3 text-base font-semibold text-gray-900">{t('app.startFirstInspiration')}</p>
               <p className="relative mx-auto mt-1 max-w-md text-sm leading-6 text-gray-600">
-                {text('在 Discover 中收藏喜欢的款式，图片会自动出现在这里。', 'Save looks you love in Discover and their images will appear here automatically.')}
+                {t('app.saveLooksLoveDiscoverTheirImagesWillAppearHereAutomatically')}
               </p>
               <div className="relative mt-5 flex flex-wrap justify-center gap-2">
                 <Link
                   to={Routes.community}
                   className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  {text('发现灵感', 'Explore looks')}
+                  {t('app.exploreLooks')}
                 </Link>
                 <Button variant="secondary" className="min-h-11 rounded-full px-5" onClick={() => setCreateOpen(true)}>
-                  {text('创建画板', 'Create a board')}
+                  {t('app.createBoard')}
                 </Button>
               </div>
             </div>
@@ -256,7 +253,7 @@ export default function CommunityBoardsPage() {
                         <BoardCoverMosaic
                           board={board}
                           looksById={looksById}
-                          emptyLabel={text('等待第一份灵感', 'Ready for inspiration')}
+                          emptyLabel={t('app.readyInspiration')}
                         />
                         {board.items.length > 4 && (
                           <span className="absolute bottom-3 right-3 rounded-full bg-black/65 px-2.5 py-1 text-nano font-semibold text-white backdrop-blur-sm">
@@ -268,12 +265,12 @@ export default function CommunityBoardsPage() {
                         <div className="min-w-0">
                           <h2 className="truncate text-h3 font-semibold text-gray-950">{board.title}</h2>
                           <p className="mt-0.5 text-xs text-gray-500">
-                            {board.items.length} {text('份灵感', board.items.length === 1 ? 'inspiration' : 'inspirations')}
+                            {board.items.length} {t('community.inspirationCount')}
                           </p>
                         </div>
                         <span className="mt-0.5 flex shrink-0 items-center gap-1 rounded-full bg-white px-2 py-1 text-nano font-medium text-gray-500 ring-1 ring-gray-200">
                           <VisibilityIcon visibility={board.visibility} />
-                          {text(label.zh, label.en)}
+                          {t(label)}
                         </span>
                       </div>
                     </Link>
@@ -285,19 +282,16 @@ export default function CommunityBoardsPage() {
 
           <details className="self-start text-nano text-gray-400" data-testid="boards-local-demo-disclosure">
             <summary className="min-h-11 cursor-pointer py-3 text-gray-400 hover:text-gray-600">
-              {text('关于当前 Demo 数据', 'About this demo data')}
+              {t('app.aboutDemoData')}
             </summary>
             <p className="max-w-xl pb-2 leading-5">
-              {text(
-                `当前使用本地 Demo 身份 ${LOCAL_DEMO_IDENTITY_ID}；Board 只保存款式引用，数据仅存于本浏览器。`,
-                `Using local demo identity ${LOCAL_DEMO_IDENTITY_ID}; boards store look references only and live in this browser.`,
-              )}
+              {t('app.usingLocalDemoIdentityLocalDemoIdentityIdBoardsStoreLookReferencesOnlyLiveBrowser', { LOCAL_DEMO_IDENTITY_ID: LOCAL_DEMO_IDENTITY_ID })}
             </p>
           </details>
         </>
       )}
 
-      <Modal open={createOpen} onClose={closeCreate} title={text('新建 Nail Board', 'Create Nail Board')} size="md">
+      <Modal open={createOpen} onClose={closeCreate} title={t('app.createNailBoard')} size="md">
         <form
           className="flex flex-col gap-4"
           onSubmit={(event) => {
@@ -310,15 +304,15 @@ export default function CommunityBoardsPage() {
             <Input
               autoFocus
               className="min-h-11"
-              label={text('Board 名称', 'Board name')}
-              placeholder={text('例如：婚礼灵感', 'e.g. Wedding inspiration')}
+              label={t('app.boardName')}
+              placeholder={t('app.eGWeddingInspiration')}
               value={title}
               maxLength={80}
               onChange={(event) => setTitle(event.target.value)}
               data-testid="boards-create-title"
             />
             <p className="mt-2 text-xs leading-5 text-gray-500" data-testid="boards-default-private-disclosure">
-              {text('默认仅自己可见。创建后可在 Board 内调整公开范围。', 'Private by default. You can change visibility inside the board later.')}
+              {t('app.privateByDefaultCanChangeVisibilityInsideBoardLater')}
             </p>
           </div>
           {createError && (
@@ -328,7 +322,7 @@ export default function CommunityBoardsPage() {
           )}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="secondary" className="min-h-11" onClick={closeCreate} disabled={creating}>
-              {text('取消', 'Cancel')}
+              {t('app.cancel')}
             </Button>
             <Button
               type="submit"
@@ -338,7 +332,7 @@ export default function CommunityBoardsPage() {
               data-testid="boards-create-submit"
             >
               {creating ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Plus size={14} aria-hidden />}
-              {text('创建 Board', 'Create board')}
+              {t('app.createBoard2')}
             </Button>
           </div>
         </form>

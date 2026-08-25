@@ -24,7 +24,6 @@ import {
   isWizardShapeEnabled,
   loadShapeCapabilities,
   loadShapeParams,
-  shapeAvailabilityLabel,
   type ShapeCapability,
   type ShapeCapabilitiesRegistry,
   type ShapeParams,
@@ -84,24 +83,20 @@ interface ShapeCardProps {
 }
 
 function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelect }: ShapeCardProps) {
-  const { locale } = useLocale();
+  const { locale, legacyLocale, t } = useLocale();
   const enabled = isWizardShapeEnabled(capability);
   const compatibility = getShapeLengthCompatibility(capability.id, length);
-  const compatibilityHint = compatibilityTitle(compatibility, locale);
-  const compatibilityBadge = compatibilityLabel(compatibility, locale);
-  const rawAvailability = shapeAvailabilityLabel(capability);
-  const availability =
-    locale === 'zh'
-      ? rawAvailability
-      : rawAvailability === '可用'
-        ? 'Available'
-        : rawAvailability === '校准中'
-          ? 'In review'
-          : rawAvailability === '模板适配中'
-            ? 'Assets pending'
-            : rawAvailability === '规划中'
-              ? 'Planned'
-              : 'Coming soon';
+  const compatibilityHint = compatibilityTitle(compatibility, legacyLocale);
+  const compatibilityBadge = compatibilityLabel(compatibility, legacyLocale);
+  const availability = isWizardShapeEnabled(capability)
+    ? t('shape.available')
+    : capability.capabilities.geometry === 'placeholder'
+      ? t('shape.planned')
+      : capability.capabilities.geometry !== 'signed_off'
+        ? t('shape.inReview')
+        : capability.capabilities.templates !== 'complete' || capability.capabilities.styles !== 'complete'
+          ? t('shape.assetsPending')
+          : t('shape.comingSoon');
   const shapeLabel = taxonomyLabel('shape', capability.id, locale, {
     zh: capability.label,
     en: capability.label_en,
@@ -206,7 +201,7 @@ function ShapeCard({ capability, silhouette, selected, length, lengthMm, onSelec
 }
 
 export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange }: ShapeLengthPickerProps) {
-  const { locale, text } = useLocale();
+  const { locale, legacyLocale, t } = useLocale()
   const [params, setParams] = useState<ShapeParams | null>(null);
   const [registry, setRegistry] = useState<ShapeCapabilitiesRegistry | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -254,10 +249,10 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-xs font-medium text-gray-700">{text('甲型', 'NAIL SHAPE')}</p>
+        <p className="mb-2 text-xs font-medium text-gray-700">{t('app.nailShape')}</p>
         {loadFailed ? (
           <div role="alert" className="rounded-card border border-error/20 bg-error-soft px-3 py-2 text-xs text-error">
-            甲型目录加载失败，请刷新后重试。
+            {t('shape.loadFailed')}
           </div>
         ) : (
           <>
@@ -269,7 +264,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
                 aria-expanded={tierTwoOpen}
                 className="flex w-full items-center justify-between px-3 py-2 text-left text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
-                <span>{text(`更多甲型（${tierTwo.length}）`, `More shapes (${tierTwo.length})`)}</span>
+                <span>{t('app.moreShapesTiertwoLength', { tierTwo_length: tierTwo.length })}</span>
                 <ChevronDown
                   size={15}
                   className={cx('transition-transform duration-fast', tierTwoOpen && 'rotate-180')}
@@ -282,7 +277,7 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-medium text-gray-700">{text('长度', 'LENGTH')}</p>
+        <p className="mb-2 text-xs font-medium text-gray-700">{t('app.length2')}</p>
         <div className="flex flex-wrap gap-2">
           {LENGTH_ORDER.map((item) => {
             const meta = params?.lengths[item];
@@ -290,8 +285,8 @@ export function ShapeLengthPicker({ shape, length, onShapeChange, onLengthChange
             const compatibility = shape
               ? getShapeLengthCompatibility(shape, item)
               : { severity: 'neutral' as const, selectable: true as const };
-            const hint = compatibilityTitle(compatibility, locale);
-            const badge = compatibilityLabel(compatibility, locale);
+            const hint = compatibilityTitle(compatibility, legacyLocale);
+            const badge = compatibilityLabel(compatibility, legacyLocale);
             return (
               <button
                 type="button"

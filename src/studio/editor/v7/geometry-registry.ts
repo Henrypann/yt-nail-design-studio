@@ -80,7 +80,7 @@ export const GENERIC_NAIL_SILHOUETTE_V7: NailSilhouetteV7 = {
   source: 'generic',
   pathD: 'M50 5 C74 5 87 20 88 48 L84 120 C82 144 69 155 50 155 C31 155 18 144 16 120 L12 48 C13 20 26 5 50 5 Z',
   viewBox: '0 0 100 160',
-  label: '通用甲型轮廓（未关联可用产品几何）',
+  label: 'generic-outline',
   fidelity: 'unavailable',
   manufacturingValidated: false,
 };
@@ -167,9 +167,7 @@ export function resolveEditorGeometryV7(
     length: exact.length,
     finger: exact.finger,
     silhouette: structuredClone(exact.silhouette),
-    label: fidelity === 'exact'
-      ? `${exact.shape} / ${exact.length} · 已签收 2D 产品轮廓`
-      : `${exact.shape} / ${exact.length} · 生成轮廓（近似）`,
+    label: `${exact.shape} / ${exact.length}`,
     registryAssetSetSha256: PRODUCT_GEOMETRY_ASSET_SET_SHA256_V7,
     manufacturingValidated: false,
   };
