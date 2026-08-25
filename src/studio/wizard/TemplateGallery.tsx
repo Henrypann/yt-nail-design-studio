@@ -13,7 +13,7 @@ import type { NailShape } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import {
   compatTier,
-  isHighFidelityConceptGalleryTemplate,
+  isQuickStartOfficialTemplate,
   loadLibraryIndex,
   notRecommendedReason,
   sortTemplatesForShape,
@@ -21,7 +21,6 @@ import {
   type TemplateEntry,
 } from '@/studio/preview/material-library';
 import { useWizardStore } from './wizard-store';
-import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -63,19 +62,14 @@ export function TemplateGallery() {
 
   const visible = useMemo(() => {
     if (!index) return [];
-    const highFidelityTemplates = index.templates.filter(isHighFidelityConceptGalleryTemplate);
-    const enabledTemplates = PETAL_VEIL_P0_ENABLED
-      ? highFidelityTemplates
-      : highFidelityTemplates.filter((template) => template.id !== 't_petal_veil_french');
-    return appliedShape
-      ? sortTemplatesForShape(enabledTemplates, appliedShape)
-      : [...enabledTemplates].sort((a, b) => a.sort_order - b.sort_order);
+    const enabledTemplates = index.templates.filter((template) => isQuickStartOfficialTemplate(template, appliedShape ?? undefined));
+    return sortTemplatesForShape(enabledTemplates, appliedShape ?? 'almond');
   }, [index, appliedShape]);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2 border-b border-hairline pb-2">
-        <div><p className="text-sm font-semibold text-ink">官方模板</p><p className="text-nano text-mute">按当前甲型适配度排序 · 概念/模拟证据单独标注</p></div>
+        <div><p className="text-sm font-semibold text-ink">官方模板</p><p className="text-nano text-mute">经典法式 · 精确资产 · 按当前甲型适配度排序</p></div>
       </div>
 
       {/* 卡片列表（窄栏单列） */}
@@ -109,11 +103,7 @@ export function TemplateGallery() {
                 disabled={readOnly}
                 onApply={() => {
                   applyTemplate(t);
-                  if (t.asset_status === 'CONCEPT') {
-                    toast.warning(t.id === 't_petal_veil_french'
-                      ? '已应用 Petal Veil HQ 候选。Canonical Fixture 尚待人工视觉签收，制造状态未验证。'
-                      : `已应用「${t.name}」概念基础层。`);
-                  }
+                  toast.success(`已应用「${t.name}」官方起稿模板。`);
                 }}
               />
             ))}
@@ -206,11 +196,7 @@ function TemplateCard({ template, shape, selected, disabled, onApply }: Template
             onClick={onApply}
             className="h-7 w-full text-nano"
           >
-            {template.asset_status === 'CONCEPT'
-              ? selected
-                ? template.id === 't_petal_veil_french' ? '已应用 HQ 候选' : '已应用概念基础层'
-                : template.id === 't_petal_veil_french' ? '应用 HQ 候选' : '应用概念基础层'
-              : selected
+            {selected
                 ? '已应用 · 再次应用'
                 : '应用此模板'}
           </Button>

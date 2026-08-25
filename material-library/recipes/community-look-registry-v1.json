@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "community-look-recipe-registry-v1",
+  "architectureBaseline": "v0.7.2",
+  "updatedAt": "2026-08-25T00:00:00.000Z",
+  "recipes": [
+    {
+      "recipeId": "mercury-dew",
+      "displayName": "Mercury Dew",
+      "lookIds": ["cc_mercury_dew"],
+      "sourceRefs": ["material-library/recipes/mercury-dew/recipe.json", "assets/hero-recipes/mercury-dew/manifest.json"],
+      "lifecycle": "SIMULATED",
+      "evidenceTier": "simulated",
+      "completenessPriority": 1,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "petal-veil-french",
+      "displayName": "Petal Veil French",
+      "lookIds": ["look.v7-1.petal-veil", "cc_petal_veil"],
+      "sourceRefs": ["material-library/recipes/petal-veil-french/recipe.json", "assets/hero-recipes/petal-veil-french/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "architecture-golden",
+      "completenessPriority": 2,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "leopard-gilded-nude",
+      "displayName": "Leopard Gilded Nude",
+      "lookIds": ["look.v0-7-2.leopard-gilded-nude"],
+      "sourceRefs": ["src/integration/community-studio/v0-7-2-four-look-sets.ts", "assets/hero-recipes/leopard-gilded-nude/recipe-spec.json", "assets/hero-recipes/leopard-gilded-nude/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "simulated",
+      "completenessPriority": 3,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "crimson-reliquary",
+      "displayName": "Crimson Reliquary",
+      "lookIds": ["look.v0-7-2.crimson-reliquary"],
+      "sourceRefs": ["src/integration/community-studio/v0-7-2-four-look-sets.ts", "assets/hero-recipes/crimson-reliquary/recipe-spec.json", "assets/hero-recipes/crimson-reliquary/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "simulated",
+      "completenessPriority": 4,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "ivory-lace-crystal",
+      "displayName": "Ivory Lace Crystal",
+      "lookIds": ["look.v0-7-2.ivory-lace-crystal"],
+      "sourceRefs": ["src/integration/community-studio/v0-7-2-four-look-sets.ts", "assets/hero-recipes/ivory-lace-crystal/recipe-spec.json", "assets/hero-recipes/ivory-lace-crystal/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "simulated",
+      "completenessPriority": 5,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "honey-petal-glass",
+      "displayName": "Honey Petal Glass",
+      "lookIds": ["look.v0-7-2.honey-petal-glass"],
+      "sourceRefs": ["src/integration/community-studio/v0-7-2-four-look-sets.ts", "assets/hero-recipes/honey-petal-glass/recipe-spec.json", "assets/hero-recipes/honey-petal-glass/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "simulated",
+      "completenessPriority": 6,
+      "manufacturingCommandAllowed": false
+    },
+    {
+      "recipeId": "petal-pearl-bloom",
+      "displayName": "Petal Pearl Bloom",
+      "lookIds": ["cc_petal_pearl_bloom"],
+      "sourceRefs": ["assets/hero-recipes/petal-pearl-bloom/recipe-spec.json", "assets/hero-recipes/petal-pearl-bloom/manifest.json"],
+      "lifecycle": "CONCEPT",
+      "evidenceTier": "simulated",
+      "completenessPriority": 7,
+      "manufacturingCommandAllowed": false
+    }
+  ]
+}

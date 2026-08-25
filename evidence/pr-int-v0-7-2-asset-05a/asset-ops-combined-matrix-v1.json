@@ -18,10 +18,10 @@
       "binariesPresentCount": 25
     },
     "starterShelf": {
-      "candidateDatasetCount": 10,
-      "preflightCaseCount": 70,
-      "exactIdentityCount": 63,
-      "unavailableCount": 7,
+      "candidateDatasetCount": 1,
+      "preflightCaseCount": 7,
+      "exactIdentityCount": 7,
+      "unavailableCount": 0,
       "usageScope": "LOCAL_CONCEPT_DRAFT_ONLY",
       "rightsStatus": "PENDING",
       "promotionStatus": "BLOCKED",

@@ -300,49 +300,49 @@
       "shape": "almond",
       "assetId": "asset.template-pattern.t_french_white.almond",
       "revision": "template-v1",
-      "sha256": "47fafa9af0909e3a53294a01c97836edd82d5a40305e67e673f703850cabab20"
+      "sha256": "b19534eb2594de9f6ce9d50a398a1ad916786a9d91e72df84044c0cdacbcf20e"
     },
     {
       "templateId": "t_french_white",
       "shape": "coffin",
       "assetId": "asset.template-pattern.t_french_white.coffin",
       "revision": "template-v1",
-      "sha256": "f8ece504ff97596f5be1c4877a17ba7ff9d80fb9cc5c20dbf3f8852449f39359"
+      "sha256": "768fbe78c5fabf434100c9c8d5f24172def0f3774db1a0a0c542b604598c9089"
     },
     {
       "templateId": "t_french_white",
       "shape": "oval",
       "assetId": "asset.template-pattern.t_french_white.oval",
       "revision": "template-v1",
-      "sha256": "cd6ca29982ae07a3cc9b5c84215fb7ce712cb3c98fb46deb26f785643b65f079"
+      "sha256": "95dbc591ae02e10b3b7441e5506fab1692a26d1f0dc0c266a320b8e1231ce9af"
     },
     {
       "templateId": "t_french_white",
       "shape": "round",
       "assetId": "asset.template-pattern.t_french_white.round",
       "revision": "template-v1",
-      "sha256": "306463d5218099c6c80a0e3b50f111fa7ef211baf3b93b564682ba754d13346e"
+      "sha256": "1dea271312ae534e5bcf555180c26df02a66fa8136a942c5f484c6accad35438"
     },
     {
       "templateId": "t_french_white",
       "shape": "square",
       "assetId": "asset.template-pattern.t_french_white.square",
       "revision": "template-v1",
-      "sha256": "a985543ce37c810a0531ff9c3eb0c4f25215b9a38a6d6dac0fac7053e192ff42"
+      "sha256": "13543636274f1d1531e006ffa78da2f90455275327f5f39884ccc182a113ec8f"
     },
     {
       "templateId": "t_french_white",
       "shape": "squoval",
       "assetId": "asset.template-pattern.t_french_white.squoval",
       "revision": "template-v1",
-      "sha256": "de705852b7ef52dc3229db5f7b51921d74968acd24f3f175c03720cab9327fd2"
+      "sha256": "f16cba1b8f317f72e2446660970ab46db6d1653e4e622b49d724523d486a8a37"
     },
     {
       "templateId": "t_french_white",
       "shape": "stiletto",
       "assetId": "asset.template-pattern.t_french_white.stiletto",
       "revision": "template-v1",
-      "sha256": "cf21ea12fbb9b5fe00337bf2d9eada0b99545c1c3a3c8038ad70e990eae9accf"
+      "sha256": "defa27ce460090b6fceae9b214080a7aa9e51d0ae6b034e49f23b6f3ad85ba6b"
     },
     {
       "templateId": "t_holiday_glitter",

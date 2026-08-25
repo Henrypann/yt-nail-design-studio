@@ -133,4 +133,4 @@ for (const relative of writerZeroSources) {
   assert.doesNotMatch(source, /editorV7Store|wizardStore|localStorage\.setItem|sessionStorage\.setItem/);
 }
 
-console.log('test-asset-ops-combined-handoff: PASS (21+4 inventory, 25/25 governance, 63/7 shelf, 24 capability, 6+6 viewport evidence, 15 owner candidates fail closed, owner Unknowns explicit)');
+console.log('test-asset-ops-combined-handoff: PASS (21+4 inventory, 25/25 governance, 7/0 Classic French shelf, 24 capability, 6+6 viewport evidence, 15 owner candidates fail closed, owner Unknowns explicit)');

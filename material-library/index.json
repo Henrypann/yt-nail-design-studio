@@ -1,7 +1,7 @@
 {
   "version": 2,
   "updated_at": "2026-08-04T00:00:00Z",
-  "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。REAL 为正式可编辑模板；CONCEPT 为独立产品卡片，但必须通过 render_template_id 降级到已签收基础层，并显示未实现能力。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码。not_recommended 的每个条目必须带人类可读 reason。",
+  "comment": "模板索引（DEV-PLAN §5.1 数据模型 + §5.4 映射表）。REAL 是资产库模板；只有带 quick_start.enabled + editor_ready 且通过 template-pattern registry 的条目进入 Quick Start。CONCEPT/SIMULATED 是 Community/editorial 兼容数据，不因 Hero 封面进入 Quick Start。前端一律从本文件读取模板清单、适配关系与排序，禁止硬编码。not_recommended 的每个条目必须带人类可读 reason。",
   "style_tags": [
     {
       "id": "trending",
@@ -492,9 +492,10 @@
     },
     {
       "id": "t_french_white",
-      "name": "法式白边",
-      "name_en": "French White Tip",
+      "name": "经典法式",
+      "name_en": "Classic French",
       "asset_status": "REAL",
+      "render_template_id": "t_french_white",
       "style_tags": [
         "minimal",
         "classic"
@@ -518,7 +519,14 @@
       },
       "thumbnail_url": "material-library/templates/t_french_white/thumbnails/default.png",
       "manifest_url": "material-library/templates/t_french_white/manifest.json",
-      "sort_order": 2
+      "sort_order": 0,
+      "quick_start": {
+        "enabled": true,
+        "placement": "OFFICIAL_TEMPLATE",
+        "editor_ready": true,
+        "source": "TEMPLATE_ASSET_REGISTRY"
+      },
+      "applies_to_shapes": ["almond", "oval", "coffin", "squoval", "round", "square", "stiletto"]
     },
     {
       "id": "t_nude_gradient",

@@ -38,6 +38,12 @@ import {
   loadCreatorPublishedLookReadModelsV1,
   type CreatorLookLoadDiagnosticV1,
 } from '@/integration/community-studio/backend-runtime';
+import communityRecipeRegistryRaw from '../../../material-library/recipes/community-look-registry-v1.json' with { type: 'json' };
+import {
+  parseCommunityLookRecipeRegistryV1,
+  selectRegisteredCommunityLooksV1,
+  type CommunityLookRecipeRegistryV1,
+} from '../domain/recipes/community-look-registry-v1';
 
 const runtimeMode = import.meta.env?.MODE ?? 'integration';
 
@@ -58,6 +64,7 @@ type LookCandidateSource = 'canonical' | 'four-look' | 'creator' | 'legacy';
 export type CommunityLookLoadDiagnosticV1 =
   | { scope: 'discovery-index'; code: 'UNAVAILABLE'; issues: DiscoveryIndexIssueV1[] }
   | { scope: 'discovery-index'; code: 'RECORD_BLOCKED'; contentId: string; blockedCode: DiscoveryIndexBlockedEntryV1['code'] }
+  | { scope: 'recipe-registry'; code: 'UNAVAILABLE' }
   | { scope: 'look-aggregation'; code: 'IDENTITY_COLLISION'; lookId: string; keptSource: LookCandidateSource; droppedSource: LookCandidateSource }
   | CreatorLookLoadDiagnosticV1;
 
@@ -68,6 +75,8 @@ function defaultCreatorDiagnostic(diagnostic: CommunityLookLoadDiagnosticV1): vo
 type DiscoveryFixtures =
   | { ok: true; index: CommunityDiscoveryIndexV1; blocked: DiscoveryIndexBlockedEntryV1[]; rawIndex: CommunityContentIndexV1 }
   | { ok: false; issues: DiscoveryIndexIssueV1[] };
+
+const communityRecipeRegistry: CommunityLookRecipeRegistryV1 | null = parseCommunityLookRecipeRegistryV1(communityRecipeRegistryRaw);
 
 /** Fetch + strict-parse the three discovery fixtures exactly once per load. */
 async function loadDiscoveryFixtures(): Promise<DiscoveryFixtures> {
@@ -144,6 +153,10 @@ export async function loadLookReadModels(input?: {
     emitDiagnostic({ scope: 'discovery-index', code: 'UNAVAILABLE', issues: fixtures.issues });
     return [];
   }
+  if (!communityRecipeRegistry) {
+    emitDiagnostic({ scope: 'recipe-registry', code: 'UNAVAILABLE' });
+    return [];
+  }
   const { index, blocked, rawIndex } = fixtures;
   const blockedById = new Map(blocked.map((entry) => [entry.contentId, entry]));
   for (const entry of blocked) {
@@ -183,7 +196,11 @@ export async function loadLookReadModels(input?: {
   for (const look of FOUR_LOOK_SET_READ_MODELS_V0_7_2) candidates.push({ source: 'four-look', look });
   for (const look of creator) candidates.push({ source: 'creator', look });
   for (const look of legacy) candidates.push({ source: 'legacy', look });
-  return aggregateLookCandidates(candidates, emitDiagnostic);
+  const aggregated = aggregateLookCandidates(candidates, emitDiagnostic);
+  // Unregistered legacy/creator records are expected governance filtering, not
+  // runtime failures. The selector retains an optional diagnostic hook for
+  // pure tests/tools, but the public repository deliberately stays quiet.
+  return selectRegisteredCommunityLooksV1(communityRecipeRegistry, aggregated);
 }
 
 export async function getLookReadModelById(

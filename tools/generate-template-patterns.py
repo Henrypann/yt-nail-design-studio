@@ -78,6 +78,7 @@ def f(v: float) -> str:
 def p_french_white(shape_id: str) -> tuple[str, str]:
     ys, yc = FRENCH_SMILE[shape_id]
     body = (
+        '    <rect x="-60" y="-200" width="120" height="220" fill="#F5E0D3"/>\n'
         f'    <path d="M -60 -200 H 60 V {ys} Q 0 {yc} -60 {ys} Z" fill="#FFFFFF"/>\n'
         f'    <path d="M -60 {ys} Q 0 {yc} 60 {ys}" fill="none" stroke="#F3E8E2" stroke-width="1.2"/>\n'
     )
@@ -391,13 +392,15 @@ def make_thumbnail(tid: str, out: Path) -> None:
     dr.polygon(
         [(cx - hw, bot), (cx - hw + 6, 160), (cx - 30, 70), (cx, top),
          (cx + 30, 70), (cx + hw - 6, 160), (cx + hw, bot)],
-        fill="#FFFFFF",
+        fill="#F5E0D3",
     )
     # 意象
     if tid == "t_french_white":
-        dr.polygon([(cx - hw, bot), (cx - hw + 6, 160), (cx - 30, 70), (cx, top),
-                    (cx + 30, 70), (cx + hw - 6, 160), (cx + hw, bot)], fill="#FFFFFF")
-        dr.arc([cx - hw + 4, 90, cx + hw - 4, 250], 200, 340, fill="#E8D5CC", width=3)
+        # 经典法式缩略图：裸粉底 + 白色尖端 + 轻微微笑线。
+        dr.pieslice([cx - hw, 40, cx + hw, 175], 180, 360, fill="#FFFFFF")
+        dr.polygon([(cx - hw, 112), (cx - hw + 6, 160), (cx - 30, 70), (cx, top),
+                    (cx + 30, 70), (cx + hw - 6, 160), (cx + hw, 112)], fill="#FFFFFF")
+        dr.arc([cx - hw + 4, 100, cx + hw - 4, 220], 200, 340, fill="#E8D5CC", width=3)
     elif tid == "t_checkerboard":
         for ix in range(5):
             for iy in range(6):

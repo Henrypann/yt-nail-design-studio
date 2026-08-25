@@ -23,18 +23,7 @@ export type StarterAssetPreflightV1 = {
 };
 
 const SHAPES: readonly NailShape[] = ['almond', 'oval', 'coffin', 'squoval', 'round', 'square', 'stiletto'];
-const EXPECTED_RENDER_TEMPLATE_IDS: Record<string, string> = {
-  t_petal_pearl_bloom_simulated: 't_petal_pearl_bloom_simulated',
-  t_mercury_dew_concept: 't_liquid_velvet_cat_eye',
-  t_pearl_tide_shell_concept: 't_3d_waterdrop',
-  t_micro_coquette_concept: 't_french_white',
-  t_starfish_bloom_elegance_concept: 't_3d_waterdrop',
-  t_sea_glass_chrome_concept: 't_liquid_velvet_cat_eye',
-  t_sunset_aura_glaze_concept: 't_nude_gradient',
-  t_liquid_chrome_statement_concept: 't_chrome_mirror',
-  t_butter_glaze_quiet_concept: 't_nude_gradient',
-  t_petal_veil_french: 't_petal_veil_french',
-};
+const EXPECTED_RENDER_TEMPLATE_IDS: Record<string, string> = { t_french_white: 't_french_white' };
 const OUTPUT_KEYS = ['assetRef', 'diagnostics', 'manufacturingValidated', 'promotionStatus', 'rightsStatus', 'technicalStatus', 'usageScope'];
 const ASSET_REF_KEYS = ['assetId', 'kind', 'mimeType', 'path', 'revision', 'sha256'];
 const SHA256 = /^[a-f0-9]{64}$/;
@@ -105,7 +94,6 @@ export async function preflightOfficialStarterAssetV1(input: {
     || !entry.renderTemplateId || entry.renderTemplateId.includes('/') || entry.renderTemplateId.includes('..')) return unavailable(['CANDIDATE_SOURCE_ID_INVALID']);
   const expectedRenderTemplateId = EXPECTED_RENDER_TEMPLATE_IDS[entry.assetId];
   if (entry.renderTemplateId !== expectedRenderTemplateId) return unavailable(['CANDIDATE_RENDER_MAPPING_MISMATCH']);
-  if (entry.assetId === 't_petal_pearl_bloom_simulated') return unavailable(['UNAVAILABLE_FOR_TEMPLATE_PREFLIGHT']);
   const resolveRegistry = input.resolveRegistry ?? getOfficialTemplatePatternAssetV7;
   const registryAsset = resolveRegistry(entry.renderTemplateId, shape);
   if (!registryAsset) return unavailable(['UNAVAILABLE_FOR_TEMPLATE_PREFLIGHT']);
