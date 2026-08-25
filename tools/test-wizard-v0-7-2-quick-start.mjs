@@ -8,6 +8,15 @@ const gallery = read('src/studio/wizard/TemplateGallery.tsx');
 const list = read('src/app/pages/design/DesignListPage.tsx');
 const app = read('src/app/App.tsx');
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+assert(
+  stepTwo.includes('...(s.templateAssetRef ? { templateAssetRef: s.templateAssetRef } : {})'),
+  'Wizard Editor preflight must receive the exact saved templateAssetRef when present',
+);
+assert(
+  !stepTwo.includes('templateAssetRef: getOfficialTemplatePatternAssetV7') &&
+    stepTwo.includes('...(s.templateAssetRef ? { templateAssetRef: s.templateAssetRef } : {})'),
+  'Wizard Editor preflight must not fabricate a template asset ref when the store has none',
+);
 assert(!stepOne.includes('StyleRecommendModal') && !stepOne.includes('applyValidatedStyleRecommendation'), 'recommendation modal remains active');
 assert(!stepTwo.includes('markConfirmed') && !params.includes('markConfirmed'), 'Quick Start confirmation writer remains');
 assert(!params.includes('decorationId') && params.includes('baseColor'), 'Quick Start decoration writer remains');

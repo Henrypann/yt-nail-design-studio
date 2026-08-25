@@ -119,6 +119,7 @@ export function StepTwo() {
     shape: s.appliedShape,
     length: s.appliedLength,
     ...(s.templateId ? { templateId: s.templateId } : {}),
+    ...(s.templateAssetRef ? { templateAssetRef: s.templateAssetRef } : {}),
     finish: s.finish,
     recipe: s.recipe,
     fingerOverrides: s.fingerOverrides,
