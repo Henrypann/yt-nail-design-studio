@@ -10,11 +10,11 @@ export function PublisherBadge({
   publisher: CommunityPublisherV1 | null | undefined;
   className?: string;
 }) {
-  const { text } = useLocale();
+  const { t, locale } = useLocale();
   const official = publisher?.type === 'OFFICIAL';
   const label = official
-    ? text('官方', 'Official')
-    : publisherBadgeLabel(publisher);
+    ? t('app.official')
+    : publisherBadgeLabel(publisher, locale);
   return (
     <Badge variant={official ? 'blue' : 'warning'} className={cx(className)}>
       {label}

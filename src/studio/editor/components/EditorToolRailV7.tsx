@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import type { FlatVectorToolV7 } from '../v7/flat-vector';
 import {
@@ -25,19 +26,8 @@ import {
   type EditorWorkspaceToolIdV7,
 } from '../v7/workspace-ia';
 
-const TOOL_META: Record<EditorWorkspaceToolIdV7, { label: string; icon: typeof MousePointer2; flatTool?: FlatVectorToolV7 }> = {
-  select: { label: '选择', icon: MousePointer2, flatTool: 'select' },
-  background: { label: '背景', icon: PaintBucket },
-  brush: { label: '画笔', icon: Paintbrush, flatTool: 'brush' },
-  eraser: { label: '橡皮', icon: Eraser, flatTool: 'eraser' },
-  line: { label: '线条', icon: Minus, flatTool: 'line' },
-  french: { label: '法式', icon: Waves, flatTool: 'french' },
-  shape: { label: '图形', icon: Shapes, flatTool: 'rectangle' },
-  text: { label: '文字', icon: Type },
-  assets: { label: '素材', icon: Image },
-  effects: { label: '效果', icon: Sparkles },
-  decorations: { label: '立体', icon: Gem },
-  finish: { label: '封层', icon: ShieldCheck },
+const TOOL_META: Record<EditorWorkspaceToolIdV7, { key: keyof typeof import('@/lib/i18n/messages').ZH_CN_MESSAGES; icon: typeof MousePointer2; flatTool?: FlatVectorToolV7 }> = {
+  select: { key: 'editorV7.tool.select', icon: MousePointer2, flatTool: 'select' }, background: { key: 'editorV7.tool.background', icon: PaintBucket }, brush: { key: 'editorV7.tool.brush', icon: Paintbrush, flatTool: 'brush' }, eraser: { key: 'editorV7.tool.eraser', icon: Eraser, flatTool: 'eraser' }, line: { key: 'editorV7.tool.line', icon: Minus, flatTool: 'line' }, french: { key: 'editorV7.tool.french', icon: Waves, flatTool: 'french' }, shape: { key: 'editorV7.tool.shape', icon: Shapes, flatTool: 'rectangle' }, text: { key: 'editorV7.tool.text', icon: Type }, assets: { key: 'editorV7.tool.assets', icon: Image }, effects: { key: 'editorV7.tool.effects', icon: Sparkles }, decorations: { key: 'editorV7.tool.decorations', icon: Gem }, finish: { key: 'editorV7.tool.finish', icon: ShieldCheck },
 };
 
 function toolButtonClass(active: boolean, horizontal: boolean): string {
@@ -63,6 +53,7 @@ export function EditorToolRailV7({
   onActivateTool(tool: EditorWorkspaceToolAvailabilityV7, trigger: HTMLButtonElement): void;
   onBlockedTool(tool: EditorWorkspaceToolAvailabilityV7, trigger: HTMLButtonElement): void;
 }) {
+  const { t } = useLocale();
   const nail = useEditorV7Store(selectCurrentNailV7);
   const selectedStep = useEditorV7Store(selectCurrentStepV7);
   const resourceMode = useEditorV7Store((state) => state.resourceMode);
@@ -100,7 +91,7 @@ export function EditorToolRailV7({
   };
   return (
     <nav
-      aria-label="设计工具"
+      aria-label={t('editorV7.tool.designTools')}
       data-testid={`v7-tool-rail-${orientation}`}
       className={cx(
         'border-gray-200 bg-white',
@@ -124,12 +115,13 @@ export function EditorToolRailV7({
           : tool.id === 'text' || tool.id === 'assets'
             ? selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id
           : meta.flatTool !== undefined && selectedStep?.kind === 'flat_design' && resourcesOpen && resourceMode === tool.id;
+        const label = t(meta.key);
         return (
           <button
             key={tool.id}
             type="button"
             aria-disabled={!tool.enabled}
-            aria-label={tool.enabled ? meta.label : `${meta.label}，${tool.reason ?? '当前不可用'}`}
+            aria-label={tool.enabled ? label : `${label}，${tool.reason ?? t('editorV7.tool.unavailable')}`}
             aria-describedby={!tool.enabled ? reasonId : undefined}
             aria-pressed={active}
             data-tool={tool.id}
@@ -137,7 +129,7 @@ export function EditorToolRailV7({
             data-tool-status={tool.status}
             data-step-kind={tool.requiredStepKind}
             data-target-step-id={tool.targetStepId ?? undefined}
-            title={tool.enabled ? meta.label : tool.reason}
+            title={tool.enabled ? label : tool.reason}
             onClick={(event) => {
               if (tool.enabled) onActivateTool(tool, event.currentTarget);
               else onBlockedTool(tool, event.currentTarget);
@@ -146,24 +138,24 @@ export function EditorToolRailV7({
             className={toolButtonClass(active, horizontal)}
           >
             <Icon size={16} />
-            {!horizontal && <span className="text-nano font-medium">{meta.label}</span>}
-            {!tool.enabled && <span id={reasonId} className="sr-only">{tool.reason ?? '当前工具不可用'}</span>}
+            {!horizontal && <span className="text-nano font-medium">{label}</span>}
+            {!tool.enabled && <span id={reasonId} className="sr-only">{tool.reason ?? t('editorV7.tool.unavailable')}</span>}
           </button>
         );
       })}
 
       <span className={cx('bg-gray-200', horizontal ? 'mx-1 h-7 w-px shrink-0' : 'my-1 h-px w-9')} aria-hidden="true" />
-      <button type="button" aria-label="当前层工具与参数" aria-pressed={resourcesOpen} onClick={onToggleResources} onKeyDown={moveToolFocus} className={toolButtonClass(resourcesOpen, horizontal)} title="打开当前层工具与参数">
+      <button type="button" aria-label={t('editorV7.tool.currentLayer')} aria-pressed={resourcesOpen} onClick={onToggleResources} onKeyDown={moveToolFocus} className={toolButtonClass(resourcesOpen, horizontal)} title={t('editorV7.tool.openCurrentLayer')}>
         <LibraryBig size={16} />
-        {!horizontal && <span className="text-nano font-medium">参数</span>}
+        {!horizontal && <span className="text-nano font-medium">{t('editorV7.tool.parameters')}</span>}
       </button>
-      <button type="button" aria-label="层级" onClick={() => onOpenPanel('layers')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title="打开层级">
+      <button type="button" aria-label={t('editorV7.tool.layers')} onClick={() => onOpenPanel('layers')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title={t('editorV7.tool.openLayers')}>
         <Layers3 size={16} />
-        {!horizontal && <span className="text-nano font-medium">层级</span>}
+        {!horizontal && <span className="text-nano font-medium">{t('editorV7.tool.layers')}</span>}
       </button>
-      <button type="button" aria-label="属性" onClick={() => onOpenPanel('inspector')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title="打开属性">
+      <button type="button" aria-label={t('editorV7.tool.properties')} onClick={() => onOpenPanel('inspector')} onKeyDown={moveToolFocus} className={cx(toolButtonClass(false, horizontal), 'xl:hidden')} title={t('editorV7.tool.openProperties')}>
         <SlidersHorizontal size={16} />
-        {!horizontal && <span className="text-nano font-medium">属性</span>}
+        {!horizontal && <span className="text-nano font-medium">{t('editorV7.tool.properties')}</span>}
       </button>
     </nav>
   );

@@ -7,7 +7,8 @@
  * meanings in the optical-effect and attachment domains.
  */
 
-import type { Locale } from '@/lib/i18n';
+import { toLegacyLocale } from '@/lib/i18n/types';
+import type { LegacyLocale, Locale } from '@/lib/i18n/types';
 
 export type NailTaxonomyNamespace =
   | 'shape'
@@ -160,22 +161,23 @@ export function canonicalTaxonomyId(namespace: NailTaxonomyNamespace, id: string
 export function taxonomyLabel(
   namespace: NailTaxonomyNamespace,
   id: string,
-  locale: Locale,
+  locale: Locale | LegacyLocale,
   fallback?: { zh?: string; en?: string },
 ): string {
   const entry = resolveTaxonomyEntry(namespace, id);
-  if (entry) return locale === 'en' ? entry.en : entry.zh;
-  const localized = locale === 'en'
+  const legacyLocale = toLegacyLocale(locale);
+  if (entry) return legacyLocale === 'en' ? entry.en : entry.zh;
+  const localized = legacyLocale === 'en'
     ? fallback?.en?.trim() || fallback?.zh?.trim()
     : fallback?.zh?.trim() || fallback?.en?.trim();
   if (localized) return localized;
-  return locale === 'en' ? `Unknown (${id || 'missing'})` : `未知（${id || 'missing'}）`;
+  return legacyLocale === 'en' ? `Unknown (${id || 'missing'})` : `未知（${id || 'missing'}）`;
 }
 
 export function communityTaxonomyLabel(
   namespace: Extract<NailTaxonomyNamespace, `community-${string}`>,
   item: LocalizedTaxonomyItem | undefined,
-  locale: Locale,
+  locale: Locale | LegacyLocale,
   unknownId = '',
 ): string {
   const id = item?.id ?? unknownId;

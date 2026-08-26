@@ -22,7 +22,7 @@
  * legacy fields; this component never renders anything from legacy data.
  */
 
-import type { Locale } from '@/lib/i18n';
+import { useLocale, type Locale } from '@/lib/i18n';
 import { isCurrentMakeable } from '../domain/taxonomy-v2/governance';
 import {
   CARD_TAG_PILL_MAX,
@@ -48,7 +48,7 @@ interface CommunityDiscoveryMetadataProps {
 
 /** Taxonomy label locale for the current i18n locale. */
 function taxonomyLocale(locale: Locale): 'zh-CN' | 'en' {
-  return locale === 'en' ? 'en' : 'zh-CN';
+  return locale === 'en-US' ? 'en' : 'zh-CN';
 }
 
 /**
@@ -128,16 +128,6 @@ export function RightsBadge({
   );
 }
 
-const MAKEABILITY_ROW_LABELS = {
-  'zh-CN': '可制作性',
-  en: 'Makeability',
-} as const;
-
-const DETAIL_SECTION_LABELS = {
-  'zh-CN': '结构化标签',
-  en: 'Structured tags',
-} as const;
-
 /**
  * Full structured discovery detail section: all non-empty groups in the
  * required order with bilingual group labels and every tag id; separate
@@ -150,11 +140,12 @@ export function DiscoveryDetailSection({
   locale,
 }: CommunityDiscoveryMetadataProps) {
   const labelLocale = taxonomyLocale(locale);
+  const { t } = useLocale();
   const groups = discoveryDetailGroups(discovery);
   const makeabilityId = makeabilityTagIdForDiscovery(discovery);
   const rightsId = rightsTagIdForDiscovery(discovery);
   const currentMakeable = isCurrentMakeable(discovery);
-  const sectionLabel = DETAIL_SECTION_LABELS[labelLocale];
+  const sectionLabel = t('community.discovery.structuredTags');
 
   return (
     <section
@@ -196,14 +187,14 @@ export function DiscoveryDetailSection({
             data-makeability-classification={discovery.makeability.classification}
             className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-nano text-gray-600"
           >
-            {MAKEABILITY_ROW_LABELS[labelLocale]}：
+            {t('community.discovery.makeability')}：
             {resolveV2TagLabel(taxonomy, makeabilityId, labelLocale)}
             {currentMakeable && (
               <span
                 data-testid="community-makeability-evidence-gated"
                 className="ml-1 font-medium text-emerald-700"
               >
-                · 当前可制作（证据门禁）
+                · {t('community.discovery.currentMakeableEvidenceGated')}
               </span>
             )}
           </span>

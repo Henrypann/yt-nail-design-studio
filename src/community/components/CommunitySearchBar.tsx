@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function CommunitySearchBar({ value, onSubmit, placeholder }: Props) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const [draft, setDraft] = useState(value);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function CommunitySearchBar({ value, onSubmit, placeholder }: Props) {
       data-testid="community-search-bar"
     >
       <label htmlFor="community-search-input" className="sr-only">
-        {text('搜索 Community', 'Search Community')}
+        {t('app.searchCommunity')}
       </label>
       <div className="relative min-w-0 flex-1">
         <Search
@@ -56,7 +56,7 @@ export function CommunitySearchBar({ value, onSubmit, placeholder }: Props) {
             event.preventDefault();
             submit();
           }}
-          placeholder={placeholder ?? text('搜索标题、风格、颜色、创作者…', 'Search title, style, color, creator…')}
+          placeholder={placeholder ?? t('app.searchTitleStyleColorCreator')}
           className="h-11 w-full rounded-button border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-none"
         />
       </div>
@@ -65,7 +65,7 @@ export function CommunitySearchBar({ value, onSubmit, placeholder }: Props) {
         data-testid="community-search-submit"
         className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-button bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        {text('搜索', 'Search')}
+        {t('app.search')}
       </button>
       {draft && (
         <button
@@ -81,7 +81,7 @@ export function CommunitySearchBar({ value, onSubmit, placeholder }: Props) {
           )}
         >
           <X size={14} aria-hidden />
-          <span className="hidden sm:inline">{text('清除', 'Clear')}</span>
+          <span className="hidden sm:inline">{t('app.clear')}</span>
         </button>
       )}
     </form>

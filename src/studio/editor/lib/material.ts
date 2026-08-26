@@ -7,7 +7,8 @@
  */
 
 import type { Finish, NailLength, NailShape } from '@/lib/types';
-import type { Locale } from '@/lib/i18n';
+import { toLegacyLocale } from '@/lib/i18n/types';
+import type { Locale, LegacyLocale } from '@/lib/i18n/types';
 import { taxonomyLabel } from '@/studio/shared/nail-taxonomy-labels';
 import type {
   BaseCoverage,
@@ -237,9 +238,9 @@ export function editorShapeCapability(shape: NailShape): EditorShapeCapability |
   return EDITOR_SHAPE_CAPABILITIES.find((entry) => entry.id === shape) ?? null;
 }
 
-export function shapeName(shape: NailShape, locale: Locale = 'en'): string {
+export function shapeName(shape: NailShape, locale: Locale | LegacyLocale = 'en-US'): string {
   const fallback = shapeParams?.shapes?.[shape];
-  return taxonomyLabel('shape', shape, locale, { zh: fallback?.name, en: fallback?.name_en });
+  return taxonomyLabel('shape', shape, toLegacyLocale(locale), { zh: fallback?.name, en: fallback?.name_en });
 }
 
 export function isEditorShapeEnabled(shape: EditorShapeCapability): boolean {
@@ -255,8 +256,8 @@ export const TIER_ONE_EDITOR_SHAPES: readonly EditorShapeCapability[] = (
     return readiness !== 0 ? readiness : a.order - b.order;
   });
 
-export function lengthName(length: NailLength, locale: Locale = 'zh'): string {
-  return taxonomyLabel('geometry-length', length, locale);
+export function lengthName(length: NailLength, locale: Locale | LegacyLocale = 'zh-CN'): string {
+  return taxonomyLabel('geometry-length', length, toLegacyLocale(locale));
 }
 
 /** 紧凑型 Editor 控件只暴露能力注册表中已签收、已启用的甲型。 */

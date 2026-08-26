@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Badge, Button, Input, cx } from '@/design-system';
 import { useToast } from '@/design-system';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
+import { useLocale } from '@/lib/i18n';
 import { isValidEmail } from './accounts';
 import {
   cooldownRemainingSec,
@@ -32,6 +33,7 @@ export function CodeVerification(props: {
   verifyLabel?: string;
 }) {
   const toast = useToast();
+  const { t } = useLocale();
   const flags = useMockScenarios((s) => s.flags);
 
   const [email, setEmail] = useState(props.initialEmail ?? '');
@@ -57,7 +59,7 @@ export function CodeVerification(props: {
 
   const handleSend = () => {
     if (!isValidEmail(email)) {
-      setEmailError('请输入有效的邮箱地址');
+      setEmailError(t('platform.emailInvalid'));
       return;
     }
     setEmailError(null);
@@ -70,28 +72,28 @@ export function CodeVerification(props: {
       });
       if (!result.ok && result.reason === 'locked') {
         setLockMs(result.lockedUntil - Date.now());
-        toast.error('尝试次数过多，账号已临时锁定。请稍后再试。');
+        toast.error(t('platform.attemptsLocked'));
         return;
       }
       if (!result.ok && result.reason === 'sendFail') {
         setCooldown(cooldownRemainingSec(email.trim().toLowerCase()));
-        toast.error('验证码发送失败，请重试。');
+        toast.error(t('platform.codeSendFailed'));
         return;
       }
       setCooldown(cooldownRemainingSec(email.trim().toLowerCase()));
       setCodeError(null);
-      toast.info('验证码已发送（Mock：固定验证码 123456）。');
+      toast.info(t('platform.codeSent'));
     }, 400);
   };
 
   const handleVerify = () => {
     const normalized = email.trim().toLowerCase();
     if (!isValidEmail(normalized)) {
-      setEmailError('请输入有效的邮箱地址');
+      setEmailError(t('platform.emailInvalid'));
       return;
     }
     if (code.trim() === '') {
-      setCodeError('请输入验证码');
+      setCodeError(t('platform.codeNeedSend'));
       return;
     }
     setVerifying(true);
@@ -101,30 +103,30 @@ export function CodeVerification(props: {
         forceExpired: isScenarioOn(flags, 'auth.codeExpired'),
       });
       if (result.ok) {
-        toast.success('验证成功。');
+        toast.success(t('platform.verified'));
         props.onVerified(normalized);
         return;
       }
       switch (result.reason) {
         case 'locked':
           setLockMs(result.lockedUntil - Date.now());
-          toast.error('账号已锁定，请稍后再试。');
+          toast.error(t('platform.accountLocked'));
           break;
         case 'justLocked':
           setLockMs(result.lockedUntil - Date.now());
-          setCodeError('验证码连续错误 3 次，已锁定 5 分钟。');
-          toast.error('验证码连续错误 3 次，已锁定 5 分钟。');
+          setCodeError(t('platform.codeLocked'));
+          toast.error(t('platform.codeLocked'));
           break;
         case 'wrong':
-          setCodeError(`验证码错误，你还剩 ${result.remaining} 次尝试。`);
-          toast.warning(`验证码错误，你还剩 ${result.remaining} 次尝试。`);
+          setCodeError(t('platform.codeRemaining', { remaining: result.remaining }));
+          toast.warning(t('platform.codeRemaining', { remaining: result.remaining }));
           break;
         case 'expired':
-          setCodeError('验证码已过期，请重新获取。');
-          toast.error('验证码已过期，请重新获取。');
+          setCodeError(t('platform.codeExpired'));
+          toast.error(t('platform.codeExpired'));
           break;
         case 'noCode':
-          setCodeError('请先获取验证码。');
+          setCodeError(t('platform.codeNeedSend'));
           break;
       }
     }, 400);
@@ -141,14 +143,14 @@ export function CodeVerification(props: {
       >
         <Badge variant="warning">MOCK</Badge>
         <p className="text-xs text-gray-600">
-          不发送邮件、不保存密码 · 原型固定验证码 123456
+          {t('platform.codeMockHint')}
         </p>
       </div>
 
       <Input
-        label="邮箱"
+        label={t('platform.email')}
         type="email"
-        placeholder="you@example.com"
+        placeholder={t('platform.emailPlaceholder')}
         value={email}
         readOnly={props.emailReadOnly}
         disabled={props.emailReadOnly}
@@ -162,10 +164,10 @@ export function CodeVerification(props: {
       <div className="flex items-end gap-2">
         <div className="flex-1">
           <Input
-            label="验证码"
+            label={t('platform.verificationCode')}
             inputMode="numeric"
             maxLength={6}
-            placeholder="6 位数字验证码"
+            placeholder={t('platform.codePlaceholder')}
             value={code}
             error={codeError ?? undefined}
             onChange={(e) => {
@@ -184,18 +186,18 @@ export function CodeVerification(props: {
           disabled={locked || cooldown > 0 || props.emailReadOnly !== true && !email}
           className="shrink-0"
         >
-          {cooldown > 0 ? `重新获取 (${cooldown}s)` : '获取验证码'}
+          {cooldown > 0 ? t('platform.getCodeAgain', { seconds: cooldown }) : t('platform.getCode')}
         </Button>
       </div>
 
       {locked && (
         <p className="rounded-panel border border-error/30 bg-error-soft px-3 py-2 text-xs text-error">
-          验证码连续错误 3 次，已锁定。请 {formatLock(lockMs)} 后重试。
+          {t('platform.codeLockedCountdown', { time: formatLock(lockMs) })}
         </p>
       )}
 
       <Button onClick={handleVerify} loading={verifying} disabled={locked}>
-        {props.verifyLabel ?? '验证'}
+        {props.verifyLabel ?? t('platform.verify')}
       </Button>
     </div>
   );

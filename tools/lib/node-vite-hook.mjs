@@ -37,9 +37,14 @@ export async function resolve(specifier, context, nextResolve) {
     return { url: MATERIAL_SHIM, shortCircuit: true, format: 'module' };
   }
 
-  // Vite resolves a bare path to <p>.ts / <p>.tsx or <p>/index.ts(x)
+  // Vite resolves a bare path to <p>.ts / <p>.tsx or <p>/index.ts(x).
+  // Prefer files before directories: src/lib/i18n.tsx intentionally coexists
+  // with src/lib/i18n/ implementation modules.
   const withTsOrIndex = (abs) => {
     if (HAS_EXT.test(abs) || HAS_JSON.test(abs)) return abs;
+    for (const ext of ['.ts', '.tsx']) {
+      if (fs.existsSync(`${abs}${ext}`)) return `${abs}${ext}`;
+    }
     try {
       if (fs.statSync(abs).isDirectory()) {
         for (const name of ['index.ts', 'index.tsx']) {
@@ -50,9 +55,6 @@ export async function resolve(specifier, context, nextResolve) {
       }
     } catch {
       /* not a directory */
-    }
-    for (const ext of ['.ts', '.tsx']) {
-      if (fs.existsSync(`${abs}${ext}`)) return `${abs}${ext}`;
     }
     return `${abs}.ts`;
   };

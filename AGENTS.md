@@ -115,3 +115,12 @@ ConfirmedDesignSnapshot + NailTwinSnapshot + Recipe/Intent
 按风险运行 typecheck、build、领域/migration/fixture 测试、render/asset validator 与 `git diff --check`。UI 必须实际走查主流程、错误态、保存/恢复、390/768/1024/1280/1440 响应式、console 和网络异常；自动测试不能替代视觉与状态转换验收。
 
 交付时报告：分支/HEAD、改动范围、测试与走查、证据等级、已知限制、工作树状态和合入建议。所有能力必须标清 `planned / prototype / simulated / architecture-golden / integrated / visually-signed-off / physically-validated / production-ready`，不得把上一等级写成下一等级。
+
+## 9. 国际化（i18n）默认门禁
+
+- 所有用户可见文案必须使用 `@/lib/i18n` 的 typed key，包括标题、按钮、表单、占位符、`aria-*`、`title`、Toast、错误、空态和状态；`LocaleValue.text` 已删除，生产代码与审计不得恢复该兼容 API。平台的 `Response.text()` 等 API 不属于 i18n 调用。
+- 默认语言为 `zh-CN`，支持语言从 locale registry 派生，当前为 `en-US`；旧 `zh`/`en` 仅作为读取别名。新增语言必须在 registry 增加 canonical BCP-47、别名和显示元数据，再增加满足 `Record<MessageKey, string>` 的静态 catalog，并通过 parity、fallback、localStorage 持久化、`document.documentElement.lang` 和缺失 key 可见性检查。
+- catalog key 使用稳定 namespace，新增 key 必须同时补齐中英文并通过 i18n 专项测试。简单变量使用 `{name}` / `{count}` 插值，不拼接句子碎片；禁止 source-copy-derived 超长 camelCase key、机械数字后缀和 `app.*` 承载 community/board/rights/share/asset 领域。历史违规 key 只能进入 frozen legacy baseline，baseline 只能减少，且不得掩盖新增违规。
+- 单 entry CRUD 仅是 draft primitive；面向全部注册语言的 atomic bundle parity、placeholder parity、expectedRevision 校验和 release/publishability gate 才能进入可发布流程，失败不得部分写。
+- taxonomy、Look、资产和领域实体的显示名由各自领域合同提供，不复制进通用 catalog；只有产品 chrome、流程文案和反馈消息进入 i18n。
+- 本地 CRUD/revision/audit 合同不等同于 CMS、生产权限或发布系统；测试通过不得升级为生产运营能力声明。

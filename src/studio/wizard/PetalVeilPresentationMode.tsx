@@ -2,6 +2,7 @@ import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'rea
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Badge } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 import {
   PetalVeilPresentationCanvas,
@@ -17,6 +18,7 @@ export function PetalVeilPresentationMode({
   onClose: () => void;
   recipe: RecipeInstanceV1;
 }) {
+  const { t } = useLocale();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -52,23 +54,23 @@ export function PetalVeilPresentationMode({
       data-debug-id="studio.presentation.petal-hq"
       role="dialog"
       aria-modal="true"
-      aria-label="Petal Veil 顾客展示"
+      aria-label={`${t('customer.customerPresentation')} Petal Veil`}
       onKeyDown={trapFocus}
     >
       <header className="flex shrink-0 flex-col items-stretch gap-3 px-4 py-5 sm:px-8 lg:flex-row lg:items-center">
         <div>
-          <p className="text-lg font-medium tracking-tight text-gray-900">Petal Veil French</p>
-          <p className="text-xs text-gray-500">Almond · Medium · 重点手指 R4</p>
+          <p className="text-lg font-medium tracking-tight text-gray-900">{t('wizard.petalVeilFrench')}</p>
+          <p className="text-xs text-gray-500">{t('wizard.petalVeilPresentationSpec')}</p>
         </div>
-        <Badge variant="warning">高保真候选 · 待视觉签收</Badge>
-        <Badge variant="gray">制造未验证</Badge>
+        <Badge variant="warning">{t('wizard.hqCandidate')}</Badge>
+        <Badge variant="gray">{t('app.manufacturingUnverified')}</Badge>
         <div className="ml-auto flex min-w-0 flex-wrap items-center gap-2 overflow-x-auto">
-          <span className="text-nano text-gray-400">Esc 退出</span>
+          <span className="text-nano text-gray-400">Esc {t('common.close')}</span>
           <button
             type="button"
             ref={closeButtonRef}
             onClick={onClose}
-            aria-label="退出顾客展示"
+            aria-label={t('common.close')}
             className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500"
           >
             <X size={16} />

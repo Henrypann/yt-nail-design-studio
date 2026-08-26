@@ -38,12 +38,7 @@ import {
 import { resolveFingerData } from '../lib/model';
 import { useEditorStore } from '../store';
 
-const SAVE_LABEL = {
-  saved: '💾 已保存',
-  dirty: '● 未保存更改',
-  saving: '保存中…',
-  error: '保存失败',
-} as const;
+const SAVE_LABEL = { saved: 'editor.extra.savedBadge', dirty: 'editor.extra.dirtyBadge', saving: 'editor.extra.savingBadge', error: 'editor.extra.saveFailedBadge' } as const;
 
 export function EditorTopBar(props: {
   onOpenTiled: () => void;
@@ -53,7 +48,7 @@ export function EditorTopBar(props: {
 }) {
   const { onOpenTiled, onOpenPresentation, onOpenHelp, onFirstOutcome } = props;
   const navigate = useNavigate();
-  const { locale, text } = useLocale();
+  const { locale, t } = useLocale();
   const toast = useToast();
   const doc = useEditorStore((s) => s.doc);
   const status = useEditorStore((s) => s.status);
@@ -85,10 +80,10 @@ export function EditorTopBar(props: {
   const doSave = async () => {
     const result = await save();
     if (result === 'saved') {
-      toast.success('已保存');
+      toast.success(t('editor.extra.savedToast'));
       onFirstOutcome();
     }
-    else toast.error('保存失败（已自动重试 3 次）。请检查数据后点击 [保存] 重试。');
+    else toast.error(t('editor.extra.saveRetryToast'));
   };
 
   const requestLeave = () => {
@@ -122,10 +117,10 @@ export function EditorTopBar(props: {
         const png = await svgToPngDataUrl(svg, 1500, 880);
         downloadDataUrl(png, `十指平铺_${doc.shape}.png`);
       }
-      toast.success('PNG 已导出');
+      toast.success(t('editor.extra.exported'));
       onFirstOutcome();
     } catch {
-      toast.error('导出失败。请重试。');
+      toast.error(t('editor.extra.exportFailed'));
     } finally {
       setExporting(false);
     }
@@ -139,11 +134,11 @@ export function EditorTopBar(props: {
       const confirmed = confirmDesign(design, session?.userName ?? '美甲师');
       upsertDesign(confirmed);
       setConfirmOpen(false);
-      toast.success('已标记「顾客已确认」，设计冻结为只读');
+      toast.success(t('editor.extra.confirmedToast'));
       // 重新加载为只读态
       useEditorStore.getState().load(doc.designId);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '操作失败');
+      toast.error(err instanceof Error ? err.message : t('editor.extra.operationFailed'));
     }
   };
 
@@ -158,12 +153,12 @@ export function EditorTopBar(props: {
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
         >
           <ArrowLeft size={14} />
-          {text('返回', 'Back')}
+          {t('app.back2')}
         </button>
         <CrossProductLink
           data-testid="editor-community-entry"
-          title="进入 Community"
-          aria-label="进入 Community"
+          title={t('editor.extra.enterCommunity')}
+          aria-label={t('editor.extra.enterCommunity')}
           href={communityProductHref(communityHref({
             entry: 'editor',
             returnTo: `${Routes.designCanvas}?design=${doc.designId}`,
@@ -171,7 +166,7 @@ export function EditorTopBar(props: {
           className="flex items-center gap-1 rounded-button px-2 py-1 text-xs text-gray-500 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-800"
         >
           <Compass size={13} />
-          Community
+          {t('nav.community')}
         </CrossProductLink>
         <span className="hidden items-center gap-1 text-xs text-gray-600 xl:flex">
           <User size={13} className="text-gray-400" />
@@ -190,29 +185,29 @@ export function EditorTopBar(props: {
                 : 'text-gray-400',
           )}
         >
-          {SAVE_LABEL[saveState]}
+          {t(SAVE_LABEL[saveState])}
           {saveState === 'error' && (
             <button onClick={doSave} className="ml-1 underline">
-              重试保存
+              {t('editor.extra.retrySave')}
             </button>
           )}
         </span>
       </div>
 
       <div className="flex shrink-0 items-center gap-1.5">
-        <Button size="sm" variant="ghost" disabled={readOnly || historyCount === 0} onClick={undo} title="撤销 ⌘Z">
+        <Button size="sm" variant="ghost" disabled={readOnly || historyCount === 0} onClick={undo} title={t('editor.extra.undo')}>
           <Undo2 size={13} />
         </Button>
-        <Button size="sm" variant="ghost" disabled={readOnly || futureCount === 0} onClick={redo} title="重做 ⌘⇧Z">
+        <Button size="sm" variant="ghost" disabled={readOnly || futureCount === 0} onClick={redo} title={t('editor.extra.redo')}>
           <Redo2 size={13} />
         </Button>
-        <Button size="sm" variant="ghost" onClick={onOpenHelp} title="重新打开新手引导">
+        <Button size="sm" variant="ghost" onClick={onOpenHelp} title={t('editor.extra.restartOnboarding')}>
           <HelpCircle size={13} />
         </Button>
         {status === 'draft' && !readOnly && (
           <Button size="sm" variant="secondary" onClick={() => setConfirmOpen(true)}>
             <CheckCircle2 size={13} />
-            {text('顾客已确认', 'Customer approved')}
+            {t('app.customerApproved')}
           </Button>
         )}
         <div className="relative" ref={exportRef}>
@@ -223,7 +218,7 @@ export function EditorTopBar(props: {
             onClick={() => setExportOpen((v) => !v)}
           >
             <Download size={13} />
-            {text('导出 PNG', 'Export PNG')}
+            {t('app.exportPng')}
             <ChevronDown size={12} />
           </Button>
           {exportOpen && (
@@ -232,29 +227,29 @@ export function EditorTopBar(props: {
                 onClick={() => exportPng('single')}
                 className="w-full rounded-button px-2.5 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50"
               >
-                {text('单甲 PNG（当前指）', 'Current nail PNG')}
+                {t('app.currentNailPng')}
               </button>
               <button
                 onClick={() => exportPng('tiled')}
                 className="w-full rounded-button px-2.5 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50"
               >
-                {text('十指平铺 PNG', 'All 10 PNG')}
+                {t('app.all10Png')}
               </button>
             </div>
           )}
         </div>
         <Button size="sm" variant="secondary" onClick={onOpenTiled}>
           <LayoutGrid size={13} />
-          {text('十指预览', 'All 10 preview')}
+          {t('app.all10Preview')}
         </Button>
         <Button size="sm" variant="secondary" onClick={onOpenPresentation}>
           <Presentation size={13} />
-          {text('顾客展示', 'Present')}
+          {t('app.present')}
         </Button>
         {!readOnly && (
           <Button size="sm" onClick={doSave} loading={saveState === 'saving'}>
             <Save size={13} />
-            {text('保存', 'Save')}
+            {t('app.save')}
           </Button>
         )}
       </div>
@@ -263,21 +258,20 @@ export function EditorTopBar(props: {
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="标记「顾客已确认」？"
+        title={t('editor.extra.confirmTitle')}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setConfirmOpen(false)}>
-              取消
+              {t('editor.extra.cancel')}
             </Button>
             <Button size="sm" onClick={doConfirm}>
-              标记已确认
+              {t('editor.extra.confirm')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-600">
-          顾客已在店内确认该方案？确认后设计将冻结，不可再编辑。如需修改，可在设计列表
-          「基于已确认设计创建新版本」或「退回草稿」。
+          {t('editor.extra.confirmDescription')}
         </p>
       </Modal>
 
@@ -285,14 +279,14 @@ export function EditorTopBar(props: {
       <Modal
         open={leaveOpen}
         onClose={() => setLeaveOpen(false)}
-        title="有未保存的更改"
+        title={t('editor.extra.unsavedTitle')}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setLeaveOpen(false)}>
-              继续编辑
+              {t('editor.extra.continueEditing')}
             </Button>
             <Button variant="danger" size="sm" onClick={() => navigate(Routes.designs)}>
-              不保存离开
+              {t('editor.extra.leaveWithoutSaving')}
             </Button>
             <Button
               size="sm"
@@ -301,12 +295,12 @@ export function EditorTopBar(props: {
                 navigate(Routes.designs);
               }}
             >
-              保存并离开
+              {t('editor.extra.saveAndLeave')}
             </Button>
           </>
         }
       >
-        <p className="text-sm text-gray-600">当前设计有未保存的更改，离开后未保存内容将丢失。</p>
+        <p className="text-sm text-gray-600">{t('editor.extra.unsavedDescription')}</p>
       </Modal>
     </header>
   );

@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { Box, Info, Layers3, Sparkles } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import {
   createGlitterPreviewParticlesV7,
@@ -81,6 +82,7 @@ function renderDecoration(decoration: DimensionalDecorationV7): ReactNode {
 }
 
 export function V7FinishCompositeCanvas() {
+  const { t } = useLocale();
   const nail = useEditorV7Store(selectCurrentNailV7);
   const step = useEditorV7Store(selectCurrentStepV7);
   const previewFinishType = useEditorV7Store((state) => state.previewFinishType);
@@ -127,7 +129,7 @@ export function V7FinishCompositeCanvas() {
   return (
     <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(190px,0.9fr)_minmax(210px,1fr)] sm:items-center" data-testid="v7-finish-composite-canvas" data-preview-finish={model.previewFinishType} data-canonical-finish={model.canonicalFinishType} data-preview-only={String(model.previewOnly)} data-preview-fidelity={previewFidelity} data-french-fidelity={frenchFidelity} data-active-step-count={model.activeStepIds.length}>
       <div className="relative mx-auto aspect-[5/8] w-full max-w-[260px] rounded-[32px] border border-white bg-white/80 p-3 shadow-[0_26px_70px_rgba(77,53,67,0.2)]" style={{ transform: 'perspective(900px) rotateX(5deg) rotateY(-4deg)' }}>
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full overflow-visible" role="img" aria-label={`${nail.finger} ${SURFACE_FINISH_LABELS_V7[model.previewFinishType]}组合模拟预览`}>
+        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full overflow-visible" role="img" aria-label={t('editorV7.finishCanvas.aria', { finger: nail.finger, finish: SURFACE_FINISH_LABELS_V7[model.previewFinishType] })}>
           <defs>
             <clipPath id={clipId}><path d={silhouette.pathD} transform={silhouetteTransform(silhouette.viewBox)} /></clipPath>
             {background.background.mode === 'gradient' && <linearGradient id={backgroundGradientId} gradientTransform={`rotate(${normalizeBackgroundDirectionV7(background.background.directionDeg)} .5 .5)`}>{background.background.stops.map((stop, index) => <stop key={index} offset={stop.offset} stopColor={rgbaToHexV7(stop.color)} stopOpacity={stop.color.a} />)}</linearGradient>}
@@ -137,20 +139,20 @@ export function V7FinishCompositeCanvas() {
           </defs>
           <g clipPath={`url(#${clipId})`}>
             {backgroundArtwork()}
-            {adaptedMiddleSteps.map(({ candidate, adapted }, stepIndex) => { const renderCandidate = adapted?.status === 'structured' ? adapted.step : adapted?.status === 'unavailable' ? { ...candidate, elements: [] } : candidate; if (adapted?.status !== 'unavailable' && (!candidate.visible || candidate.skipped)) return null; return <g key={candidate.id} data-composite-step-kind={candidate.kind}>{renderCandidate.kind === 'flat_design' ? <>{adapted?.status === 'unavailable' && <text x="50" y="80" textAnchor="middle" fontSize="4" fill="#9f2f2f">法式预览不可用</text>}{renderCandidate.elements.map((element) => <Fragment key={element.id}>{renderFlatElement(element)}</Fragment>)}</> : renderCandidate.kind === 'surface_effect' ? renderEffectStep(renderCandidate, `${rawId}-${stepIndex}`) : renderCandidate.kind === 'dimensional_decoration' ? renderCandidate.decorations.map((decoration) => <Fragment key={decoration.id}>{renderDecoration(decoration)}</Fragment>) : null}</g>; })}
+            {adaptedMiddleSteps.map(({ candidate, adapted }, stepIndex) => { const renderCandidate = adapted?.status === 'structured' ? adapted.step : adapted?.status === 'unavailable' ? { ...candidate, elements: [] } : candidate; if (adapted?.status !== 'unavailable' && (!candidate.visible || candidate.skipped)) return null; return <g key={candidate.id} data-composite-step-kind={candidate.kind}>{renderCandidate.kind === 'flat_design' ? <>{adapted?.status === 'unavailable' && <text x="50" y="80" textAnchor="middle" fontSize="4" fill="#9f2f2f">{t('editorV7.finishCanvas.frenchUnavailable')}</text>}{renderCandidate.elements.map((element) => <Fragment key={element.id}>{renderFlatElement(element)}</Fragment>)}</> : renderCandidate.kind === 'surface_effect' ? renderEffectStep(renderCandidate, `${rawId}-${stepIndex}`) : renderCandidate.kind === 'dimensional_decoration' ? renderCandidate.decorations.map((decoration) => <Fragment key={decoration.id}>{renderDecoration(decoration)}</Fragment>) : null}</g>; })}
             {finishOverlay}
             <path d={silhouette.pathD} transform={silhouetteTransform(silhouette.viewBox)} fill="none" stroke="rgb(255 255 255 / .74)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
           </g>
         </svg>
       </div>
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/92 p-4 shadow-sm">
-        <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Simulated 3D · SVG 2.5D</p></div>
-        <h2 className="mt-2 text-lg font-semibold text-gray-900">{SURFACE_FINISH_LABELS_V7[model.previewFinishType]}组合预览</h2>
-        <div className="mt-3 flex flex-wrap gap-2"><span className={cx('inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', fidelityTone)}>{previewFidelity === 'unavailable' ? '部分不可表达 · 2D 保底' : '近似组合预览'}</span>{model.previewOnly && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-nano font-semibold text-violet-700">仅预览 · 未应用</span>}</div>
-        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，最终组合预览已相应降级。</p>}
-        <div className="mt-4 grid grid-cols-5 gap-1 text-center text-nano text-gray-500"><span><Layers3 size={13} className="mx-auto mb-1" />背景<br />{model.layerCounts.background}</span><span>2D<br />{model.layerCounts.flat}</span><span><Sparkles size={13} className="mx-auto mb-1" />效果<br />{model.layerCounts.surface}</span><span><Box size={13} className="mx-auto mb-1" />立体<br />{model.layerCounts.dimensional}</span><span>封层<br />{model.layerCounts.finish}</span></div>
-        {model.warnings.length > 0 && <div className="mt-4 space-y-1 text-nano leading-4 text-gray-500">{model.warnings.map((warning) => <p key={warning}>• {warning}</p>)}</div>}
-        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />这是 WebGL-free 模拟组合预览，未证明真实 3D、材料外观、UV/LED 固化状态或物理可制造性。</div>
+        <div className="flex items-center gap-2"><Sparkles size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">{t('editorV7.finishCanvas.title')}</p></div>
+        <h2 className="mt-2 text-lg font-semibold text-gray-900">{t('editorV7.finishCanvas.previewTitle', { finish: SURFACE_FINISH_LABELS_V7[model.previewFinishType] })}</h2>
+        <div className="mt-3 flex flex-wrap gap-2"><span className={cx('inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', fidelityTone)}>{previewFidelity === 'unavailable' ? t('editorV7.finishCanvas.unavailable') : t('editorV7.finishCanvas.approximate')}</span>{model.previewOnly && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-nano font-semibold text-violet-700">{t('editorV7.finishCanvas.previewOnly')}</span>}</div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">{t('editorV7.finishCanvas.shapeWarning', { fidelity: silhouette.fidelity === 'approximate' ? t('editorV7.finishCanvas.shapeApproximate') : t('editorV7.finishCanvas.shapeFallback') })}</p>}
+        <div className="mt-4 grid grid-cols-5 gap-1 text-center text-nano text-gray-500"><span><Layers3 size={13} className="mx-auto mb-1" />{t('editorV7.finishCanvas.background')}<br />{model.layerCounts.background}</span><span>{t('editorV7.finishCanvas.flat')}<br />{model.layerCounts.flat}</span><span><Sparkles size={13} className="mx-auto mb-1" />{t('editorV7.finishCanvas.surface')}<br />{model.layerCounts.surface}</span><span><Box size={13} className="mx-auto mb-1" />{t('editorV7.finishCanvas.dimensional')}<br />{model.layerCounts.dimensional}</span><span>{t('editorV7.finishCanvas.finish')}<br />{model.layerCounts.finish}</span></div>
+        {model.warnings.length > 0 && <div className="mt-4 space-y-1 text-nano leading-4 text-gray-500">{model.warnings.map((warning) => <p key={warning}>{t('editorV7.finishCanvas.warning', { warning })}</p>)}</div>}
+        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />{t('editorV7.finishCanvas.disclaimer')}</div>
       </div>
     </div>
   );

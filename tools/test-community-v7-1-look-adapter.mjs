@@ -339,8 +339,9 @@ assert.match(lookPage, /onError/);
 assert.match(lookPage, /community-look-evidence/);
 assert.match(lookPage, /community-look-evidence-missing/);
 assert.match(lookPage, /community-look-source-caveat/);
-assert.match(lookPage, /预览通过 ≠ 可制造 ≠ 已下发生产/);
-assert.match(lookPage, /无证据/);
+assert.match(lookPage, /t\('app\.statusDistinctionThreeIndependentAxes'\)/);
+assert.match(lookPage, /t\('app\.noEvidence'\)/);
+assert.match(lookPage, /t\('app\.legacyStaticContentPartialEvidenceNotFullPublishedlookv1'\)/);
 assert.match(lookPage, /getLookReadModelById/);
 assert.doesNotMatch(lookPage, /useWizardStore|useEditorStore/);
 

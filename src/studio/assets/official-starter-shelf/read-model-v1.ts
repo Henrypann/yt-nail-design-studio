@@ -7,9 +7,7 @@ import {
 
 export const OFFICIAL_STARTER_SHELF_SCHEMA = 'studio-official-starter-shelf-v1' as const;
 export const STARTER_SHELF_CANDIDATE_IDS = Object.freeze([
-  't_petal_pearl_bloom_simulated', 't_mercury_dew_concept', 't_pearl_tide_shell_concept', 't_micro_coquette_concept',
-  't_starfish_bloom_elegance_concept', 't_sea_glass_chrome_concept', 't_sunset_aura_glaze_concept',
-  't_liquid_chrome_statement_concept', 't_butter_glaze_quiet_concept', 't_petal_veil_french',
+  't_french_white',
 ] as const);
 
 const ROOT_KEYS = ['architectureBaseline', 'featureFlags', 'schemaVersion', 'summary', 'entries'];
@@ -26,7 +24,7 @@ export type OfficialStarterShelfEntryV1 = {
   evidenceTier: string;
   candidateOnlyLabels: string[];
   sortOrder: number;
-  lifecycleStatus: 'CONCEPT' | 'SIMULATED';
+  lifecycleStatus: 'REAL';
   rightsStatus: 'PENDING';
   promotionStatus: 'BLOCKED';
   capabilityStatus: 'UNVERIFIED' | 'CONCEPT_ONLY';
@@ -39,7 +37,7 @@ export type OfficialStarterShelfReadModelV1 = {
   schemaVersion: typeof OFFICIAL_STARTER_SHELF_SCHEMA;
   architectureBaseline: 'v0.7.2';
   featureFlags: { petalVeilEnabled: boolean };
-  summary: { candidateDatasetCount: 10; visibleCount: 9 | 10 };
+  summary: { candidateDatasetCount: 1; visibleCount: 1 };
   entries: OfficialStarterShelfEntryV1[];
 };
 
@@ -60,7 +58,7 @@ export function parseOfficialStarterShelfEntryV1(value: unknown): OfficialStarte
   if (!entry || !exactKeys(entry, ENTRY_KEYS) || !string(entry.assetId) || !string(entry.displayName) || !string(entry.evidenceTier)
     || !strings(entry.candidateOnlyLabels) || entry.candidateOnlyLabels.length !== 3
     || !entry.candidateOnlyLabels.includes('CANDIDATE_ONLY') || !entry.candidateOnlyLabels.includes('RIGHTS_PENDING') || !entry.candidateOnlyLabels.includes('PROMOTION_BLOCKED')
-    || !['CONCEPT', 'SIMULATED'].includes(entry.lifecycleStatus as string) || !Number.isInteger(entry.sortOrder)
+    || entry.lifecycleStatus !== 'REAL' || !Number.isInteger(entry.sortOrder)
     || entry.rightsStatus !== 'PENDING' || entry.promotionStatus !== 'BLOCKED'
     || !['UNVERIFIED', 'CONCEPT_ONLY'].includes(entry.capabilityStatus as string)
     || !strings(entry.blockingCodes) || !entry.blockingCodes.includes('RIGHTS_EVIDENCE_MISSING') || !entry.blockingCodes.includes('PROMOTION_NOT_AUTHORIZED')
@@ -101,7 +99,7 @@ export function createOfficialStarterShelfReadModelV1(input: {
     if (!entry || !string(entry.id) || seen.has(entry.id) || !candidateSet.has(entry.id)) return null;
     seen.add(entry.id);
     const record = candidateRecord(ledger, entry.id);
-    if (!record || !['CONCEPT', 'SIMULATED'].includes(entry.asset_status as string)
+    if (!record || entry.asset_status !== 'REAL'
       || record.lifecycleStatus !== entry.asset_status || record.rightsStatus !== 'PENDING'
       || record.promotionStatus !== 'BLOCKED' || !['UNVERIFIED', 'CONCEPT_ONLY'].includes(record.capabilityStatus)
       || !Number.isFinite(entry.sort_order as number)
@@ -115,7 +113,7 @@ export function createOfficialStarterShelfReadModelV1(input: {
       evidenceTier: record.evidenceTier,
       candidateOnlyLabels: ['CANDIDATE_ONLY', 'RIGHTS_PENDING', 'PROMOTION_BLOCKED'],
       sortOrder: entry.sort_order as number,
-      lifecycleStatus: record.lifecycleStatus as 'CONCEPT' | 'SIMULATED',
+      lifecycleStatus: record.lifecycleStatus as 'REAL',
       rightsStatus: record.rightsStatus,
       promotionStatus: record.promotionStatus,
       capabilityStatus: record.capabilityStatus,
@@ -127,12 +125,12 @@ export function createOfficialStarterShelfReadModelV1(input: {
   if (seen.size !== STARTER_SHELF_CANDIDATE_IDS.length || entries.length !== STARTER_SHELF_CANDIDATE_IDS.length) return null;
   entries.sort((a, b) => a.sortOrder - b.sortOrder || a.assetId.localeCompare(b.assetId));
   entries.forEach((entry, index) => { entry.sortOrder = index; });
-  const visibleEntries = petalVeilEnabled ? entries : entries.filter((entry) => entry.assetId !== 't_petal_veil_french');
+  const visibleEntries = entries;
   return {
     schemaVersion: OFFICIAL_STARTER_SHELF_SCHEMA,
     architectureBaseline: 'v0.7.2',
     featureFlags: { petalVeilEnabled },
-    summary: { candidateDatasetCount: 10, visibleCount: visibleEntries.length as 9 | 10 },
+    summary: { candidateDatasetCount: 1, visibleCount: 1 },
     entries: visibleEntries,
   };
 }
@@ -144,18 +142,17 @@ export function parseOfficialStarterShelfReadModelV1(value: unknown): OfficialSt
   const flags = object(raw.featureFlags);
   if (!flags || !exactKeys(flags, FLAG_KEYS) || typeof flags.petalVeilEnabled !== 'boolean') return null;
   const summary = object(raw.summary);
-  if (!summary || !exactKeys(summary, SUMMARY_KEYS) || summary.candidateDatasetCount !== 10
-    || summary.visibleCount !== (flags.petalVeilEnabled ? 10 : 9) || raw.entries.length !== summary.visibleCount) return null;
+  if (!summary || !exactKeys(summary, SUMMARY_KEYS) || summary.candidateDatasetCount !== 1
+    || summary.visibleCount !== 1 || raw.entries.length !== summary.visibleCount) return null;
   const seen = new Set<string>();
   for (const candidate of raw.entries) {
     const entry = parseOfficialStarterShelfEntryV1(candidate);
     if (!entry || seen.has(entry.assetId)
       || !STARTER_SHELF_CANDIDATE_IDS.includes(entry.assetId as typeof STARTER_SHELF_CANDIDATE_IDS[number])
     ) return null;
-    if (entry.assetId === 't_petal_veil_french' && !flags.petalVeilEnabled) return null;
     seen.add(entry.assetId);
   }
-  const expectedVisibleIds = STARTER_SHELF_CANDIDATE_IDS.filter((id) => flags.petalVeilEnabled || id !== 't_petal_veil_french');
+  const expectedVisibleIds = STARTER_SHELF_CANDIDATE_IDS;
   if (seen.size !== expectedVisibleIds.length || expectedVisibleIds.some((id) => !seen.has(id))) return null;
   for (let index = 1; index < raw.entries.length; index += 1) {
     const previous = object(raw.entries[index - 1]);

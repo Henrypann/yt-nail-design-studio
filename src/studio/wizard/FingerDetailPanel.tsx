@@ -8,6 +8,7 @@
 import { useMemo } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { Spinner } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { FingerCode, FingerOverrides, Finish, NailLength, NailShape } from '@/lib/types';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
 import { useNailDesignAssets } from '@/studio/preview/use-nail-design-assets';
@@ -40,6 +41,7 @@ export function FingerDetailPanel({
   selectedFinger,
   onExpand,
 }: FingerDetailPanelProps) {
+  const { t } = useLocale();
   const assets = useNailDesignAssets(shape, length, templateId);
   const { status, silhouette, patternMarkup, patternError, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
 
@@ -60,15 +62,15 @@ export function FingerDetailPanel({
       className="flex shrink-0 flex-col gap-2 rounded-card border border-gray-200 bg-white p-3"
     >
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-gray-700">单指详情</p>
+        <p className="text-xs font-medium text-gray-700">{t('wizard.viewSingle')}</p>
         {selectedFinger && onExpand && (
           <button
             onClick={onExpand}
             className="flex items-center gap-1 rounded-button px-1.5 py-0.5 text-nano text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
-            title="切换到单指细节视图"
+            title={t('wizard.switchSingle')}
           >
             <Maximize2 size={11} />
-            放大查看
+            {t('wizard.zoomView')}
           </button>
         )}
       </div>
@@ -80,9 +82,9 @@ export function FingerDetailPanel({
 
       {!selectedFinger ? (
         <p className="py-6 text-center text-xs leading-relaxed text-gray-400">
-          点击任意视图中的指甲，
+          {t('wizard.clickNail')}
           <br />
-          这里会同步显示该指细节。
+          {t('wizard.detailAppears')}
         </p>
       ) : status !== 'ready' || !silhouette ? (
         <div className="flex items-center justify-center py-6">
@@ -147,6 +149,7 @@ function FingerDetailBody({
   decorationById: Map<string, DecorationAsset>;
   strokeScale: number;
 }) {
+  const { t } = useLocale();
   const color = override?.baseColor ?? baseColor;
   const decoration = override?.decorationId ? decorationById.get(override.decorationId) : undefined;
   const clipId = `detail-clip-${finger}`;
@@ -178,23 +181,23 @@ function FingerDetailBody({
             decoration={decoration}
             strokeScale={strokeScale}
             readOnly
-            fingerLabel={FINGER_LABEL[finger]}
+            fingerLabel={t(FINGER_LABEL[finger])}
           />
         </svg>
       </div>
       <div className="flex flex-col gap-1 text-nano text-gray-600">
         <p className="font-medium text-gray-900">
-          {finger} · {FINGER_LABEL[finger]}
+          {finger} · {t(FINGER_LABEL[finger])}
         </p>
         <p className="flex items-center gap-1.5">
-          底色
+          {t('wizard.baseColor')}
           <span className="inline-block h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: color }} />
           <span className="tnum">{color}</span>
-          {override?.baseColor && <span style={{ color: 'var(--color-primary)' }}>（单独定制）</span>}
+          {override?.baseColor && <span style={{ color: 'var(--color-primary)' }}>{t('wizard.customized')}</span>}
         </p>
         <p>
-          附件{decoration ? `：${decoration.name}` : '：无'}
-          {override?.decorationId && <span style={{ color: 'var(--color-primary)' }}>（单独定制）</span>}
+          {t('wizard.decoration')}{decoration ? `：${decoration.name}` : `：${t('wizard.none')}`}
+          {override?.decorationId && <span style={{ color: 'var(--color-primary)' }}>{t('wizard.customized')}</span>}
         </p>
       </div>
     </>

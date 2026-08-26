@@ -5,7 +5,7 @@
  * - Trending 无/不足信号时展示显式回退说明（disclosure），绝不静默降级。
  */
 
-import { useLocale } from '@/lib/i18n';
+import {useLocale, type MessageKey} from '@/lib/i18n';
 import { cx } from '@/design-system';
 import {
   EXPLORE_SORTS,
@@ -13,10 +13,10 @@ import {
   type TrendingFallbackReason,
 } from '../domain/v7_1/explore-search';
 
-const SORT_LABELS: Record<ExploreSort, [string, string]> = {
-  featured: ['精选', 'Featured'],
-  trending: ['趋势', 'Trending'],
-  new: ['最新', 'New'],
+const SORT_LABELS: Record<ExploreSort, MessageKey> = {
+  featured: 'community.sort.featured',
+  trending: 'community.sort.trending',
+  new: 'community.sort.new',
 };
 
 interface Props {
@@ -26,16 +26,15 @@ interface Props {
 }
 
 export function CommunitySortControl({ sort, onChange, trendingFallback }: Props) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   return (
     <div className="flex flex-col gap-1.5" data-testid="community-sort-control">
       <div
         role="group"
-        aria-label={text('排序', 'Sort')}
+        aria-label={t('app.sort')}
         className="flex flex-wrap items-center gap-1.5"
       >
         {EXPLORE_SORTS.map((value) => {
-          const [zh, en] = SORT_LABELS[value];
           const active = sort === value;
           return (
             <button
@@ -52,7 +51,7 @@ export function CommunitySortControl({ sort, onChange, trendingFallback }: Props
                   : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
               )}
             >
-              {text(zh, en)}
+              {t(SORT_LABELS[value])}
             </button>
           );
         })}
@@ -63,14 +62,8 @@ export function CommunitySortControl({ sort, onChange, trendingFallback }: Props
           className="max-w-2xl text-nano leading-relaxed text-amber-700"
         >
           {trendingFallback.reason === 'trending_no_signals'
-            ? text(
-                '当前没有 Trending 信号数据（静态 fixture 不含真实互动分析），已回退到精选排序。',
-                'No trending signal data is available (static fixtures carry no real analytics); fell back to Featured.',
-              )
-            : text(
-                `Trending 信号不足（窗口内至少需要 ${trendingFallback.minDistinctSamples} 个独立样本），已回退到精选排序。`,
-                `Insufficient trending signals (at least ${trendingFallback.minDistinctSamples} distinct samples in-window are required); fell back to Featured.`,
-              )}
+            ? t('app.noTrendingSignalDataAvailableStaticFixturesCarryNoRealAnalyticsFellBackFeatured')
+            : t('app.insufficientTrendingSignalsAtLeastTrendingfallbackMindistinctsamplesDistinctSamplesWindowRequiredFellBackFeatured', { trendingFallback_minDistinctSamples: trendingFallback.minDistinctSamples })}
         </p>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge, Button, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { FINGER_CODES, type FingerCode } from '@/lib/types';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 import { registerPreviewExporter } from '@/studio/preview/export-png';
@@ -22,6 +23,7 @@ function PetalVeilCanvas({
   registerExport = false,
   className,
 }: CanvasProps) {
+  const { t } = useLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<PetalVeilRenderer | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -93,12 +95,12 @@ function PetalVeilCanvas({
         role="alert"
         data-testid="petal-hq-unavailable"
       >
-        <p className="text-sm font-medium text-error">模拟 3D 预览不可用</p>
+        <p className="text-sm font-medium text-error">{t('petal.hqUnavailable')}</p>
         <p className="max-w-sm text-xs leading-relaxed text-gray-600">
-          当前区域没有渲染 2D 内容。请返回并切换到标准 2D 预览；模拟 3D 不代表物理适配或制造验证。
+          {t('petal.hqUnavailableDescription')}
         </p>
         <Button size="sm" variant="secondary" onClick={() => setRetryKey((key) => key + 1)}>
-          重试模拟 3D
+          {t('petal.retry')}
         </Button>
       </div>
     );
@@ -114,7 +116,7 @@ function PetalVeilCanvas({
       />
       {state === 'loading' && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#D8D0CA] text-xs text-gray-500">
-          正在生成高保真预览…
+          {t('petal.generating')}
         </div>
       )}
     </div>
@@ -136,6 +138,7 @@ export function PetalVeilTiledPreview({
   registerExport?: boolean;
   showControls?: boolean;
 }) {
+  const { t } = useLocale();
   return (
     <div className="relative h-full min-h-[420px]" data-debug-id="studio.preview.petal-hq-tiled">
       <PetalVeilCanvas recipe={recipe} mode="tiled" registerExport={registerExport} />
@@ -151,7 +154,7 @@ export function PetalVeilTiledPreview({
             onClick={() => onFingerClick?.(finger)}
             onDoubleClick={() => onOpenSingle?.(finger)}
           >
-            {finger}{finger === 'R4' ? ' · 花' : ''}
+            {finger}{finger === 'R4' ? ` · ${t('petal.flowerShort')}` : ''}
           </button>
         ))}
       </div>}
@@ -170,22 +173,23 @@ export function PetalVeilSinglePreview({
   onExit?: () => void;
   registerExport?: boolean;
 }) {
+  const { t } = useLocale();
   const model = compilePetalVeilAppearance(recipe, finger);
   return (
     <div className="flex h-full min-h-[440px] flex-col gap-3 rounded-card border border-gray-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900">{finger} · 单指细节</p>
+          <p className="text-sm font-medium text-gray-900">{finger} · {t('petal.singleDetail')}</p>
           <p className="text-nano text-gray-400">{model.appearanceChecksum}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="warning">HQ 候选 · 待视觉签收</Badge>
-          {onExit && <Button size="sm" variant="ghost" onClick={onExit}>返回十指</Button>}
+          <Badge variant="warning">{t('petal.hqCandidate')}</Badge>
+          {onExit && <Button size="sm" variant="ghost" onClick={onExit}>{t('petal.backToTenFinger')}</Button>}
         </div>
       </div>
       <PetalVeilCanvas recipe={recipe} mode="single" finger={finger} registerExport={registerExport} className="flex-1" />
       <p className="text-center text-xs text-gray-500">
-        奶雾裸透底 · 柔边微法式{finger === 'R4' ? ' · 五瓣低浮雕花 0.18mm' : ''}
+        {t('petal.caption')}{finger === 'R4' ? t('petal.flowerDetail') : ''}
       </p>
     </div>
   );

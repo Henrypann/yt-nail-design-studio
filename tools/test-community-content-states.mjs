@@ -69,7 +69,7 @@ assert.match(card, /assetCapability\.capabilityState/);
 assert.doesNotMatch(card, /resolveStudioUseAvailabilityV1/);
 const detail = fs.readFileSync(path.join(root, 'src/community/pages/CommunityLookPage.tsx'), 'utf8');
 assert.match(detail, /community-use-disabled/);
-assert.match(detail, /Studio 素材尚未补齐/);
+assert.match(detail, /t\('community\.assetsIncomplete'\)/);
 assert.doesNotMatch(detail, /resolveStudioUseAvailabilityV1|canTryInStudio/);
 
 console.log('[community-content-states] explicit versioned / legacy / incomplete / unavailable capability states: PASS');

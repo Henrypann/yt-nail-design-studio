@@ -10,6 +10,7 @@ import { readAllDesigns } from '@/platform/designs';
 import { CrossProductLink } from '@/app/CrossProductLink';
 import { useCustomerStore } from '@/platform/customers';
 import { readData, StorageKeys } from '@/lib/storage';
+import { useLocale } from '@/lib/i18n';
 
 interface GuideCard {
   key: string;
@@ -27,6 +28,7 @@ interface GuideCard {
  */
 export default function DashboardPage() {
   const session = useRequireAuth();
+  const { t } = useLocale();
   const customers = useCustomerStore((s) => s.customers);
 
   if (!session) return null; // useRequireAuth 触发跳转
@@ -41,27 +43,21 @@ export default function DashboardPage() {
     {
       key: 'device',
       icon: Monitor,
-      title: '绑定第一台设备',
-      description: '连接扫描仪或打印机，开始数字化工作流。',
-      actionLabel: '去绑定设备',
+      title: t('dashboard.bindDeviceTitle'), description: t('dashboard.bindDeviceDescription'), actionLabel: t('dashboard.bindDeviceAction'),
       to: Routes.deviceBind,
       done: onboarding.hasDevice,
     },
     {
       key: 'customer',
       icon: Users,
-      title: '添加第一位客户',
-      description: '建立客户档案，记录偏好与过敏信息。',
-      actionLabel: '新建客户',
+      title: t('dashboard.addCustomerTitle'), description: t('dashboard.addCustomerDescription'), actionLabel: t('dashboard.addCustomerAction'),
       to: Routes.customerNew,
       done: onboarding.hasCustomer,
     },
     {
       key: 'design',
       icon: Palette,
-      title: '创建第一个设计',
-      description: '选模板、调参数，十分钟出一套十指设计。',
-      actionLabel: '创建设计',
+      title: t('dashboard.createDesignTitle'), description: t('dashboard.createDesignDescription'), actionLabel: t('dashboard.createDesignAction'),
       to: designNewFresh(),
       done: onboarding.hasDesign,
     },
@@ -72,17 +68,17 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6 animate-fade-in" data-debug-id="app.dashboard">
       <header>
         <h1 className="text-lg font-semibold text-gray-900">
-          欢迎回来，{session.storeName}
+          {t('dashboard.welcome', { storeName: session.storeName })}
         </h1>
-        <p className="mt-0.5 text-xs text-gray-500">今天也是做出好看指甲的一天。</p>
+        <p className="mt-0.5 text-xs text-gray-500">{t('dashboard.today')}</p>
       </header>
 
       {/* 概览统计 */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {[
-          { label: '客户', value: activeCustomers, to: Routes.customers },
-          { label: '设计稿', value: designCount, to: Routes.designs },
-          { label: '设备', value: deviceCount, to: Routes.devices },
+          { label: t('dashboard.customers'), value: activeCustomers, to: Routes.customers },
+          { label: t('dashboard.designs'), value: designCount, to: Routes.designs },
+          { label: t('dashboard.devices'), value: deviceCount, to: Routes.devices },
         ].map((stat) => (
           <Link key={stat.label} to={stat.to}>
             <Card className="transition-shadow duration-base hover:shadow-float">
@@ -99,15 +95,15 @@ export default function DashboardPage() {
             <Compass size={18} />
           </span>
           <div>
-            <p className="text-sm font-medium text-gray-900">浏览 Community</p>
-            <p className="mt-0.5 text-xs text-gray-500">独立灵感域 · 不依赖当前 Wizard 选择</p>
+          <p className="text-sm font-medium text-gray-900">{t('dashboard.communityTitle')}</p>
+            <p className="mt-0.5 text-xs text-gray-500">{t('dashboard.communityDescription')}</p>
           </div>
         </div>
         <CrossProductLink
           href={communityProductHref(communityHref({ entry: 'dashboard', returnTo: Routes.dashboard }))}
           className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors duration-fast hover:text-primary-hover"
         >
-          进入 Nail Lover Community
+          {t('dashboard.communityCta')}
           <ArrowRight size={13} />
         </CrossProductLink>
       </Card>
@@ -115,7 +111,7 @@ export default function DashboardPage() {
       {/* 引导卡片：全部完成后整组消失 */}
       {pendingCards.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-medium text-gray-700">开始你的第一次配置</h2>
+          <h2 className="mb-3 text-sm font-medium text-gray-700">{t('dashboard.setupTitle')}</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {pendingCards.map((card) => (
               <Card

@@ -19,6 +19,7 @@ import { FingerNailContent } from '@/studio/render';
 import { FINGER_LABEL } from './TenFingerPreview';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
 import { NailGrid } from './NailGrid';
+import { useLocale } from '@/lib/i18n';
 
 /* ── 单格渲染器（平铺格 / 搭配条共用） ───────────────────── */
 
@@ -74,6 +75,7 @@ export function NailCellView({
   onDoubleClick,
   size = 'md',
 }: NailCellViewProps) {
+  const { t } = useLocale();
   const rawId = useId().replace(/[^a-zA-Z0-9]/g, '');
   const clipId = `cellclip-${rawId}-${finger}`;
   const displayScale = fingerDisplayScale(finger);
@@ -106,7 +108,7 @@ export function NailCellView({
       disabled={readOnly && !onClick}
       onClick={() => onClick?.(finger)}
       onDoubleClick={() => onDoubleClick?.(finger)}
-      title={FINGER_LABEL[finger]}
+      title={t(FINGER_LABEL[finger])}
       data-finger-code={finger}
       data-finger-display-scale={displayScale}
       className={cx(
@@ -118,7 +120,7 @@ export function NailCellView({
       )}
     >
       {failed && (
-        <span className="absolute left-1 top-1 z-10 text-caption leading-none" title="该指渲染失败（MOCK）">
+        <span className="absolute left-1 top-1 z-10 text-caption leading-none" title={t('preview.renderFailedMock')}>
           ⚠️
         </span>
       )}
@@ -126,7 +128,7 @@ export function NailCellView({
         <span
           className="absolute right-1.5 top-1.5 z-10 h-2 w-2 rounded-full"
           style={{ backgroundColor: 'var(--color-primary)' }}
-          title="该指有单独定制"
+          title={t('preview.customizedFinger')}
         />
       )}
       <span
@@ -164,13 +166,13 @@ export function NailCellView({
             decoration={decoration}
             strokeScale={effectiveStrokeScale}
             readOnly
-            fingerLabel={FINGER_LABEL[finger]}
+            fingerLabel={t(FINGER_LABEL[finger])}
           />
         </svg>
       </span>
       <span className={cx('flex items-center gap-1 text-gray-500', size === 'md' ? 'text-nano' : 'text-nano')}>
         <span className="font-medium tnum">{finger}</span>
-        {size === 'md' && <span>{FINGER_LABEL[finger]}</span>}
+        {size === 'md' && <span>{t(FINGER_LABEL[finger])}</span>}
       </span>
     </button>
   );
@@ -209,6 +211,7 @@ export function TiledNailsPreview({
   readOnly = false,
   className,
 }: TiledNailsPreviewProps) {
+  const { t } = useLocale();
   const assets = useNailDesignAssets(shape, length, templateId);
   const {
     status,
@@ -232,10 +235,10 @@ export function TiledNailsPreview({
   if (status === 'error') {
     return (
       <div className={cx('flex flex-col items-center justify-center gap-3 rounded-card border border-gray-200 bg-white py-16', className)}>
-        <p className="text-sm text-gray-700">预览加载失败。请刷新页面重试。</p>
+        <p className="text-sm text-gray-700">{t('preview.loadFailed')}</p>
         <Button size="sm" variant="secondary" onClick={retry}>
           <RefreshCw size={13} />
-          刷新
+          {t('preview.refresh')}
         </Button>
       </div>
     );
@@ -245,7 +248,7 @@ export function TiledNailsPreview({
     return (
       <div className={cx('flex flex-col items-center justify-center gap-3 rounded-card border border-gray-200 bg-canvas py-16', className)}>
         <Spinner size={28} className="text-primary" />
-        <p className="text-xs text-gray-500">正在生成十指平铺…</p>
+        <p className="text-xs text-gray-500">{t('preview.tiledGenerating')}</p>
       </div>
     );
   }
@@ -256,14 +259,14 @@ export function TiledNailsPreview({
         <div role="alert" className="flex w-full items-center justify-between rounded-button border border-error/20 bg-error-soft px-3 py-2 text-xs text-error">
           <span>{patternError}</span>
           <Button size="sm" variant="ghost" onClick={retryPattern}>
-            重试图案
+            {t('preview.retryPattern')}
           </Button>
         </div>
       )}
       <NailGrid
         fingers={FINGER_CODES}
         density="preview"
-        ariaLabel="十指平铺预览"
+        ariaLabel={t('preview.tiledAria')}
         className="max-w-5xl"
         renderFinger={(finger) => {
           const override = fingerOverrides?.[finger];

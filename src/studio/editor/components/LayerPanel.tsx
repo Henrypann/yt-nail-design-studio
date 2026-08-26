@@ -17,6 +17,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Button, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { DECORATIONS, FINISHES, PALETTE } from '../lib/material';
 import {
   HEIGHT_MAX_MM,
@@ -32,28 +33,29 @@ import {
 import { FRENCH_VARIANT_LABELS } from '../lib/french-edge';
 import { useEditorStore } from '../store';
 
-function patternElLabel(el: PatternElement): string {
+function patternElLabel(el: PatternElement, t: ReturnType<typeof useLocale>['t']): string {
   switch (el.kind) {
     case 'template_pattern':
-      return `模板 · ${el.name}`;
+      return t('editorV7.layerPanel.templateLabel', { name: el.name });
     case 'brush':
-      return `手绘笔画（${el.points.length} 点）`;
+      return t('editorV7.layerPanel.brushLabel', { count: el.points.length });
     case 'image':
-      return `导入 · ${el.name}`;
+      return t('editorV7.layerPanel.importLabel', { name: el.name });
     case 'gradient':
-      return `渐变 · ${el.name}`;
+      return t('editorV7.layerPanel.gradientLabel', { name: el.name });
     case 'eraser':
-      return '橡皮擦除';
+      return t('editorV7.layerPanel.eraserLabel');
     case 'french_edge':
-      return `法式 · ${FRENCH_VARIANT_LABELS[el.variant]}`;
+      return t('editorV7.layerPanel.frenchLabel', { variant: FRENCH_VARIANT_LABELS[el.variant] });
   }
 }
 
 function TransformSliders(props: {
   value: Transform;
   onCommit: (t: Transform) => void;
+  t: ReturnType<typeof useLocale>['t'];
 }) {
-  const { value, onCommit } = props;
+  const { value, onCommit, t } = props;
   const [draft, setDraft] = useState<Transform | null>(null);
   const shown = draft ?? value;
   const row = (
@@ -84,11 +86,11 @@ function TransformSliders(props: {
   );
   return (
     <div className="mt-1 flex flex-col gap-1 rounded-button bg-gray-50 p-2">
-      {row('位置X', 'x', -55, 55, 1, (v) => v.toFixed(0))}
-      {row('位置Y', 'y', -200, 20, 1, (v) => v.toFixed(0))}
-      {row('缩放', 'scale', 0.2, 3, 0.05, (v) => `${Math.round(v * 100)}%`)}
-      {row('旋转', 'rotation', -180, 180, 1, (v) => `${v.toFixed(0)}°`)}
-      {draft && <p className="text-nano text-gray-400">松开鼠标应用</p>}
+      {row(t('editorV7.layerPanel.positionX'), 'x', -55, 55, 1, (v) => v.toFixed(0))}
+      {row(t('editorV7.layerPanel.positionY'), 'y', -200, 20, 1, (v) => v.toFixed(0))}
+      {row(t('editorV7.layerPanel.scale'), 'scale', 0.2, 3, 0.05, (v) => `${Math.round(v * 100)}%`)}
+      {row(t('editorV7.layerPanel.rotation'), 'rotation', -180, 180, 1, (v) => `${v.toFixed(0)}°`)}
+      {draft && <p className="text-nano text-gray-400">{t('editorV7.layerPanel.releaseToApply')}</p>}
     </div>
   );
 }
@@ -96,8 +98,9 @@ function TransformSliders(props: {
 function FrenchEdgeSliders(props: {
   value: FrenchEdgeElement;
   onPatch: (patch: Partial<FrenchEdgeElement>) => void;
+  t: ReturnType<typeof useLocale>['t'];
 }) {
-  const { value, onPatch } = props;
+  const { value, onPatch, t } = props;
   const [draft, setDraft] = useState<Partial<FrenchEdgeElement> | null>(null);
   const shown = { ...value, ...draft };
   const classicControls = shown.classicControls ?? {
@@ -175,7 +178,7 @@ function FrenchEdgeSliders(props: {
   return (
     <div className="mt-1 flex flex-col gap-1 rounded-button bg-gray-50 p-2">
       <label className="flex items-center justify-between text-nano text-gray-500">
-        <span>甲尖颜色</span>
+        <span>{t('editorV7.layerPanel.tipColor')}</span>
         <input
           type="color"
           value={shown.fillColor}
@@ -184,7 +187,7 @@ function FrenchEdgeSliders(props: {
         />
       </label>
       <label className="flex cursor-pointer items-center justify-between text-nano text-gray-500">
-        <span>{value.variant === 'double' ? '双线边线' : '金属细边'}</span>
+        <span>{value.variant === 'double' ? t('editorV7.layerPanel.doubleLine') : t('editorV7.layerPanel.metallicLine')}</span>
         <input
           type="checkbox"
           checked={(shown.outlineEnabled ?? false) || value.variant === 'double'}
@@ -196,7 +199,7 @@ function FrenchEdgeSliders(props: {
       {((shown.outlineEnabled ?? false) || value.variant === 'double') && (
         <>
           <label className="flex items-center justify-between text-nano text-gray-500">
-            <span>边线颜色</span>
+            <span>{t('editorV7.layerPanel.outlineColor')}</span>
             <input
               type="color"
               value={shown.strokeColor}
@@ -204,31 +207,30 @@ function FrenchEdgeSliders(props: {
               className="h-6 w-10 cursor-pointer"
             />
           </label>
-          {row('细边宽度', 'strokeWidth', 2, 10, 1)}
+          {row(t('editorV7.layerPanel.strokeWidth'), 'strokeWidth', 2, 10, 1)}
         </>
       )}
       {value.variant === 'arc' ? (
         <>
-          {classicRow('左翼点', 'leftWingOffset')}
-          {classicRow('中心点', 'centerOffset')}
-          {classicRow('右翼点', 'rightWingOffset')}
-          <p className="text-nano text-gray-400">
-            也可直接拖拽画布上的三个控制点
-          </p>
+          {classicRow(t('editorV7.layerPanel.leftWing'), 'leftWingOffset')}
+          {classicRow(t('editorV7.layerPanel.center'), 'centerOffset')}
+          {classicRow(t('editorV7.layerPanel.rightWing'), 'rightWingOffset')}
+          <p className="text-nano text-gray-400">{t('editorV7.layerPanel.dragControlPoints')}</p>
         </>
       ) : (
         <>
-          {row('侧翼延伸', 'tipOffset', 15, 100, 1)}
-          {row('微笑线深', 'smileDepth', 4, 50, 1)}
+          {row(t('editorV7.layerPanel.sideExtension'), 'tipOffset', 15, 100, 1)}
+          {row(t('editorV7.layerPanel.smileDepth'), 'smileDepth', 4, 50, 1)}
         </>
       )}
-      {value.variant === 'double' && row('线间距', 'lineGap', 4, 24, 1)}
-      {draft && <p className="text-nano text-gray-400">松开鼠标应用</p>}
+      {value.variant === 'double' && row(t('editorV7.layerPanel.lineGap'), 'lineGap', 4, 24, 1)}
+      {draft && <p className="text-nano text-gray-400">{t('editorV7.layerPanel.releaseToApply')}</p>}
     </div>
   );
 }
 
 export function LayerPanel() {
+  const { t } = useLocale();
   const doc = useEditorStore((s) => s.doc);
   const currentFinger = useEditorStore((s) => s.currentFinger);
   const readOnly = useEditorStore((s) => s.readOnly);
@@ -312,20 +314,20 @@ export function LayerPanel() {
     <div className="flex flex-col gap-3" data-testid="layer-panel" data-debug-id="studio.editor.layers">
       {doc.recipe?.recipeRef.id === 'mercury-dew' && (
         <section className="rounded-panel border border-[#D7B36A]/40 bg-[#FFFCF5] p-3" data-testid="recipe-layer-group">
-          <header className="mb-2 flex items-center justify-between"><h3 className="text-xs font-semibold text-gray-800">Mercury Dew Recipe</h3><span className="text-nano text-gray-400">虚拟图层 · 真源</span></header>
-          <div className="flex flex-col gap-1 text-nano text-gray-600"><span>① Jelly Base</span><span>② Cat-eye Appearance</span><span>③ Chrome Ribbon Relief</span><span>④ Droplets Accent</span></div>
-          <p className="mt-2 text-nano leading-relaxed text-gray-400">Recipe 参数由设计面板编辑；此处展示组件顺序，不重复持久化派生图层。</p>
+          <header className="mb-2 flex items-center justify-between"><h3 className="text-xs font-semibold text-gray-800">{t('editorV7.layerPanel.recipeTitle')}</h3><span className="text-nano text-gray-400">{t('editorV7.layerPanel.virtualLayers')}</span></header>
+          <div className="flex flex-col gap-1 text-nano text-gray-600"><span>{t('editorV7.layerPanel.recipeJellyBase')}</span><span>{t('editorV7.layerPanel.recipeCatEye')}</span><span>{t('editorV7.layerPanel.recipeChromeRelief')}</span><span>{t('editorV7.layerPanel.recipeDroplets')}</span></div>
+          <p className="mt-2 text-nano leading-relaxed text-gray-400">{t('editorV7.layerPanel.recipeDescription')}</p>
         </section>
       )}
       {/* ① 底色层 */}
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
-            <span className="text-nano font-normal text-gray-400">①</span>
-            底色
+            <span className="text-nano font-normal text-gray-400">{t('editorV7.layerPanel.baseOrdinal')}</span>
+            {t('editorV7.layerPanel.baseTitle')}
             <Lock size={11} className="text-gray-400" />
           </h3>
-          <span className="text-nano text-gray-400">只能选色 · 不可手绘</span>
+          <span className="text-nano text-gray-400">{t('editorV7.layerPanel.baseHint')}</span>
         </header>
         <div className="flex flex-wrap items-center gap-1.5">
           {PALETTE.map((c) => (
@@ -355,7 +357,7 @@ export function LayerPanel() {
               })
             }
             className="h-6 w-8 cursor-pointer disabled:opacity-40"
-            title="自定义底色"
+            title={t('editorV7.layerPanel.customColor')}
           />
         </div>
       </section>
@@ -364,13 +366,13 @@ export function LayerPanel() {
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="text-xs font-semibold text-gray-800">
-            <span className="mr-1 text-nano font-normal text-gray-400">②</span>
-            图案
+            <span className="mr-1 text-nano font-normal text-gray-400">{t('editorV7.layerPanel.patternOrdinal')}</span>
+            {t('editorV7.layerPanel.patternTitle')}
           </h3>
-          <span className="text-nano text-gray-400">模板 + 手绘 + 导入 · 可擦</span>
+          <span className="text-nano text-gray-400">{t('editorV7.layerPanel.patternHint')}</span>
         </header>
         {data.pattern.length === 0 ? (
-          <p className="text-nano text-gray-400">空图层 — 用画笔绘制或导入图片</p>
+          <p className="text-nano text-gray-400">{t('editorV7.layerPanel.patternEmpty')}</p>
         ) : (
           <ul className="flex flex-col gap-1">
             {data.pattern.map((el) => {
@@ -390,19 +392,19 @@ export function LayerPanel() {
                         setSelection(selected ? null : { layer: 'pattern', id: el.id })
                       }
                     >
-                      {el.name || patternElLabel(el)}
+                      {el.name || patternElLabel(el, t)}
                     </button>
                     {!readOnly && (
                       <span className="ml-1 flex items-center gap-0.5">
                         <button
-                          title={el.visible ? '隐藏' : '显示'}
+                          title={el.visible ? t('editorV7.layerPanel.hide') : t('editorV7.layerPanel.show')}
                           onClick={() => patchElementMeta('pattern', el.id, { visible: !el.visible })}
                           className="text-gray-400 hover:text-gray-700"
                         >
                           {el.visible ? <Eye size={11} /> : <EyeOff size={11} />}
                         </button>
                         <button
-                          title={el.locked ? '解锁' : '锁定'}
+                          title={el.locked ? t('editorV7.layerPanel.unlock') : t('editorV7.layerPanel.lock')}
                           onClick={() => patchElementMeta('pattern', el.id, { locked: !el.locked })}
                           className="text-gray-400 hover:text-gray-700"
                         >
@@ -410,19 +412,19 @@ export function LayerPanel() {
                         </button>
                         {el.kind !== 'eraser' && (
                           <>
-                            <button title={el.locked ? '请先解锁' : '上移'} disabled={el.locked} onClick={() => moveElement('pattern', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                            <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.moveUp')} disabled={el.locked} onClick={() => moveElement('pattern', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                               <ArrowUp size={11} />
                             </button>
-                            <button title={el.locked ? '请先解锁' : '下移'} disabled={el.locked} onClick={() => moveElement('pattern', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                            <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.moveDown')} disabled={el.locked} onClick={() => moveElement('pattern', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                               <ArrowDown size={11} />
                             </button>
-                            <button title={el.locked ? '请先解锁' : '复制'} disabled={el.locked} onClick={() => duplicateElement('pattern', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                            <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.copy')} disabled={el.locked} onClick={() => duplicateElement('pattern', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                               <Copy size={11} />
                             </button>
                           </>
                         )}
                         <button
-                          title={el.locked ? '请先解锁' : '删除元素'}
+                          title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.deleteElement')}
                           disabled={el.locked}
                           onClick={() =>
                             editCurrentFingerData((d) => {
@@ -439,7 +441,7 @@ export function LayerPanel() {
                   {selected && !readOnly && el.kind !== 'eraser' && (
                     <input
                       value={el.name}
-                      aria-label="图层名称"
+                      aria-label={t('editorV7.layerPanel.layerName')}
                       onChange={(event) => patchElementMeta('pattern', el.id, { name: event.target.value })}
                       className="mt-1 h-7 w-full rounded-button border border-gray-200 bg-white px-2 text-nano text-gray-700"
                     />
@@ -447,13 +449,15 @@ export function LayerPanel() {
                   {selected && (el.kind === 'template_pattern' || el.kind === 'image') && !readOnly && !el.locked && (
                     <TransformSliders
                       value={el.transform}
-                      onCommit={(t) => updateElementTransform('pattern', el.id, t)}
+                      onCommit={(transform) => updateElementTransform('pattern', el.id, transform)}
+                      t={t}
                     />
                   )}
                   {selected && el.kind === 'french_edge' && !readOnly && !el.locked && (
                     <FrenchEdgeSliders
                       value={el}
                       onPatch={(patch) => updateFrenchEdge(el.id, patch)}
+                      t={t}
                     />
                   )}
                 </li>
@@ -467,13 +471,13 @@ export function LayerPanel() {
       <section className="rounded-panel border border-gray-200 bg-white p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="text-xs font-semibold text-gray-800">
-            <span className="mr-1 text-nano font-normal text-gray-400">③</span>
-            附件
+            <span className="mr-1 text-nano font-normal text-gray-400">{t('editorV7.layerPanel.attachmentOrdinal')}</span>
+            {t('editorV7.layerPanel.attachmentTitle')}
           </h3>
-          <span className="text-nano text-gray-400">预制组件 · 高度 0.05–0.30mm</span>
+          <span className="text-nano text-gray-400">{t('editorV7.layerPanel.attachmentHint')}</span>
         </header>
         {data.attachments.length === 0 ? (
-          <p className="mb-1 text-nano text-gray-400">空图层 — 拖入预制组件</p>
+          <p className="mb-1 text-nano text-gray-400">{t('editorV7.layerPanel.attachmentEmpty')}</p>
         ) : (
           <ul className="mb-1 flex flex-col gap-1">
             {data.attachments.map((el) => {
@@ -493,27 +497,27 @@ export function LayerPanel() {
                         setSelection(selected ? null : { layer: 'attachment', id: el.id })
                       }
                     >
-                      {el.name} · {el.heightMm.toFixed(2)}mm
+                      {t('editorV7.layerPanel.attachmentSummary', { name: el.name, height: el.heightMm.toFixed(2) })}
                     </button>
                     {!readOnly && (
                       <span className="ml-1 flex items-center gap-0.5">
-                        <button title={el.visible ? '隐藏' : '显示'} onClick={() => patchElementMeta('attachment', el.id, { visible: !el.visible })} className="text-gray-400 hover:text-gray-700">
+                        <button title={el.visible ? t('editorV7.layerPanel.hide') : t('editorV7.layerPanel.show')} onClick={() => patchElementMeta('attachment', el.id, { visible: !el.visible })} className="text-gray-400 hover:text-gray-700">
                           {el.visible ? <Eye size={11} /> : <EyeOff size={11} />}
                         </button>
-                        <button title={el.locked ? '解锁' : '锁定'} onClick={() => patchElementMeta('attachment', el.id, { locked: !el.locked })} className="text-gray-400 hover:text-gray-700">
+                        <button title={el.locked ? t('editorV7.layerPanel.unlock') : t('editorV7.layerPanel.lock')} onClick={() => patchElementMeta('attachment', el.id, { locked: !el.locked })} className="text-gray-400 hover:text-gray-700">
                           {el.locked ? <Lock size={11} /> : <LockOpen size={11} />}
                         </button>
-                        <button title={el.locked ? '请先解锁' : '上移'} disabled={el.locked} onClick={() => moveElement('attachment', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                        <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.moveUp')} disabled={el.locked} onClick={() => moveElement('attachment', el.id, -1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                           <ArrowUp size={11} />
                         </button>
-                        <button title={el.locked ? '请先解锁' : '下移'} disabled={el.locked} onClick={() => moveElement('attachment', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                        <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.moveDown')} disabled={el.locked} onClick={() => moveElement('attachment', el.id, 1)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                           <ArrowDown size={11} />
                         </button>
-                        <button title={el.locked ? '请先解锁' : '复制'} disabled={el.locked} onClick={() => duplicateElement('attachment', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                        <button title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.copy')} disabled={el.locked} onClick={() => duplicateElement('attachment', el.id)} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
                           <Copy size={11} />
                         </button>
                         <button
-                          title={el.locked ? '请先解锁' : '删除附件'}
+                          title={el.locked ? t('editorV7.layerPanel.unlockFirst') : t('editorV7.layerPanel.deleteAttachment')}
                           disabled={el.locked}
                           onClick={() =>
                             editCurrentFingerData((d) => {
@@ -530,7 +534,7 @@ export function LayerPanel() {
                   {selected && !readOnly && (
                     <input
                       value={el.name}
-                      aria-label="附件名称"
+                      aria-label={t('editorV7.layerPanel.attachmentName')}
                       onChange={(event) => patchElementMeta('attachment', el.id, { name: event.target.value })}
                       className="mt-1 h-7 w-full rounded-button border border-gray-200 bg-white px-2 text-nano text-gray-700"
                     />
@@ -538,7 +542,7 @@ export function LayerPanel() {
                   {selected && !readOnly && !el.locked && (
                     <div className="mt-1 flex flex-col gap-1 rounded-button bg-gray-50 p-2">
                       <label className="flex items-center gap-2 text-nano text-gray-500">
-                        <span className="w-10 shrink-0">高度</span>
+                        <span className="w-10 shrink-0">{t('editorV7.layerPanel.height')}</span>
                         <input
                           type="range"
                           min={HEIGHT_MIN_MM * 100}
@@ -553,11 +557,12 @@ export function LayerPanel() {
                           }
                           className="flex-1 accent-primary"
                         />
-                        <span className="w-12 text-right tnum">{el.heightMm.toFixed(2)}mm</span>
+                        <span className="w-12 text-right tnum">{t('editorV7.layerPanel.heightValue', { height: el.heightMm.toFixed(2) })}</span>
                       </label>
                       <TransformSliders
                         value={el.transform}
-                        onCommit={(t) => updateElementTransform('attachment', el.id, t)}
+                        onCommit={(transform) => updateElementTransform('attachment', el.id, transform)}
+                        t={t}
                       />
                     </div>
                   )}
@@ -570,7 +575,7 @@ export function LayerPanel() {
           <div className="relative">
             <Button size="sm" variant="secondary" onClick={() => setPickerOpen((v) => !v)}>
               <Plus size={13} />
-              添加附件
+              {t('editorV7.layerPanel.addAttachment')}
             </Button>
             {pickerOpen && (
               <div className="absolute left-0 top-9 z-20 grid w-44 grid-cols-2 gap-1 rounded-panel border border-gray-200 bg-white p-2 shadow-modal animate-fade-in">
@@ -606,10 +611,10 @@ export function LayerPanel() {
       <section className="rounded-panel border border-dashed border-gray-200 bg-gray-50/50 p-3">
         <header className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
-            封层
+            {t('editorV7.layerPanel.finishTitle')}
             <Lock size={11} className="text-gray-400" />
           </h3>
-          <span className="text-nano text-gray-400"> gloss / matte / pearl</span>
+          <span className="text-nano text-gray-400">{t('editorV7.layerPanel.finishHint')}</span>
         </header>
         <div className="flex gap-1.5">
           {FINISHES.filter((f) => f.id !== 'pearl').map((f) => (

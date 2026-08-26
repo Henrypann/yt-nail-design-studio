@@ -37,7 +37,7 @@ interface Props {
 type LoadState = 'loading' | 'ready' | 'error';
 
 export function NailBoardSaveDialog({ look, open, onClose }: Props) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const repository = useMemo(() => createBrowserBoardRepository(), []);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [boards, setBoards] = useState<NailBoardV1[]>([]);
@@ -71,7 +71,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
         if (all.corrupted) {
           setNotice({
             kind: 'error',
-            message: text('本地存储损坏，已停止写入，请先清除本地数据后重试。', 'Local storage is corrupted; writes are disabled. Clear local data and retry.'),
+            message: t('app.localStorageCorruptedWritesDisabledClearLocalDataRetry'),
           });
         }
       } catch {
@@ -81,7 +81,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [open, look, repository, retry, text]);
+  }, [open, look, repository, retry, t]);
 
   if (!open || !look) return null;
 
@@ -132,13 +132,13 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
       setNotice({
         kind: 'saved',
         message: saved.value.changed
-          ? text('已保存到该 Board。', 'Saved to the board.')
-          : text('该款式此前已在此 Board 中（未重复保存）。', 'This look was already on that board (nothing duplicated).'),
+          ? t('app.savedBoard')
+          : t('app.lookWasAlreadyBoardNothingDuplicated'),
       });
     } catch (error) {
       setNotice({
         kind: 'error',
-        message: error instanceof Error ? error.message : text('保存失败，请重试。', 'Save failed. Retry.'),
+        message: error instanceof Error ? error.message : t('app.saveFailedRetry'),
       });
     } finally {
       setSaving(false);
@@ -149,12 +149,12 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title={text('保存到 Nail Board', 'Save to Nail Board')}
+      title={t('app.saveNailBoard')}
       size="md"
       footer={
         <>
           <Button variant="ghost" className="min-h-11" onClick={onClose}>
-            {text('完成', 'Done')}
+            {t('app.done')}
           </Button>
           <Button
             variant="primary"
@@ -164,7 +164,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
             onClick={() => void runSave()}
           >
             {saving ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Bookmark size={14} aria-hidden />}
-            {text('保存', 'Save')}
+            {t('app.save')}
           </Button>
         </>
       }
@@ -174,8 +174,8 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
           <p className="text-sm font-medium text-gray-900">{look.title}</p>
           <p className="mt-0.5 text-nano text-gray-500">
             {reference.sourceKind === 'CANONICAL_VERSIONED'
-              ? text('版本化引用（designVersionId 精确匹配）', 'Versioned reference (exact designVersionId)')
-              : text('未版本化灵感参考（legacy）', 'Unversioned inspiration reference (legacy)')}
+              ? t('app.versionedReferenceExactDesignversionid')
+              : t('app.unversionedInspirationReferenceLegacy')}
           </p>
         </div>
 
@@ -184,25 +184,22 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
             className="rounded-button border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800"
             data-testid="nail-board-legacy-caveat"
           >
-            {text(
-              '此款式来自 legacy 静态内容，没有 DesignVersionId：只能作为“未版本化灵感参考”保存，不能声称版本稳定或可制造。',
-              'This look comes from legacy static content with no DesignVersionId: it can only be saved as an unversioned inspiration reference, never claimed version-stable or manufacturable.',
-            )}
+            {t('app.lookComesLegacyStaticContentNoDesignversionidItCanOnlyBeSavedAsUnversionedInspirationReferenceNeverClaimedVersionStableManufacturable')}
           </p>
         )}
 
         {loadState === 'loading' && (
           <p className="flex items-center gap-2 py-4 text-sm text-gray-500">
             <Loader2 size={14} className="animate-spin" aria-hidden />
-            {text('加载 Board…', 'Loading boards…')}
+            {t('app.loadingBoards')}
           </p>
         )}
 
         {loadState === 'error' && (
           <div className="flex flex-col items-start gap-2 py-2">
-            <p className="text-sm text-gray-600">{text('Board 列表加载失败。', 'Failed to load boards.')}</p>
+            <p className="text-sm text-gray-600">{t('app.failedLoadBoards')}</p>
             <Button size="sm" variant="secondary" className="min-h-11" onClick={() => setRetry((k) => k + 1)}>
-              {text('重试', 'Retry')}
+              {t('app.retry')}
             </Button>
           </div>
         )}
@@ -217,7 +214,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700"
                 >
                   <Bookmark size={11} aria-hidden />
-                  {text('已保存到', 'Saved in')}「{board.title}」
+                  {t('app.saved')}「{board.title}」
                 </span>
               ))}
           </div>
@@ -225,10 +222,10 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
 
         {loadState === 'ready' && (
           <fieldset className="flex flex-col gap-2">
-            <legend className="text-xs font-medium text-gray-700">{text('保存到', 'Save to')}</legend>
+            <legend className="text-xs font-medium text-gray-700">{t('app.save2')}</legend>
             {targets.length === 0 && !creatingNew && (
               <p className="text-xs text-gray-500" data-testid="nail-board-all-saved">
-                {text('所有 Board 都已包含此款式；可以新建一个。', 'Every board already contains this look; you can create a new one.')}
+                {t('app.everyBoardAlreadyContainsLookCanCreateNewOne')}
               </p>
             )}
             {targets.map((board) => (
@@ -254,7 +251,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
                 />
                 <span className="min-w-0 flex-1 truncate text-gray-900">{board.title}</span>
                 <span className="shrink-0 text-nano text-gray-400">
-                  {board.items.length} {text('款', 'items')}
+                  {board.items.length} {t('app.items')}
                 </span>
               </label>
             ))}
@@ -275,7 +272,7 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
                 className="h-4 w-4 accent-primary"
               />
               <Plus size={14} aria-hidden className="shrink-0 text-gray-500" />
-              <span className="text-gray-900">{text('新建 Board（默认仅自己可见）', 'New board (PRIVATE by default)')}</span>
+              <span className="text-gray-900">{t('app.newBoardPrivateByDefault')}</span>
             </label>
             {creatingNew && (
               <div className="pl-6">
@@ -283,8 +280,8 @@ export function NailBoardSaveDialog({ look, open, onClose }: Props) {
                   className="min-h-11"
                   value={newTitle}
                   onChange={(event) => setNewTitle(event.target.value)}
-                  label={text('Board 名称', 'Board title')}
-                  placeholder={text('例如：婚礼灵感', 'e.g. Wedding inspiration')}
+                  label={t('app.boardTitle')}
+                  placeholder={t('app.eGWeddingInspiration')}
                   maxLength={80}
                   data-testid="nail-board-new-title"
                 />

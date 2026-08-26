@@ -1,19 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Eye, EyeOff, Layers3, Lock, ScanLine, X } from 'lucide-react';
 import { Button, cx } from '@/design-system';
+import { useLocale, type MessageKey } from '@/lib/i18n';
 import type { EditorWorkspaceToolAvailabilityV7 } from '../v7/workspace-ia';
 import { EDITOR_WORKSPACE_PERSONAL_STEP_META_V7 } from '../v7/workspace-step-factory';
 
-const STATUS_LABEL = {
-  switching: '正在切换设计',
-  read_only: '当前设计只读',
-  missing_step: '缺少对应工艺步骤',
-  locked: '步骤已锁定',
-  skipped: '步骤已跳过',
-  hidden: '步骤已隐藏',
-  geometry_unavailable: '甲型轮廓不可用于空间编辑',
-  ready: '可以使用',
-} as const;
+const STATUS_KEYS = { switching: 'editorV7.intent.switching', read_only: 'editorV7.intent.readOnly', missing_step: 'editorV7.intent.missingStep', locked: 'editorV7.intent.locked', skipped: 'editorV7.intent.skipped', hidden: 'editorV7.intent.hidden', geometry_unavailable: 'editorV7.intent.geometryUnavailable', ready: 'editorV7.intent.ready' } as const;
 
 const STATUS_ICON = {
   switching: Layers3,
@@ -26,26 +18,24 @@ const STATUS_ICON = {
   ready: Eye,
 } as const;
 
-const TOOL_LABEL = {
-  select: '选择', background: '背景', brush: '画笔', eraser: '橡皮', line: '线条', french: '法式', shape: '图形', text: '文字', assets: '素材', effects: '效果', decorations: '立体', finish: '封层',
-} as const;
+const TOOL_LABEL: Record<EditorWorkspaceToolAvailabilityV7['id'], MessageKey> = { select: 'editorV7.tool.select', background: 'editorV7.tool.background', brush: 'editorV7.tool.brush', eraser: 'editorV7.tool.eraser', line: 'editorV7.tool.line', french: 'editorV7.tool.french', shape: 'editorV7.tool.shape', text: 'editorV7.tool.text', assets: 'editorV7.tool.assets', effects: 'editorV7.tool.effects', decorations: 'editorV7.tool.decorations', finish: 'editorV7.tool.finish' };
 
-const STEP_LABEL = {
-  background: '背景层', flat_design: '平面设计层', surface_effect: '表面效果层', dimensional_decoration: '立体装饰层', surface_finish: '表面完成层',
-} as const;
+const STEP_LABEL: Record<EditorWorkspaceToolAvailabilityV7['requiredStepKind'], MessageKey> = {
+  background: 'editorV7.layers.background', flat_design: 'editorV7.layers.flatDesign', surface_effect: 'editorV7.layers.surfaceEffect', dimensional_decoration: 'editorV7.layers.dimensional', surface_finish: 'editorV7.layers.finish',
+};
 
-function actionLabel(intent: EditorWorkspaceToolAvailabilityV7): string | null {
+function actionLabel(intent: EditorWorkspaceToolAvailabilityV7, t: ReturnType<typeof useLocale>['t']): string | null {
   if (intent.status === 'missing_step') {
     const meta = intent.requiredStepKind === 'flat_design'
       || intent.requiredStepKind === 'surface_effect'
       || intent.requiredStepKind === 'dimensional_decoration'
       ? EDITOR_WORKSPACE_PERSONAL_STEP_META_V7[intent.requiredStepKind]
       : null;
-    return meta ? `添加${meta.label}并继续` : null;
+    return meta ? t('editorV7.intent.addAndContinue', { label: t(meta.labelKey) }) : null;
   }
-  if (intent.status === 'locked') return '解锁并继续';
-  if (intent.status === 'skipped') return '取消跳过并继续';
-  if (intent.status === 'hidden') return '恢复显示并继续';
+  if (intent.status === 'locked') return t('editorV7.intent.unlockContinue');
+  if (intent.status === 'skipped') return t('editorV7.intent.unskipContinue');
+  if (intent.status === 'hidden') return t('editorV7.intent.restoreContinue');
   return null;
 }
 
@@ -58,9 +48,10 @@ export function EditorWorkspaceIntentNoticeV7({
   onResolve(): void;
   onDismiss(): void;
 }) {
+  const { t } = useLocale();
   const actionRef = useRef<HTMLButtonElement>(null);
   const dismissRef = useRef<HTMLButtonElement>(null);
-  const action = actionLabel(intent);
+  const action = actionLabel(intent, t);
   const Icon = STATUS_ICON[intent.status];
   useEffect(() => {
     (action ? actionRef.current : dismissRef.current)?.focus();
@@ -82,15 +73,15 @@ export function EditorWorkspaceIntentNoticeV7({
     >
       <span className="flex min-w-0 flex-1 items-start gap-2">
         <Icon size={15} className="mt-0.5 shrink-0" />
-        <span><strong className="block font-semibold">{STATUS_LABEL[intent.status]}</strong><span className="mt-0.5 block leading-5">{intent.reason ?? '当前工具尚不可用。'}</span></span>
+        <span><strong className="block font-semibold">{t(STATUS_KEYS[intent.status])}</strong><span className="mt-0.5 block leading-5">{intent.reason ?? t('editorV7.intent.unavailable')}</span></span>
       </span>
-      <span className="flex flex-wrap gap-1 text-nano" aria-label="工具与层级目标">
-        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">工具 · {TOOL_LABEL[intent.id]}</span>
-        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">步骤 · {STEP_LABEL[intent.requiredStepKind]}</span>
-        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">恢复后同步高亮</span>
+      <span className="flex flex-wrap gap-1 text-nano" aria-label={t('editorV7.intent.targets')}>
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">{t('editorV7.intent.toolPrefix', { label: t(TOOL_LABEL[intent.id]) })}</span>
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">{t('editorV7.intent.stepPrefix', { label: t(STEP_LABEL[intent.requiredStepKind]) })}</span>
+        <span className="rounded-full border border-current/15 bg-white/70 px-2 py-1">{t('editorV7.intent.syncHighlight')}</span>
       </span>
       {action && <Button ref={actionRef} size="sm" className="min-h-11" onClick={onResolve}>{action}</Button>}
-      <button ref={dismissRef} type="button" aria-label="关闭工具提示" onClick={onDismiss} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>
+      <button ref={dismissRef} type="button" aria-label={t('editorV7.intent.close')} onClick={onDismiss} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>
     </section>
   );
 }

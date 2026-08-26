@@ -67,7 +67,7 @@ export default function CommunityLookPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const toast = useToast();
-  const { locale, text } = useLocale();
+  const { locale, legacyLocale, t } = useLocale();
   const [look, setLook] = useState<PublishedLookReadModelV1 | null | undefined>(undefined);
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null>(null);
   const [taxonomyV2, setTaxonomyV2] = useState<CommunityTaxonomyV2 | null>(null);
@@ -134,9 +134,9 @@ export default function CommunityLookPage() {
         className="rounded-card border border-gray-200 bg-white p-6"
         data-testid="community-look-load-failed"
       >
-        <h1 className="text-lg font-semibold text-gray-900">内容加载失败</h1>
+        <h1 className="text-lg font-semibold text-gray-900">{t('community.contentLoadFailed')}</h1>
         <p className="mt-1 text-xs text-gray-500">
-          网络或运行时错误导致无法加载该内容；这不代表内容不存在或已下架。
+          {t('community.contentLoadFailedHint')}
         </p>
         <div className="mt-4 flex gap-2">
           <Button
@@ -147,10 +147,10 @@ export default function CommunityLookPage() {
               setRetry((k) => k + 1);
             }}
           >
-            重试
+            {t('common.retry')}
           </Button>
           <Button variant="secondary" onClick={() => navigate(Routes.community)}>
-            返回 Discover
+            {t('community.returnDiscover')}
           </Button>
         </div>
       </div>
@@ -159,17 +159,17 @@ export default function CommunityLookPage() {
   if (look === undefined) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6 text-sm text-gray-500">
-        加载中…
+        {t('common.loading')}
       </div>
     );
   }
   if (look === null) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6" data-testid="community-look-missing">
-        <h1 className="text-lg font-semibold text-gray-900">内容不存在或已下架</h1>
-        <p className="mt-1 text-xs text-gray-500">可能是草稿、已下架或无效深链。</p>
+        <h1 className="text-lg font-semibold text-gray-900">{t('community.contentNotFound')}</h1>
+        <p className="mt-1 text-xs text-gray-500">{t('community.contentUnavailableHint')}</p>
         <Button className="mt-4" variant="secondary" onClick={() => navigate(Routes.community)}>
-          返回 Discover
+          {t('community.returnDiscover')}
         </Button>
       </div>
     );
@@ -188,14 +188,14 @@ export default function CommunityLookPage() {
   const localHandoffAvailable = canUseLocalStudioHandoff(window.location.origin);
   const crossOriginDisabledReason = localHandoffAvailable
     ? undefined
-    : '跨域导入通道尚未配置；当前不会创建 Studio 导入意图。';
+    : t('community.crossOriginImportUnavailable');
   const useUnavailableMessage = assetCapability?.capabilityState === 'ASSETS_INCOMPLETE'
-    ? 'Studio 素材尚未补齐，暂不可使用'
+    ? t('community.assetsIncomplete')
     : assetCapability?.capabilityState === 'INSPIRATION_ONLY'
-      ? '该 Look 仅供灵感参考，暂不可使用'
+      ? t('community.lookInspirationOnlyShort')
       : assetCapability?.capabilityState === 'UNAVAILABLE'
-        ? '该内容当前不可用，请查看资产能力诊断'
-        : '资产能力合同不可用，已停止内容应用动作';
+        ? t('community.contentUnavailableDiagnostics')
+        : t('community.assetContractStopped');
 
   const prepareLegacyIntent = (): { ok: true; href: string } | { ok: false } => {
     const result = createStudioImportIntent({
@@ -208,11 +208,11 @@ export default function CommunityLookPage() {
     });
     if (!result.ok) {
       if (result.reason === 'inspiration_only') {
-        toast.info('该内容仅供灵感参考，不可直接试用到 Studio。');
+        toast.info(t('community.inspirationOnlyNotice'));
       } else if (result.reason === 'missing_asset') {
-        toast.error('无法创建试用意图：缺少可应用资产。');
+        toast.error(t('community.missingApplicationAsset'));
       } else {
-        toast.error('无法创建试用意图：内容未发布。');
+        toast.error(t('community.contentNotPublished'));
       }
       return { ok: false };
     }
@@ -228,7 +228,7 @@ export default function CommunityLookPage() {
     if (!canonical) return { ok: false };
     const result = createVersionedUseIntentForLookV1(look.sourceLook);
     if (!result.ok) {
-      toast.error('该版本暂不可用于 Studio，请刷新或返回 Explore 重试。');
+      toast.error(t('community.tryUnavailable'));
       return { ok: false };
     }
     return { ok: true, href: studioProductHref(result.href) };
@@ -239,13 +239,13 @@ export default function CommunityLookPage() {
       <div className="flex items-center gap-2">
         <Button size="sm" variant="ghost" onClick={() => navigate(-1)}>
           <ArrowLeft size={14} />
-          返回
+          {t('common.back')}
         </Button>
         <Link
           to={communityInternalHref(Routes.community, searchParams)}
           className="text-xs text-gray-500 hover:text-gray-800"
         >
-          Discover
+          {t('app.discover')}
         </Link>
       </div>
 
@@ -256,7 +256,7 @@ export default function CommunityLookPage() {
               className="flex h-full w-full items-center justify-center text-xs text-gray-400"
               data-testid="community-cover-fallback"
             >
-              封面暂不可用
+              {t('community.coverUnavailable')}
             </div>
           ) : (
             <img
@@ -291,7 +291,7 @@ export default function CommunityLookPage() {
               className="rounded-panel border border-gray-200 px-3 py-2 text-xs text-gray-500"
               data-testid="community-discovery-loading"
             >
-              结构化分类加载中…
+              {t('community.structuredTaxonomyLoading')}
             </div>
           ) : (
             <div
@@ -299,31 +299,30 @@ export default function CommunityLookPage() {
               data-testid="community-discovery-unavailable"
             >
               {taxonomyV2Error !== null
-                ? `结构化分类（taxonomy-v2）加载失败（${taxonomyV2Error}）；本页不基于 legacy 字段推断标签。`
-                : '该内容缺少结构化发现元数据；不基于 legacy 字段推断标签。'}
+                ? t('community.taxonomyLoadFailedNoLegacyInference', { reason: taxonomyV2Error })
+                : t('community.discoveryMetadataMissingNoLegacyInference')}
             </div>
           )}
 
           <CommunityAssetCapabilitySection
             capability={assetCapability}
             issueCodes={assetCapabilityIssueCodes}
-            locale={locale}
+            locale={legacyLocale}
           />
 
           <p className="text-nano leading-relaxed text-gray-500">
-            预览通过 ≠ 可制造 ≠ 已下发生产。试用仅写入 Studio 导入意图，不会由 Community 直接改写 Wizard /
-            Editor。
+            {t('community.previewNotManufacturingNote')}
           </p>
 
           <div className="flex flex-wrap gap-2">
             {assetCapability === undefined ? (
               <Button className="min-h-11" disabled variant="secondary" data-testid="community-asset-capability-action-loading">
-                资产能力加载中
+                {t('community.assetCapabilityLoading')}
               </Button>
             ) : assetCapability === null ? (
               <div className="flex flex-col items-start gap-1" data-testid="community-asset-capability-action-restricted">
-                <Button className="min-h-11" disabled variant="secondary">使用</Button>
-                <p className="text-xs text-amber-700">资产能力合同不可用；内容应用动作保持关闭。</p>
+                <Button className="min-h-11" disabled variant="secondary">{t('common.use')}</Button>
+                <p className="text-xs text-amber-700">{t('community.assetContractUnavailable')}</p>
               </div>
             ) : remixAllowed ? (
               canonical && assetCapability.cta === 'USE_VERSIONED' ? (
@@ -334,11 +333,11 @@ export default function CommunityLookPage() {
                   data-testid="community-use-versioned"
                   className="inline-flex min-h-11 items-center justify-center rounded-button bg-gradient-to-r from-fuchsia-600 to-rose-500 px-5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-200 hover:from-fuchsia-700 hover:to-rose-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
                 >
-                  使用此版本在 Studio 中定制
+                  {t('community.customizeVersionInStudio')}
                 </CrossProductAction>
               ) : legacy && assetCapability.cta === 'USE_LEGACY_APPROXIMATE' ? (
                   <Button className="min-h-11" onClick={onTryClick} disabled={!localHandoffAvailable} title={crossOriginDisabledReason} data-testid="community-try-in-studio">
-                    在 Studio 中试用（Legacy 近似）
+                    {t('community.tryLegacyApproximate')}
                   </Button>
               ) : (
                 <div className="flex flex-col items-start gap-1">
@@ -350,7 +349,7 @@ export default function CommunityLookPage() {
                     data-use-state={assetCapability.capabilityState}
                     title={useUnavailableMessage}
                   >
-                    使用
+                    {t('common.use')}
                   </Button>
                   <p
                     className="text-xs text-gray-500"
@@ -368,10 +367,10 @@ export default function CommunityLookPage() {
                 data-testid="personal-use-only-action-restricted"
               >
                 <Badge variant="warning" className="border-amber-300 bg-amber-50 text-amber-800">
-                  仅限个人使用
+                  {t('community.personalUseOnly')}
                 </Badge>
                 <p className="text-xs text-amber-700">
-                  该内容仅限个人使用：不提供「使用此版本在 Studio 中定制 / 试用 / 近似应用」等应用与二次创作动作。
+                  {t('community.personalUseOnlyDescription')}
                 </p>
               </div>
             ) : (
@@ -380,7 +379,7 @@ export default function CommunityLookPage() {
                 data-testid="community-remix-unavailable"
               >
                 <p className="text-xs text-gray-500">
-                  该内容缺少结构化权利元数据；不提供应用/二次创作动作（fail closed，不推断）。
+                  {t('community.rightsMetadataMissing')}
                 </p>
               </div>
             )}
@@ -389,7 +388,7 @@ export default function CommunityLookPage() {
               data-testid="community-open-studio"
               className="inline-flex h-9 items-center justify-center rounded-button border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              进入 Studio
+              {t('community.enterStudio')}
             </CrossProductLink>
             {look.assetRef?.manifestUrl && (
               <a
@@ -399,7 +398,7 @@ export default function CommunityLookPage() {
                 className="inline-flex h-9 items-center justify-center rounded-button border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 <ExternalLink size={14} className="mr-1" />
-                资产清单
+                {t('community.assetManifest')}
               </a>
             )}
             {crossOriginDisabledReason && remixAllowed && (assetCapability.cta === 'USE_VERSIONED' || assetCapability.cta === 'USE_LEGACY_APPROXIMATE') && (
@@ -417,48 +416,48 @@ export default function CommunityLookPage() {
         data-testid="community-look-evidence"
       >
         <h2 className="text-sm font-semibold text-amber-900">
-          {text('证据与兼容性', 'Evidence & compatibility')}
+          {t('app.evidenceCompatibility')}
         </h2>
 
         <div className="mt-2 flex flex-wrap items-center gap-2" data-testid="community-legacy-application-evidence">
-          <span className="text-xs text-amber-800">{text('旧版应用标签（仅兼容证据）', 'Legacy application label (compatibility evidence only)')}</span>
+          <span className="text-xs text-amber-800">{t('app.legacyApplicationLabelCompatibilityEvidenceOnly')}</span>
           <ApplicationBadge level={look.applicationLevel} />
         </div>
 
         <div className="mt-2 space-y-1.5">
           <EvidenceRow
-            label={text('兼容状态', 'Compatibility status')}
+            label={t('app.compatibilityStatus')}
             value={
               legacy
-                ? text('Legacy 静态内容 · 部分证据（非完整 PublishedLookV1）', 'Legacy static content · partial evidence (not a full PublishedLookV1)')
-                : 'Canonical PublishedLookV1 · 完整证据'
+                ? t('app.legacyStaticContentPartialEvidenceNotFullPublishedlookv1')
+                : t('community.canonicalPublishedLookEvidence')
             }
             tone={legacy ? 'missing' : 'ok'}
           />
           <EvidenceRow
-            label={text('不可变设计版本', 'Immutable design version')}
+            label={t('app.immutableDesignVersion')}
             value={
               evidence.immutableDesignVersion.present
-                ? text('已引用 DesignVersionV1', 'DesignVersionV1 referenced')
-                : text('缺失（无 designVersionId / EditorDoc SHA-256）', 'Unavailable (no designVersionId / EditorDoc SHA-256)')
+                ? t('app.designversionv1Referenced')
+                : t('app.unavailableNoDesignversionidEditordocSha256')
             }
             tone={evidence.immutableDesignVersion.present ? 'ok' : 'missing'}
           />
           <EvidenceRow
-            label={text('预览 revision / hash', 'Preview revision / hash')}
+            label={t('app.previewRevisionHash')}
             value={
               evidence.previewEvidence.present
-                ? text('已引用不可变预览资产', 'Immutable preview asset referenced')
-                : text('缺失（无 preview revision / sha256）', 'Unavailable (no preview revision / sha256)')
+                ? t('app.immutablePreviewAssetReferenced')
+                : t('app.unavailableNoPreviewRevisionSha256')
             }
             tone={evidence.previewEvidence.present ? 'ok' : 'missing'}
           />
           <EvidenceRow
-            label={text('公开出版门禁', 'Public publication gate')}
+            label={t('app.publicPublicationGate')}
             value={
               evidence.publicationGate.present
-                ? text('已通过（copyright/source/moderation）', 'Verified (copyright/source/moderation)')
-                : text('未验证（无版权/来源/审核证据）', 'Unverified (no copyright/source/moderation evidence)')
+                ? t('app.verifiedCopyrightSourceModeration')
+                : t('app.unverifiedNoCopyrightSourceModerationEvidence')
             }
             tone={evidence.publicationGate.present ? 'ok' : 'missing'}
           />
@@ -469,22 +468,22 @@ export default function CommunityLookPage() {
           data-testid="community-look-evidence-missing"
         >
           <p className="font-medium text-gray-800">
-            {text('状态区分（三者相互独立）', 'Status distinction (three independent axes)')}
+            {t('app.statusDistinctionThreeIndependentAxes')}
           </p>
           <div className="mt-1.5 space-y-1">
             <EvidenceRow
-              label={text('预览已验证', 'Preview verified')}
-              value={evidence.status.previewVerified ? text('是（渲染已校验）', 'Yes (render verified)') : text('否（CONCEPT）', 'No (CONCEPT)')}
+              label={t('app.previewVerified')}
+              value={evidence.status.previewVerified ? t('app.yesRenderVerified') : t('app.noConcept')}
               tone={evidence.status.previewVerified ? 'ok' : 'missing'}
             />
             <EvidenceRow
-              label={text('可制造性证据', 'Manufacturing evidence')}
-              value={evidence.status.manufacturable ? text('已验证', 'Verified') : text('无证据', 'No evidence')}
+              label={t('app.manufacturingEvidence')}
+              value={evidence.status.manufacturable ? t('app.verified') : t('app.noEvidence')}
               tone={evidence.status.manufacturable ? 'ok' : 'missing'}
             />
             <EvidenceRow
-              label={text('已下发生产', 'Production dispatched')}
-              value={evidence.status.productionDispatched ? text('是', 'Yes') : text('无证据', 'No evidence')}
+              label={t('app.productionDispatched')}
+              value={evidence.status.productionDispatched ? t('app.yes') : t('app.noEvidence')}
               tone={evidence.status.productionDispatched ? 'ok' : 'missing'}
             />
           </div>
@@ -492,22 +491,19 @@ export default function CommunityLookPage() {
 
         <p className="mt-2 text-nano leading-relaxed text-amber-800" data-testid="community-look-source-caveat">
           {legacy
-            ? text(
-                '来源：静态 fixture 数据，非实时社区后端；Demo 创作者内容仅开发/集成环境可见。预览通过 ≠ 可制造 ≠ 已下发生产，本记录不含制造/设备证据。',
-                'Source: static fixture data, not a live community backend; demo creator content is visible only in development/integration. Preview verified ≠ manufacturable ≠ production dispatched; this record carries no manufacturing/device evidence.',
-              )
-            : text('来源：canonical PublishedLookV1 合同。', 'Source: canonical PublishedLookV1 contract.')}
+            ? t('app.sourceStaticFixtureDataNotLiveCommunityBackendDemoCreatorContentVisibleOnlyDevelopmentIntegrationPreviewVerifiedManufacturableProductionDispatchedRecordCarriesNoManufacturingDeviceEvidence')
+            : t('app.sourceCanonicalPublishedlookv1Contract')}
         </p>
       </section>
 
       <Modal
         open={approxOpen}
         onClose={() => setApproxOpen(false)}
-        title="近似应用说明"
+                title={t('community.approximateApplication')}
         footer={
           <>
             <Button variant="ghost" onClick={() => setApproxOpen(false)}>
-              取消
+              {t('common.cancel')}
             </Button>
             <CrossProductAction
               href={studioProductHref(Routes.designNew)}
@@ -519,13 +515,13 @@ export default function CommunityLookPage() {
               data-testid="community-approx-confirm"
               className="inline-flex h-9 items-center justify-center rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
-              了解，继续试用
+              {t('community.understandContinueTrial')}
             </CrossProductAction>
           </>
         }
       >
         <p className="text-sm text-gray-600">
-          该内容为「近似应用」：进入 Studio 后会尽量贴近官方效果，但可能与高保真预览存在差异，且不代表生产验证通过。
+          {t('community.approximateApplicationDescription')}
         </p>
       </Modal>
     </div>

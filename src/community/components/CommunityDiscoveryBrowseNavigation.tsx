@@ -21,7 +21,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { cx } from '@/design-system';
-import { useLocale } from '@/lib/i18n';
+import {useLocale, localizedLabel} from '@/lib/i18n';
 import {
   DEFAULT_RECOMMENDATION_CHANNEL,
   PRIMARY_BROWSE_DIMENSION,
@@ -89,7 +89,7 @@ export function CommunityDiscoveryBrowseNavigation({
   relationshipProviderAvailable,
   onChange,
 }: CommunityDiscoveryBrowseNavigationProps) {
-  const { text } = useLocale();
+  const { t, locale } = useLocale();
 
   /**
    * 会话记忆：primary browse id → 最后一次有效 topic（仅内存 ref，挂载期内
@@ -158,7 +158,7 @@ export function CommunityDiscoveryBrowseNavigation({
     <div className="flex flex-col gap-3" data-testid="community-browse-navigation">
       <div
         role="group"
-        aria-label={text('浏览', 'Browse')}
+        aria-label={t('app.browse')}
         className="flex flex-wrap items-center gap-2"
         data-testid="community-browse-primary"
       >
@@ -181,7 +181,7 @@ export function CommunityDiscoveryBrowseNavigation({
                   : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
               )}
             >
-              {text(entry.labels['zh-CN'], entry.labels.en)}
+              {localizedLabel(entry.labels['zh-CN'], entry.labels.en, locale)}
             </button>
           );
         })}
@@ -190,7 +190,7 @@ export function CommunityDiscoveryBrowseNavigation({
       {visibleSecondary.length > 0 && (
         <div
           role="group"
-          aria-label={text('浏览细分', 'Browse topics')}
+          aria-label={t('app.browseTopics')}
           className="overflow-x-auto pb-1"
           data-testid="community-browse-secondary"
         >
@@ -213,7 +213,7 @@ export function CommunityDiscoveryBrowseNavigation({
                       : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
                   )}
                 >
-                  {text(labels['zh-CN'], labels.en)}
+                  {localizedLabel(labels['zh-CN'], labels.en, locale)}
                 </button>
               );
             })}

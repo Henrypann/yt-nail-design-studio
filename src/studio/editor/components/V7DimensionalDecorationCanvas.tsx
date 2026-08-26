@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { Box, EyeOff, Info } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, selectCurrentStepV7, useEditorV7Store } from '../store-v7';
 import { resolveBackgroundSilhouetteV7 } from '../v7/background';
 import type { BackgroundPayloadV7, DimensionalDecorationV7, NailPointV7 } from '../v7/model';
@@ -61,6 +62,7 @@ function decorationArtwork(decoration: DimensionalDecorationV7, selected: boolea
 }
 
 export function V7DimensionalDecorationCanvas() {
+  const { t } = useLocale();
   const toast = useToast();
   const svgRef = useRef<SVGSVGElement>(null);
   const nail = useEditorV7Store(selectCurrentNailV7);
@@ -126,7 +128,7 @@ export function V7DimensionalDecorationCanvas() {
   return (
     <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(180px,0.9fr)_minmax(190px,1fr)] sm:items-center" data-testid="v7-dimensional-decoration-canvas" data-preview-fidelity={previewFidelity} data-unavailable-count={decorations.filter((item) => dimensionalDecorationFidelityV7(item) === 'unavailable').length}>
       <div className="relative mx-auto aspect-[5/8] w-full max-w-[260px] overflow-hidden rounded-[32px] border border-white bg-white/80 p-3 shadow-[0_20px_60px_rgba(77,53,67,0.14)] touch-none">
-        <svg ref={svgRef} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full select-none touch-none" role="img" aria-label={`${currentFinger} 立体装饰 2.5D 编辑预览`} onPointerDown={() => selectElement(null)} onPointerMove={moveDrag} onPointerUp={finishDrag} onPointerCancel={() => { setDrag(null); setDraft(null); }}>
+        <svg ref={svgRef} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full select-none touch-none" role="img" aria-label={t('editorV7.decorationCanvas.aria', { finger: currentFinger })} onPointerDown={() => selectElement(null)} onPointerMove={moveDrag} onPointerUp={finishDrag} onPointerCancel={() => { setDrag(null); setDraft(null); }}>
           <defs><clipPath id={clipId}><path d={silhouette.pathD} transform={silhouetteTransform(silhouette.viewBox)} /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
             <rect width={WIDTH} height={HEIGHT} fill={backgroundFill(backgroundStep.background)} />
@@ -134,15 +136,15 @@ export function V7DimensionalDecorationCanvas() {
             <path d={silhouette.pathD} transform={silhouetteTransform(silhouette.viewBox)} fill="none" stroke="rgb(255 255 255 / .72)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
           </g>
         </svg>
-        {(!decorationStep.visible || decorationStep.skipped) && <div className="absolute inset-3 flex items-center justify-center rounded-[24px] bg-white/82 text-xs font-semibold text-gray-600 backdrop-blur-sm"><EyeOff size={15} className="mr-2" />{decorationStep.skipped ? '此装饰步骤已跳过' : '此装饰步骤已隐藏'}</div>}
+        {(!decorationStep.visible || decorationStep.skipped) && <div className="absolute inset-3 flex items-center justify-center rounded-[24px] bg-white/82 text-xs font-semibold text-gray-600 backdrop-blur-sm"><EyeOff size={15} className="mr-2" />{decorationStep.skipped ? t('editorV7.decorationCanvas.skipped') : t('editorV7.decorationCanvas.hidden')}</div>}
       </div>
       <div className="min-w-0 rounded-3xl border border-gray-200 bg-white/90 p-4 shadow-sm">
-        <div className="flex items-center gap-2"><Box size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Dimensional · 2D/2.5D</p></div>
-        <h2 className="mt-2 text-lg font-semibold text-gray-900">{decorations.length} 个立体装饰</h2>
+        <div className="flex items-center gap-2"><Box size={17} className="text-primary" /><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">{t('editorV7.decorationCanvas.title')}</p></div>
+        <h2 className="mt-2 text-lg font-semibold text-gray-900">{decorations.length} {t('editorV7.decorationCanvas.count')}</h2>
         <div className={cx('mt-3 inline-flex rounded-full border px-2.5 py-1 text-nano font-semibold', tone)}>{DIMENSIONAL_FIDELITY_LABELS_V7[previewFidelity]}</div>
-        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">甲型轮廓为{silhouette.fidelity === 'approximate' ? '生成近似' : '通用回退'}，整体投影已相应降级。</p>}
-        <div className="mt-4 space-y-1 text-xs text-gray-600">{decorations.slice(0, 4).map((item) => <p key={item.id}>{dimensionalDecorationLabelV7(item)} · {item.heightMm.toFixed(2)} mm</p>)}</div>
-        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />俯视阴影和高度仅为编辑态 2.5D 投影；Mesh 状态不代表物理结构、装配或可制造性。</div>
+        {silhouette.fidelity !== 'exact' && <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-nano leading-4 text-amber-900">{t('editorV7.decorationCanvas.shapeWarning', { fidelity: silhouette.fidelity === 'approximate' ? t('editorV7.decorationCanvas.shapeApproximate') : t('editorV7.decorationCanvas.shapeFallback') })}</p>}
+        <div className="mt-4 space-y-1 text-xs text-gray-600">{decorations.slice(0, 4).map((item) => <p key={item.id}>{t('editorV7.decorationCanvas.detail', { label: dimensionalDecorationLabelV7(item), height: item.heightMm.toFixed(2) })}</p>)}</div>
+        <div className="mt-4 rounded-2xl border border-info/20 bg-info-soft p-3 text-xs leading-5 text-info"><Info size={14} className="mb-1" />{t('editorV7.decorationCanvas.disclaimer')}</div>
       </div>
     </div>
   );

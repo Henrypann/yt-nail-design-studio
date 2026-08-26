@@ -1,4 +1,5 @@
 import type { NailDesignV7, ProcessStepV7 } from './model';
+import type { MessageKey, MessageParams } from '@/lib/i18n/types';
 import { resolveBackgroundSilhouetteV7 } from './background';
 import { resolveEditorGeometryV7 } from './geometry-registry';
 
@@ -13,9 +14,10 @@ export type EditorWorkspaceStageStateV7 = 'configured' | 'attention' | 'empty' |
 
 export interface EditorWorkspaceStageV7 {
   id: EditorWorkspaceStageIdV7;
-  label: string;
-  shortLabel: string;
-  description: string;
+  labelKey: MessageKey;
+  shortLabelKey: MessageKey;
+  descriptionKey: MessageKey;
+  descriptionParams?: MessageParams;
   state: EditorWorkspaceStageStateV7;
   active: boolean;
   count?: number;
@@ -36,7 +38,7 @@ export interface EditorWorkspaceStepLaneV7 {
   id: EditorWorkspaceStepLaneIdV7;
   kind: (typeof PERSONAL_STEP_KINDS)[number];
   toolId: 'brush' | 'effects' | 'decorations';
-  label: string;
+  labelKey: MessageKey;
   state: EditorWorkspaceStepLaneStateV7;
   active: boolean;
   count: number;
@@ -44,10 +46,10 @@ export interface EditorWorkspaceStepLaneV7 {
   targetStepId: string | null;
 }
 
-const LANE_META: ReadonlyArray<Pick<EditorWorkspaceStepLaneV7, 'id' | 'kind' | 'toolId' | 'label'>> = [
-  { id: 'flat', kind: 'flat_design', toolId: 'brush', label: '平面' },
-  { id: 'effects', kind: 'surface_effect', toolId: 'effects', label: '效果' },
-  { id: 'decorations', kind: 'dimensional_decoration', toolId: 'decorations', label: '立体' },
+const LANE_META: ReadonlyArray<Pick<EditorWorkspaceStepLaneV7, 'id' | 'kind' | 'toolId' | 'labelKey'>> = [
+  { id: 'flat', kind: 'flat_design', toolId: 'brush', labelKey: 'editorV7.workspace.lane.flat' },
+  { id: 'effects', kind: 'surface_effect', toolId: 'effects', labelKey: 'editorV7.workspace.lane.effects' },
+  { id: 'decorations', kind: 'dimensional_decoration', toolId: 'decorations', labelKey: 'editorV7.workspace.lane.decorations' },
 ];
 
 function preferredStepForKindV7(
@@ -126,29 +128,28 @@ export function deriveEditorWorkspaceStagesV7(
   return [
     {
       id: 'geometry',
-      label: '甲型与适配',
-      shortLabel: '甲型',
-      description: geometry.label,
+      labelKey: 'editorV7.workspace.stage.geometry',
+      shortLabelKey: 'editorV7.workspace.stage.geometryShort',
+      descriptionKey: geometry.fidelity === 'exact' ? 'editorV7.workspace.stage.geometryExact' : geometry.fidelity === 'approximate' ? 'editorV7.workspace.stage.geometryApproximate' : 'editorV7.workspace.stage.geometryUnavailable',
       state: geometry.fidelity === 'exact' ? 'configured' : 'attention',
       active: currentStage === 'geometry',
       targetStepId: null,
     },
     {
       id: 'background',
-      label: '基础背景',
-      shortLabel: '背景',
-      description: background?.kind === 'background' ? background.background.mode : '缺少背景',
+      labelKey: 'editorV7.workspace.stage.background',
+      shortLabelKey: 'editorV7.workspace.stage.backgroundShort',
+      descriptionKey: background ? 'editorV7.background.modeLabel' : 'editorV7.workspace.stage.backgroundMissing',
       state: background ? (background.visible ? 'configured' : 'attention') : 'unavailable',
       active: currentStage === 'background',
       targetStepId: background?.id ?? null,
     },
     {
       id: 'personalize',
-      label: '个性化设计',
-      shortLabel: '设计',
-      description: personalSteps.length > 0
-        ? `${personalSteps.length} 个步骤 · ${activePersonalSteps} 启用 · ${skippedPersonalSteps} 跳过 · ${hiddenPersonalSteps} 隐藏`
-        : '尚未添加设计步骤',
+      labelKey: 'editorV7.workspace.stage.personalize',
+      shortLabelKey: 'editorV7.workspace.stage.personalizeShort',
+      descriptionKey: personalSteps.length > 0 ? 'editorV7.workspace.stage.personalizeSummary' : 'editorV7.workspace.stage.personalizeEmpty',
+      descriptionParams: personalSteps.length > 0 ? { total: personalSteps.length, active: activePersonalSteps, skipped: skippedPersonalSteps, hidden: hiddenPersonalSteps } : undefined,
       state: personalSteps.length === 0
         ? 'empty'
         : activePersonalSteps === personalSteps.length
@@ -163,18 +164,18 @@ export function deriveEditorWorkspaceStagesV7(
     },
     {
       id: 'finish',
-      label: '表面封层',
-      shortLabel: '封层',
-      description: finish?.kind === 'surface_finish' ? finish.finish.type : '缺少最终封层',
+      labelKey: 'editorV7.workspace.stage.finish',
+      shortLabelKey: 'editorV7.workspace.stage.finishShort',
+      descriptionKey: finish ? 'editorV7.layers.appliedFinish' : 'editorV7.workspace.stage.finishMissing',
       state: finish ? 'configured' : 'unavailable',
       active: currentStage === 'finish',
       targetStepId: finish?.id ?? null,
     },
     {
       id: 'customer',
-      label: '顾客确认',
-      shortLabel: '确认',
-      description: '只读预览已可用 · 确认待 V7-16',
+      labelKey: 'editorV7.workspace.stage.customer',
+      shortLabelKey: 'editorV7.workspace.stage.customerShort',
+      descriptionKey: 'editorV7.workspace.stage.customerPending',
       state: 'empty',
       active: false,
       targetStepId: null,

@@ -1,5 +1,6 @@
 import { EyeOff, Info } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { selectCurrentNailV7, useEditorV7Store } from '../store-v7';
 import {
   composeBackgroundAlphaV7,
@@ -10,7 +11,7 @@ import {
   rgbaToHexV7,
 } from '../v7/background';
 
-const MODE_LABEL: Record<string, string> = { solid: '单色', translucent: '透色', gradient: '渐变', cat_eye: '猫眼', glitter: '闪粉' };
+const MODE_LABEL = { solid: 'editorV7.background.mode.solid', translucent: 'editorV7.background.mode.translucent', gradient: 'editorV7.background.mode.gradient', cat_eye: 'editorV7.background.mode.catEye', glitter: 'editorV7.background.mode.glitter' } as const;
 
 function viewBoxMetrics(viewBox: string) {
   const values = viewBox.trim().split(/\s+/).map(Number);
@@ -19,10 +20,11 @@ function viewBoxMetrics(viewBox: string) {
 }
 
 export function V7BackgroundCanvas() {
+  const { t } = useLocale();
   const currentFinger = useEditorV7Store((state) => state.currentFinger);
   const nail = useEditorV7Store(selectCurrentNailV7);
   const backgroundStep = nail?.steps[0];
-  if (!nail || backgroundStep?.kind !== 'background') return <div className="rounded-2xl border border-error/20 bg-red-50 p-4 text-xs text-error">背景合同缺失，预览已停止且文档不会被重置。</div>;
+  if (!nail || backgroundStep?.kind !== 'background') return <div className="rounded-2xl border border-error/20 bg-red-50 p-4 text-xs text-error">{t('editorV7.background.contractMissing')}</div>;
 
   const background = backgroundStep.background;
   const preview = resolveBackgroundPreviewModelV7(background, backgroundStep.visible);
@@ -65,21 +67,21 @@ export function V7BackgroundCanvas() {
   return (
     <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(180px,0.8fr)_minmax(180px,1fr)] sm:items-center" data-testid="v7-background-canvas" data-background-mode={preview.mode} data-preview-fidelity={preview.fidelity} data-silhouette-source={silhouette.source}>
       <div className="relative mx-auto flex h-[300px] w-full max-w-[240px] items-center justify-center overflow-hidden rounded-[28px] border border-white bg-white/75 p-2 shadow-[0_18px_50px_rgba(77,53,67,0.12)] sm:p-3">
-        <svg viewBox={silhouette.viewBox} className="h-full max-h-[280px] w-full" role="img" aria-label={`${currentFinger} ${MODE_LABEL[preview.mode] ?? preview.mode}背景预览`} preserveAspectRatio="xMidYMid meet">
+        <svg viewBox={silhouette.viewBox} className="h-full max-h-[280px] w-full" role="img" aria-label={`${currentFinger} ${t(MODE_LABEL[preview.mode as keyof typeof MODE_LABEL] ?? 'editorV7.background.mode.solid')} ${t('editor.extra.preview')}`} preserveAspectRatio="xMidYMid meet">
           <defs>
             <clipPath id={clipId}><path d={silhouette.pathD} /></clipPath>
             <pattern id={gridId} width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#f7f7f8" /><rect width="6" height="6" fill="#e5e7eb" /><rect x="6" y="6" width="6" height="6" fill="#e5e7eb" /></pattern>
             {background.mode === 'gradient' && (
               <linearGradient id={gradientId} x1="0%" y1="50%" x2="100%" y2="50%" gradientTransform={`rotate(${normalizeBackgroundDirectionV7(background.directionDeg)} 0.5 0.5)`}>
-                {background.stops.map((stop, index) => <stop key={index} offset={`${stop.offset * 100}%`} stopColor={rgbaToHexV7(stop.color)} stopOpacity={stop.color.a} />)}
+                {background.stops.map((stop, index) => <stop key={index} offset={`${stop.offset * 100}${t('editorV7.background.percent')}`} stopColor={rgbaToHexV7(stop.color)} stopOpacity={stop.color.a} />)}
               </linearGradient>
             )}
             {background.mode === 'cat_eye' && (
               <linearGradient id={bandId} x1="0%" y1="50%" x2="100%" y2="50%" gradientTransform={`rotate(${normalizeBackgroundDirectionV7(background.directionDeg)} 0.5 0.5)`}>
                 <stop offset="0%" stopColor="#000" stopOpacity="0" />
-                <stop offset={`${Math.max(0, 50 - background.bandWidth * 50)}%`} stopColor="#fff" stopOpacity="0" />
+                <stop offset={`${Math.max(0, 50 - background.bandWidth * 50)}${t('editorV7.background.percent')}`} stopColor="#fff" stopOpacity="0" />
                 <stop offset="50%" stopColor="#fff" stopOpacity={0.18 + background.intensity * 0.72} />
-                <stop offset={`${Math.min(100, 50 + background.bandWidth * 50)}%`} stopColor="#fff" stopOpacity="0" />
+                <stop offset={`${Math.min(100, 50 + background.bandWidth * 50)}${t('editorV7.background.percent')}`} stopColor="#fff" stopOpacity="0" />
                 <stop offset="100%" stopColor="#000" stopOpacity="0" />
               </linearGradient>
             )}
@@ -90,32 +92,32 @@ export function V7BackgroundCanvas() {
           </g>
           <path d={silhouette.pathD} fill="none" stroke="#8d7c78" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
         </svg>
-        {!preview.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/80 px-3 py-2 text-nano text-white"><EyeOff size={12} />背景已隐藏</span>}
+        {!preview.visible && <span className="absolute inset-x-4 bottom-4 flex items-center justify-center gap-1.5 rounded-full bg-gray-900/80 px-3 py-2 text-nano text-white"><EyeOff size={12} />{t('editorV7.background.hidden')}</span>}
       </div>
 
       <div className="min-w-0 space-y-3">
-        <div><p className="text-nano font-semibold uppercase tracking-[0.14em] text-gray-400">2D 背景编辑</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {MODE_LABEL[preview.mode] ?? preview.mode}</h2><p className="mt-1 text-nano text-gray-600">{silhouette.label}</p><p className="mt-0.5 truncate font-mono text-nano text-gray-400" title={`${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`}>{nail.geometryRef.assetId}</p></div>
+        <div><p className="text-nano font-semibold uppercase tracking-[0.14em] text-gray-400">{t('editorV7.background.editorTitle')}</p><h2 className="mt-1 text-lg font-semibold text-gray-900">{currentFinger} · {t(MODE_LABEL[preview.mode as keyof typeof MODE_LABEL] ?? 'editorV7.background.mode.solid')}</h2><p className="mt-1 text-nano text-gray-600">{silhouette.label}</p><p className="mt-0.5 truncate font-mono text-nano text-gray-400" title={`${nail.geometryRef.assetId} @ ${nail.geometryRef.revision}`}>{nail.geometryRef.assetId}</p></div>
         <dl className="grid grid-cols-2 gap-2 text-nano">
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">代表色</dt><dd className="mt-1 flex items-center gap-2 font-mono font-semibold text-gray-800"><span className="h-4 w-4 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />{hex.toUpperCase()}</dd></div>
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">背景透明度</dt><dd className="mt-1 font-semibold tabular-nums text-gray-800">{Math.round(background.opacity * 100)}%</dd></div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">{t('editorV7.background.representativeColor')}</dt><dd className="mt-1 flex items-center gap-2 font-mono font-semibold text-gray-800"><span className="h-4 w-4 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />{hex.toUpperCase()}</dd></div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2"><dt className="text-gray-400">{t('editorV7.background.opacityLabel')}</dt><dd className="mt-1 font-semibold tabular-nums text-gray-800">{Math.round(background.opacity * 100)}{t('editorV7.background.percent')}</dd></div>
         </dl>
         <div className={cx('flex items-start gap-2 rounded-xl border px-3 py-2.5 text-nano leading-4', preview.fidelity === 'exact' ? 'border-success/20 bg-success-soft text-success' : 'border-info/20 bg-info-soft text-info')}>
           <Info size={13} className="mt-0.5 shrink-0" />
           <span>{preview.fidelity === 'unavailable'
-            ? `${MODE_LABEL[background.mode]} 当前标记为不可预览；保留文档参数并显示甲面边界，不伪造效果。`
+            ? t('editorV7.background.unavailableNotice', { mode: t(MODE_LABEL[background.mode as keyof typeof MODE_LABEL] ?? 'editorV7.background.mode.solid') })
             : preview.fidelity === 'exact' && (background.mode === 'cat_eye' || background.mode === 'glitter')
-              ? `${MODE_LABEL[background.mode]} 当前由已签收的 2D adapter 精确派生；仍不代表真实材料或制造结果。`
+              ? t('editorV7.background.exactCanvasNotice', { mode: t(MODE_LABEL[background.mode as keyof typeof MODE_LABEL] ?? 'editorV7.background.mode.solid') })
             : background.mode === 'gradient'
-            ? '渐变由 canonical 色标与 nail-local 方向直接派生。'
+            ? t('editorV7.background.gradientCanvasNotice')
             : background.mode === 'cat_eye'
-              ? '猫眼使用解析式确定性光带近似，不含随机采样，也不代表真实磁粉响应。'
+              ? t('editorV7.background.catEyeCanvasNotice')
               : background.mode === 'glitter'
-                ? `闪粉按已保存 seed「${background.seed}」确定性投影；仅为 2D 近似。`
+                ? t('editorV7.background.glitterCanvasNotice', { seed: background.seed })
                 : preview.fidelity === 'approximate'
-                  ? '透色为 2D 近似效果，不代表真实材料透光率。'
-                  : '单色背景由 EditorDocV7 的 canonical sRGB 与 opacity 直接派生。'}</span>
+                  ? t('editorV7.background.translucentCanvasNotice')
+                  : t('editorV7.background.solidCanvasNotice')}</span>
         </div>
-        {silhouette.source === 'generic' && <p className="rounded-xl border border-dashed border-warning/30 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{silhouette.label}；未修改原 geometryRef，关联正式轮廓后会自动替换预览边界。</p>}
+        {silhouette.source === 'generic' && <p className="rounded-xl border border-dashed border-warning/30 bg-warning-soft px-3 py-2 text-nano leading-4 text-warning">{t('editorV7.background.genericOutlineWarning', { label: t('editorV7.workspace.stage.geometryUnavailable') })}</p>}
       </div>
     </div>
   );

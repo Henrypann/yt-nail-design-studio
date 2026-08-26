@@ -1,12 +1,14 @@
 import { CommunityFeed } from '../components/CommunityFeed';
+import { useLocale } from '@/lib/i18n';
 
 export default function CommunityCreatorsPage() {
+  const { t } = useLocale();
   return (
     <div data-testid="community-creators-page" data-debug-id="community.creators">
       <CommunityFeed
         mode="discover"
-        title="认证创作者"
-        subtitle="认证创作者 · Demo · 默认灵感参考，不展示假互动数据"
+        title={t('community.creatorsTitle')}
+        subtitle={t('community.creatorsSubtitle')}
         lockedSource="creators"
       />
     </div>

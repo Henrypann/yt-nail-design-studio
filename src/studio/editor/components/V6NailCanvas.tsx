@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { FINGER_CODES } from '@/lib/types';
+import { useLocale } from '@/lib/i18n';
 import { registerPreviewSvg } from '@/studio/preview/export-png';
 import { getSilhouette } from '../lib/material';
 import { useEditorV6Store } from '../store-v6';
@@ -100,6 +101,7 @@ function NailElements(props: {
 }
 
 export function V6NailCanvas() {
+  const { t } = useLocale();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const doc = useEditorV6Store((state) => state.doc);
   const currentFinger = useEditorV6Store((state) => state.currentFinger);
@@ -157,7 +159,7 @@ export function V6NailCanvas() {
 
   if (viewMode === 'overview') {
     return (
-      <svg ref={svgRef} viewBox="0 0 800 420" className="h-full w-full" role="img" aria-label="Ten-finger customer preview" data-canvas-mode="overview">
+      <svg ref={svgRef} viewBox="0 0 800 420" className="h-full w-full" role="img" aria-label={t('editor.extra.previewTenFinger')} data-canvas-mode="overview">
         <rect width="800" height="420" rx="24" fill="#fbf8f6" />
         {FINGER_CODES.map((finger, index) => {
           const nail = doc.nails[finger];
@@ -180,7 +182,7 @@ export function V6NailCanvas() {
           );
         })}
         <text x="28" y="34" fontSize="18" fontWeight="600" fill="#392e2a">{doc.title}</text>
-        <text x="28" y="58" fontSize="12" fill="#7c6d67">Customer preview · simulated 2D · manufacturing unverified</text>
+        <text x="28" y="58" fontSize="12" fill="#7c6d67">{t('editor.extra.previewSimulated')}</text>
       </svg>
     );
   }
@@ -192,7 +194,7 @@ export function V6NailCanvas() {
       viewBox={current.silhouette.viewBox}
       className="h-full w-full touch-none select-none"
       role="application"
-      aria-label="V6 direct manipulation canvas"
+      aria-label={t('editor.extra.directCanvas')}
       data-canvas-mode="single"
       onPointerDown={(event) => {
         const target = event.target as SVGElement;

@@ -6,7 +6,7 @@ import { isFingerUnlocked } from '../lib/model';
 import { useEditorStore } from '../store';
 
 export function FingerStrip() {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const doc = useEditorStore((state) => state.doc);
   const readOnly = useEditorStore((state) => state.readOnly);
   const current = useEditorStore((state) => state.currentFinger);
@@ -27,7 +27,7 @@ export function FingerStrip() {
     >
       <div className="w-[218px] shrink-0">
         <p className="mb-1 text-nano font-semibold text-gray-700">
-          {text('编辑范围', 'EDIT SCOPE')}
+          {t('app.editScope')}
         </p>
         <div className="grid grid-cols-2 rounded-button border border-gray-200 bg-gray-50 p-0.5">
           <button
@@ -39,7 +39,7 @@ export function FingerStrip() {
               editScope === 'single' ? 'bg-white font-medium text-primary shadow-sm' : 'text-gray-500',
             )}
           >
-            {text(`仅当前指 ${current}`, `CURRENT ${current}`)}
+            {t('app.currentCurrent', { current: current })}
           </button>
           <button
             type="button"
@@ -50,13 +50,13 @@ export function FingerStrip() {
               editScope === 'all' ? 'bg-white font-medium text-primary shadow-sm' : 'text-gray-500',
             )}
           >
-            {text('十指同步', 'ALL 10')}
+            {t('app.all10')}
           </button>
         </div>
         <p className="mt-1 truncate text-nano text-gray-400">
           {editScope === 'single'
-            ? text('绘制、款式和图层只修改当前指', 'Draw, recipes and layers affect this nail only')
-            : text('修改共享设计；已有单指例外不覆盖', 'Edits the shared design; overrides stay independent')}
+            ? t('app.drawRecipesLayersAffectNailOnly')
+            : t('app.editsSharedDesignOverridesStayIndependent')}
         </p>
       </div>
 
@@ -86,16 +86,16 @@ export function FingerStrip() {
       <div className="flex shrink-0 flex-col gap-1">
         <Button size="sm" variant="ghost" disabled={readOnly || doc.masterFinger === current} onClick={() => setMaster(current)}>
           <Heart size={12} />
-          {text('设为重音指', 'Set accent')}
+          {t('app.setAccent')}
         </Button>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" disabled={readOnly} onClick={() => mirrorToOpposite('pattern-only')} title={text('复制并镜像到对侧指，可撤销', 'Mirror to opposite nail; undo is available')}>
+          <Button size="sm" variant="ghost" disabled={readOnly} onClick={() => mirrorToOpposite('pattern-only')} title={t('app.mirrorOppositeNailUndoAvailable')}>
             <FlipHorizontal2 size={12} />
-            {text('镜像', 'Mirror')}
+            {t('app.mirror')}
           </Button>
-          <Button size="sm" variant="ghost" disabled={readOnly || !currentUnlocked} onClick={() => lockFinger(current)} title={text('清除当前指例外，恢复共享设计', 'Clear this nail override')}>
+          <Button size="sm" variant="ghost" disabled={readOnly || !currentUnlocked} onClick={() => lockFinger(current)} title={t('app.clearNailOverride')}>
             <RotateCcw size={12} />
-            {text('重置', 'Reset')}
+            {t('app.reset')}
           </Button>
         </div>
       </div>

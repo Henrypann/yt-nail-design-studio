@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Info, Ruler, UserRoundCheck, X } from 'lucide-react';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 
 export interface EditorStageContextDetailV7 {
   label: string;
@@ -24,6 +25,7 @@ export function EditorStageContextNoticeV7({
   disclaimer?: string;
   onDismiss(): void;
 }) {
+  const { t } = useLocale();
   const closeRef = useRef<HTMLButtonElement>(null);
   const Icon = context === 'geometry' ? Ruler : UserRoundCheck;
 
@@ -36,7 +38,7 @@ export function EditorStageContextNoticeV7({
       id={`editor-v7-stage-context-${context}`}
       role="region"
       aria-live="polite"
-      aria-label={context === 'geometry' ? '甲型与适配说明' : '顾客预览状态'}
+      aria-label={context === 'geometry' ? t('editorV7.workspace.stage.geometry') : t('editorV7.workspace.stage.customer')}
       data-testid="v7-stage-context"
       data-stage-context={context}
       data-geometry-source={context === 'geometry' ? source : undefined}
@@ -64,7 +66,7 @@ export function EditorStageContextNoticeV7({
           )}
           {disclaimer && <p className="mt-2 flex items-start gap-1.5 text-nano leading-4 opacity-75"><Info size={12} className="mt-0.5 shrink-0" />{disclaimer}</p>}
         </div>
-        <button ref={closeRef} type="button" aria-label="关闭阶段说明" onClick={onDismiss} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>
+        <button ref={closeRef} type="button" aria-label={t('editor.extra.closeStageNotice')} onClick={onDismiss} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><X size={15} /></button>
       </div>
     </section>
   );

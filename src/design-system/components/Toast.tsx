@@ -10,6 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
 import { cx } from '../cx';
+import { useLocale } from '@/lib/i18n';
 
 /** Toast 四型（PRD §七） */
 export type ToastType = 'success' | 'warning' | 'error' | 'info';
@@ -53,6 +54,7 @@ const ToastContext = createContext<ToastApi | null>(null);
 
 /** 全局 Toast：页面顶部居中、距顶 24px、同时最多 1 条、左侧 4px 状态色竖条 */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { t } = useLocale();
   const [toast, setToast] = useState<ToastItem | null>(null);
   const timerRef = useRef<number | null>(null);
   const idRef = useRef(0);
@@ -110,7 +112,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 onClick={dismiss}
                 className="ml-1 rounded-button p-1 text-gray-400 transition-colors duration-fast hover:bg-gray-100 hover:text-gray-700"
-                aria-label="关闭通知"
+                aria-label={t('common.closeNotification')}
               >
                 <X size={14} />
               </button>
@@ -124,6 +126,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
 export function useToast(): ToastApi {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast 必须在 <ToastProvider> 内使用');
+  if (!ctx) throw new Error('useToast must be used inside <ToastProvider>');
   return ctx;
 }

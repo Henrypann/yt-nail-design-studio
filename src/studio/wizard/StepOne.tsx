@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Button, Card, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { CheckCircle2, AlertTriangle, MinusCircle, UserRound, ArrowRight, RefreshCw } from 'lucide-react';
 import type { Customer } from '@/lib/types';
 import { Routes } from '@/app/routes';
@@ -27,28 +28,29 @@ function mockUnscannedCount(id: string): number {
 }
 
 function TwinNotice({ customer }: { customer: Customer }) {
+  const { t } = useLocale();
   switch (customer.twinStatus) {
     case 'MOCK_VALID':
       return (
         <div className="flex items-center gap-2 text-xs text-success">
           <CheckCircle2 size={14} />
-          十指已全部扫描
-          <Badge variant="gray" className="text-nano">MOCK · 预览使用标准尺寸</Badge>
+          {t('wizard.scannedAll')}
+          <Badge variant="gray" className="text-nano">{t('wizard.mockStandard')}</Badge>
         </div>
       );
     case 'MOCK_LOW_CONFIDENCE':
       return (
         <div className="flex flex-wrap items-center gap-2 text-xs text-warning">
           <AlertTriangle size={14} />
-          {mockUnscannedCount(customer.id)} 指未扫描。可跳过，提交生产前须补全。
-          <Badge variant="gray" className="text-nano">MOCK · 预览使用标准尺寸</Badge>
+          {t('wizard.unscanned', { count: mockUnscannedCount(customer.id) })}
+          <Badge variant="gray" className="text-nano">{t('wizard.mockStandard')}</Badge>
         </div>
       );
     case 'NO_DATA':
       return (
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <MinusCircle size={14} />
-          客户尚未扫描。预览将使用标准尺寸。
+          {t('wizard.notScanned')}
         </div>
       );
   }
@@ -56,6 +58,7 @@ function TwinNotice({ customer }: { customer: Customer }) {
 
 /** 甲型/长度即时预览：选择一变即重新渲染（与 STEP 2 同一套单甲渲染器） */
 function LiveShapePreview() {
+  const { t } = useLocale();
   const shape = useWizardStore((s) => s.shape);
   const length = useWizardStore((s) => s.length);
   const [sil, setSil] = useState<SilhouetteAsset | null>(null);
@@ -122,9 +125,9 @@ function LiveShapePreview() {
             💅
           </div>
           <p className="text-nano leading-relaxed text-gray-400">
-            选择甲型与长度
+            {t('wizard.chooseShapeLength')}
             <br />
-            这里即时预览效果
+            {t('wizard.livePreview')}
           </p>
         </div>
       )}
@@ -133,6 +136,7 @@ function LiveShapePreview() {
 }
 
 export function StepOne() {
+  const { t } = useLocale();
   const customer = useWizardStore((s) => s.customer);
   const shape = useWizardStore((s) => s.shape);
   const length = useWizardStore((s) => s.length);
@@ -164,15 +168,15 @@ export function StepOne() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-semibold text-gray-900">{customer?.name ?? '未关联客户'}</span>
-            {customer && <span className="text-xs text-gray-400 tnum">{countDesignsByCustomer(customer.id)} 个历史设计</span>}
+          <span className="truncate text-sm font-semibold text-gray-900">{customer?.name ?? t('wizard.noCustomerLinked')}</span>
+            {customer && <span className="text-xs text-gray-400 tnum">{t('wizard.historicalDesigns', { count: countDesignsByCustomer(customer.id) })}</span>}
           </div>
           <div className="mt-1">
-            {customer ? <TwinNotice customer={customer} /> : <p className="text-xs text-gray-500">使用标准尺寸完成设计；绑定设备或扫描后可再关联客户。</p>}
+            {customer ? <TwinNotice customer={customer} /> : <p className="text-xs text-gray-500">{t('wizard.standardSizeHint')}</p>}
           </div>
         </div>
         <Button size="sm" variant="ghost" onClick={openPicker}>
-          {customer ? '更换客户' : '关联客户'}
+          {customer ? t('wizard.changeCustomer') : t('wizard.linkCustomer')}
         </Button>
       </Card>
 
@@ -205,7 +209,7 @@ export function StepOne() {
             )}
           >
             <RefreshCw size={11} />
-            重试
+            {t('common.retry')}
           </button>
         </div>
       )}
@@ -219,9 +223,9 @@ export function StepOne() {
           onClick={handleApply}
           className="min-w-[180px]"
         >
-          {applying ? '生成预览中…' : (
+          {applying ? t('wizard.generatingPreview') : (
             <>
-              进入快速建稿
+              {t('wizard.enterQuickStart')}
               <ArrowRight size={14} />
             </>
           )}

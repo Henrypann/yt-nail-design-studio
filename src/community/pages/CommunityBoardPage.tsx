@@ -51,7 +51,7 @@ function shareStatus(share: BoardShareLinkV1, now: string): 'active' | 'expired'
 export default function CommunityBoardPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const navigate = useNavigate();
-  const { text } = useLocale();
+  const { t } = useLocale();
   const repository = useMemo(() => createBrowserBoardRepository(), []);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [board, setBoard] = useState<NailBoardV1 | null>(null);
@@ -91,7 +91,7 @@ export default function CommunityBoardPage() {
         setNowIso(new Date().toISOString());
         setLoadState(detail.corrupted ? 'error' : 'ready');
         if (detail.corrupted) {
-          setActionError(text('本地存储已损坏：为避免覆盖，写入已停止。', 'Local storage is corrupted: writes are disabled to avoid overwriting it.'));
+          setActionError(t('app.localStorageCorruptedWritesDisabledAvoidOverwritingIt'));
         }
       } catch {
         if (!cancelled) setLoadState('error');
@@ -100,7 +100,7 @@ export default function CommunityBoardPage() {
     return () => {
       cancelled = true;
     };
-  }, [boardId, repository, retry, text]);
+  }, [boardId, repository, retry, t]);
 
   /** Apply a repository command result: success updates state; failure shows the error and keeps the previous canonical state. */
   const applyResult = useCallback(
@@ -116,13 +116,13 @@ export default function CommunityBoardPage() {
     [],
   );
 
-  if (!boardId) return <Link to={Routes.communityBoards}>{text('返回 Boards', 'Back to boards')}</Link>;
+  if (!boardId) return <Link to={Routes.communityBoards}>{t('community.backBoards')}</Link>;
 
   if (loadState === 'loading') {
     return (
       <div className="flex items-center gap-2 rounded-card border border-gray-200 bg-white p-6 text-sm text-gray-500">
         <Loader2 size={14} className="animate-spin" aria-hidden />
-        {text('加载中…', 'Loading…')}
+        {t('app.loading')}
       </div>
     );
   }
@@ -130,11 +130,11 @@ export default function CommunityBoardPage() {
   if (loadState === 'error' || board === null) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6" data-testid="board-missing">
-        <h1 className="text-lg font-semibold text-gray-900">{text('Board 不存在或已删除', 'Board missing or deleted')}</h1>
-        <p className="mt-1 text-xs text-gray-500">{text('可能是无效深链或本地数据已被清除。', 'Invalid deep link, or local data was cleared.')}</p>
+        <h1 className="text-lg font-semibold text-gray-900">{t('app.boardMissingDeleted')}</h1>
+        <p className="mt-1 text-xs text-gray-500">{t('app.invalidDeepLinkLocalDataWasCleared')}</p>
         {actionError && <p className="mt-2 text-xs text-amber-700">{actionError}</p>}
         <Button className="mt-4 min-h-11" variant="secondary" onClick={() => navigate(Routes.communityBoards)}>
-          {text('返回 Boards', 'Back to boards')}
+          {t('community.backBoards')}
         </Button>
       </div>
     );
@@ -143,15 +143,12 @@ export default function CommunityBoardPage() {
   if (board.ownerIdentityId !== LOCAL_DEMO_IDENTITY_ID) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6" data-testid="board-forbidden">
-        <h1 className="text-lg font-semibold text-gray-900">{text('无权管理此 Board', 'No permission to manage this board')}</h1>
+        <h1 className="text-lg font-semibold text-gray-900">{t('app.noPermissionManageBoard')}</h1>
         <p className="mt-1 text-xs text-gray-500">
-          {text(
-            `仅 owner（${board.ownerIdentityId}）可管理；当前本地 Demo 身份为 ${LOCAL_DEMO_IDENTITY_ID}。`,
-            `Only the owner (${board.ownerIdentityId}) can manage this board; the current local-demo identity is ${LOCAL_DEMO_IDENTITY_ID}.`,
-          )}
+          {t('app.onlyOwnerBoardOwneridentityidCanManageBoardCurrentLocalDemoIdentityLocalDemoIdentityId', { board_ownerIdentityId: board.ownerIdentityId, LOCAL_DEMO_IDENTITY_ID: LOCAL_DEMO_IDENTITY_ID })}
         </p>
         <Button className="mt-4 min-h-11" variant="secondary" onClick={() => navigate(Routes.communityBoards)}>
-          {text('返回 Boards', 'Back to boards')}
+          {t('community.backBoards')}
         </Button>
       </div>
     );
@@ -170,10 +167,7 @@ export default function CommunityBoardPage() {
       setShares(reload.shares);
       if (value.revokedShareCount > 0) {
         setActionError(
-          text(
-            `已切换到仅自己可见，并自动撤销 ${value.revokedShareCount} 个分享链接。`,
-            `Switched to PRIVATE; ${value.revokedShareCount} share link(s) were revoked.`,
-          ),
+          t('share.switchedPrivateValueRevokedsharecountShareLinkSWereRevoked', { value_revokedShareCount: value.revokedShareCount }),
         );
       }
     });
@@ -193,7 +187,7 @@ export default function CommunityBoardPage() {
       setShareUrl(url);
       setShares(repository.getBoard(board.boardId).shares);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : text('创建分享链接失败。', 'Failed to create share link.'));
+      setActionError(error instanceof Error ? error.message : t('app.failedCreateShareLink'));
     } finally {
       setCreatingShare(false);
     }
@@ -254,7 +248,7 @@ export default function CommunityBoardPage() {
           size="sm"
           className="min-h-11 px-2"
           onClick={() => navigate(Routes.communityBoards)}
-          aria-label={text('返回 Boards', 'Back to boards')}
+          aria-label={t('community.backBoards')}
         >
           <ArrowLeft size={16} aria-hidden />
         </Button>
@@ -274,7 +268,7 @@ export default function CommunityBoardPage() {
           <div className="flex-1">
             <Input
               className="min-h-11"
-              label={text('Board 名称', 'Board title')}
+              label={t('app.boardTitle')}
               value={renameDraft}
               maxLength={80}
               onChange={(event) => setRenameDraft(event.target.value)}
@@ -288,7 +282,7 @@ export default function CommunityBoardPage() {
             data-testid="board-rename-submit"
             onClick={rename}
           >
-            {text('重命名', 'Rename')}
+            {t('app.rename')}
           </Button>
         </div>
 
@@ -301,14 +295,11 @@ export default function CommunityBoardPage() {
       <section className="flex flex-col gap-3 rounded-card border border-gray-200 bg-white p-4" data-testid="board-share-section">
         <h2 className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
           <Link2 size={14} aria-hidden />
-          {text('分享链接', 'Share links')}
+          {t('app.shareLinks')}
         </h2>
         {board.visibility === 'PRIVATE' ? (
           <p className="rounded-button border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500" data-testid="board-share-private-note">
-            {text(
-              'PRIVATE Board 不可生成匿名分享链接；切换到 UNLISTED 或 PUBLIC 后可分享（只读）。',
-              'PRIVATE boards are never anonymously shareable. Switch to UNLISTED or PUBLIC to share read-only.',
-            )}
+            {t('app.privateBoardsNeverAnonymouslyShareableSwitchUnlistedPublicShareReadOnly')}
           </p>
         ) : (
           <div className="flex flex-col gap-2">
@@ -317,7 +308,7 @@ export default function CommunityBoardPage() {
                 <Input
                   className="min-h-11"
                   type="date"
-                  label={text('过期时间（可选）', 'Expiry (optional)')}
+                  label={t('app.expiryOptional')}
                   value={shareExpiry}
                   onChange={(event) => setShareExpiry(event.target.value)}
                   data-testid="board-share-expiry"
@@ -331,28 +322,28 @@ export default function CommunityBoardPage() {
                 onClick={() => void createShare()}
               >
                 {creatingShare ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Link2 size={14} aria-hidden />}
-                {text('创建分享链接', 'Create share link')}
+                {t('app.createShareLink')}
               </Button>
             </div>
             {shareUrl && (
               <div className="flex flex-col gap-1 rounded-button border border-emerald-200 bg-emerald-50 p-2" data-testid="board-share-url">
                 <p className="text-nano text-emerald-800">
-                  {text('链接仅显示一次（原始 token 不会存储）：', 'Shown once only (the raw token is never stored):')}
+                  {t('app.shownOnceOnlyRawTokenNeverStored')}
                 </p>
                 <div className="flex flex-col gap-1 sm:flex-row">
                   <input
                     readOnly
                     value={shareUrl}
-                    aria-label={text('分享链接', 'Share link')}
+                    aria-label={t('app.shareLink')}
                     className="h-11 min-w-0 flex-1 rounded-button border border-emerald-300 bg-white px-2 text-xs text-gray-800 focus:outline-none"
                   />
                   <Button variant="secondary" className="min-h-11" data-testid="board-share-copy" onClick={() => void copyShareUrl()}>
                     {copyState === 'copied' ? <Check size={14} aria-hidden /> : <Copy size={14} aria-hidden />}
-                    {copyState === 'copied' ? text('已复制', 'Copied') : text('复制', 'Copy')}
+                    {copyState === 'copied' ? t('app.copied') : t('app.copy')}
                   </Button>
                 </div>
                 {copyState === 'manual' && (
-                  <p className="text-nano text-amber-700">{text('复制失败：请手动选择并复制链接。', 'Copy failed: select the link and copy it manually.')}</p>
+                  <p className="text-nano text-amber-700">{t('app.copyFailedSelectLinkCopyItManually')}</p>
                 )}
               </div>
             )}
@@ -373,7 +364,7 @@ export default function CommunityBoardPage() {
                           status === 'revoked' && 'bg-gray-100 text-gray-500',
                         )}
                       >
-                        {status === 'active' ? text('有效', 'Active') : status === 'expired' ? text('已过期', 'Expired') : text('已撤销', 'Revoked')}
+                        {status === 'active' ? t('app.active') : status === 'expired' ? t('app.expired') : t('app.revoked')}
                       </span>
                       {status === 'active' && (
                         <Button
@@ -385,7 +376,7 @@ export default function CommunityBoardPage() {
                           onClick={() => revokeShare(share.shareId)}
                         >
                           <X size={13} aria-hidden />
-                          {text('撤销', 'Revoke')}
+                          {t('app.revoke')}
                         </Button>
                       )}
                     </li>
@@ -399,17 +390,17 @@ export default function CommunityBoardPage() {
 
       <section className="flex flex-col gap-2 rounded-card border border-gray-200 bg-white p-4" data-testid="board-items-section">
         <h2 className="text-sm font-semibold text-gray-900">
-          {text('款式', 'Looks')}（{board.items.length}）
+          {t('app.looks')}（{board.items.length}）
         </h2>
         {board.items.length === 0 ? (
           <div className="rounded-button border border-dashed border-gray-200 px-4 py-8 text-center" data-testid="board-items-empty">
             <FolderHeart size={20} className="mx-auto text-gray-300" aria-hidden />
-            <p className="mt-1 text-sm text-gray-600">{text('还没有保存的款式', 'No saved looks yet')}</p>
+            <p className="mt-1 text-sm text-gray-600">{t('app.noSavedLooksYet')}</p>
             <Link
               to={Routes.community}
               className="mt-2 inline-flex h-11 items-center rounded-button border border-primary/30 bg-primary-soft px-3 text-xs font-medium text-primary hover:bg-primary/15"
             >
-              {text('去 Discover 收藏', 'Collect looks in Discover')}
+              {t('app.collectLooksDiscover')}
             </Link>
           </div>
         ) : (
@@ -438,31 +429,28 @@ export default function CommunityBoardPage() {
           onClick={() => setConfirmDeleteOpen(true)}
         >
           <Trash2 size={14} aria-hidden />
-          {text('删除此 Board', 'Delete this board')}
+          {t('app.deleteBoard')}
         </Button>
       </section>
 
       <Modal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
-        title={text('删除 Board？', 'Delete this board?')}
+        title={t('app.deleteBoard2')}
         size="sm"
         footer={
           <>
             <Button variant="ghost" className="min-h-11" onClick={() => setConfirmDeleteOpen(false)}>
-              {text('取消', 'Cancel')}
+              {t('app.cancel')}
             </Button>
             <Button variant="danger" className="min-h-11" disabled={deleting} data-testid="board-delete-confirm" onClick={deleteBoard}>
-              {text('确认删除', 'Delete')}
+              {t('app.delete')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-700">
-          {text(
-            `「${board.title}」及其所有分享链接将被删除。此操作不可撤销。`,
-            `"${board.title}" and all of its share links will be deleted. This cannot be undone.`,
-          )}
+          {t('app.boardTitleAllItsShareLinksWillBeDeletedCannotBeUndone', { board_title: board.title })}
         </p>
       </Modal>
     </div>
@@ -486,7 +474,7 @@ function BoardItemRow({
   onMove: (direction: 'up' | 'down') => void;
   onDelete: () => void;
 }) {
-  const { text } = useLocale();
+  const { t } = useLocale();
   const [coverFailed, setCoverFailed] = useState(false);
   const viewState: BoardItemViewStateV1 = resolveItemViewState(item, look);
   const title = look?.title ?? item.lookId;
@@ -512,7 +500,7 @@ function BoardItemRow({
         <p className="mt-0.5 flex flex-wrap items-center gap-1 text-nano text-gray-500">
           {item.sourceKind === 'LEGACY_UNVERSIONED' ? (
             <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-700">
-              {text('未版本化灵感参考', 'Unversioned inspiration')}
+              {t('app.unversionedInspiration')}
             </span>
           ) : (
             <span className="rounded-full bg-primary-soft px-1.5 py-0.5 text-primary">
@@ -521,21 +509,21 @@ function BoardItemRow({
           )}
           {viewState.state === 'look_unavailable' && (
             <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-red-600" data-testid="board-item-look-unavailable">
-              {text('款式已删除或不可用', 'Look deleted or unavailable')}
+              {t('app.lookDeletedUnavailable')}
             </span>
           )}
           {viewState.state === 'version_unavailable' && (
             <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-700" data-testid="board-item-version-unavailable">
-              {text('设计版本不可用', 'Design version unavailable')}
+              {t('app.designVersionUnavailable')}
             </span>
           )}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-1" role="group" aria-label={text('条目操作', 'Item actions')}>
+      <div className="flex shrink-0 items-center gap-1" role="group" aria-label={t('app.itemActions')}>
         <button
           type="button"
           disabled={busy || index === 0}
-          aria-label={text(`上移 ${title}`, `Move ${title} up`)}
+          aria-label={t('app.moveTitleUp', { title: title })}
           data-testid="board-item-move-up"
           className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-gray-200 text-gray-600 hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:text-gray-300"
           onClick={() => onMove('up')}
@@ -545,7 +533,7 @@ function BoardItemRow({
         <button
           type="button"
           disabled={busy || index === count - 1}
-          aria-label={text(`下移 ${title}`, `Move ${title} down`)}
+          aria-label={t('app.moveTitleDown', { title: title })}
           data-testid="board-item-move-down"
           className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-gray-200 text-gray-600 hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:text-gray-300"
           onClick={() => onMove('down')}
@@ -555,7 +543,7 @@ function BoardItemRow({
         <button
           type="button"
           disabled={busy}
-          aria-label={text(`从 Board 删除 ${title}`, `Remove ${title} from board`)}
+          aria-label={t('app.removeTitleBoard', { title: title })}
           data-testid="board-item-delete"
           className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-600 disabled:cursor-not-allowed disabled:text-gray-300"
           onClick={onDelete}

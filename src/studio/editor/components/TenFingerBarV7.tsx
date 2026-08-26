@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type RefObject } from 'react';
 import { Copy, Link2, MoreHorizontal, Unlink, X } from 'lucide-react';
 import { Button, cx, useToast } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { FINGER_CODES, type FingerCode } from '@/lib/types';
 import { useEditorV7Store } from '../store-v7';
 import {
@@ -11,21 +12,17 @@ import { isExactEditorGeometryV7 } from '../v7/geometry-registry';
 import {
   deriveFingerContentStateV7,
   EDITOR_FINGER_ROWS_V7,
-  FINGER_CONTENT_STATE_LABEL_V7,
-  fingerDisplayNameV7,
+  fingerContentStateLabelForLocaleV7,
+  fingerDisplayNameForLocaleV7,
+  fingerNameForLocaleV7,
+  fingerHandLabelForLocaleV7,
 } from '../v7/finger-identity';
-
-const SCOPE_LABEL: Record<EditorV7FingerScopeKind, string> = {
-  current: '当前指',
-  selected: '已选指',
-  mirror: '对侧镜像',
-  all: '全部十指',
-};
 
 type PendingAction = 'copy' | 'sync' | 'detach' | null;
 const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function TenFingerBarV7() {
+  const { t, locale } = useLocale();
   const toast = useToast();
   const doc = useEditorV7Store((state) => state.doc);
   const readOnly = useEditorV7Store((state) => state.readOnly);
@@ -129,8 +126,8 @@ export function TenFingerBarV7() {
     const outcome = setCurrentFinger(finger);
     if (!outcome) return;
     setSelectionStatus(outcome.exact
-      ? `已切换至 ${finger}，并保持相同工艺步骤位置。`
-      : `${finger} 缺少当前同序号工艺步骤，已显示背景层；未创建新步骤。`);
+      ? t('editorV7.tenFinger.switchExact', { finger })
+      : t('editorV7.tenFinger.switchMissing', { finger }));
   };
 
   const chooseFinger = (finger: FingerCode) => {
@@ -152,7 +149,7 @@ export function TenFingerBarV7() {
           ? (currentIndex - 1 + FINGER_CODES.length) % FINGER_CODES.length
           : (currentIndex + 1) % FINGER_CODES.length;
     const nextFinger = FINGER_CODES[nextIndex];
-    const button = event.currentTarget.closest('[aria-label="选择手指"]')
+    const button = event.currentTarget.closest(`[aria-label="${t('editorV7.tenFinger.selectFinger')}"]`)
       ?.querySelector<HTMLButtonElement>(`button[data-finger="${nextFinger}"]`);
     button?.focus();
     button?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -171,17 +168,17 @@ export function TenFingerBarV7() {
   };
 
   const runPendingAction = () => {
-    if (pendingAction === 'copy') report(copyFingerScope(), `已复制到 ${writeTargets.length} 根指甲；目标保持独立。`);
-    if (pendingAction === 'sync') report(syncFingerScope(), `已同步当前快照到 ${writeTargets.length} 根指甲。`);
-    if (pendingAction === 'detach') report(detachFingerScope(), `已解除 ${linkedInScope.join('、')} 的快照同步；设计内容未改变。`);
+    if (pendingAction === 'copy') report(copyFingerScope(), t('editorV7.tenFinger.copySuccess', { count: writeTargets.length }));
+    if (pendingAction === 'sync') report(syncFingerScope(), t('editorV7.tenFinger.syncSuccess', { count: writeTargets.length }));
+    if (pendingAction === 'detach') report(detachFingerScope(), t('editorV7.tenFinger.detachSuccess', { fingers: linkedInScope.join('、') }));
     setPendingAction(null);
     restoreActionFocus();
   };
 
   const actionControls = (
     <div className="flex flex-wrap items-center gap-1.5" data-testid="v7-cross-finger-actions">
-      <Button className="min-h-11" size="sm" variant="secondary" disabled={!canMaterialize} title={unavailableGeometry.length ? `以下指位缺少已签收 2D 甲型轮廓：${unavailableGeometry.join('、')}` : undefined} onClick={(event) => openConfirmation('copy', event)}>
-        <Copy size={14} />复制一次
+      <Button className="min-h-11" size="sm" variant="secondary" disabled={!canMaterialize} title={unavailableGeometry.length ? t('editorV7.tenFinger.geometryMissing', { fingers: unavailableGeometry.join('、') }) : undefined} onClick={(event) => openConfirmation('copy', event)}>
+        <Copy size={14} />{t('editorV7.tenFinger.copyOnce')}
       </Button>
       <Button
         className="min-h-11"
@@ -189,18 +186,18 @@ export function TenFingerBarV7() {
         variant="secondary"
         disabled={!canSync}
         title={fingerScope === 'mirror'
-          ? '镜像只支持一次性复制，不建立持续同步关系'
+          ? t('editorV7.tenFinger.mirrorNotice')
           : unavailableGeometry.length > 0
-            ? `以下指位缺少已签收 2D 甲型轮廓：${unavailableGeometry.join('、')}`
-          : linkedOutsideScope.length > 0
-            ? `范围外仍有同步成员：${linkedOutsideScope.join('、')}；请先解除或选择全部十指`
+            ? t('editorV7.tenFinger.geometryMissing', { fingers: unavailableGeometry.join('、') })
+            : linkedOutsideScope.length > 0
+            ? t('editorV7.tenFinger.outsideMembers', { fingers: linkedOutsideScope.join('、') })
             : undefined}
         onClick={(event) => openConfirmation('sync', event)}
       >
-        <Link2 size={14} />同步当前快照
+        <Link2 size={14} />{t('editorV7.tenFinger.syncCurrent')}
       </Button>
       <Button className="min-h-11" size="sm" variant="ghost" disabled={!canDetach} onClick={(event) => openConfirmation('detach', event)}>
-        <Unlink size={14} />解除同步
+        <Unlink size={14} />{t('editorV7.tenFinger.detach')}
       </Button>
     </div>
   );
@@ -208,14 +205,14 @@ export function TenFingerBarV7() {
   if (!doc) return null;
 
   return (
-    <footer className="relative border-t border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label="十指编辑与跨指操作" data-testid="v7-ten-finger-bar">
-      {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-nano text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">跨指复制与同步已停用：{unavailableGeometry.join('、')} 缺少已签收 2D 甲型轮廓。解除同步仍可使用。</p>}
+    <footer className="relative border-t border-gray-200 bg-white px-2 py-2 sm:px-3" aria-label={t('editorV7.tenFinger.bar')} data-testid="v7-ten-finger-bar">
+      {unavailableGeometry.length > 0 && <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-nano text-amber-900" role="status" data-testid="v7-cross-finger-geometry-gate">{t('editorV7.tenFinger.gate', { fingers: unavailableGeometry.join('、') })}</p>}
       <div className="flex min-w-0 flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
-        <div className="min-w-0 overflow-x-auto pb-0.5 max-sm:overflow-x-hidden" aria-label="选择手指" data-testid="v7-finger-locator">
+        <div className="min-w-0 overflow-x-auto pb-0.5 max-sm:overflow-x-hidden" aria-label={t('editorV7.tenFinger.selectFinger')} data-testid="v7-finger-locator">
           <div className="flex min-w-max items-start gap-3 max-sm:min-w-0 max-sm:flex-col max-sm:gap-1">
             {EDITOR_FINGER_ROWS_V7.map((row) => (
-              <section key={row.id} className="flex items-center gap-1 max-sm:w-full" aria-label={`${row.label}五指`} data-hand={row.id}>
-                <span className="mr-0.5 text-nano font-semibold text-gray-400 [writing-mode:vertical-rl] max-sm:w-7 max-sm:[writing-mode:horizontal-tb]">{row.label}</span>
+              <section key={row.id} className="flex items-center gap-1 max-sm:w-full" aria-label={t('editorV7.tenFinger.hand', { label: fingerHandLabelForLocaleV7(row.id, locale) })} data-hand={row.id}>
+                <span className="mr-0.5 text-nano font-semibold text-gray-400 [writing-mode:vertical-rl] max-sm:w-7 max-sm:[writing-mode:horizontal-tb]">{fingerHandLabelForLocaleV7(row.id, locale)}</span>
                 {row.fingers.map((identity) => {
                   const finger = identity.finger;
                   const current = currentFinger === finger;
@@ -226,7 +223,7 @@ export function TenFingerBarV7() {
                     <button
                       key={finger}
                       type="button"
-                      aria-label={`${fingerDisplayNameV7(finger)} ${finger}，${FINGER_CONTENT_STATE_LABEL_V7[contentState]}`}
+                      aria-label={`${fingerDisplayNameForLocaleV7(finger, locale)} ${finger}, ${fingerContentStateLabelForLocaleV7(contentState, locale)}`}
                       aria-current={current ? 'true' : undefined}
                       aria-pressed={fingerScope === 'selected' ? selected : current}
                       data-finger={finger}
@@ -251,11 +248,11 @@ export function TenFingerBarV7() {
                         style={{ width: `${18 * identity.previewWidth}px`, height: `${23 * identity.previewHeight}px` }}
                         aria-hidden="true"
                       />
-                      <span className="leading-3 max-sm:hidden">{identity.name}</span>
+                      <span className="leading-3 max-sm:hidden">{fingerNameForLocaleV7(identity.name, locale)}</span>
                       <span className="text-nano font-normal leading-3 text-gray-400">{finger}</span>
                       {syncState && (
                         <span className={cx('absolute right-0.5 top-0.5 rounded px-0.5 text-nano font-semibold leading-3', syncState === 'linked' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800')}>
-                          {syncState === 'linked' ? '同' : '独'}
+                          {syncState === 'linked' ? t('editorV7.tenFinger.syncLinked') : t('editorV7.tenFinger.syncIndependent')}
                         </span>
                       )}
                     </button>
@@ -267,9 +264,9 @@ export function TenFingerBarV7() {
         </div>
 
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <div className="min-w-0 overflow-x-auto" role="group" aria-label="跨指范围">
+          <div className="min-w-0 overflow-x-auto" role="group" aria-label={t('editorV7.tenFinger.scope')}>
             <div className="flex min-w-max gap-1 rounded-xl bg-gray-100 p-1">
-              {(Object.keys(SCOPE_LABEL) as EditorV7FingerScopeKind[]).map((scope) => (
+              {(['current', 'selected', 'mirror', 'all'] as EditorV7FingerScopeKind[]).map((scope) => (
                 <button
                   key={scope}
                   type="button"
@@ -280,38 +277,38 @@ export function TenFingerBarV7() {
                     fingerScope === scope ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900',
                   )}
                 >
-                  {SCOPE_LABEL[scope]}
+                  {t(`editorV7.tenFinger.scope.${scope}` as 'editorV7.tenFinger.scope.current' | 'editorV7.tenFinger.scope.selected' | 'editorV7.tenFinger.scope.mirror' | 'editorV7.tenFinger.scope.all')}
                 </button>
               ))}
             </div>
           </div>
           <div className="hidden lg:block">{actionControls}</div>
-          <Button ref={actionsTriggerRef} className="min-h-11 min-w-11 lg:hidden" size="sm" variant="secondary" onClick={() => setActionsOpen(true)} aria-label="打开跨指操作">
+          <Button ref={actionsTriggerRef} className="min-h-11 min-w-11 lg:hidden" size="sm" variant="secondary" onClick={() => setActionsOpen(true)} aria-label={t('editorV7.tenFinger.openActions')}>
             <MoreHorizontal size={16} />
           </Button>
         </div>
       </div>
 
       <p className="mt-1.5 truncate text-nano text-gray-500" role="status">
-        正在编辑：<strong className="font-semibold text-gray-800">{fingerDisplayNameV7(currentFinger)}（{currentFinger}）</strong> · {FINGER_CONTENT_STATE_LABEL_V7[currentContentState]} · 范围 {SCOPE_LABEL[fingerScope]} · {writeTargets.length > 0 ? `将覆盖 ${writeTargets.join('、')}` : '当前没有可写目标'}
-        {fingerScope === 'mirror' ? ' · 布局镜像，文字与素材本体保持正向' : ''}
+        {t('editorV7.tenFinger.editing', { fingerName: fingerDisplayNameForLocaleV7(currentFinger, locale), finger: currentFinger, state: fingerContentStateLabelForLocaleV7(currentContentState, locale), scope: t(`editorV7.tenFinger.scope.${fingerScope}` as 'editorV7.tenFinger.scope.current' | 'editorV7.tenFinger.scope.selected' | 'editorV7.tenFinger.scope.mirror' | 'editorV7.tenFinger.scope.all'), targets: writeTargets.length > 0 ? t('editorV7.tenFinger.overwriteTargets', { fingers: writeTargets.join(', ') }) : t('editorV7.tenFinger.noWritableTargets') })}
+        {fingerScope === 'mirror' ? ` · ${t('editorV7.tenFinger.mirrorActionNotice')}` : ''}
       </p>
-      <p className="mt-0.5 text-nano text-gray-400" aria-hidden="true">粉色边框 = 当前指 · 粉色实心 = 有设计 · 虚线 = 空白 · 黄色 = 内容已隐藏</p>
+      <p className="mt-0.5 text-nano text-gray-400" aria-hidden="true">{t('editorV7.tenFinger.legend')}</p>
       {selectionStatus && <p className="mt-1 break-words text-nano leading-4 text-amber-700" role="status" aria-atomic="true" data-testid="v7-finger-selection-status">{selectionStatus}</p>}
-      {doc.compositionMeta && <p className="mt-0.5 text-nano text-gray-400">状态：同 = 已同步当前快照；独 = 已解除同步、可单独编辑</p>}
+      {doc.compositionMeta && <p className="mt-0.5 text-nano text-gray-400">{t('editorV7.tenFinger.syncStatus')}</p>}
       {fingerScope !== 'mirror' && linkedOutsideScope.length > 0 && (
-        <p className="mt-0.5 text-nano text-amber-700">范围外仍有同步成员 {linkedOutsideScope.join('、')}；为避免暗改，需先解除它们或选择全部十指。</p>
+        <p className="mt-0.5 text-nano text-amber-700">{t('editorV7.tenFinger.outsideMembers', { fingers: linkedOutsideScope.join('、') })}</p>
       )}
 
       {actionsOpen && (
         <>
-          <button type="button" className="fixed inset-0 z-40 bg-gray-950/20" aria-label="关闭跨指操作" onClick={closeActions} />
-          <div ref={actionsDialogRef} role="dialog" aria-modal="true" aria-label="跨指操作" onKeyDown={(event) => trapFocus(event, actionsDialogRef)} className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border border-gray-200 bg-white p-4 shadow-modal lg:hidden">
+          <button type="button" className="fixed inset-0 z-40 bg-gray-950/20" aria-label={t('editorV7.tenFinger.closeActions')} onClick={closeActions} />
+          <div ref={actionsDialogRef} role="dialog" aria-modal="true" aria-label={t('editorV7.tenFinger.actions')} onKeyDown={(event) => trapFocus(event, actionsDialogRef)} className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border border-gray-200 bg-white p-4 shadow-modal lg:hidden">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <div><p className="text-sm font-semibold text-gray-900">跨指操作</p><p className="text-xs text-gray-500">来源 {currentFinger} · {SCOPE_LABEL[fingerScope]}</p></div>
-              <button type="button" className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-gray-100" onClick={closeActions} aria-label="关闭"><X size={18} /></button>
+              <div><p className="text-sm font-semibold text-gray-900">{t('editorV7.tenFinger.actions')}</p><p className="text-xs text-gray-500">{t('editorV7.tenFinger.source', { finger: currentFinger, scope: t(`editorV7.tenFinger.scope.${fingerScope}` as 'editorV7.tenFinger.scope.current' | 'editorV7.tenFinger.scope.selected' | 'editorV7.tenFinger.scope.mirror' | 'editorV7.tenFinger.scope.all') })}</p></div>
+              <button type="button" className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-gray-100" onClick={closeActions} aria-label={t('common.close')}><X size={18} /></button>
             </div>
-            {fingerScope === 'mirror' && <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">对侧镜像是一次性布局复制，不建立快照同步；文字与素材本体保持正向。</p>}
+            {fingerScope === 'mirror' && <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{t('editorV7.tenFinger.mirrorNotice')}</p>}
             {actionControls}
           </div>
         </>
@@ -321,23 +318,23 @@ export function TenFingerBarV7() {
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-gray-950/30 p-0 sm:items-center sm:p-4" role="presentation">
           <div ref={confirmationDialogRef} role="alertdialog" aria-modal="true" aria-labelledby="v7-scope-confirm-title" onKeyDown={(event) => trapFocus(event, confirmationDialogRef)} className="w-full max-w-md rounded-t-2xl bg-white p-5 shadow-modal sm:rounded-2xl">
             <h2 id="v7-scope-confirm-title" className="text-base font-semibold text-gray-900">
-              {pendingAction === 'copy' ? '确认覆盖并复制？' : pendingAction === 'sync' ? '确认同步当前快照？' : '确认解除同步？'}
+              {pendingAction === 'copy' ? t('editorV7.tenFinger.confirmCopy') : pendingAction === 'sync' ? t('editorV7.tenFinger.confirmSync') : t('editorV7.tenFinger.confirmDetach')}
             </h2>
             <p className="mt-2 text-sm leading-6 text-gray-600">
               {pendingAction === 'detach'
-                ? `将解除 ${linkedInScope.join('、')} 的快照同步关系。设计内容、甲型和图层都不会改变。`
-                : `将使用 ${currentFinger} 的当前设计覆盖 ${writeTargets.join('、')}。目标甲型不会改变；每根指甲仍保存独立图层和独立 ID。`}
+                ? t('editorV7.tenFinger.detachDescription', { fingers: linkedInScope.join('、') })
+                : t('editorV7.tenFinger.copyDescription', { source: currentFinger, targets: writeTargets.join('、') })}
             </p>
             <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
               {pendingAction === 'copy'
-                ? '这是一次性复制，之后修改任一指甲都不会影响其他指甲。'
+                ? t('editorV7.tenFinger.copyNotice')
                 : pendingAction === 'sync'
-                  ? '同步表示显式快照成员关系，不是实时联动；后续单指编辑会自动解除该指同步。'
-                  : '解除后，该范围不会再被视为当前快照成员；需要时可再次显式同步。'}
+                  ? t('editorV7.tenFinger.syncNotice')
+                  : t('editorV7.tenFinger.detachNotice')}
             </p>
             <div className="mt-5 flex justify-end gap-2">
-              <Button className="min-h-11" autoFocus variant="ghost" onClick={() => { setPendingAction(null); restoreActionFocus(); }}>取消</Button>
-              <Button className="min-h-11" onClick={runPendingAction}>确认执行</Button>
+              <Button className="min-h-11" autoFocus variant="ghost" onClick={() => { setPendingAction(null); restoreActionFocus(); }}>{t('editorV7.tenFinger.cancel')}</Button>
+              <Button className="min-h-11" onClick={runPendingAction}>{t('editorV7.tenFinger.confirm')}</Button>
             </div>
           </div>
         </div>

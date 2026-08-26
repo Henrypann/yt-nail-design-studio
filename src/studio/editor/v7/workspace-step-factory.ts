@@ -1,5 +1,6 @@
 import { generateEditorV7Id, type EditorV7IdFactory } from './id';
 import type { FingerCode } from '../../../lib/types';
+import type { MessageKey } from '@/lib/i18n/types';
 import { addEditorV7Step, type EditorV7CommandResult } from './commands';
 import type { EditorDocV7, ProcessStepV7 } from './model';
 import { PROCESS_STEP_TYPE_IDS_V7 } from './registry';
@@ -12,24 +13,24 @@ export type EditorWorkspacePersonalStepKindV7 =
 
 export const EDITOR_WORKSPACE_PERSONAL_STEP_META_V7 = {
   flat_design: {
-    label: '平面设计',
-    shortLabel: '平面',
-    description: '画笔、文字、贴纸、形状与 2D 导入',
+    labelKey: 'editorV7.workspace.personal.flat',
+    shortLabelKey: 'editorV7.workspace.personal.flatShort',
+    descriptionKey: 'editorV7.workspace.personal.flatDescription',
   },
   surface_effect: {
-    label: '表面效果',
-    shortLabel: '效果',
-    description: '局部猫眼、闪粉、镜面与晕染',
+    labelKey: 'editorV7.workspace.personal.effects',
+    shortLabelKey: 'editorV7.workspace.personal.effectsShort',
+    descriptionKey: 'editorV7.workspace.personal.effectsDescription',
   },
   dimensional_decoration: {
-    label: '立体装饰',
-    shortLabel: '立体',
-    description: '浮雕、液滴、堆胶、雕花与饰品',
+    labelKey: 'editorV7.workspace.personal.decorations',
+    shortLabelKey: 'editorV7.workspace.personal.decorationsShort',
+    descriptionKey: 'editorV7.workspace.personal.decorationsDescription',
   },
 } as const satisfies Record<EditorWorkspacePersonalStepKindV7, {
-  label: string;
-  shortLabel: string;
-  description: string;
+  labelKey: MessageKey;
+  shortLabelKey: MessageKey;
+  descriptionKey: MessageKey;
 }>;
 
 /**

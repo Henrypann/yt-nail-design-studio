@@ -9,11 +9,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, RefreshCw } from 'lucide-react';
 import { Badge, Button, Skeleton, useToast, cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { NailShape } from '@/lib/types';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import {
   compatTier,
-  isHighFidelityConceptGalleryTemplate,
+  isQuickStartOfficialTemplate,
   loadLibraryIndex,
   notRecommendedReason,
   sortTemplatesForShape,
@@ -21,12 +22,13 @@ import {
   type TemplateEntry,
 } from '@/studio/preview/material-library';
 import { useWizardStore } from './wizard-store';
-import { PETAL_VEIL_P0_ENABLED } from '@/studio/petal-veil/feature';
 
 type LoadState = 'loading' | 'ready' | 'error';
+// Compatibility contract: 官方模板 is catalog-backed; filtering stays governance-driven.
 
 export function TemplateGallery() {
   const toast = useToast();
+  const { t } = useLocale();
   const appliedShape = useWizardStore((s) => s.appliedShape);
   const templateId = useWizardStore((s) => s.templateId);
   const templateName = useWizardStore((s) => s.templateName);
@@ -51,7 +53,7 @@ export function TemplateGallery() {
       } catch {
         if (!cancelled) {
           setState('error');
-          toast.error('模板库加载失败。请重试。');
+          toast.error(t('wizard.templateLoadFailed'));
         }
       }
     })();
@@ -63,19 +65,14 @@ export function TemplateGallery() {
 
   const visible = useMemo(() => {
     if (!index) return [];
-    const highFidelityTemplates = index.templates.filter(isHighFidelityConceptGalleryTemplate);
-    const enabledTemplates = PETAL_VEIL_P0_ENABLED
-      ? highFidelityTemplates
-      : highFidelityTemplates.filter((template) => template.id !== 't_petal_veil_french');
-    return appliedShape
-      ? sortTemplatesForShape(enabledTemplates, appliedShape)
-      : [...enabledTemplates].sort((a, b) => a.sort_order - b.sort_order);
+    const enabledTemplates = index.templates.filter((template) => isQuickStartOfficialTemplate(template, appliedShape ?? undefined));
+    return sortTemplatesForShape(enabledTemplates, appliedShape ?? 'almond');
   }, [index, appliedShape]);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2 border-b border-hairline pb-2">
-        <div><p className="text-sm font-semibold text-ink">官方模板</p><p className="text-nano text-mute">按当前甲型适配度排序 · 概念/模拟证据单独标注</p></div>
+        <div><p className="text-sm font-semibold text-ink">{t('wizard.officialTemplates')}</p><p className="text-nano text-mute">{t('wizard.classicFrenchExact')}</p></div>
       </div>
 
       {/* 卡片列表（窄栏单列） */}
@@ -90,36 +87,32 @@ export function TemplateGallery() {
 
         {state === 'error' && (
           <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-gray-300 py-10">
-            <p className="text-xs text-gray-500">模板库加载失败。请重试。</p>
+            <p className="text-xs text-gray-500">{t('wizard.templateLoadFailed')}</p>
             <Button size="sm" variant="secondary" onClick={() => setRetryKey((k) => k + 1)}>
               <RefreshCw size={13} />
-              重试
+              {t('common.retry')}
             </Button>
           </div>
         )}
 
         {state === 'ready' && (
           <div className="grid grid-cols-1 gap-2">
-            {visible.map((t) => (
+            {visible.map((template) => (
               <TemplateCard
-                key={t.id}
-                template={t}
+                key={template.id}
+                template={template}
                 shape={appliedShape}
-                selected={templateId === (t.render_template_id ?? t.id) && templateName === t.name}
+                selected={templateId === (template.render_template_id ?? template.id) && templateName === template.name}
                 disabled={readOnly}
                 onApply={() => {
-                  applyTemplate(t);
-                  if (t.asset_status === 'CONCEPT') {
-                    toast.warning(t.id === 't_petal_veil_french'
-                      ? '已应用 Petal Veil HQ 候选。Canonical Fixture 尚待人工视觉签收，制造状态未验证。'
-                      : `已应用「${t.name}」概念基础层。`);
-                  }
+                  applyTemplate(template);
+                  toast.success(`${t('wizard.templateAppliedPrefix')}「${template.name}」${t('wizard.templateAppliedSuffix')}`);
                 }}
               />
             ))}
             {visible.length === 0 && (
               <p className="py-8 text-center text-xs text-gray-400">
-                该风格下暂无模板。
+                {t('wizard.noTemplates')}
               </p>
             )}
           </div>
@@ -138,6 +131,7 @@ interface TemplateCardProps {
 }
 
 function TemplateCard({ template, shape, selected, disabled, onApply }: TemplateCardProps) {
+  const { t } = useLocale();
   const tier = shape ? compatTier(template, shape) : 'neutral';
   const reason = shape ? notRecommendedReason(template, shape) : null;
 
@@ -164,7 +158,7 @@ function TemplateCard({ template, shape, selected, disabled, onApply }: Template
         />
         {(template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED') && (
           <span className="absolute right-1.5 top-1.5 rounded-button border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-nano font-medium text-amber-800">
-            {template.asset_status === 'SIMULATED' ? '已签收模拟' : template.id === 't_petal_veil_french' ? 'HQ 候选 · 待签收' : '高保真概念'}
+            {template.asset_status === 'SIMULATED' ? t('wizard.simulatedSigned') : template.id === 't_petal_veil_french' ? t('wizard.hqCandidate') : t('wizard.highFidelityConcept')}
           </span>
         )}
       </div>
@@ -173,13 +167,13 @@ function TemplateCard({ template, shape, selected, disabled, onApply }: Template
           <span className="truncate text-xs font-medium text-gray-900">{template.name}</span>
         </div>
         <div className="flex flex-wrap gap-1 text-nano text-gray-500">
-          {tier === 'high' && <Badge variant="success" className="px-1 py-0 text-nano">适配当前甲型</Badge>}
-          {tier === 'not' && <Badge variant="warning" className="px-1 py-0 text-nano">需人工检查</Badge>}
+          {tier === 'high' && <Badge variant="success" className="px-1 py-0 text-nano">{t('wizard.shapeCompatible')}</Badge>}
+          {tier === 'not' && <Badge variant="warning" className="px-1 py-0 text-nano">{t('wizard.needsReview')}</Badge>}
         </div>
         {/* 不建议原因（不建议 ≠ 禁止，仍可应用） */}
         {tier === 'not' && reason && (
           <p className="text-nano leading-snug text-warning">
-            ⚠ {reason}。仍可选择。
+            ⚠ {reason}。{t('wizard.stillSelectable')}
           </p>
         )}
         {template.asset_status === 'CONCEPT' && template.capability_summary && (
@@ -193,7 +187,7 @@ function TemplateCard({ template, shape, selected, disabled, onApply }: Template
                 rel="noreferrer"
                 className="inline-block font-medium text-primary underline underline-offset-2"
               >
-                查看 Asset Spec
+                {t('wizard.viewAssetSpec')}
               </a>
             )}
           </div>
@@ -206,13 +200,9 @@ function TemplateCard({ template, shape, selected, disabled, onApply }: Template
             onClick={onApply}
             className="h-7 w-full text-nano"
           >
-            {template.asset_status === 'CONCEPT'
-              ? selected
-                ? template.id === 't_petal_veil_french' ? '已应用 HQ 候选' : '已应用概念基础层'
-                : template.id === 't_petal_veil_french' ? '应用 HQ 候选' : '应用概念基础层'
-              : selected
-                ? '已应用 · 再次应用'
-                : '应用此模板'}
+            {selected
+                ? t('wizard.appliedAgain')
+                : t('wizard.applyTemplate')}
           </Button>
         </div>
       </div>

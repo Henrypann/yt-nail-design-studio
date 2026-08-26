@@ -6,6 +6,7 @@
  */
 
 import type { Finish, NailLength, NailShape } from '@/lib/types';
+import { getOfficialTemplatePatternAssetV7 } from '@/studio/editor/v7/official-template-assets';
 
 /* ── 数据模型（与 material-library/*.json 对齐） ── */
 
@@ -42,6 +43,15 @@ export interface TemplateEntry {
   thumbnail_url: string;
   manifest_url: string;
   sort_order: number;
+  /** Explicit Quick Start placement. Community/editorial cards are not starters. */
+  quick_start?: {
+    enabled: boolean;
+    placement: 'OFFICIAL_TEMPLATE';
+    editor_ready: boolean;
+    source: 'TEMPLATE_ASSET_REGISTRY';
+  };
+  /** Shape claims are explicit; Quick Start verifies each against V7 registry. */
+  applies_to_shapes?: NailShape[];
 }
 
 export interface LibraryIndex {
@@ -184,12 +194,33 @@ export function hasHighFidelityCover(template: TemplateEntry): boolean {
   return template.thumbnail_url.startsWith('assets/hero-recipes/');
 }
 
-/** Wizard gallery: only customer-facing CONCEPT/SIMULATED hero-recipe cards. */
+/** Legacy helper for editorial Hero cards; Quick Start uses isQuickStartOfficialTemplate. */
 export function isHighFidelityConceptGalleryTemplate(template: TemplateEntry): boolean {
   return (
     hasHighFidelityCover(template)
     && (template.asset_status === 'CONCEPT' || template.asset_status === 'SIMULATED')
   );
+}
+
+/**
+ * Quick Start must be driven by an explicit starter declaration and the
+ * immutable pattern registry, never by an editorial hero cover.
+ */
+export function isQuickStartOfficialTemplate(template: TemplateEntry, shape?: NailShape): boolean {
+  if (template.asset_status !== 'REAL' || !template.quick_start
+    || template.quick_start.enabled !== true
+    || template.quick_start.placement !== 'OFFICIAL_TEMPLATE'
+    || template.quick_start.editor_ready !== true
+    || template.quick_start.source !== 'TEMPLATE_ASSET_REGISTRY') return false;
+  const appliesToShapes = template.applies_to_shapes;
+  const allShapes: readonly NailShape[] = ['almond', 'oval', 'coffin', 'squoval', 'round', 'square', 'stiletto'];
+  if (!Array.isArray(appliesToShapes) || appliesToShapes.length === 0
+    || new Set(appliesToShapes).size !== appliesToShapes.length
+    || appliesToShapes.some((candidate) => !allShapes.includes(candidate)
+      || getOfficialTemplatePatternAssetV7(template.id, candidate) === null)) return false;
+  if (shape === undefined) return true;
+  return allShapes.includes(shape) && appliesToShapes.includes(shape)
+    && getOfficialTemplatePatternAssetV7(template.id, shape) !== null;
 }
 
 const TIER_ORDER: Record<CompatTier, number> = { high: 0, neutral: 1, not: 2 };

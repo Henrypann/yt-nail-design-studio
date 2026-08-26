@@ -8,12 +8,21 @@ const gallery = read('src/studio/wizard/TemplateGallery.tsx');
 const list = read('src/app/pages/design/DesignListPage.tsx');
 const app = read('src/app/App.tsx');
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+assert(
+  stepTwo.includes('...(s.templateAssetRef ? { templateAssetRef: s.templateAssetRef } : {})'),
+  'Wizard Editor preflight must receive the exact saved templateAssetRef when present',
+);
+assert(
+  !stepTwo.includes('templateAssetRef: getOfficialTemplatePatternAssetV7') &&
+    stepTwo.includes('...(s.templateAssetRef ? { templateAssetRef: s.templateAssetRef } : {})'),
+  'Wizard Editor preflight must not fabricate a template asset ref when the store has none',
+);
 assert(!stepOne.includes('StyleRecommendModal') && !stepOne.includes('applyValidatedStyleRecommendation'), 'recommendation modal remains active');
 assert(!stepTwo.includes('markConfirmed') && !params.includes('markConfirmed'), 'Quick Start confirmation writer remains');
 assert(!params.includes('decorationId') && params.includes('baseColor'), 'Quick Start decoration writer remains');
-assert(gallery.includes('官方模板') && !gallery.includes('tagFilter'), 'official template selector contract missing');
+assert(gallery.includes("t('wizard.officialTemplates')") && !gallery.includes('tagFilter'), 'official template selector contract missing');
 assert(app.includes('OfficialTemplatesRedirect') && read('src/app/routing/official-template-redirect.ts').includes('officialTemplatePanel'), 'legacy template redirect missing');
-assert(list.includes('readDesignApprovalProjection') && list.includes('固定版本已确认') && list.includes('历史本地确认'), 'approval projection missing');
+assert(list.includes('readDesignApprovalProjection') && list.includes("t('design.fixedApproved')") && list.includes("t('design.historical')"), 'approval projection missing');
 assert(read('src/studio/approval/design-approval-projection.ts').includes('authority failed strict parse'), 'authority corruption is not visible');
 const projection = read('src/studio/approval/design-approval-projection.ts');
 assert(projection.includes('isServiceIdV1(key)') && projection.includes("['schemaVersion', 'value', 'ledger']"), 'atomic authority envelope is not strict');

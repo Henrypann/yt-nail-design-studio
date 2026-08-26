@@ -7,25 +7,26 @@ import { useRef, useState } from 'react';
 import { Brush, Eraser, ImagePlus, Palette, Spline } from 'lucide-react';
 import { cx, useToast } from '@/design-system';
 import { useLocale } from '@/lib/i18n';
+import type { MessageKey } from '@/lib/i18n';
 import { LENGTHS, loadRecentColors, PALETTE, SHAPES, lengthName, pushRecentColor, shapeName } from '../lib/material';
 import { createLayerMeta, genId } from '../lib/model';
 import { useEditorStore, type BrushPreset, type EditorTool } from '../store';
 import { BrandPalettePopover } from './BrandPalettePopover';
 import { FrenchEdgePopover } from './FrenchEdgePopover';
 
-const TOOLS: { key: EditorTool; label: string; icon: typeof Brush; hotkey: string }[] = [
-  { key: 'brush', label: '画笔', icon: Brush, hotkey: 'B' },
-  { key: 'eraser', label: '橡皮', icon: Eraser, hotkey: 'E' },
+const TOOLS: { key: EditorTool; label: MessageKey; icon: typeof Brush; hotkey: string }[] = [
+  { key: 'brush', label: 'editor.extra.brush', icon: Brush, hotkey: 'B' },
+  { key: 'eraser', label: 'editor.extra.eraserMask', icon: Eraser, hotkey: 'E' },
 ];
 
-const PRESETS: { key: BrushPreset; label: string }[] = [
-  { key: 'fine', label: '细' },
-  { key: 'standard', label: '标' },
-  { key: 'thick', label: '粗' },
+const PRESETS: { key: BrushPreset; label: MessageKey }[] = [
+  { key: 'fine', label: 'editor.extra.thin' },
+  { key: 'standard', label: 'editor.extra.standard' },
+  { key: 'thick', label: 'editor.extra.thick' },
 ];
 
 export function ToolPanel() {
-  const { locale, text } = useLocale();
+  const { locale, t } = useLocale();
   const tool = useEditorStore((s) => s.tool);
   const setTool = useEditorStore((s) => s.setTool);
   const brushColor = useEditorStore((s) => s.brushColor);
@@ -48,7 +49,7 @@ export function ToolPanel() {
 
   const onImportFile = (file: File) => {
     if (!file.type.includes('png') && !file.type.includes('jpeg') && !file.type.includes('svg')) {
-      toast.warning('仅支持导入 PNG / JPG / SVG 图片');
+      toast.warning(t('editor.extra.importImage'));
       return;
     }
     const reader = new FileReader();
@@ -67,36 +68,36 @@ export function ToolPanel() {
             transform: { x: 0, y: -90, scale: 1, rotation: 0 },
           });
         });
-        toast.success('图片已导入到图案层');
+        toast.success(t('editor.extra.imageImported'));
       };
-      img.onerror = () => toast.error('图片解析失败，请换一张重试');
+      img.onerror = () => toast.error(t('editor.extra.imageRetry'));
       img.src = dataUrl;
     };
-    reader.onerror = () => toast.error('图片读取失败，请重试');
+    reader.onerror = () => toast.error(t('editor.extra.readRetry'));
     reader.readAsDataURL(file);
   };
 
   return (
     <div className="relative flex w-14 shrink-0 flex-col items-center gap-1 border-r border-gray-200 bg-white py-3">
-      {TOOLS.map((t) => (
+      {TOOLS.map((toolItem) => (
         <button
-          key={t.key}
+          key={toolItem.key}
           disabled={readOnly}
-          onClick={() => setTool(t.key)}
-          title={`${t.label}（${t.hotkey}）`}
+          onClick={() => setTool(toolItem.key)}
+          title={`${t(toolItem.label)}（${toolItem.hotkey}）`}
           className={cx(
             'flex h-10 w-10 items-center justify-center rounded-button transition-colors duration-fast',
-            tool === t.key ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-100',
+            tool === toolItem.key ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-100',
             readOnly && 'cursor-not-allowed opacity-40',
           )}
         >
-          <t.icon size={18} />
+          <toolItem.icon size={18} />
         </button>
       ))}
       <button
         disabled={readOnly}
         onClick={() => fileRef.current?.click()}
-        title="导入 PNG / JPG / SVG 到图案层"
+        title={t('editor.extra.importToPattern')}
         className={cx(
           'flex h-10 w-10 items-center justify-center rounded-button text-gray-500 transition-colors duration-fast hover:bg-gray-100',
           readOnly && 'cursor-not-allowed opacity-40',
@@ -123,7 +124,7 @@ export function ToolPanel() {
             setFrenchOpen((v) => !v);
             setPaletteOpen(false);
           }}
-          title="法式边一键模板"
+          title={t('editor.extra.frenchTemplate')}
           className={cx(
             'flex h-10 w-10 items-center justify-center rounded-button transition-colors duration-fast',
             frenchOpen ? 'bg-primary-soft text-primary' : 'text-gray-500 hover:bg-gray-100',
@@ -195,7 +196,7 @@ export function ToolPanel() {
                 setPaletteOpen((v) => !v);
                 setFrenchOpen(false);
               }}
-              title="打开 120 色品牌色板"
+              title={t('editor.extra.brandPalette')}
               className={cx(
                 'flex w-full items-center justify-center gap-1 rounded-button border py-1 text-nano',
                 paletteOpen
@@ -204,7 +205,7 @@ export function ToolPanel() {
               )}
             >
               <Palette size={11} />
-              120色
+              {t('editor.extra.palette')}
             </button>
             {paletteOpen && <BrandPalettePopover onClose={() => setPaletteOpen(false)} />}
           </div>
@@ -218,10 +219,10 @@ export function ToolPanel() {
               pushRecentColor(hex);
             }}
             className="h-6 w-10 cursor-pointer"
-            title="自定义颜色"
+            title={t('editor.extra.customColor')}
           />
           <label className="w-full text-center text-nano text-gray-400">
-            粗细 {brushSize}
+            {t('editor.extra.strokeWidth')} {brushSize}
             <input
               type="range"
               min={2}
@@ -232,7 +233,7 @@ export function ToolPanel() {
             />
           </label>
           <label className="w-full text-center text-nano text-gray-400">
-            透明 {Math.round(brushOpacity * 100)}%
+            {t('editor.extra.opacity')} {Math.round(brushOpacity * 100)}%
             <input
               type="range"
               min={10}
@@ -246,7 +247,7 @@ export function ToolPanel() {
       )}
       {tool === 'eraser' && !readOnly && (
         <label className="w-full px-1 text-center text-nano text-gray-400">
-          橡皮 {eraserSize}
+          {t('editor.extra.eraserMask')} {eraserSize}
           <input
             type="range"
             min={6}
@@ -271,7 +272,7 @@ export function ToolPanel() {
               })
             }
             className="w-full rounded-button border border-gray-300 px-1 py-1 text-nano disabled:opacity-40"
-            title={`${text('甲型', 'Shape')}：${shapeName(doc.shape, locale)}`}
+            title={`${t('app.shape')}：${shapeName(doc.shape, locale)}`}
           >
             {SHAPES.map((s) => (
               <option key={s} value={s}>
@@ -288,7 +289,7 @@ export function ToolPanel() {
               })
             }
             className="w-full rounded-button border border-gray-300 px-1 py-1 text-nano disabled:opacity-40"
-            title={text('长度', 'Length')}
+            title={t('app.length')}
           >
             {LENGTHS.map((l) => (
               <option key={l} value={l}>

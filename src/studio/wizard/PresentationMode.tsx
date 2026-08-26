@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Badge, Spinner } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import { FINGER_CODES, type FingerCode, type FingerOverrides, type Finish, type NailLength, type NailShape } from '@/lib/types';
 import { loadFinishes, loadShapeParams } from '@/studio/preview/material-library';
 import type { DecorationAsset } from '@/studio/preview/nail-assets';
@@ -53,6 +54,7 @@ export function PresentationMode({
   initialFinger,
   tipOrientation = 'up',
 }: PresentationModeProps) {
+  const { t } = useLocale();
   const assets = useNailDesignAssets(shape, length, templateId);
   const { status: loadStatus, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
 
@@ -129,20 +131,20 @@ export function PresentationMode({
       data-debug-id="studio.presentation"
       role="dialog"
       aria-modal="true"
-      aria-label="顾客展示模式"
+      aria-label={t('customer.customerPresentation')}
       onKeyDown={trapFocus}
     >
       {/* 顶栏：标题与退出，无编辑或确认控件。 */}
       <header className="flex shrink-0 flex-col items-stretch gap-3 px-4 py-4 sm:px-8 lg:flex-row lg:items-center">
-        <p className="text-sm font-medium text-gray-900">{templateName ?? '未命名设计'}</p>
-        {recipe?.recipeRef.id === 'mercury-dew' && <Badge variant="warning">模拟效果 · 尚未完成生产验证</Badge>}
+        <p className="text-sm font-medium text-gray-900">{templateName ?? t('design.untitled')}</p>
+        {recipe?.recipeRef.id === 'mercury-dew' && <Badge variant="warning">{t('wizard.simulatedUnverified')}</Badge>}
         <div className="ml-auto flex min-w-0 flex-wrap items-center gap-3 overflow-x-auto">
-          <span className="text-nano text-gray-400">Esc 退出</span>
+          <span className="text-nano text-gray-400">Esc {t('common.close')}</span>
           <button
             ref={closeButtonRef}
             onClick={onClose}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 transition-colors duration-fast hover:text-gray-900"
-            title="退出展示模式（Esc）"
+            title={`${t('common.close')}${t('customer.customerPresentation')}（Esc）`}
           >
             <X size={15} />
           </button>
@@ -203,12 +205,12 @@ export function PresentationMode({
                   decoration={focusDecoration}
                   strokeScale={240 / Number(silhouette.viewBox.split(/\s+/)[2] ?? 120)}
                   readOnly
-                  fingerLabel={FINGER_LABEL[focusFinger]}
+                  fingerLabel={t(FINGER_LABEL[focusFinger])}
                 />
               </svg>
               <div className="flex flex-col items-center gap-1 text-center">
-                <p className="text-sm font-medium text-gray-900">{FINGER_LABEL[focusFinger]}</p>
-                {focusDecoration && <p className="text-xs text-gray-500">附件：{focusDecoration.name}</p>}
+                <p className="text-sm font-medium text-gray-900">{t(FINGER_LABEL[focusFinger])}</p>
+                {focusDecoration && <p className="text-xs text-gray-500">{t('wizard.decoration')}：{focusDecoration.name}</p>}
               </div>
             </>
           ) : (
@@ -225,7 +227,7 @@ export function PresentationMode({
             <span className="inline-block h-3.5 w-3.5 rounded-full border border-gray-300" style={{ backgroundColor: baseColor }} />
             {baseColor}
           </span>
-          <span>质感：{finishLabel}</span>
+          <span>{t('wizard.finish')}：{finishLabel}</span>
         </div>
 
         {/* 十指搭配条（点击切换重点指，只读展示） */}

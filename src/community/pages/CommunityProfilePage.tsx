@@ -10,9 +10,11 @@ import { loadPublishers, loadPublishedContents } from '../data/content-repositor
 import type { CommunityContentV1, CommunityPublisherV1 } from '../domain/types';
 import { PublisherBadge } from '../components/PublisherBadge';
 import { communityInternalHref } from '../lib/entry-link';
+import { useLocale } from '@/lib/i18n';
 
 export default function CommunityProfilePage() {
   const { handle } = useParams<{ handle: string }>();
+  const { t } = useLocale();
   const [searchParams] = useSearchParams();
   const [publisher, setPublisher] = useState<CommunityPublisherV1 | null | undefined>(undefined);
   const [works, setWorks] = useState<CommunityContentV1[]>([]);
@@ -39,7 +41,7 @@ export default function CommunityProfilePage() {
   if (publisher === undefined) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6 text-sm text-gray-500">
-        加载中…
+        {t('common.loading')}
       </div>
     );
   }
@@ -47,12 +49,12 @@ export default function CommunityProfilePage() {
   if (publisher === null) {
     return (
       <div className="rounded-card border border-gray-200 bg-white p-6" data-testid="community-profile-missing">
-        <h1 className="text-lg font-semibold text-gray-900">未找到发布者</h1>
+        <h1 className="text-lg font-semibold text-gray-900">{t('community.publisherNotFound')}</h1>
         <Link
           to={communityInternalHref(Routes.communityCreators, searchParams)}
           className="mt-3 inline-block text-sm text-primary"
         >
-          返回 Creators
+          {t('community.backCreators')}
         </Link>
       </div>
     );
@@ -69,9 +71,9 @@ export default function CommunityProfilePage() {
         {publisher.bio && <p className="mt-2 text-xs text-gray-500">{publisher.bio}</p>}
       </div>
       <section>
-        <h2 className="mb-2 text-sm font-medium text-gray-700">已发布内容（{works.length}）</h2>
+        <h2 className="mb-2 text-sm font-medium text-gray-700">{t('community.publishedContentCount', { count: works.length })}</h2>
         {works.length === 0 ? (
-          <p className="text-xs text-gray-500">暂无已发布内容。</p>
+          <p className="text-xs text-gray-500">{t('community.noPublishedContent')}</p>
         ) : (
           <ul className="space-y-2">
             {works.map((c) => (

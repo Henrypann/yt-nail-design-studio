@@ -1,12 +1,14 @@
 import { CommunityFeed } from '../components/CommunityFeed';
+import { useLocale } from '@/lib/i18n';
 
 export default function CommunityOfficialPage() {
+  const { t } = useLocale();
   return (
     <div data-testid="community-official-page" data-debug-id="community.official">
       <CommunityFeed
         mode="discover"
-        title="官方灵感库"
-        subtitle="平台策展高保真方案 · 非用户 UGC · 制造状态见证据徽章"
+        title={t('community.officialTitle')}
+        subtitle={t('community.officialSubtitle')}
         lockedSource="official"
         showOfficialProgress
       />

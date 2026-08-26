@@ -1,7 +1,10 @@
 import type { FingerCode } from '@/lib/types';
+import { localizedLabel } from '@/lib/i18n/localize';
+import type { LegacyLocale, Locale } from '@/lib/i18n/types';
 import type { NailDesignV7 } from './model';
 
 export type FingerContentStateV7 = 'blank' | 'inactive' | 'designed';
+type FingerLabelLocale = Locale | LegacyLocale;
 
 export interface FingerIdentityV7 {
   finger: FingerCode;
@@ -43,8 +46,28 @@ export const EDITOR_FINGER_IDENTITY_V7 = Object.fromEntries(
 ) as Record<FingerCode, FingerIdentityV7>;
 
 export function fingerDisplayNameV7(finger: FingerCode): string {
+  return fingerDisplayNameForLocaleV7(finger, 'zh-CN');
+}
+
+export function fingerDisplayNameForLocaleV7(finger: FingerCode, locale: FingerLabelLocale): string {
   const identity = EDITOR_FINGER_IDENTITY_V7[finger];
-  return `${identity.handLabel}${identity.name}`;
+  return `${fingerHandLabelForLocaleV7(identity.hand, locale)}${fingerNameForLocaleV7(identity.name, locale)}`;
+}
+
+export function fingerHandLabelForLocaleV7(hand: FingerIdentityV7['hand'], locale: FingerLabelLocale): string {
+  return localizedLabel(hand === 'left' ? '左手' : '右手', hand === 'left' ? 'Left hand' : 'Right hand', locale);
+}
+
+export function fingerNameForLocaleV7(name: FingerIdentityV7['name'], locale: FingerLabelLocale): string {
+  const labels: Record<FingerIdentityV7['name'], [string, string]> = {
+    拇指: ['拇指', 'Thumb'],
+    食指: ['食指', 'Index finger'],
+    中指: ['中指', 'Middle finger'],
+    无名指: ['无名指', 'Ring finger'],
+    小指: ['小指', 'Pinky'],
+  };
+  const [zh, en] = labels[name];
+  return localizedLabel(zh, en, locale);
 }
 
 export function deriveFingerContentStateV7(nail: NailDesignV7): FingerContentStateV7 {
@@ -58,3 +81,13 @@ export const FINGER_CONTENT_STATE_LABEL_V7: Record<FingerContentStateV7, string>
   inactive: '内容已隐藏',
   designed: '有设计',
 };
+
+export function fingerContentStateLabelForLocaleV7(state: FingerContentStateV7, locale: FingerLabelLocale): string {
+  const labels: Record<FingerContentStateV7, [string, string]> = {
+    blank: ['空白', 'Blank'],
+    inactive: ['内容已隐藏', 'Content hidden'],
+    designed: ['有设计', 'Designed'],
+  };
+  const [zh, en] = labels[state];
+  return localizedLabel(zh, en, locale);
+}

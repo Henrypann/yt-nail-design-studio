@@ -16,6 +16,7 @@ import { FingerNailContent } from '@/studio/render';
 import { FINGER_LABEL } from './TenFingerPreview';
 import { NailCellView } from './TiledNailsPreview';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import { useLocale } from '@/lib/i18n';
 
 export interface SingleNailViewProps {
   shape: NailShape;
@@ -49,6 +50,7 @@ export function SingleNailView({
   readOnly = false,
   className,
 }: SingleNailViewProps) {
+  const { t } = useLocale();
   const assets = useNailDesignAssets(shape, length, templateId);
   const { status, retry, silhouette, patternMarkup, patternVisible, patternFadeMs, failedFingers, patternK } = assets;
 
@@ -91,10 +93,10 @@ export function SingleNailView({
   if (status === 'error') {
     return (
       <div className={cx('flex flex-col items-center justify-center gap-3 rounded-card border border-gray-200 bg-white py-16', className)}>
-        <p className="text-sm text-gray-700">预览加载失败。请刷新页面重试。</p>
+        <p className="text-sm text-gray-700">{t('preview.loadFailed')}</p>
         <Button size="sm" variant="secondary" onClick={retry}>
           <RefreshCw size={13} />
-          刷新
+          {t('preview.refresh')}
         </Button>
       </div>
     );
@@ -104,7 +106,7 @@ export function SingleNailView({
     return (
       <div className={cx('flex flex-col items-center justify-center gap-3 rounded-card border border-gray-200 bg-canvas py-16', className)}>
         <Spinner size={28} className="text-primary" />
-        <p className="text-xs text-gray-500">正在生成单指细节…</p>
+        <p className="text-xs text-gray-500">{t('preview.singleGenerating')}</p>
       </div>
     );
   }
@@ -122,13 +124,13 @@ export function SingleNailView({
     >
       {/* 大图区 */}
       <div className="flex min-h-0 flex-1 items-center justify-center gap-6 overflow-y-auto p-4">
-        <Button size="sm" variant="ghost" onClick={() => step(-1)} title="上一指（←）">
+        <Button size="sm" variant="ghost" onClick={() => step(-1)} title={t('preview.previousFinger')}>
           <ChevronLeft size={18} />
         </Button>
 
         <div className="relative">
           {failed && (
-            <span className="absolute -top-2 left-1/2 z-10 -translate-x-1/2 text-lg" title="该指渲染失败（MOCK）">
+            <span className="absolute -top-2 left-1/2 z-10 -translate-x-1/2 text-lg" title={t('preview.renderFailedMock')}>
               ⚠️
             </span>
           )}
@@ -156,12 +158,12 @@ export function SingleNailView({
               decoration={decoration}
               strokeScale={strokeScale}
               readOnly
-              fingerLabel={FINGER_LABEL[finger]}
+              fingerLabel={t(FINGER_LABEL[finger])}
             />
           </svg>
         </div>
 
-        <Button size="sm" variant="ghost" onClick={() => step(1)} title="下一指（→）">
+        <Button size="sm" variant="ghost" onClick={() => step(1)} title={t('preview.nextFinger')}>
           <ChevronRight size={18} />
         </Button>
       </div>
@@ -169,19 +171,19 @@ export function SingleNailView({
       {/* 信息行 */}
       <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-4 py-2 text-xs text-gray-600">
         <span className="font-medium text-gray-900">
-          {finger} · {FINGER_LABEL[finger]}
+          {finger} · {t(FINGER_LABEL[finger])}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: color }} />
           {color}
         </span>
-        {decoration && <span>附件：{decoration.name}</span>}
+        {decoration && <span>{t('preview.attachment', { name: decoration.name })}</span>}
         {override && (override.baseColor || override.decorationId) && (
           <span className="rounded-button px-1.5 py-0.5 text-nano" style={{ backgroundColor: 'var(--color-primary-soft)', color: 'var(--color-primary)' }}>
-            单独定制
+            {t('preview.customized')}
           </span>
         )}
-        <span className="ml-auto text-nano text-gray-400">←/→ 切指 · Esc 返回</span>
+        <span className="ml-auto text-nano text-gray-400">{t('preview.keyboardHint')}</span>
       </div>
 
       {/* 十指搭配条 */}

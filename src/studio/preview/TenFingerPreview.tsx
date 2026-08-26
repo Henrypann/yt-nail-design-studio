@@ -19,11 +19,12 @@ import { useNailDesignAssets } from './use-nail-design-assets';
 import { BackPlatePreview, slotsForLength } from '@/studio/render';
 import type { NailLengthMm, NailSlotV2 } from '@/studio/slots';
 import type { RecipeInstanceV1 } from '@/studio/editor/lib/recipe-model';
+import { useLocale, type MessageKey } from '@/lib/i18n';
 
 /** 十指中文标签（UI 展示用） */
-export const FINGER_LABEL: Record<FingerCode, string> = {
-  L1: '左·拇指', L2: '左·食指', L3: '左·中指', L4: '左·无名指', L5: '左·小指',
-  R1: '右·拇指', R2: '右·食指', R3: '右·中指', R4: '右·无名指', R5: '右·小指',
+export const FINGER_LABEL: Record<FingerCode, MessageKey> = {
+  L1: 'preview.finger.leftThumb', L2: 'preview.finger.leftIndex', L3: 'preview.finger.leftMiddle', L4: 'preview.finger.leftRing', L5: 'preview.finger.leftPinky',
+  R1: 'preview.finger.rightThumb', R2: 'preview.finger.rightIndex', R3: 'preview.finger.rightMiddle', R4: 'preview.finger.rightRing', R5: 'preview.finger.rightPinky',
 };
 
 /**
@@ -94,6 +95,7 @@ export function TenFingerPreview({
   registerExport = true,
   className,
 }: TenFingerPreviewProps) {
+  const { t } = useLocale();
   const rawId = useId().replace(/[^a-zA-Z0-9]/g, '');
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -128,10 +130,10 @@ export function TenFingerPreview({
       {/* 状态 7：全部失败 */}
       {status === 'error' && (
         <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3">
-          <p className="text-sm text-gray-700">预览加载失败。请刷新页面重试。</p>
+          <p className="text-sm text-gray-700">{t('preview.loadFailed')}</p>
           <Button size="sm" variant="secondary" onClick={retry}>
             <RefreshCw size={13} />
-            刷新
+            {t('preview.refresh')}
           </Button>
         </div>
       )}
@@ -141,7 +143,7 @@ export function TenFingerPreview({
           {status === 'loading' && (
             <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-canvas">
               <Spinner size={28} className="text-primary" />
-              <p className="text-xs text-gray-500">正在生成十指预览…</p>
+              <p className="text-xs text-gray-500">{t('preview.tenFingerGenerating')}</p>
             </div>
           )}
 
@@ -186,7 +188,8 @@ export function TenFingerPreview({
                   readOnly={readOnly}
                   rawId={rawId}
                   svgRef={svgRef}
-                  fingerLabel={(fc) => FINGER_LABEL[fc]}
+                  fingerLabel={(fc) => t(FINGER_LABEL[fc])}
+                  ariaLabel={t('preview.backPlateAria')}
                 />
               </div>
             </div>

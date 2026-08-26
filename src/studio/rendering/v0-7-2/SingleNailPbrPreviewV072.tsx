@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { cx } from '@/design-system';
+import { useLocale } from '@/lib/i18n';
 import type { EditorDocV7, NailDesignV7, ProcessStepV7, RecipeInstanceV7 } from '@/studio/editor/v7/model';
 import type { CustomerNailPreviewReadModelV7 } from '@/studio/editor/v7/customer-preview';
 import { resolveEditorGeometryV7 } from '@/studio/editor/v7/geometry-registry';
@@ -17,7 +18,7 @@ import {
 } from './texture-map-assets';
 
 const CAMERA_LABEL = {
-  surface: '正视', oblique_left: '左斜', oblique_right: '右斜', side_profile: '侧面', tip_grazing: '指尖',
+  surface: 'render.camera.surface', oblique_left: 'render.camera.obliqueLeft', oblique_right: 'render.camera.obliqueRight', side_profile: 'render.camera.sideProfile', tip_grazing: 'render.camera.tipGrazing',
 } as const;
 type CameraId = keyof typeof CAMERA_LABEL;
 
@@ -281,6 +282,7 @@ export default function SingleNailPbrPreviewV072({
   recipeInstances?: Record<string, RecipeInstanceV7>;
   allNails?: EditorDocV7['nails'];
 }) {
+  const { t } = useLocale();
   const hostRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<SingleNailPbrRuntimeV072 | null>(null);
   const cameraIdRef = useRef<CameraId>('oblique_left');
@@ -431,17 +433,17 @@ export default function SingleNailPbrPreviewV072({
   }, [cameraId, status]);
 
   if (status === 'fallback') {
-    return <div data-testid="single-nail-pbr-fallback" className="space-y-3">{fallback}<p className="mx-auto max-w-sm rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-nano text-warning">模拟 3D 运行时或已签收甲型不可用；已留在当前指并回退 SVG 2.5D。设计未被修改。</p></div>;
+    return <div data-testid="single-nail-pbr-fallback" className="space-y-3">{fallback}<p className="mx-auto max-w-sm rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-nano text-warning">{t('render.fallback')}</p></div>;
   }
 
   return (
     <figure className="mx-auto w-full max-w-[520px]" data-testid="single-nail-pbr-v0-7-2" data-finger={nail.finger} data-runtime-status={status} data-camera-id={cameraId} data-surface-hash={surfaceHash} data-geometry-registry-entry={promotion.status === 'promoted' ? promotion.entry.registryEntryId : 'unavailable'} data-geometry-representation={promotion.status === 'promoted' ? promotion.delivery.representationId : 'unavailable'} data-material-projection={projection.schemaVersion} data-material-hash={projection.projectionHash} data-material-mode={projection.backgroundMode} data-material-fidelity={projection.fidelity} data-projected-layer-kinds={projection.projectedLayerKinds.join(',')} data-texture-asset-set={textureAssetSet?.assetSetId ?? 'none'} data-texture-asset-revision={textureAssetSet?.revision ?? 'none'} data-decoration-rendered-count={dimensionalResult.renderedCount} data-decoration-fallback-count={dimensionalResult.fallbackAssetIds.length} data-render-bounds="nail-and-visible-decorations" data-uv-contract="nail-local-v1-tip-to-root" data-evidence="simulated-not-manufacturing">
       <div ref={hostRef} className="h-[min(58dvh,560px)] min-h-[360px] w-full overflow-hidden rounded-[28px] border border-white bg-[radial-gradient(circle_at_50%_30%,#fff_0%,#f5eee7_72%)] shadow-[0_24px_70px_rgba(77,53,67,0.16)]" data-testid="single-nail-pbr-canvas-host" />
-      <div className="mt-3 flex flex-wrap justify-center gap-1.5" role="group" aria-label="单指模拟 3D 观察角度">
-        {(Object.keys(CAMERA_LABEL) as CameraId[]).map((id) => <button key={id} type="button" aria-pressed={cameraId === id} onClick={() => setCameraId(id)} className={cx('min-h-11 rounded-xl border px-3 text-nano font-medium', cameraId === id ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600')}>{CAMERA_LABEL[id]}</button>)}
+      <div className="mt-3 flex flex-wrap justify-center gap-1.5" role="group" aria-label={t('render.cameraGroupAria')}>
+        {(Object.keys(CAMERA_LABEL) as CameraId[]).map((id) => <button key={id} type="button" aria-pressed={cameraId === id} onClick={() => setCameraId(id)} className={cx('min-h-11 rounded-xl border px-3 text-nano font-medium', cameraId === id ? 'border-primary bg-primary-soft text-primary' : 'border-gray-200 bg-white text-gray-600')}>{t(CAMERA_LABEL[id])}</button>)}
       </div>
-      <figcaption className="mt-2 text-center text-nano leading-4 text-gray-500">SIMULATED PBR · Registry V2 · Almond medium v3 · {projection.schemaVersion} · {projection.fidelity} · {textureAssetSet ? 'decal + normal + roughness + visual height' : 'canonical color projection'}。甲面 GLB 已绑定 CanonicalGeometry，但 C 弧与 vertical preview thickness 仍为算法假设；立体装饰 Boolean 尚未接入，不证明贴合、工程壁厚、真实材质、固化、打印或制造。</figcaption>
-      {dimensionalResult.fallbackAssetIds.length > 0 && <p className="mt-2 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-center text-nano text-warning" role="status" data-testid="single-nail-decoration-fallback">{dimensionalResult.fallbackAssetIds.length} 个立体装饰未通过不可变 revision / SHA 校验，已保留当前甲面并降级；设计未被修改。</p>}
+      <figcaption className="mt-2 text-center text-nano leading-4 text-gray-500">{t('render.caption', { schemaVersion: projection.schemaVersion, fidelity: projection.fidelity, materialMode: textureAssetSet ? 'decal + normal + roughness + visual height' : 'canonical color projection' })}</figcaption>
+      {dimensionalResult.fallbackAssetIds.length > 0 && <p className="mt-2 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-center text-nano text-warning" role="status" data-testid="single-nail-decoration-fallback">{t('render.decorationFallback', { count: dimensionalResult.fallbackAssetIds.length })}</p>}
       {projection.warnings.length > 0 && <p className="mt-2 rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-center text-nano text-warning">{projection.warnings.join('；')}</p>}
     </figure>
   );

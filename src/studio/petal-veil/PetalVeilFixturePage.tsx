@@ -7,10 +7,12 @@ import {
   PetalVeilTiledPreview,
 } from './PetalVeilPreview';
 import { PETAL_VEIL_P0_ENABLED } from './feature';
+import { useLocale } from '@/lib/i18n';
 
 export default function PetalVeilFixturePage() {
+  const { t } = useLocale();
   if (!PETAL_VEIL_P0_ENABLED) {
-    return <main className="p-8 text-sm text-error">Petal Veil P0 feature flag 未开启。</main>;
+    return <main className="p-8 text-sm text-error">{t('petal.featureDisabled')}</main>;
   }
   const recipe = createPetalVeilInstance();
   const params = new URLSearchParams(window.location.search);
@@ -22,11 +24,11 @@ export default function PetalVeilFixturePage() {
     <main className="h-screen w-screen overflow-hidden bg-[#D8D0CA] p-6" data-testid="petal-fixture-page">
       <header className="mb-4 flex h-12 items-center justify-between">
         <div>
-          <h1 className="text-lg font-medium text-gray-900">Petal Veil French</h1>
-          <p className="text-xs text-gray-600">Almond · Medium · Canonical candidate · visual signoff pending</p>
+          <h1 className="text-lg font-medium text-gray-900">{t('petal.title')}</h1>
+          <p className="text-xs text-gray-600">{t('petal.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3 text-xs text-gray-600">
-          <p>three-pbr/petal-veil-1 · manufacturing blocked/unvalidated</p>
+          <p>{t('petal.rendererStatus')}</p>
           {showExportCheck && (
             <button
               type="button"
@@ -40,7 +42,7 @@ export default function PetalVeilFixturePage() {
               }}
               className="rounded-button border border-gray-500 px-3 py-1"
             >
-              校验 HQ PNG
+              {t('petal.checkPng')}
             </button>
           )}
           {exportMeta && <span data-testid="petal-export-meta">{exportMeta}</span>}
