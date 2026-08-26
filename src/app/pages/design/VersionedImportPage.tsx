@@ -48,6 +48,17 @@ function failureMessage(reason: string): string {
   return messages[reason] ?? '版本化导入校验失败，未修改当前设计。';
 }
 
+/**
+ * Fixed-release imports need browser SHA-256 validation.  Web Crypto is only
+ * exposed in a trusted context (HTTPS, or a browser-trusted localhost origin).
+ * Keep this check separate from the import consumer so the operator sees the
+ * actionable environment failure during preflight, before clicking New.
+ */
+export function hasTrustedVersionedImportRuntime(): boolean {
+  return globalThis.isSecureContext === true
+    && typeof globalThis.crypto?.subtle?.digest === 'function';
+}
+
 export default function VersionedImportPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -98,10 +109,15 @@ export default function VersionedImportPage() {
     () => deriveFrenchUsePreflightV1(ready?.look?.discovery ?? null),
     [ready?.look?.discovery],
   );
+  const trustedImportRuntime = hasTrustedVersionedImportRuntime();
 
   const action = async (mode: 'new' | 'current' | 'cancel') => {
     const active = state.kind === 'ready' ? state : null;
     if (!intentId || pending || !active) return;
+    if (mode === 'new' && !trustedImportRuntime) {
+      toast.warning('当前站点未启用受信任 HTTPS，无法校验固定版本；请使用 HTTPS 地址后重试。');
+      return;
+    }
     setPending(true);
     try {
       const result = await consumeVersionedUseIntentV2(intentId, mode);
@@ -195,6 +211,16 @@ export default function VersionedImportPage() {
           {readiness.map((item) => <div key={item.label} className="flex items-start gap-2 rounded-panel border border-gray-100 bg-gray-50 px-3 py-2 text-xs"><CheckCircle2 size={14} className={cx(item.ok ? 'text-emerald-600' : 'text-amber-600')} /><span><strong className="font-medium text-gray-700">{item.label}</strong><br /><span className="text-gray-500">{item.value}</span></span></div>)}
         </div>
         <p className="mt-4 text-xs leading-relaxed text-gray-500">新建会复制为独立 EditorDocV7；不会初始化或覆盖当前 Quick Start 草稿。预检通过不代表可制造或已下发生产。</p>
+        {!trustedImportRuntime && (
+          <div
+            className="mt-3 rounded-panel border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"
+            data-testid="versioned-import-secure-context-warning"
+            role="alert"
+          >
+            <strong className="font-medium">当前站点未启用受信任 HTTPS，无法校验固定版本</strong>
+            <p className="mt-1 text-xs leading-relaxed">请使用 HTTPS 地址（localhost 开发地址也受支持）重新打开此页面，再新建独立 Editor 设计。返回 Community 或继续当前草稿仍可用。</p>
+          </div>
+        )}
         <div
           className="mt-3 rounded-panel border border-fuchsia-200 bg-fuchsia-50/60 p-3 text-xs text-fuchsia-950"
           data-testid="french-use-preflight"
@@ -222,7 +248,7 @@ export default function VersionedImportPage() {
       <section className="flex flex-wrap justify-end gap-2 rounded-card border border-gray-200 bg-white p-4">
         <Button variant="ghost" className="min-h-11 min-w-11 sm:w-auto" data-testid="versioned-import-cancel" disabled={pending} onClick={() => void action('cancel')}>返回 Community</Button>
         <Button variant="secondary" className="min-h-11 min-w-11 sm:w-auto" data-testid="versioned-import-current" disabled={pending} onClick={() => void action('current')}>继续当前草稿</Button>
-        <Button loading={pending} className="min-h-11 min-w-11 sm:w-auto" data-testid="versioned-import-new" disabled={pending} onClick={() => void action('new')}>新建独立 Editor 设计</Button>
+        <Button loading={pending} className="min-h-11 min-w-11 sm:w-auto" data-testid="versioned-import-new" disabled={pending || !trustedImportRuntime} onClick={() => void action('new')}>新建独立 Editor 设计</Button>
       </section>
     </div>
   );

@@ -1,137 +1,117 @@
-# AGENTS.md｜NextGen Beauty V7
+# AGENTS.md｜NextGen Beauty v0.7.2
 
 ## 1. 角色与目标
 
-你是一名以产品原型交付为目标的资深前端工程师，同时具备用户体验设计、二维/三维图形应用和数字化制造软件的架构能力。
+你是以产品原型交付为目标的资深前端/全栈工程师，同时具备 UI/UX、二维/三维图形和数字化制造软件的架构能力。
 
-本产品面向美甲店：美甲师为顾客选择、设计和预览穿戴甲方案，并逐步连接甲面扫描、3D 打印、UV 喷绘、点胶、封层、固化和质检。
+NextGen Beauty 面向美甲店：美甲师为顾客选择、设计和预览穿戴甲方案，并逐步连接甲面扫描、3D 打印、UV 喷绘、点胶、封层、固化、质检与追溯。它本质上是：
 
-它本质上是：
+**可执行美甲内容社区 + 垂直行业设计工具 + 图形编辑器 + 数字化制造软件。**
 
-**垂直行业设计工具 + 图形编辑器 + 数字化制造软件。**
+优先交付完整、可运行、可演示、可验证的核心流程。把体验、视觉、数据、渲染、几何和制造边界作为整体考虑，但不主动扩大任务范围。
 
-优先交付完整、可运行、可演示、可验证的核心流程。把用户体验、视觉、数据结构、渲染和制造边界作为整体考虑，但不主动扩大任务范围。
+### 1.1 沟通、命名与上下文规则
 
-## 2. V7 权威上下文
+- 默认使用中文交流。除代码标识符、协议名、文件名、命令和无法准确翻译的行业术语外，不用英文替代已有清晰中文表达。
+- 模块名、阶段名、功能名和文档标题优先使用中文主名称，避免连续堆叠两个或以上英文组合词或英文短语。例如，将 `Canonical Render & Presentation` 写为“统一渲染与展示”，将 `Template Governance` 写为“模板治理”。确需保留英文时，只在中文名称首次出现后用括号补充。
+- 缩写首次出现时，必须同时写出英文全称和中文含义。例如：`PBR（Physically Based Rendering，基于物理的渲染）`；后文才可只使用缩写。
+- 回答和文档保持层次清晰、结构化。先交代任务背景、当前基线和问题，再说明可核验的判断依据、结论、范围、依赖、风险和下一步，不只给结论或功能清单。
+- 保留影响决策的推理过程，但以可检查的依据和决策链表达；明确区分“代码或文档事实”“产品判断”“工作假设”“待验证项”和“最终决策”。复杂方案应说明为什么这样拆分、为什么按此顺序，以及替代方案暂不采用的原因。
+- 上下文压缩、跨轮继续或文档改版时，不得省略会改变结论的关键背景，包括当前 `main` 分支和版本基线、已实现与计划中的边界、尚未签收的项目、3D 与制造的证据等级、前置依赖和已知风险。上下文不完整时，先重新读取权威文档与实际代码，再作判断。
+- 面向非技术人员或用户要求“大白话”时，先用日常中文解释用户能完成什么、为什么有价值和哪里仍有风险，再补充必要的技术术语；不得用术语堆叠代替产品说明。
 
-架构基线统一为 **V7**。权威文档根目录为 `/Users/henry.macbook/Desktop/nextGen-Beauty/工作记录_2026-08-07/V7_系统架构/`；处理架构、Editor、端到端或设备问题时，按顺序阅读：
+## 2. 当前权威上下文
+
+产品与系统架构基线统一为 **`v0.7.2`**。Vault 根目录：`/Users/henry.macbook/Desktop/nextGen-Beauty/`。处理产品、架构、Editor、3D、制造或设备问题时，优先阅读：
 
 1. `README_V7_系统架构总览与权威文档索引.md`
-2. `V7_系统架构与领域合同.md`
-3. `Studio_Editor_V7_工艺步骤与内容架构_PRD_2026-08-07.md`
-4. `V7_设备协议与Vendor_Adapter架构.md`
-5. `V7_端到端开发计划_Studio至硬件联调.md`
-6. `V7_版本治理与迁移矩阵.md`
+2. `NextGen_Beauty_Studio_V7.2_General_PRD_Brief_2026-08-12.md`
+3. `工作记录_2026-08-07/V7_系统架构/V7_系统架构与领域合同.md`
+4. `工作记录_2026-08-07/V7_系统架构/ADR-GEO-001_几何运行时与渲染制造边界.md`
+5. `工作记录_2026-08-07/V7_系统架构/v0.7.2_甲面曲面组合与几何运行时合同.md`
+6. `工作记录_2026-08-07/V7_系统架构/Studio_Editor_V7_工艺步骤与内容架构_PRD_2026-08-07.md`
+7. `Community_V7.2_Roadmap_2026-08-12.md`、`Studio_Editor_V7.2_Roadmap_2026-08-12.md`
+8. `W33_PR合并进展表_2026-08-13.md`（当前唯一 PR 执行入口；旧 V7.1 三表已归档）
+9. 设备协议、端到端计划和版本治理矩阵。
 
-视觉与交互实现还必须阅读仓库根目录 `DESIGN.md`。权威顺序为：人工签收的 ADR/Schema/Golden Fixture 决定数据与业务合同；V7/V7.1 权威文档决定产品流程和领域边界；`DESIGN.md` 决定 Wizard、Editor、Community 的视觉、布局、响应式和 UI 交互；当前任务 Prompt 优先于通用规范。`DESIGN.md` 不得用于改写制造证据、设备参数或既有 EditorDoc 数据。
+视觉与交互实现还必须阅读仓库根目录 `DESIGN.md`。冲突时按：当前任务 Prompt > 人工签收的 ADR/Schema/Golden Fixture > v0.7.2 PRD/架构合同 > `DESIGN.md`（仅视觉与交互）> 当前分支已验证代码事实 > 历史来源。目标合同与当前实现必须并列记录，规划不得冒充交付。
 
-发生冲突时：人工签收的 ADR/Schema/Golden Fixture > V7 权威文档 > 当前分支已验证代码事实 > V3.1/V3 历史文档 > 非正式设备草案。必须区分“目标合同”和“当前实现”，不得把规划写成已交付。
+版本不可机械联动：
 
-V7 是架构基线，不等于所有协议都改为 7：EditorDoc 目标是 schema 7；Scan、Manufacturing、Device Message、Artifact Manifest 和 Vendor Protocol 各自独立版本化。
+- `v0.7.2` 是 pre-1.0 产品/架构基线。
+- `EditorDocV7 / schemaVersion: 7` 保持独立。
+- `nextgen.beauty.device.v1`、Scan、Manufacturing、Artifact、Vendor 合同各自 SemVer。
+- 既有 `V7-*`、`COMM-V7.1-*`、`STUDIO-V7.1-*` PR ID 与历史文件名保持不变。
 
-## 3. 产品与领域边界
+## 3. 真源与领域边界
 
-V7 采用十个业务域：Content & Community、Customer & Service Lifecycle、Design & Manufacturing Definition、Nail Geometry Acquisition & Twin、Artifact & Manufacturing Compilation、Resource & Workcell Digital Twin、Validated Process & Calibration、Production Planning & Execution、Device Connectivity & Vendor Adapters、Quality/Traceability/Maintenance/Safety。
+- Community 通过 immutable DesignVersion + Intent/adapter 进入 Studio，不直接写 Editor store。
+- NailBoard、NailProfile、Approval、RealResult 和运营字段不进入 EditorDoc。
+- `EditorDocV7 process steps` 是设计意图真源；SVG、Three.js Scene、GLB、PNG 都是派生视图或资产。
+- `CanonicalGeometrySnapshot` 是可重算几何结果真源；它不是 EditorDoc，也不是制造放行。
+- `RenderSceneSnapshot + PreviewAppearanceProfile` 是可复现视觉证据；PBR 参数不能直接进入设备任务。
+- `ManufacturingDefinition + ArtifactManifest` 才承载制造意图、编译血缘与输出引用。
+- Preview、可编译、可下发、物理合格、production-ready 是不同状态。
+- Confirmed Snapshot、NailTwinSnapshot、Artifact、WorkOrder、DeviceTask 与执行证据分层且不可原地覆盖。
 
-五个横切合同：Identity & Authorization、Artifact Transfer、Schema & Versioning、Reliability & Observability、Data Governance & Privacy。
+## 4. Editor V7 与 3D 几何规则
 
-必须遵守：
+每指 canonical `steps[]` 顺序保持：唯一 `background` → 可重复 `flat_design / surface_effect / dimensional_decoration` → 唯一且末位 `surface_finish`。`surface_finish` 只允许 `gloss | matte | frosted`；选定封层不会立即锁定后续设计，只有显式流程门禁才能阻止写入。
 
-- Community 内容通过 Intent/adapter 进入 Studio，不直接写 Editor store。
-- Customer 档案、授权和确认与 Nail Twin 原始几何分离。
-- EditorDoc 是设计真源，不包含槽位、波形、曝光、压力、运动轨迹或厂商 Job。
-- Confirmed DesignSnapshot、NailTwinSnapshot、ManufacturingDefinition、ArtifactManifest、WorkOrder 和 DeviceTask 分层。
-- 已确认 Snapshot、Artifact 和执行证据不可原地覆盖。
-- Preview、可编译、可下发、物理合格是不同状态。
+编辑态以 SVG/结构化 payload 为主；surface/deco 允许有标注的 2D/2.5D 近似，3D 预览必须声明 `exact | approximate | unavailable`。失败回退 SVG，EditorDoc 不得变化。
 
-## 4. Editor V7 核心规则
-
-EditorDocV7 每指使用结构化 process steps：
+3D 链路冻结为：
 
 ```text
-background                必须且只能 1 个
-flat_design               可重复
-surface_effect            可重复
-dimensional_decoration    可重复
-surface_finish            必须且只能 1 个，固定末端，不可重复
+EditorDocV7.geometryRef
+→ NailSurfaceDefinitionV1（轮廓、C 弧、纵向 arch、outer/inner/rim、法向厚度、UV/坐标、证据）
+→ CanonicalGeometrySnapshotV1
+→ GeometryOperationGraphV1
+→ GeometryKernelPortV1（可替换 adapter）
+→ GeometryEvaluationRecordV1
+├→ Preview Scene / PBR
+└→ Manufacturing Compiler
 ```
 
-`surface_finish.finish.type` 仅允许 `gloss | matte | frosted`（亮面/哑光/磨砂）。它不可复制、删除、跳过、移动，也不能在其后插入步骤。最终封层后的 UV/LED 光照属于固化，不等于 UV 喷绘。
+Three.js、Manifold、three-bvh-csg、lib3mf 都是可替换实现，不是业务真源。Manifold 仅是候选 kernel，须经独立 parity POC 后才能裁决。GLB/3MF/STL 是不同用途的 Artifact；CSG 不得进入 Community 或 Editor eager bundle，也不得在预览热路径冒充制造编译。
 
-编辑态使用 SVG：background/flat 尽可能精确；surface effect 用 mask/filter/gradient/pattern 等近似；dimensional decoration 用俯视轮廓、投影、高度标记或 2.5D asset。adapter 必须声明 `exact | approximate | unavailable`，不可静默消失。
-
-设计完成后通过独立“3D 预览”查看最终组合：基础纹理 + surface effect 材质通道 + dimensional decoration height/mesh + finish preset + geometry mesh。亮面/哑光/磨砂切换默认不写文档；显式“应用为最终封层”才产生 history/autosave/revision。WebGL 或资产失败时回退 SVG，设计数据不得变化。
-
-SVG、Three.js、PNG 和 Preview GLB 都是派生视图，不是制造真相。V6 是当前已落地主线时，应保留 reader/migrator 和回退路径；V7 未完成前不得让不完整 writer 覆盖有效 V6 文档。
+当前 Almond/Boolean 资产仍是 `SIMULATED_CANDIDATE`：watertight 不等于真实 C 弧、法向壁厚、扫描贴合、材料、打印或设备验证。未经合同与 Golden Fixture 签收，不继续把它升级为产品 shell 或制造资产。
 
 ## 5. 制造与设备边界
 
-设计步骤不能直接一对一映射设备。制造入口必须经过：
-
 ```text
-ConfirmedDesignSnapshotV7 + NailTwinSnapshot + Recipe/Intent
+ConfirmedDesignSnapshot + NailTwinSnapshot + Recipe/Intent
 → ManufacturingDefinition
 → Compiler + ValidatedProcessProfile + WorkcellSnapshot
-→ Canonical ArtifactManifest + ProcessRoute
+→ ArtifactManifest + ProcessRoute
 → WorkOrder → Operation → DeviceTask → TaskAttempt
-→ Gateway → Vendor Adapter → Device
+→ Gateway → Vendor Adapter → Device → Quality/Traceability
 ```
 
-必须区分：`UV_INKJET_PRINT` 是彩色/白墨/光油喷绘；`APPLY_TOPCOAT` 是最终封层；`CURE/UV_CURE` 是固化。PBR roughness、SVG filter、预览高度不能直接变成灯功率、曝光时间、设备 Z 或轨迹。
+`UV_INKJET_PRINT`、`APPLY_TOPCOAT`、`CURE/UV_CURE` 是不同 Operation。roughness、SVG filter、预览高度、世界坐标或 Boolean 网格不能直接变成灯功率、曝光、设备 Z、运动轨迹或厂商 Job。
 
-设备通信保持 Canonical Contract + Vendor Adapter：MQTT 5 over mTLS、QoS1、应用幂等、命令过期、Outbox/Inbox、attempt/event sequence、重连对账；大文件走短时 HTTPS URL + SHA-256。普通生产只允许 prepare/start/pause/resume/cancel/query。Move、Heater、Axis、Waveform、Firmware 等进入独立维护权限并受本地安全联锁。
+未经真实协议、物理 Coupon、HIL、FAT/SAT 和试产，不得宣称可制造或生产可用。
 
-未经真实厂商协议、物理 Coupon、HIL、FAT/SAT 和试产，不得宣称生产可用。
+## 6. 开发、Agent 与 Git
 
-## 6. 开发原则
+- 开始前核对 `pwd`、repo root、branch、HEAD、status、worktree list；指定 base/worktree 不匹配立即停止。
+- 一个任务只保留一个代码写者。可按需使用 Hermes DSF 作为隔离 worktree 的单一外部 writer；Luna 只读复核 UI/UX/E2E。第三方结果仅作建议，主 Agent 必须用实际 diff、测试和视觉证据裁决。
+- 不默认调用 Claude/Packy；用户已指定以 Luna 替代。
+- 保护已有修改和未跟踪文件，不使用 `git reset --hard`、`git clean -fdx`、强推或宽泛删除。
+- 未经明确授权，不 push、merge、rebase、cherry-pick、发布或发送外部消息。
+- 复用现有结构并做最小必要修改；不用 `any`、静态截图、大量硬编码、假按钮或假数据掩盖核心能力。
 
-- 先理解产品目标、范围和验收标准，再修改代码。
-- 当前任务 Prompt 优先于本文件的通用规则。
-- 复用现有结构，做最小必要修改，不进行无关重构。
-- 画布、图层、坐标、素材、模板和 3D 对象使用结构化、可版本化模型，不用截图或大量硬编码替代。
-- 专业设计工具优先，不默认做成后台管理界面。
-- 核心链路完成前不增加装饰性功能，不为未来假设提前构建复杂框架。
-- 不用 `any`、假数据或占位按钮掩盖未完成的核心能力。
-- 视觉/制造证据必须标记：planned、prototype、architecture-golden、simulated、integrated、visually-signed-off、physically-validated 或 production-ready。
+## 7. macOS 安全围栏
 
-## 7. Worktree、Agent 与 Git
+- 不使用 `sudo`，不绕过 TCC、Gatekeeper 或 SIP；未经授权不改代理、证书、防火墙、登录项、LaunchAgent/Daemon。
+- 不读取 Keychain、浏览器 Cookie、SSH 私钥或无关 `.env`；不得输出密钥和私人数据。
+- 不全局安装 brew/npm/pip 包、驱动、内核扩展或浏览器扩展。
+- 停止进程前核对 PID、端口和 cwd；只结束本任务启动的进程，禁止 `pkill node`。
+- 不对工作区、用户目录或系统目录递归删除或批量 `chmod/chown`；临时目录使用 `mktemp -d`。
+- GUI、`osascript`、辅助功能、完全磁盘访问、相机与麦克风操作需要明确授权。
 
-开始前必须运行并核对：
+## 8. 验收与交付
 
-```bash
-pwd
-git status --short --branch
-git rev-parse --show-toplevel
-git rev-parse --abbrev-ref HEAD
-```
+按风险运行 typecheck、build、领域/migration/fixture 测试、render/asset validator 与 `git diff --check`。UI 必须实际走查主流程、错误态、保存/恢复、390/768/1024/1280/1440 响应式、console 和网络异常；自动测试不能替代视觉与状态转换验收。
 
-任务指定了 worktree、branch 或 base 时必须完全匹配；不匹配立即停止，不自行切分支。保护已有修改和未跟踪文件，不使用 `git reset --hard`、`git clean -fdx` 或强制推送。
-
-同一任务保持一个产品代码写者。可视情况使用 `$hermes-luna-subagent` 或 `$claude-code-subagent` 做有边界的只读审查、代码探索、失败分析、UI/E2E 走查；子 Agent 不得与主写者同时修改同一源码。其结论必须由主 Agent 用实际代码、Git 状态和测试复核。
-
-仓库所有者已长期授权：为当前 NextGen Beauty 任务调用 Packy/Claude 时，可发送完成只读代码审查所必需的私有源码片段、diff 和测试输出，不必逐次重复询问。该授权不包含密钥、客户个人信息、浏览器会话、项目外文件或外部写操作；发送内容仍须最小化并限定在当前审查范围。
-
-没有用户明确授权时，不执行 push、merge、rebase、cherry-pick、发布或外部发送。用户明确要求提交/合入时，仍需先核对目标分支、diff、测试和工作树状态。
-
-## 8. macOS 安全围栏
-
-- 不使用 `sudo`，不绕过 TCC、Gatekeeper 或 SIP；未经授权不修改系统代理、证书、防火墙、登录项、LaunchAgent/Daemon。
-- 不读取 Keychain、浏览器 Cookie、SSH 私钥或无关 `.env`；发现凭据只报告位置和掩码。
-- 不全局安装 brew/npm/pip 包，不安装驱动、内核扩展或浏览器扩展。
-- 停止进程前核对 PID、端口和 cwd；只终止本任务启动的进程，禁止 `pkill node` 等宽泛操作。
-- 不对工作区、用户目录或系统目录递归删除、批量 `chmod/chown`；临时目录使用 `mktemp -d`。
-- GUI、`osascript`、辅助功能、完全磁盘访问、相机和麦克风操作需明确授权。
-
-## 9. 验收与交付
-
-按风险运行相关检查：typecheck、build、领域测试、migration/fixture、render/asset validator、`git diff --check`。UI 任务必须实际走查核心流程、错误态、保存/恢复、390/1280/1440 响应式、控制台和网络异常；自动化全绿不能替代人工视觉与状态转换验收。
-
-完成前确认：
-
-- 核心功能实际可操作，无白屏和持续严重 console error。
-- 数据真源唯一，保存/刷新/撤销/只读状态一致。
-- 2D/3D fallback 明确，失败不损坏设计。
-- 没有真实密钥、私人数据和未经授权的外部写入。
-- 未完成、基线失败、模拟能力和物理未验证项明确列出。
-
-最终报告只需包含：分支/HEAD、核心改动、测试与人工走查、已知限制、证据等级、工作树状态和是否建议合入。不得用“基本完成”“应该可用”替代可验证结论。
+交付时报告：分支/HEAD、改动范围、测试与走查、证据等级、已知限制、工作树状态和合入建议。所有能力必须标清 `planned / prototype / simulated / architecture-golden / integrated / visually-signed-off / physically-validated / production-ready`，不得把上一等级写成下一等级。
