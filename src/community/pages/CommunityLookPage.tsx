@@ -600,6 +600,7 @@ export default function CommunityLookPage() {
 
       <Modal
         open={confirmOpen}
+        testId="community-confirm-look-dialog"
         onClose={() => {
           if (!confirmBusy) setConfirmOpen(false);
         }}
