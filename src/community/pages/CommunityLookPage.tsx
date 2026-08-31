@@ -44,6 +44,11 @@ import { DiscoveryDetailSection } from '../components/CommunityDiscoveryMetadata
 import { CommunityAssetCapabilitySection } from '../components/CommunityAssetCapability';
 import { communityInternalHref, studioReturnPath } from '../lib/entry-link';
 import { createVersionedUseIntentForLookV1 } from '@/integration/community-studio/versioned-use-runtime';
+import {
+  confirmCanonicalLookAsDesignVersionV1,
+  readConfirmedLookDesignVersionsV1,
+} from '@/integration/community-studio/look-confirm-runtime';
+import type { ConfirmedLookDesignVersionRefV1 } from '@/community/domain/v7_1/look-confirm';
 
 function EvidenceRow({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'missing' }) {
   return (
@@ -80,6 +85,9 @@ export default function CommunityLookPage() {
   const [retry, setRetry] = useState(0);
   const [coverFailed, setCoverFailed] = useState(false);
   const [approxOpen, setApproxOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+  const [confirmed, setConfirmed] = useState<ConfirmedLookDesignVersionRefV1 | null>(null);
 
   useEffect(() => {
     if (!lookId) return;
@@ -116,6 +124,14 @@ export default function CommunityLookPage() {
         if (lookModel) {
           const pub = await getPublisherById(lookModel.publisherId);
           if (!cancelled) setPublisher(pub);
+        }
+        const listed = readConfirmedLookDesignVersionsV1();
+        if (!cancelled) {
+          setConfirmed(
+            listed.ok
+              ? listed.records.find((record) => record.lookId === lookId) ?? null
+              : null,
+          );
         }
       } catch {
         // TAX-04: 网络/运行时错误 ≠ 内容不存在或已下架；独立错误状态 + 重试。
@@ -234,6 +250,29 @@ export default function CommunityLookPage() {
     return { ok: true, href: studioProductHref(result.href) };
   };
 
+  const onConfirmLook = () => {
+    if (!canonical || confirmBusy) return;
+    setConfirmBusy(true);
+    try {
+      const result = confirmCanonicalLookAsDesignVersionV1(look);
+      if (!result.ok) {
+        toast.error(
+          result.reason === 'legacy_missing_design_version'
+            ? t('community.confirm.legacyBlocked')
+            : t('community.confirm.unavailable'),
+        );
+        return;
+      }
+      setConfirmed(result.record);
+      setConfirmOpen(false);
+      toast.success(result.created ? t('community.confirm.success') : t('community.confirm.already'));
+    } catch {
+      toast.error(t('community.confirm.unavailable'));
+    } finally {
+      setConfirmBusy(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-3xl space-y-4" data-testid="community-look-page">
       <div className="flex items-center gap-2">
@@ -313,6 +352,22 @@ export default function CommunityLookPage() {
           <p className="text-nano leading-relaxed text-gray-500">
             {t('community.previewNotManufacturingNote')}
           </p>
+          {confirmed && (
+            <div
+              className="rounded-panel border border-hairline bg-surface-soft px-3 py-2 text-xs text-body"
+              data-testid="community-confirm-look-identity"
+            >
+              <p className="font-medium text-ink">{t('community.confirm.identity')}</p>
+              <p className="mt-1 font-mono text-nano text-mute">
+                {t('community.confirm.identityLine', {
+                  designVersionId: confirmed.designVersionId,
+                  revision: confirmed.revision,
+                  sha: `${confirmed.editorDocSha256.slice(0, 12)}…`,
+                })}
+              </p>
+              <p className="mt-1 text-nano text-mute">{t('community.confirm.notEditorWrite')}</p>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             {assetCapability === undefined ? (
@@ -381,6 +436,24 @@ export default function CommunityLookPage() {
                 <p className="text-xs text-gray-500">
                   {t('community.rightsMetadataMissing')}
                 </p>
+              </div>
+            )}
+            {canonical ? (
+              <Button
+                className="min-h-11"
+                variant="secondary"
+                disabled={confirmBusy}
+                data-testid="community-confirm-look"
+                onClick={() => setConfirmOpen(true)}
+              >
+                {confirmed ? t('community.confirm.already') : t('community.confirm.action')}
+              </Button>
+            ) : (
+              <div className="flex flex-col items-start gap-1" data-testid="community-confirm-look-legacy">
+                <Button className="min-h-11" disabled variant="secondary">
+                  {t('community.confirm.action')}
+                </Button>
+                <p className="text-xs text-amber-700">{t('community.confirm.legacyBlocked')}</p>
               </div>
             )}
             <CrossProductLink
@@ -523,6 +596,31 @@ export default function CommunityLookPage() {
         <p className="text-sm text-gray-600">
           {t('community.approximateApplicationDescription')}
         </p>
+      </Modal>
+
+      <Modal
+        open={confirmOpen}
+        onClose={() => {
+          if (!confirmBusy) setConfirmOpen(false);
+        }}
+        title={t('community.confirm.title')}
+        footer={
+          <>
+            <Button variant="ghost" disabled={confirmBusy} onClick={() => setConfirmOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              loading={confirmBusy}
+              data-testid="community-confirm-look-submit"
+              onClick={onConfirmLook}
+            >
+              {t('community.confirm.action')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-body">{t('community.confirm.description')}</p>
+        <p className="mt-2 text-xs text-mute">{t('community.confirm.notEditorWrite')}</p>
       </Modal>
     </div>
   );

@@ -63,6 +63,8 @@ export const StorageKeys = {
   versionedStudioImportIntents: 'community.versioned-studio-import-intents-v2',
   /** Successful Look → Studio conversions; idempotent by versioned intent id. */
   lookCustomizeEvents: 'community.look-customize-events-v1',
+  /** Community explicit Look → DesignVersion confirm pins (id + revision + hash). */
+  lookConfirmDesignVersions: 'community.look-confirm-design-versions-v1',
   /** Creator local prototype: PublishPackage → PublishedLook workflow. */
   creatorPublications: 'community.creator-publications-v1',
   /** Fixed-version client share links, snapshots and approval events. */

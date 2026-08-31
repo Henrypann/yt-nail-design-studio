@@ -115,6 +115,16 @@ export const COMMUNITY_ZH_MESSAGES = {
   'community.discovery.structuredTags': '结构化标签',
   'community.discovery.makeability': '可制作性',
   'community.discovery.currentMakeableEvidenceGated': '当前可制作（证据门禁）',
+  'community.confirm.action': '确认此 Look',
+  'community.confirm.title': '确认 Look 为 DesignVersion',
+  'community.confirm.description': '确认会钉住此 Look 当前的 DesignVersion 身份（id、revision 与文档哈希），供 Studio 引用。不会改写编辑器文档，也不进入制造或生产任务。',
+  'community.confirm.success': '已确认 Look 对应的 DesignVersion。',
+  'community.confirm.already': '已确认此 DesignVersion',
+  'community.confirm.legacyBlocked': '旧版静态内容没有不可变 DesignVersion，不能确认。',
+  'community.confirm.unavailable': '当前无法确认此 Look。请刷新后重试。',
+  'community.confirm.identity': '已钉住的 DesignVersion 身份',
+  'community.confirm.identityLine': '{designVersionId} · r{revision} · {sha}',
+  'community.confirm.notEditorWrite': '确认只写身份钉，不会由 Community 直接改写 Editor 文档。',
 } as const;
 
 export const COMMUNITY_EN_MESSAGES = {
@@ -233,4 +243,14 @@ export const COMMUNITY_EN_MESSAGES = {
   'community.discovery.structuredTags': 'Structured tags',
   'community.discovery.makeability': 'Makeability',
   'community.discovery.currentMakeableEvidenceGated': 'Currently makeable (evidence gate)',
+  'community.confirm.action': 'Confirm this Look',
+  'community.confirm.title': 'Confirm Look as DesignVersion',
+  'community.confirm.description': 'Confirm pins this Look’s current DesignVersion identity (id, revision, and document hash) so Studio can reference it. It does not rewrite the editor document, and it is not a manufacturing or production job.',
+  'community.confirm.success': 'The Look’s DesignVersion is now confirmed.',
+  'community.confirm.already': 'This DesignVersion is already confirmed',
+  'community.confirm.legacyBlocked': 'Legacy static content has no immutable DesignVersion and cannot be confirmed.',
+  'community.confirm.unavailable': 'This Look cannot be confirmed right now. Refresh and try again.',
+  'community.confirm.identity': 'Pinned DesignVersion identity',
+  'community.confirm.identityLine': '{designVersionId} · r{revision} · {sha}',
+  'community.confirm.notEditorWrite': 'Confirm writes identity pins only; Community does not rewrite the Editor document.',
 } as const;
