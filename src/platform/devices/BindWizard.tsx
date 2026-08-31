@@ -1,11 +1,11 @@
 /**
- * 设备配网向导（模块 2 · MOCK IOT）—— Studio-PRD §4.3 六步：
- * Step1 选择路径 → Step2 发现设备（15s 超时模拟）→ Step3 输入 WiFi（密码不持久化）
- * → Step4 配网中（0→100% 约 3-5s）→ Step5 命名设备 → Step6 绑定完成。
+ * 设备配网向导（模块 2 · prototype）—— 工作站两跳绑定：
+ * Step1 搜索机器（WebBluetooth）/ 同页数据线（WebUSB）→ Step2 发现+配对
+ * → Step3 输入 WiFi（密码不持久化；手机代填不是绑定路径）
+ * → Step4 配网中 → Step5 命名 + hop1 本地绑定 → hop2 云注册 → Step6 完成。
  *
- * 异常场景全部由 Mock 注入面板驱动（PRD §4.5）：
- * 发现超时 / WiFi 密码错误 / 入网超时 30s / 已被其他门店绑定 /
- * Token 过期 / 并发绑定；页面刷新 5 分钟 TTL 内恢复进度，超时回到步骤 1。
+ * CLOUD_REGISTER_FAILED 只重试 hop2。LAN 不是绑定路径。
+ * 真实 BT/USB 不可用时走同路径 mock 注入，不静默改走另一条路径。
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -23,9 +23,11 @@ import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
 import { getSession } from '@/platform/session';
 import {
+  bindErrorMessageKeyV1,
+  mapBindErrorV1,
   mapWizardBindErrorV1,
-  resolveSnAlreadyBound,
-  type BindWizardErrorCodeV1,
+  type BindErrorCodeV1,
+  type BindSnMismatchDisplayV1,
   type WizardBindErrorAliasV1,
 } from './bind-error-codes';
 import {
@@ -40,7 +42,6 @@ import {
   DEVICE_TYPE_LABEL,
   IOT_SCENARIOS,
   IOT_TIMINGS,
-  mockDiscoverDevice,
   mockMobileToken,
   randomProvisionMs,
 } from './iot-mock';
@@ -49,18 +50,17 @@ import {
   issueMobileToken,
   readMobileToken,
 } from './mobile-tokens';
+import { selectBindTransportV1, type BindTransportPortV1 } from './transport';
+import { createTwoHopBindControllerV1 } from './two-hop-bind';
 import type { BindPath, BindStep, DiscoveredDevice } from './types';
 
-/** 冻结码子集。旧 6 项私有名见 WizardBindErrorAliasV1，经 mapWizardBindErrorV1 映射到此。 */
-type ErrorKind = BindWizardErrorCodeV1;
+type ErrorKind = BindErrorCodeV1;
 
 const STEP_LABEL_KEYS = ['device.choosePath', 'device.discovered', 'device.wifiPassword', 'device.provisioning', 'device.deviceAlias', 'device.bindSuccess'] as const;
 
-const PATH_LABEL_KEY: Record<BindPath, 'device.bluetoothPath' | 'device.mobilePath' | 'device.usbPath' | 'device.lanPath'> = {
+const PATH_LABEL_KEY: Record<BindPath, 'device.bluetoothPath' | 'device.usbPath'> = {
   bluetooth: 'device.bluetoothPath',
-  mobile: 'device.mobilePath',
   usb: 'device.usbPath',
-  lan: 'device.lanPath',
 };
 
 export function BindWizard() {
@@ -69,12 +69,22 @@ export function BindWizard() {
   const { t } = useLocale();
   const flags = useMockScenarios((s) => s.flags);
   const addDevice = useDevicesStore((s) => s.addDevice);
-  const deviceCount = useDevicesStore((s) => s.devices.length);
+  const setActivationState = useDevicesStore((s) => s.setActivationState);
+  const devices = useDevicesStore((s) => s.devices);
+  const deviceCount = devices.length;
 
   const [restored] = useState(() => loadBindSession());
+  const hopRef = useRef(
+    createTwoHopBindControllerV1({
+      hop1Completed: restored?.hop1Completed,
+      localDeviceId: restored?.localDeviceId,
+    }),
+  );
+  const [hop1Done, setHop1Done] = useState(() => restored?.hop1Completed === true);
   const [step, setStep] = useState<BindStep>(() => {
     if (!restored) return 1;
-    return restored.step === 4 ? 3 : restored.step; // 配网中被刷新 → 回到输入 WiFi
+    if (restored.hop1Completed) return 5;
+    return restored.step === 4 ? 3 : restored.step;
   });
   const [path, setPath] = useState<BindPath | null>(restored?.path ?? null);
   const [device, setDevice] = useState<DiscoveredDevice | null>(restored?.device ?? null);
@@ -82,17 +92,25 @@ export function BindWizard() {
   const [password, setPassword] = useState(''); // 红线：type=password，不持久化
   const [alias, setAlias] = useState(restored?.alias ?? '');
   const [mobileToken, setMobileToken] = useState(restored?.mobileToken ?? '');
-  const [useLocalWifi, setUseLocalWifi] = useState(false); // 手机路径改用电脑输入
+  const [useMobileWifiHelper, setUseMobileWifiHelper] = useState(false);
   const [error, setError] = useState<ErrorKind | null>(null);
   const [errorAlias, setErrorAlias] = useState<WizardBindErrorAliasV1 | null>(null);
+  const [snMismatch, setSnMismatch] = useState<BindSnMismatchDisplayV1 | null>(null);
+  const [usingMock, setUsingMock] = useState(false);
+  const [hop2Busy, setHop2Busy] = useState(false);
 
   const reportError = (alias: WizardBindErrorAliasV1) => {
     setError(mapWizardBindErrorV1(alias));
     setErrorAlias(alias);
   };
+  const reportCode = (code: BindErrorCodeV1) => {
+    setError(mapBindErrorV1(code));
+    setErrorAlias(null);
+  };
   const clearError = () => {
     setError(null);
     setErrorAlias(null);
+    setSnMismatch(null);
   };
   const [progress, setProgress] = useState(0);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -101,6 +119,8 @@ export function BindWizard() {
 
   const flagsRef = useRef(flags);
   flagsRef.current = flags;
+  const transportRef = useRef<BindTransportPortV1 | null>(null);
+  const discoverGen = useRef(0);
 
   /* 刷新恢复提示（5 分钟 TTL 内） */
   useEffect(() => {
@@ -108,32 +128,25 @@ export function BindWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* 会话持久化：步骤/路径/设备/SSID/别名/Token（密码永不写入） */
+  /* 会话持久化：步骤/路径/设备/SSID/别名/Token/hop1（密码永不写入） */
   useEffect(() => {
-    if (step === 6) return; // 完成态由 finalize 清除会话
-    saveBindSession({ step, path, device, wifiSsid: ssid, mobileToken, alias });
-  }, [step, path, device, ssid, mobileToken, alias]);
+    if (step === 6) return;
+    const hop = hopRef.current.state;
+    saveBindSession({
+      step,
+      path,
+      device,
+      wifiSsid: ssid,
+      mobileToken,
+      alias,
+      hop1Completed: hop.hop1Completed,
+      localDeviceId: hop.localDeviceId ?? undefined,
+    });
+  }, [step, path, device, ssid, mobileToken, alias, error, hop1Done]);
 
-  /* Step 2 · 发现设备：正常 ~2.6s；Mock 发现超时时 15s 后报错 */
+  /* Step 3 · 可选手机 Wi-Fi 代填：发放 Token + 2s 轮询。不是绑定路径。 */
   useEffect(() => {
-    if (step !== 2 || !path || errorAlias === 'discoverTimeout') return;
-    if (isScenarioOn(flagsRef.current, IOT_SCENARIOS.discoverTimeout)) {
-      const t = window.setTimeout(
-        () => reportError('discoverTimeout'),
-        IOT_TIMINGS.discoveryTimeoutMs,
-      );
-      return () => window.clearTimeout(t);
-    }
-    const t = window.setTimeout(() => {
-      setDevice(mockDiscoverDevice(path));
-      setStep(3);
-    }, IOT_TIMINGS.discoveryScanMs);
-    return () => window.clearTimeout(t);
-  }, [step, path, error]);
-
-  /* Step 3 · 手机辅助路径：发放 Token + 2s 轮询手机端提交 */
-  useEffect(() => {
-    if (step !== 3 || path !== 'mobile' || useLocalWifi || !device || error) return;
+    if (step !== 3 || !useMobileWifiHelper || !device || error) return;
     const token = mobileToken || mockMobileToken();
     issueMobileToken(token, device.deviceCode);
     if (token !== mobileToken) setMobileToken(token);
@@ -157,13 +170,12 @@ export function BindWizard() {
     }, 2000);
     return () => window.clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, path, useLocalWifi, device, mobileToken, error]);
+  }, [step, useMobileWifiHelper, device, mobileToken, error]);
 
-  /* Step 4 · 配网中：进度 0→100%（3-5s）；Mock 注入 WiFi 密码错误 / 入网超时 30s */
+  /* Step 4 · 配网中：进度 0→100%；Mock 注入 WiFi 密码错误 / 入网超时 30s */
   useEffect(() => {
     if (step !== 4 || error) return;
     if (isScenarioOn(flagsRef.current, IOT_SCENARIOS.bindTimeout)) {
-      // 入网超时（PRD：30s）：进度缓慢推进，倒计时结束后报错
       const startedAt = Date.now();
       const timer = window.setInterval(() => {
         const elapsed = Date.now() - startedAt;
@@ -177,24 +189,49 @@ export function BindWizard() {
     }
     const duration = randomProvisionMs();
     const startedAt = Date.now();
+    let cancelled = false;
+    let failed = false;
     const timer = window.setInterval(() => {
       const elapsed = Date.now() - startedAt;
       const pct = Math.min(100, Math.round((elapsed / duration) * 100));
       setProgress(pct);
       if (isScenarioOn(flagsRef.current, IOT_SCENARIOS.wifiWrong) && pct >= 60) {
+        failed = true;
         window.clearInterval(timer);
-        setPassword(''); // 密码错误 → 清空重输
-        setUseLocalWifi(path === 'mobile' ? true : false);
+        setPassword('');
+        setUseMobileWifiHelper(false);
         reportError('wifiWrong');
-        return;
-      }
-      if (pct >= 100) {
-        window.clearInterval(timer);
-        clearError();
-        setStep(5);
       }
     }, 100);
-    return () => window.clearInterval(timer);
+
+    const transport = transportRef.current;
+    const currentDevice = device;
+    const runHandoff = async () => {
+      if (!transport || !currentDevice) return;
+      const result = await transport.wifiHandoff(currentDevice, { ssid, password });
+      if (cancelled) return;
+      if (!result.ok) {
+        failed = true;
+        window.clearInterval(timer);
+        reportCode(result.code);
+      }
+    };
+    void runHandoff();
+
+    const done = window.setTimeout(() => {
+      if (cancelled || failed) return;
+      window.clearInterval(timer);
+      if (isScenarioOn(flagsRef.current, IOT_SCENARIOS.wifiWrong)) return;
+      clearError();
+      setProgress(100);
+      setStep(5);
+    }, duration);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      window.clearTimeout(done);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, error, provisionNonce]);
 
@@ -211,60 +248,119 @@ export function BindWizard() {
         return;
       }
       setInlineError('');
-      // 并发绑定：Mock 开关强制触发，或同 deviceCode 已被其他标签页锁定
       if (
         isScenarioOn(flagsRef.current, IOT_SCENARIOS.concurrentBind) ||
         !acquireBindLock(device.deviceCode)
       ) {
         reportError('concurrent');
-      toast.warning(t('device.concurrent'));
+        toast.warning(t('device.concurrent'));
         return;
       }
       clearError();
       setProgress(0);
       setStep(4);
     },
-    [device, toast],
+    [device, toast, t],
   );
   const startProvisioningRef = useRef(startProvisioning);
   startProvisioningRef.current = startProvisioning;
 
-  /** Step 5 · 完成绑定 */
-  const finalizeBind = () => {
-    if (!device) return;
-    if (isScenarioOn(flags, IOT_SCENARIOS.alreadyBound)) {
-      const resolution = resolveSnAlreadyBound({
-        incomingStoreId: getSession()?.email ?? '',
-        boundStoreId: '__other_store__',
-      });
-      if (resolution.outcome === 'reject') {
-        reportError('alreadyBound');
-        return;
-      }
+  const runHop2Only = useCallback(async () => {
+    const current = device;
+    const localId = hopRef.current.state.localDeviceId;
+    if (!current || !hopRef.current.state.hop1Completed || !localId) return;
+    setHop2Busy(true);
+    const storeId = getSession()?.email ?? '';
+    const cloud = await hopRef.current.runHop2({
+      serialNumber: current.serialNumber,
+      storeId,
+      fail: isScenarioOn(flagsRef.current, IOT_SCENARIOS.cloudRegisterFailed),
+    });
+    setHop2Busy(false);
+    if (!cloud.ok) {
+      reportCode('CLOUD_REGISTER_FAILED');
+      return;
     }
-    const finalAlias =
-      alias.trim() || `${DEVICE_TYPE_LABEL[device.type]}-${String(deviceCount + 1).padStart(2, '0')}`;
-    addDevice(
-      createBoundDevice({
-        alias: finalAlias,
-        type: device.type,
-        deviceCode: device.deviceCode,
-        serialNumber: '',
-        storeId: getSession()?.email ?? '',
-        activationState: 'not_activated',
-        nailProfileRef: null,
-      }),
-    );
+    setActivationState(localId, 'activated');
     clearBindSession();
     releaseBindLock();
-    setAlias(finalAlias);
     clearError();
     setStep(6);
-    toast.success(t('device.boundAlias', { alias: finalAlias }));
+    toast.success(t('device.boundAlias', { alias: alias.trim() || current.deviceCode }));
+  }, [alias, device, setActivationState, t, toast]);
+
+  useEffect(() => {
+    if (!restored?.hop1Completed) return;
+    void runHop2Only();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** Step 5 · hop1 本地绑定，成功后再 hop2。CLOUD_REGISTER_FAILED 只走 hop2。 */
+  const finalizeBind = () => {
+    if (!device) return;
+    const storeId = getSession()?.email ?? '';
+    const expectedSerialNumber = isScenarioOn(flags, IOT_SCENARIOS.snMismatch)
+      ? 'SN-EXPECT-DEMO'
+      : undefined;
+    const existing = isScenarioOn(flags, IOT_SCENARIOS.alreadyBound)
+      ? [
+          {
+            id: 'bound-other',
+            serialNumber: device.serialNumber,
+            storeId: '__other_store__',
+            activationState: 'activated' as const,
+          },
+        ]
+      : devices.map((item) => ({
+          id: item.id,
+          serialNumber: item.serialNumber,
+          storeId: item.storeId,
+          activationState: item.activationState,
+        }));
+
+    const hop1 = hopRef.current.runHop1({
+      incoming: {
+        serialNumber: device.serialNumber,
+        storeId,
+        deviceCode: device.deviceCode,
+      },
+      existingDevices: existing,
+      expectedSerialNumber,
+      persist: () => {
+        const finalAlias =
+          alias.trim() || `${DEVICE_TYPE_LABEL[device.type]}-${String(deviceCount + 1).padStart(2, '0')}`;
+        const created = createBoundDevice({
+          alias: finalAlias,
+          type: device.type,
+          deviceCode: device.deviceCode,
+          serialNumber: device.serialNumber,
+          storeId,
+          activationState: 'not_activated',
+          nailProfileRef: null,
+        });
+        addDevice(created);
+        setAlias(finalAlias);
+        return created.id;
+      },
+    });
+
+    if (!hop1.ok) {
+      if (hop1.snMismatch) setSnMismatch(hop1.snMismatch);
+      reportCode(hop1.code);
+      return;
+    }
+
+    if (hop1.sameStoreReuse) {
+      toast.info(t('device.sameStoreAlreadyBound'));
+    }
+
+    setHop1Done(true);
+    void runHop2Only();
   };
 
   /** 取消配网（二次确认后） */
   const confirmCancel = () => {
+    discoverGen.current += 1;
     clearBindSession();
     releaseBindLock();
     setCancelOpen(false);
@@ -272,31 +368,42 @@ export function BindWizard() {
   };
 
   const goBack = () => {
+    discoverGen.current += 1;
     clearError();
     setInlineError('');
+    if (hop1Done) return;
     if (step === 2) setStep(1);
     else if (step === 3) {
       setDevice(null);
+      setUseMobileWifiHelper(false);
       setStep(2);
     } else if (step === 4) setStep(3);
     else if (step === 5) setStep(3);
   };
 
   const retryError = () => {
-    if (errorAlias === 'discoverTimeout') {
+    if (error === 'CLOUD_REGISTER_FAILED') {
       clearError();
-      setStep(2); // effect 重新发现
+      void runHop2Only();
       return;
     }
-    if (errorAlias === 'wifiWrong') {
+    if (error === 'BIND_BT_WIFI_HANDOFF_FAILED' || errorAlias === 'wifiWrong') {
       clearError();
       setStep(3);
+      return;
+    }
+    if (error === 'BIND_BT_DISCOVER_FAILED' || error === 'BIND_BT_PAIR_FAILED' || error === 'BIND_USB_NOT_FOUND' || error === 'BIND_USB_DENIED') {
+      if (path) void startPath(path);
+      return;
+    }
+    if (errorAlias === 'discoverTimeout') {
+      if (path) void startPath(path);
       return;
     }
     if (errorAlias === 'joinTimeout') {
       clearError();
       setProgress(0);
-      setProvisionNonce((n) => n + 1); // 重启 Step 4
+      setProvisionNonce((n) => n + 1);
       return;
     }
     if (errorAlias === 'concurrent') {
@@ -306,7 +413,7 @@ export function BindWizard() {
     }
     if (errorAlias === 'tokenExpired') {
       clearError();
-      setMobileToken(''); // 重新生成链接
+      setMobileToken('');
     }
   };
 
@@ -323,11 +430,56 @@ export function BindWizard() {
     }
   };
 
-  const startPath = (next: BindPath) => {
+  const startPath = async (next: BindPath) => {
+    const gen = ++discoverGen.current;
     setPath(next);
     clearError();
+    setDevice(null);
+    setUseMobileWifiHelper(false);
     setStep(2);
+    const selected = selectBindTransportV1(next, {
+      allowMockWhenUnavailable: true,
+      scenarioFlags: flagsRef.current,
+    });
+    transportRef.current = selected.port;
+    setUsingMock(selected.usingMock);
+    const discovered = await selected.port.discover();
+    if (gen !== discoverGen.current) return;
+    if (!discovered.ok) {
+      reportCode(discovered.code);
+      return;
+    }
+    const paired = await selected.port.pair(discovered.device);
+    if (gen !== discoverGen.current) return;
+    if (!paired.ok) {
+      setDevice(discovered.device);
+      reportCode(paired.code);
+      return;
+    }
+    setDevice(paired.device);
+    setStep(3);
   };
+
+  const errorCopy = () => {
+    if (!error) return '';
+    if (errorAlias === 'wifiWrong') return t('device.wifiWrong');
+    if (errorAlias === 'joinTimeout') return t('device.joinTimeout');
+    if (errorAlias === 'concurrent') return t('device.concurrent');
+    if (errorAlias === 'tokenExpired') return t('device.linkExpired');
+    if (error === 'BIND_SN_MISMATCH' && snMismatch) {
+      return t('device.snMismatch', {
+        expectedSerialNumber: snMismatch.expectedSerialNumber,
+        actualSerialNumber: snMismatch.actualSerialNumber,
+      });
+    }
+    return t(bindErrorMessageKeyV1(error));
+  };
+
+  const step2Failed =
+    error === 'BIND_BT_DISCOVER_FAILED' ||
+    error === 'BIND_BT_PAIR_FAILED' ||
+    error === 'BIND_USB_NOT_FOUND' ||
+    error === 'BIND_USB_DENIED';
 
   /* ── 渲染 ───────────────────────────────────────────── */
 
@@ -339,7 +491,7 @@ export function BindWizard() {
     >
       <div className="ws-bind-page">
       <header>
-        <p className="ws-bind-kicker">MOCK IOT</p>
+        <p className="ws-bind-kicker">MOCK IOT · prototype</p>
         <h1 className="ws-bind-title">{t('device.wizardTitle')}</h1>
         <p className="ws-bind-lede">{t('device.wizardSubtitle')}</p>
       </header>
@@ -357,34 +509,25 @@ export function BindWizard() {
       )}
 
       <section className="ws-bind-panel">
-        {/* Step 1 · 搜索机器（主路径）+ 数据线脚注；手机/局域网视觉降权 */}
+        {/* Step 1 · 搜索机器（主路径）+ 同页数据线文字链接；LAN 已移除；手机不是路径卡 */}
         {step === 1 && (
           <div className="animate-fade-in">
-            <button type="button" className="ws-bind-primary" onClick={() => startPath('bluetooth')}>
+            <button type="button" className="ws-bind-primary" onClick={() => void startPath('bluetooth')}>
               {t('device.searchMachines')}
             </button>
-            <button type="button" className="ws-bind-footnote" onClick={() => startPath('usb')}>
+            <button type="button" className="ws-bind-footnote" onClick={() => void startPath('usb')}>
               {t('device.bindWithCable')}
             </button>
             <p className="ws-bind-hint">{t('device.searchHint')}</p>
-            <p className="ws-bind-alt">
-              <button type="button" className="ws-bind-alt-link" onClick={() => startPath('mobile')}>
-                {t('device.mobileWifiHelper')}
-              </button>
-              <span aria-hidden="true">·</span>
-              <button type="button" className="ws-bind-alt-link" onClick={() => startPath('lan')}>
-                {t('device.lanJobFallback')}
-              </button>
-            </p>
           </div>
         )}
 
         {/* Step 2 · 发现设备 */}
         {step === 2 && (
           <div className="ws-bind-center animate-fade-in">
-            {errorAlias === 'discoverTimeout' ? (
+            {step2Failed ? (
               <>
-                <p className="ws-bind-copy">{t('device.discoverFailed')}</p>
+                <p className="ws-bind-copy">{errorCopy()}</p>
                 <div className="ws-bind-actions">
                   <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
                   <button type="button" className="ws-bind-footnote" onClick={() => { clearError(); setStep(1); }}>
@@ -399,16 +542,17 @@ export function BindWizard() {
                   {t('device.searching', { path: path ? t(PATH_LABEL_KEY[path]) : '' })}
                 </p>
                 <p className="ws-bind-muted">{t('device.discoveryHint')}</p>
+                {usingMock && <p className="ws-bind-muted">{t('device.mockTransportHint')}</p>}
               </>
             )}
           </div>
         )}
 
-        {/* Step 3 · 输入 WiFi（桌面输入 / 手机辅助） */}
+        {/* Step 3 · 输入 WiFi（工作站键盘 / 可选手机代填，不是绑定路径） */}
         {step === 3 && device && (
           <div className="animate-fade-in">
-            <DeviceChip device={device} />
-            {path === 'mobile' && !useLocalWifi ? (
+            <DeviceChip device={device} usingMock={usingMock} />
+            {useMobileWifiHelper ? (
               errorAlias === 'tokenExpired' ? (
                 <div className="ws-bind-center">
                   <p className="ws-bind-copy">{t('device.linkExpired')}</p>
@@ -417,6 +561,7 @@ export function BindWizard() {
               ) : (
                 <div className="ws-bind-center">
                   <p className="ws-bind-copy">{t('device.openMobile')}</p>
+                  <p className="ws-bind-muted">{t('device.mobileWifiNotBindPath')}</p>
                   <div className="ws-bind-link-row">
                     <span className="min-w-0 flex-1 truncate text-left tnum">{mobileUrl}</span>
                     <button
@@ -435,7 +580,7 @@ export function BindWizard() {
                     <Loader2 size={12} className="animate-spin-slow" />
                     {t('device.waitingMobile')}
                   </p>
-                  <button type="button" className="ws-bind-footnote" onClick={() => setUseLocalWifi(true)}>
+                  <button type="button" className="ws-bind-footnote" onClick={() => setUseMobileWifiHelper(false)}>
                     {t('device.switchComputer')}
                   </button>
                 </div>
@@ -462,6 +607,14 @@ export function BindWizard() {
                 <button type="button" className="ws-bind-primary" onClick={() => startProvisioning(ssid, password)}>
                   {t('device.startProvision')}
                 </button>
+                <button
+                  type="button"
+                  className="ws-bind-footnote"
+                  onClick={() => setUseMobileWifiHelper(true)}
+                >
+                  {t('device.mobileWifiHelper')}
+                </button>
+                <p className="ws-bind-muted">{t('device.mobileWifiNotBindPath')}</p>
               </div>
             )}
             {errorAlias === 'concurrent' && (
@@ -483,6 +636,11 @@ export function BindWizard() {
                 <p className="ws-bind-copy">{t('device.joinTimeout')}</p>
                 <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
               </>
+            ) : error ? (
+              <>
+                <p className="ws-bind-copy">{errorCopy()}</p>
+                <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
+              </>
             ) : (
               <>
                 <div className="w-full">
@@ -497,15 +655,39 @@ export function BindWizard() {
           </div>
         )}
 
-        {/* Step 5 · 命名设备 */}
+        {/* Step 5 · 命名设备 / hop2 云注册 */}
         {step === 5 && device && (
           <div className="animate-fade-in">
-            <DeviceChip device={device} />
-            {errorAlias === 'alreadyBound' ? (
+            <DeviceChip device={device} usingMock={usingMock} />
+            {error === 'BIND_SN_ALREADY_BOUND' ? (
               <div className="ws-bind-field">
                 <p className="ws-bind-error">{t('device.alreadyBound')}</p>
                 <button type="button" className="ws-bind-footnote" onClick={() => setCancelOpen(true)}>
                   {t('device.cancelBind')}
+                </button>
+              </div>
+            ) : error === 'BIND_SN_MISMATCH' ? (
+              <div className="ws-bind-field">
+                <p className="ws-bind-error">{errorCopy()}</p>
+                <button type="button" className="ws-bind-footnote" onClick={() => setCancelOpen(true)}>
+                  {t('device.cancelBind')}
+                </button>
+              </div>
+            ) : hop1Done || error === 'CLOUD_REGISTER_FAILED' ? (
+              <div className="ws-bind-field">
+                <p className="ws-bind-copy">
+                  {error === 'CLOUD_REGISTER_FAILED' ? errorCopy() : t('device.hop2Registering')}
+                </p>
+                <button
+                  type="button"
+                  className="ws-bind-primary"
+                  disabled={hop2Busy}
+                  onClick={() => {
+                    clearError();
+                    void runHop2Only();
+                  }}
+                >
+                  {hop2Busy ? t('device.hop2Registering') : t('device.retryCloudRegister')}
                 </button>
               </div>
             ) : (
@@ -544,6 +726,10 @@ export function BindWizard() {
                 <dd className="tnum">{device.deviceCode}</dd>
               </div>
               <div>
+                <dt>{t('device.serialNumber')}</dt>
+                <dd className="tnum">{device.serialNumber}</dd>
+              </div>
+              <div>
                 <dt>{t('device.bindMethod')}</dt>
                 <dd>{t(PATH_LABEL_KEY[device.foundVia])}</dd>
               </div>
@@ -556,6 +742,8 @@ export function BindWizard() {
                 type="button"
                 className="ws-bind-footnote"
                 onClick={() => {
+                  hopRef.current = createTwoHopBindControllerV1();
+                  setHop1Done(false);
                   setStep(1);
                   setPath(null);
                   setDevice(null);
@@ -563,7 +751,8 @@ export function BindWizard() {
                   setPassword('');
                   setAlias('');
                   setMobileToken('');
-                  setUseLocalWifi(false);
+                  setUseMobileWifiHelper(false);
+                  setUsingMock(false);
                   clearError();
                   setProgress(0);
                 }}
@@ -578,7 +767,7 @@ export function BindWizard() {
       {step < 6 && (
         <div className="ws-bind-footer">
           <div>
-            {step > 1 && (
+            {step > 1 && !hop1Done && (
               <button type="button" className="ws-bind-text-btn" onClick={goBack}>
                 {t('device.backStep')}
               </button>
@@ -591,7 +780,6 @@ export function BindWizard() {
       )}
       </div>
 
-      {/* 取消二次确认 */}
       <Modal
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
@@ -613,17 +801,18 @@ export function BindWizard() {
   );
 }
 
-/** 已发现设备摘要条 */
-function DeviceChip({ device }: { device: DiscoveredDevice }) {
+function DeviceChip({ device, usingMock }: { device: DiscoveredDevice; usingMock: boolean }) {
   const { t } = useLocale();
   return (
     <div className="ws-bind-chip">
       <Wifi size={14} />
       <span>
         {t('device.discovered')} <span className="font-medium tnum">{device.deviceCode}</span>
+        {' · '}
+        {t('device.serialNumber')} <span className="font-medium tnum">{device.serialNumber}</span>
         （{DEVICE_TYPE_LABEL[device.type]}）
       </span>
-      <span className="ws-bind-mock ml-auto">MOCK IOT</span>
+      <span className="ws-bind-mock ml-auto">{usingMock ? 'MOCK IOT' : 'prototype'}</span>
     </div>
   );
 }

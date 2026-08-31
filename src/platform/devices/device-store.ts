@@ -22,6 +22,8 @@ interface DevicesState {
   removeDevice: (id: string) => void;
   /** 更新在线状态（重连成功等） */
   setStatus: (id: string, status: DeviceStatus) => void;
+  /** hop2 云注册成功后标记激活。不改变 HardwareRegistrationGate（仍判台数）。 */
+  setActivationState: (id: string, activationState: DeviceActivationStateV1) => void;
 }
 
 function persist(devices: Device[]): void {
@@ -55,6 +57,11 @@ export const useDevicesStore = create<DevicesState>((set, get) => ({
         ? { ...d, status, lastSeenAt: status === 'online' ? new Date().toISOString() : d.lastSeenAt }
         : d,
     );
+    persist(devices);
+    set({ devices });
+  },
+  setActivationState: (id, activationState) => {
+    const devices = get().devices.map((d) => (d.id === id ? { ...d, activationState } : d));
     persist(devices);
     set({ devices });
   },

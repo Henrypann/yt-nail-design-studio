@@ -45,8 +45,14 @@ export const WIZARD_BIND_ERROR_ALIASES_V1 = Object.freeze({
 
 export type WizardBindErrorAliasV1 = keyof typeof WIZARD_BIND_ERROR_ALIASES_V1;
 
-/** 向导当前可达的冻结码子集（旧 6 项私有 ErrorKind 的落点）。 */
-export type BindWizardErrorCodeV1 = (typeof WIZARD_BIND_ERROR_ALIASES_V1)[WizardBindErrorAliasV1];
+/** 向导当前可达的冻结码子集（旧 6 项私有 ErrorKind + PR2 传输 / 两跳码）。 */
+export type BindWizardErrorCodeV1 =
+  | (typeof WIZARD_BIND_ERROR_ALIASES_V1)[WizardBindErrorAliasV1]
+  | 'BIND_BT_PAIR_FAILED'
+  | 'BIND_USB_NOT_FOUND'
+  | 'BIND_USB_DENIED'
+  | 'BIND_SN_MISMATCH'
+  | 'CLOUD_REGISTER_FAILED';
 
 export function mapWizardBindErrorV1(alias: WizardBindErrorAliasV1): BindWizardErrorCodeV1 {
   return WIZARD_BIND_ERROR_ALIASES_V1[alias];

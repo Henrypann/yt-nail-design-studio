@@ -1,6 +1,6 @@
 import { BindWizard } from '@/platform/devices/BindWizard';
 
-/** `/devices/bind` 设备绑定向导：工作站外壳 restyle；传输仍为 MOCK。 */
+/** `/devices/bind` 工作站两跳绑定：主路径搜索机器，同页数据线回退。 */
 export default function DeviceBindPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col">
