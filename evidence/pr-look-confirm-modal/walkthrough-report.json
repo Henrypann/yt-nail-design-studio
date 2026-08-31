@@ -1,0 +1,22 @@
+{
+  "lookPath": "/look/look.v0-7-2.honey-petal-glass",
+  "checks": [
+    {
+      "name": "opaque-overlay-during-open",
+      "samples": 12
+    },
+    {
+      "name": "background-inert",
+      "ok": true
+    },
+    {
+      "name": "focus-trap",
+      "ok": true
+    },
+    {
+      "name": "focus-restore",
+      "ok": true
+    }
+  ],
+  "failure": null
+}

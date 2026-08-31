@@ -38,6 +38,8 @@
     "test:wizard-v0-7-2-legacy:e2e": "node tools/e2e-wizard-v0-7-2-legacy.mjs",
     "test:community-v7-1-use-customize": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-v7-1-use-customize.mjs",
     "test:community-look-confirm": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-look-confirm.mjs",
+    "test:design-system-modal": "node tools/test-design-system-modal-contract.mjs",
+    "test:community-look-confirm-modal:e2e": "node tools/walkthrough-community-look-confirm-modal.mjs",
     "test:studio-confirmed-design-versions": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-confirmed-design-versions.mjs",
     "test:studio-jobs-placeholder": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-studio-jobs-placeholder.mjs",
     "test:community-v7-1-use-customize:e2e": "node tools/e2e-community-v7-1-use-customize.mjs",
