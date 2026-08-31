@@ -135,7 +135,7 @@ export function Modal({
       data-testid="modal-root"
     >
       <div
-        className="absolute inset-0 bg-black/30"
+        className="absolute inset-0 bg-black/30 opacity-100"
         data-testid="modal-scrim"
         aria-hidden="true"
         onMouseDown={() => {
@@ -145,7 +145,7 @@ export function Modal({
       <div
         ref={dialogRef}
         className={cx(
-          'relative z-10 w-full rounded-panel bg-white shadow-modal animate-modal-in',
+          'relative z-10 w-full rounded-panel bg-white opacity-100 shadow-modal animate-modal-in',
           sizeClasses[size],
         )}
         role="dialog"

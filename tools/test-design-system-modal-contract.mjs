@@ -27,6 +27,14 @@ contains(modal, /e\.key !== 'Tab'/, 'Tab is trapped inside the dialog');
 contains(modal, /previousFocusRef/, 'closing restores the trigger focus');
 contains(modal, /if \(!open\) return null/, 'closed modal is unmounted');
 
+const tailwind = await readFile(new URL('../tailwind.config.js', import.meta.url), 'utf8');
+contains(tailwind, /'modal-in':/, 'modal-in animation remains registered');
+excludes(
+  tailwind,
+  /'modal-in':\s*\{[^}]*opacity:\s*'0'/,
+  'modal-in must not fade the dialog from opacity 0 over page content',
+);
+
 contains(lookPage, /testId=["']community-confirm-look-dialog["']/, 'Look confirm uses a stable dialog hook');
 contains(lookPage, /confirmCanonicalLookAsDesignVersionV1/, 'Look confirm still pins DesignVersion identity');
 excludes(lookPage, /Routes\.jobs|bindWithCable|HardwareRegistrationGate/, 'Look confirm must not open Job plane or bind/hardware');

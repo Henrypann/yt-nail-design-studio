@@ -4,9 +4,20 @@
  * the whole open animation; background is inert / not focusable.
  */
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
+
+function resolveChrome() {
+  return [
+    process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+    process.env.CHROME_PATH,
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+  ].find((candidate) => candidate && existsSync(candidate));
+}
 
 const baseURL = (process.env.BASE_URL ?? process.argv[2] ?? 'http://127.0.0.1:5173').replace(/\/+$/, '');
 const evidenceDir = process.env.EVIDENCE_DIR ?? process.argv[3] ?? 'evidence/pr-look-confirm-modal';
@@ -14,7 +25,12 @@ const shotsDir = path.join(evidenceDir, 'screenshots');
 await mkdir(shotsDir, { recursive: true });
 
 const lookPath = '/look/look.v0-7-2.honey-petal-glass';
-const browser = await chromium.launch({ headless: true });
+const chromePath = resolveChrome();
+const browser = await chromium.launch({
+  headless: true,
+  ...(chromePath ? { executablePath: chromePath } : {}),
+  args: ['--no-sandbox', '--disable-dev-shm-usage'],
+});
 const report = { lookPath, checks: [], failure: null };
 
 try {
@@ -37,13 +53,15 @@ try {
     const tick = () => {
       const root = document.querySelector('[data-testid="modal-root"]');
       const scrim = document.querySelector('[data-testid="modal-scrim"]');
-      if (root && scrim) {
+      const dialogEl = document.querySelector('[data-testid="community-confirm-look-dialog"]');
+      if (root && scrim && dialogEl) {
         const rootStyle = getComputedStyle(root);
         const scrimStyle = getComputedStyle(scrim);
         samples.push({
           t: Math.round(performance.now() - start),
           rootOpacity: rootStyle.opacity,
           scrimOpacity: scrimStyle.opacity,
+          dialogOpacity: getComputedStyle(dialogEl).opacity,
           rootZ: rootStyle.zIndex,
         });
       }
@@ -56,11 +74,13 @@ try {
   await trigger.click();
   const dialog = page.getByTestId('community-confirm-look-dialog');
   await dialog.waitFor();
+  await page.screenshot({ path: path.join(shotsDir, 'confirm-modal-open-first-frame-1280.png') });
   const samples = await animationSamples;
   assert.ok(samples.length > 0, 'open animation produced overlay samples');
   for (const sample of samples) {
     assert.equal(sample.rootOpacity, '1', `overlay root opacity must stay 1 at t=${sample.t}ms`);
     assert.equal(sample.scrimOpacity, '1', `scrim opacity must stay 1 at t=${sample.t}ms`);
+    assert.equal(sample.dialogOpacity, '1', `dialog opacity must stay 1 at t=${sample.t}ms`);
     assert.ok(Number.parseInt(sample.rootZ, 10) >= 50, `overlay z-index must sit above page content at t=${sample.t}ms`);
   }
 
@@ -108,6 +128,7 @@ try {
   });
   assert.equal(shiftInside, true, 'Shift+Tab must stay inside the dialog');
 
+  await page.waitForTimeout(220);
   await page.screenshot({ path: path.join(shotsDir, 'confirm-modal-open-1280.png') });
 
   await page.keyboard.press('Escape');
