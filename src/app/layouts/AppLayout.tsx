@@ -130,6 +130,7 @@ export function AppLayout() {
         { to: Routes.studio, label: 'Studio Home', end: true },
         { to: designNewFresh(), label: t('app.newDesign') },
         { to: Routes.designs, label: t('app.myDesigns'), end: true },
+        { to: Routes.designConfirmed, label: t('design.confirmedLooks'), end: true },
       ],
     },
     {

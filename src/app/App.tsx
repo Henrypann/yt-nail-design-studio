@@ -20,6 +20,7 @@ import CustomerNewPage from './pages/customers/CustomerNewPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
 import DesignListPage from './pages/design/DesignListPage';
 import VersionedImportPage from './pages/design/VersionedImportPage';
+import ConfirmedDesignVersionPage from './pages/design/ConfirmedDesignVersionPage';
 import CommunityPage from './pages/design/CommunityPage';
 import EditorPage from './pages/design/EditorPage';
 import CustomerPreviewPageV7 from './pages/design/CustomerPreviewPageV7';
@@ -138,6 +139,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route element={<StudioLayout />}>
       <Route path={Routes.studioHome} element={<StudioHomePage />} />
       <Route path={Routes.designs} element={<DesignListPage />} />
+      <Route path={Routes.designConfirmed} element={<ConfirmedDesignVersionPage />} />
       <Route path={Routes.designNew} element={<DesignNewRoute />} />
       <Route path={Routes.designImport} element={<VersionedImportPage />} />
       <Route path={Routes.designTemplates} element={<OfficialTemplatesRedirect />} />

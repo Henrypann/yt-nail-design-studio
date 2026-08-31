@@ -9,7 +9,9 @@ import type { CanonicalPublishedLookReadModelV1 } from '@/community/domain/v7_1/
 import {
   confirmLookAsDesignVersionV1,
   listConfirmedLookDesignVersionsV1,
+  matchConfirmedLookToReleaseV1,
   parseLookConfirmStoreV1,
+  type ConfirmedLookDesignVersionRefV1,
   type LookConfirmResultV1,
   type LookConfirmStorageV1,
 } from '@/community/domain/v7_1/look-confirm';
@@ -19,6 +21,10 @@ import {
   CANONICAL_USE_DEMO_RELEASE_RECORD_V1,
 } from './canonical-use-demo';
 import { getFourLookSetAuthorityByLookIdV0_7_2 } from './v0-7-2-four-look-sets';
+import {
+  createVersionedUseIntentForLookV1,
+  type CreateVersionedUseIntentResultV1,
+} from './versioned-use-runtime';
 
 export function createLookConfirmStorageV1(): LookConfirmStorageV1 {
   return {
@@ -79,4 +85,22 @@ export function confirmCanonicalLookAsDesignVersionV1(
 
 export function readConfirmedLookDesignVersionsV1() {
   return listConfirmedLookDesignVersionsV1(lookConfirmStorageV1);
+}
+
+/**
+ * Studio 打开已确认 DesignVersion：只创建既有版本化导入意图，不写 EditorDoc。
+ * 导入页消费意图后才会物化独立编辑文档。
+ */
+export function prepareConfirmedLookStudioOpenV1(
+  record: ConfirmedLookDesignVersionRefV1,
+  look: CanonicalPublishedLookReadModelV1,
+): CreateVersionedUseIntentResultV1 {
+  if (!look.evidence.immutableDesignVersion.present) {
+    return { ok: false, reason: 'legacy_missing_design_version' };
+  }
+  const designVersion = resolveReleasedDesignVersionForLookV1(look.sourceLook);
+  if (!designVersion) return { ok: false, reason: 'invalid_release' };
+  const matched = matchConfirmedLookToReleaseV1(record, look.sourceLook, designVersion);
+  if (!matched.ok) return { ok: false, reason: matched.reason };
+  return createVersionedUseIntentForLookV1(look.sourceLook);
 }

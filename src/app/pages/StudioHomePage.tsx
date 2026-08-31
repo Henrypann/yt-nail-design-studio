@@ -9,12 +9,15 @@ import { readAllDesigns } from '@/platform/designs';
 import { useDevicesStore } from '@/platform/devices/device-store';
 import { useRequireAuth } from '@/platform/session';
 import { CrossProductLink } from '@/app/CrossProductLink';
+import { readConfirmedLookDesignVersionsV1 } from '@/integration/community-studio/look-confirm-runtime';
 
 export default function StudioHomePage() {
   const session = useRequireAuth();
   const { t } = useLocale();
   const deviceCount = useDevicesStore((state) => state.devices.length);
   const designCount = readAllDesigns().length;
+  const confirmedLooks = readConfirmedLookDesignVersionsV1();
+  const confirmedCount = confirmedLooks.ok ? confirmedLooks.records.length : 0;
   if (!session) return null;
 
   return (
@@ -39,6 +42,13 @@ export default function StudioHomePage() {
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-hairline bg-surface px-5 text-sm font-medium text-ink hover:bg-surface-soft"
           >
             {t('design.title')} · {designCount}
+          </Link>
+          <Link
+            to={Routes.designConfirmed}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-button border border-hairline bg-surface px-5 text-sm font-medium text-ink hover:bg-surface-soft"
+            data-testid="studio-home-confirmed-looks"
+          >
+            {t('design.confirmedLooks')} · {confirmedCount}
           </Link>
         </div>
       </section>
