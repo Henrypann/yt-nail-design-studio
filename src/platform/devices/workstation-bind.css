@@ -1,0 +1,361 @@
+/**
+ * Workstation bind 局部视觉层（仅 /studio/devices/bind）。
+ * 不改 design-system/tokens.css，不给共享组件加 iOS variant。
+ */
+[data-surface='workstation-bind'] {
+  --ws-bind-bg: #f2f2f7;
+  --ws-bind-surface: #ffffff;
+  --ws-bind-grouped: #ffffff;
+  --ws-bind-primary: #007aff;
+  --ws-bind-primary-hover: #0066d6;
+  --ws-bind-primary-pressed: #0055b3;
+  --ws-bind-ink: #000000;
+  --ws-bind-secondary: #8e8e93;
+  --ws-bind-tertiary: #c7c7cc;
+  --ws-bind-separator: rgba(60, 60, 67, 0.12);
+  --ws-bind-fill: rgba(120, 120, 128, 0.12);
+  --ws-bind-radius: 10px;
+  --ws-bind-radius-button: 12px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--ws-bind-bg);
+  color: var(--ws-bind-ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+[data-surface='workstation-bind'] *,
+[data-surface='workstation-bind'] *::before,
+[data-surface='workstation-bind'] *::after {
+  box-sizing: border-box;
+}
+
+.ws-bind-page {
+  margin: 0 auto;
+  max-width: 430px;
+  padding: 28px 20px 48px;
+}
+
+.ws-bind-kicker {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-mock {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.15;
+  color: var(--ws-bind-ink);
+}
+
+.ws-bind-lede {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 20px 0 24px;
+}
+
+.ws-bind-progress-label {
+  font-size: 13px;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-progress-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ws-bind-fill);
+}
+
+.ws-bind-progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ws-bind-primary);
+  transition: width 200ms ease;
+}
+
+.ws-bind-panel {
+  margin-top: 24px;
+  padding: 20px 18px 18px;
+  background: var(--ws-bind-surface);
+  border-radius: var(--ws-bind-radius);
+}
+
+.ws-bind-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: var(--ws-bind-radius-button);
+  background: var(--ws-bind-primary);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ws-bind-primary:hover {
+  background: var(--ws-bind-primary-hover);
+}
+
+.ws-bind-primary:active {
+  background: var(--ws-bind-primary-pressed);
+}
+
+.ws-bind-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ws-bind-footnote {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ws-bind-primary);
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ws-bind-footnote:hover {
+  text-decoration: underline;
+}
+
+.ws-bind-alt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--ws-bind-separator);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-alt-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ws-bind-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ws-bind-alt-link:hover {
+  color: var(--ws-bind-ink);
+}
+
+.ws-bind-hint {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 8px;
+  text-align: center;
+}
+
+.ws-bind-center p {
+  margin: 0;
+}
+
+.ws-bind-heading {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ws-bind-ink);
+}
+
+.ws-bind-copy {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ws-bind-ink);
+}
+
+.ws-bind-muted {
+  font-size: 13px;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--ws-bind-bg);
+  font-size: 13px;
+  color: var(--ws-bind-ink);
+}
+
+.ws-bind-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ws-bind-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+.ws-bind-text-btn {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ws-bind-primary);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ws-bind-text-btn.is-muted {
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-text-btn:hover {
+  text-decoration: underline;
+}
+
+.ws-bind-field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ws-bind-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #ff3b30;
+}
+
+.ws-bind-warn {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #ff9500;
+}
+
+.ws-bind-success-icon {
+  color: #34c759;
+}
+
+.ws-bind-meter {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ws-bind-fill);
+}
+
+.ws-bind-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--ws-bind-primary);
+  transition: width 150ms ease-out;
+}
+
+.ws-bind-link-row {
+  display: flex;
+  width: 100%;
+  max-width: 360px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--ws-bind-bg);
+  font-size: 12px;
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.ws-bind-dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ws-bind-dl dt {
+  color: var(--ws-bind-secondary);
+}
+
+.ws-bind-dl dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ws-bind-ink);
+}
+
+/* 工作站页内的共享 Input / Spinner 只做颜色覆盖，不改组件 API */
+[data-surface='workstation-bind'] label {
+  color: var(--ws-bind-secondary);
+}
+
+[data-surface='workstation-bind'] input {
+  height: 44px;
+  border-color: var(--ws-bind-separator);
+  border-radius: 10px;
+  background: var(--ws-bind-bg);
+  color: var(--ws-bind-ink);
+}
+
+[data-surface='workstation-bind'] input:focus {
+  border-color: var(--ws-bind-primary);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.18);
+}
+
+[data-surface='workstation-bind'] a {
+  color: var(--ws-bind-primary);
+}

@@ -51,6 +51,16 @@ function taxonomyLocale(locale: Locale): 'zh-CN' | 'en' {
   return locale === 'en-US' ? 'en' : 'zh-CN';
 }
 
+/** 甲油色盘只用于标签 pill，不做大面积铺色。 */
+function polishTagClass(id: string): string {
+  if (id.startsWith('style:')) return 'bg-lilac-soft text-lilac';
+  if (id.startsWith('shape:')) return 'bg-coral-soft text-coral';
+  if (id.startsWith('scene:')) return 'bg-aqua-soft text-aqua';
+  if (id.startsWith('theme:')) return 'bg-butter-soft text-ink';
+  if (id.startsWith('technique:')) return 'bg-mint-soft text-mint';
+  return 'bg-primary-soft text-primary';
+}
+
 /**
  * Card tag pills: de-duplicated V2 ids from the pure helper, current browse
  * dimension first, maximum CARD_TAG_PILL_MAX, collision-free testids keyed by
@@ -79,7 +89,7 @@ export function DiscoveryCardTags({
           key={id}
           data-testid={`community-discovery-tag-${id}`}
           data-tag-id={id}
-          className="rounded-full bg-gray-100 px-2 py-0.5 text-nano text-gray-600"
+          className={`rounded-full px-2 py-0.5 text-nano ${polishTagClass(id)}`}
         >
           {resolveV2TagLabel(taxonomy, id, labelLocale)}
         </span>

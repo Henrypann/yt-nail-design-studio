@@ -26,7 +26,7 @@ export function CommunityHomeMerchandising() {
   if (state.kind === 'loading') {
     return (
       <section
-        className="rounded-card border border-gray-200 bg-white p-4"
+        className="rounded-card border border-hairline bg-surface p-5"
         data-testid="community-home-merchandising-loading"
       >
         <p className="text-xs text-gray-500">{t('app.loadingHomeCuration')}</p>
@@ -37,7 +37,7 @@ export function CommunityHomeMerchandising() {
   if (!state.result.ok) {
     return (
       <section
-        className="rounded-card border border-amber-200 bg-amber-50/70 p-4"
+        className="rounded-card border border-warning/30 bg-warning-soft p-5"
         data-testid="community-home-merchandising-unavailable"
         data-issue-codes={state.result.issues.map((issue) => issue.code).join(',')}
       >
@@ -56,35 +56,35 @@ export function CommunityHomeMerchandising() {
     const reviewing = projection.state === 'IN_REVIEW';
     return (
       <section
-        className="rounded-card border border-fuchsia-100 bg-gradient-to-br from-white to-fuchsia-50/40 p-4"
+        className="rounded-card border border-hairline bg-surface p-5"
         data-testid={reviewing
           ? 'community-home-merchandising-in-review'
           : 'community-home-merchandising-awaiting-input'}
         data-merchandising-status={projection.state}
       >
         <div className="flex items-start gap-3">
-          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-100 text-fuchsia-700">
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
             <Sparkles size={17} aria-hidden />
           </span>
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-gray-900">
+            <h2 className="text-h3 font-semibold text-ink">
               {reviewing
                 ? t('app.editorialCurationReview')
                 : t('app.editorialCurationBeingPrepared')}
             </h2>
-            <p className="mt-1 text-xs leading-relaxed text-gray-600">
+            <p className="mt-1 text-sm leading-relaxed text-body">
               {t('app.bannerFeaturedLooksCollectionsEditorialReasonsNotYetOwnerApprovedNoTrendingPersonalizedResultFabricatedUseFiveBrowseEntriesBelowExploreAllPublicContent')}
             </p>
           </div>
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <div className="rounded-panel border border-gray-200 bg-white/80 px-3 py-2">
-            <p className="text-xs font-medium text-gray-800">{t('app.communityEditorial')}</p>
-            <p className="mt-0.5 text-nano text-gray-500">{t('app.humanCuratedAwaitingOperatorInput')}</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <div className="rounded-panel border border-hairline bg-canvas px-3 py-2">
+            <p className="text-caption font-medium text-ink">{t('app.communityEditorial')}</p>
+            <p className="mt-0.5 text-nano text-mute">{t('app.humanCuratedAwaitingOperatorInput')}</p>
           </div>
-          <div className="rounded-panel border border-gray-200 bg-white/80 px-3 py-2">
-            <p className="text-xs font-medium text-gray-800">{t('app.studioOfficialStarters')}</p>
-            <p className="mt-0.5 text-nano text-gray-500">{t('app.separateProductSurfaceNeverCopiedHere')}</p>
+          <div className="rounded-panel border border-hairline bg-canvas px-3 py-2">
+            <p className="text-caption font-medium text-ink">{t('app.studioOfficialStarters')}</p>
+            <p className="mt-0.5 text-nano text-mute">{t('app.separateProductSurfaceNeverCopiedHere')}</p>
           </div>
         </div>
       </section>
@@ -98,12 +98,12 @@ export function CommunityHomeMerchandising() {
       {projection.config.banner ? (
         <Link
           to={projection.config.banner.href}
-          className="group relative block min-h-44 overflow-hidden rounded-card border border-gray-200 bg-gray-900"
+          className="group relative block min-h-44 overflow-hidden rounded-card border border-hairline bg-workspace"
           data-testid="community-home-merchandising-banner"
         >
           {bannerFailed ? (
             <div
-              className="absolute inset-0 flex items-center justify-center bg-gray-800 text-white/70"
+              className="absolute inset-0 flex items-center justify-center bg-workspace text-mute"
               data-testid="community-home-merchandising-banner-fallback"
             >
               <ImageOff size={24} aria-hidden />
@@ -117,7 +117,7 @@ export function CommunityHomeMerchandising() {
               onError={() => setBannerFailed(true)}
             />
           )}
-          <div className="relative flex min-h-44 flex-col justify-end bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
+          <div className="relative flex min-h-44 flex-col justify-end bg-ink/45 p-5 text-white">
             <h2 className="text-xl font-semibold">{zh ? projection.config.banner.title.zhCN : projection.config.banner.title.en}</h2>
             <p className="mt-1 max-w-xl text-sm text-white/85">{zh ? projection.config.banner.subtitle.zhCN : projection.config.banner.subtitle.en}</p>
           </div>
@@ -131,13 +131,13 @@ export function CommunityHomeMerchandising() {
 
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <Sparkles size={15} className="text-fuchsia-600" aria-hidden />
-          <h2 className="text-sm font-semibold text-gray-900">{t('app.editorialPicks')}</h2>
-          <span className="text-nano text-gray-500">{t('app.humanCuratedNotTrending')}</span>
+          <Sparkles size={15} className="text-primary" aria-hidden />
+          <h2 className="text-h3 font-semibold text-ink">{t('app.editorialPicks')}</h2>
+          <span className="text-nano text-mute">{t('app.humanCuratedNotTrending')}</span>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {projection.editorialSelections.map(({ look, capability, reason }) => (
-            <article key={look.lookId} className="overflow-hidden rounded-card border border-gray-200 bg-white">
+            <article key={look.lookId} className="overflow-hidden rounded-card border border-hairline bg-surface transition duration-base hover:-translate-y-0.5 hover:shadow-float">
               <img src={look.cover.url} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
               <div className="p-3">
                 <p className="text-sm font-medium text-gray-900">{look.title}</p>
@@ -156,7 +156,7 @@ export function CommunityHomeMerchandising() {
       {projection.collections.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2" data-testid="community-home-merchandising-collections">
           {projection.collections.map(({ collection, looks }) => (
-            <section key={collection.collectionId} className="rounded-card border border-gray-200 bg-white p-4">
+            <section key={collection.collectionId} className="rounded-card border border-hairline bg-surface p-4">
               <div className="flex items-center gap-2">
                 <LibraryBig size={15} className="text-gray-500" aria-hidden />
                 <h3 className="text-sm font-semibold text-gray-900">{zh ? collection.title.zhCN : collection.title.en}</h3>

@@ -89,7 +89,7 @@ export function CommunityLookCard({
     <article
       data-testid="community-look-card"
       data-look-id={look.lookId}
-      className="flex flex-col overflow-hidden rounded-card border border-gray-200 bg-white transition hover:border-primary/40 hover:shadow-sm"
+      className="flex flex-col overflow-hidden rounded-card border border-hairline bg-surface transition duration-base hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-float"
     >
       <Link
         to={detailHref}

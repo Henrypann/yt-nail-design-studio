@@ -505,7 +505,7 @@ export default function WizardPage() {
         {s.status === 'confirmed' && <Badge variant="gray">{t('wizard.legacyReadonly')}</Badge>}
         {s.communitySourceRef && (
           <div
-            className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] text-amber-800"
+            className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-nano text-amber-800"
             data-testid="wizard-legacy-source"
             title={t('wizard.conflictSource')}
           >
@@ -518,7 +518,7 @@ export default function WizardPage() {
         )}
         {s.communitySourceRef && legacyFrenchPreflight?.status === 'FRENCH_DECLARED' && (
           <div
-            className="max-w-full rounded-panel border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-[11px] leading-4 text-fuchsia-900"
+            className="max-w-full rounded-panel border border-fuchsia-200 bg-fuchsia-50 px-2 py-1 text-nano leading-4 text-fuchsia-900"
             data-testid="wizard-french-technique-hint"
           >
             {t('wizard.legacyFrench')}
@@ -526,7 +526,7 @@ export default function WizardPage() {
         )}
         {s.communitySourceRef && legacyFrenchPreflight?.status === 'DISCOVERY_UNAVAILABLE' && (
           <div
-            className="max-w-full rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] leading-4 text-amber-800"
+            className="max-w-full rounded-panel border border-amber-200 bg-amber-50 px-2 py-1 text-nano leading-4 text-amber-800"
             data-testid="wizard-french-technique-unavailable"
           >
             {t('wizard.legacyFrenchUnavailable')}

@@ -68,7 +68,7 @@ assert.match(hardwareGate, /devices\.length > 0/);
 assert.match(hardwareGate, /Navigate to=\{Routes\.studio\} replace/);
 
 const communityLayout = fs.readFileSync('src/app/layouts/CommunityLayout.tsx', 'utf8');
-assert.match(communityLayout, /Nail Lover Community/);
+assert.match(communityLayout, /app\.nailLoverCommunity/);
 assert.match(communityLayout, /href=\{studioHref\}/);
 assert.match(communityLayout, /CrossProductLink/);
 assert.doesNotMatch(communityLayout, /navigate\(studioReturn/);
@@ -80,7 +80,7 @@ assert.match(crossProductLink, /event\.currentTarget\.href = result\.href/);
 
 const communityLook = fs.readFileSync('src/community/pages/CommunityLookPage.tsx', 'utf8');
 assert.match(communityLook, /canUseLocalStudioHandoff\(window\.location\.origin\)/);
-assert.match(communityLook, /跨域导入通道尚未配置/);
+assert.match(communityLook, /community\.crossOriginImportUnavailable/);
 assert.doesNotMatch(communityLook, /window\.location\.assign/);
 
 for (const path of [

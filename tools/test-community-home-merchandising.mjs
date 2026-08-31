@@ -135,9 +135,9 @@ try {
 const page = fs.readFileSync(path.join(root, 'src/community/pages/CommunityDiscoverPage.tsx'), 'utf8');
 const component = fs.readFileSync(path.join(root, 'src/community/components/CommunityHomeMerchandising.tsx'), 'utf8');
 assert.match(page, /CommunityHomeMerchandising/);
-assert.match(component, /Community 编辑精选/);
-assert.match(component, /Studio 官方起稿/);
-assert.match(component, /不是热门榜/);
+assert.match(component, /app\.communityEditorial/);
+assert.match(component, /app\.studioOfficialStarters/);
+assert.match(component, /app\.humanCuratedNotTrending/);
 assert.match(component, /community-home-merchandising-unavailable/);
 assert.match(component, /community-home-merchandising-banner-fallback/);
 assert.doesNotMatch(component, /editorV7Store|wizardStore|QuickStart|OfficialStarterShelf/);

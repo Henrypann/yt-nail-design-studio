@@ -88,12 +88,14 @@ export function CommunityFeed({
   subtitle,
   lockedSource,
   showOfficialProgress,
+  titleAppearance = 'page',
 }: {
   mode?: ExploreMode;
   title: string;
   subtitle: string;
   lockedSource?: SourceFilter;
   showOfficialProgress?: boolean;
+  titleAppearance?: 'hero' | 'page';
 }) {
   const { t } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -311,8 +313,8 @@ export function CommunityFeed({
   return (
     <div className="flex flex-col gap-4" data-testid="community-feed">
       <header>
-        <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
-        <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>
+        <h1 className={cx(titleAppearance === 'hero' ? 'text-hero font-semibold tracking-tight text-ink' : 'text-h1 font-semibold text-ink')}>{title}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-body">{subtitle}</p>
         {showOfficialProgress && progress && (
           <p className="mt-1 text-nano text-gray-400" data-testid="official-pgc-progress">
             {t('community.pgcMetadataReady', { ready: progress.ready, target: progress.target, gap: progress.gap })}
