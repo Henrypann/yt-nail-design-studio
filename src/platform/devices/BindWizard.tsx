@@ -1,11 +1,12 @@
 /**
  * 设备配网向导（模块 2 · prototype）—— 工作站两跳绑定：
- * Step1 搜索机器（WebBluetooth）/ 同页数据线（WebUSB）→ Step2 发现+配对
+ * Step1 搜索机器（蓝牙主按钮）/ 同页数据线（USB 次按钮）→ Step2 发现+配对
  * → Step3 输入 WiFi（密码不持久化；手机代填不是绑定路径）
  * → Step4 配网中 → Step5 命名 + hop1 本地绑定 → hop2 云注册 → Step6 完成。
  *
  * CLOUD_REGISTER_FAILED 只重试 hop2。LAN 不是绑定路径。
- * 真实 BT/USB 不可用时走同路径 mock 注入，不静默改走另一条路径。
+ * 冻结期：本页强制注入同路径 mock，即使浏览器具备 WebBluetooth / WebUSB
+ * 也不创建真实适配器、不调用 requestDevice / connect / open。
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -50,7 +51,8 @@ import {
   issueMobileToken,
   readMobileToken,
 } from './mobile-tokens';
-import { selectBindTransportV1, type BindTransportPortV1 } from './transport';
+import type { BindTransportPortV1 } from './transport/bind-transport-port';
+import { createMockBindTransport } from './transport/mock-bind-transport';
 import { createTwoHopBindControllerV1 } from './two-hop-bind';
 import type { BindPath, BindStep, DiscoveredDevice } from './types';
 
@@ -96,7 +98,7 @@ export function BindWizard() {
   const [error, setError] = useState<ErrorKind | null>(null);
   const [errorAlias, setErrorAlias] = useState<WizardBindErrorAliasV1 | null>(null);
   const [snMismatch, setSnMismatch] = useState<BindSnMismatchDisplayV1 | null>(null);
-  const [usingMock, setUsingMock] = useState(false);
+  const [usingMock, setUsingMock] = useState(true);
   const [hop2Busy, setHop2Busy] = useState(false);
 
   const reportError = (alias: WizardBindErrorAliasV1) => {
@@ -119,8 +121,20 @@ export function BindWizard() {
 
   const flagsRef = useRef(flags);
   flagsRef.current = flags;
-  const transportRef = useRef<BindTransportPortV1 | null>(null);
+  const transportRef = useRef<BindTransportPortV1 | null>(
+    restored?.path ? createMockBindTransport({ kind: restored.path, scenarioFlags: flags }) : null,
+  );
   const discoverGen = useRef(0);
+
+  const injectMockTransport = (kind: BindPath) => {
+    const port = createMockBindTransport({
+      kind,
+      scenarioFlags: flagsRef.current,
+    });
+    transportRef.current = port;
+    setUsingMock(true);
+    return port;
+  };
 
   /* 刷新恢复提示（5 分钟 TTL 内） */
   useEffect(() => {
@@ -437,19 +451,14 @@ export function BindWizard() {
     setDevice(null);
     setUseMobileWifiHelper(false);
     setStep(2);
-    const selected = selectBindTransportV1(next, {
-      allowMockWhenUnavailable: true,
-      scenarioFlags: flagsRef.current,
-    });
-    transportRef.current = selected.port;
-    setUsingMock(selected.usingMock);
-    const discovered = await selected.port.discover();
+    const port = injectMockTransport(next);
+    const discovered = await port.discover();
     if (gen !== discoverGen.current) return;
     if (!discovered.ok) {
       reportCode(discovered.code);
       return;
     }
-    const paired = await selected.port.pair(discovered.device);
+    const paired = await port.pair(discovered.device);
     if (gen !== discoverGen.current) return;
     if (!paired.ok) {
       setDevice(discovered.device);
@@ -752,7 +761,8 @@ export function BindWizard() {
                   setAlias('');
                   setMobileToken('');
                   setUseMobileWifiHelper(false);
-                  setUsingMock(false);
+                  setUsingMock(true);
+                  transportRef.current = null;
                   clearError();
                   setProgress(0);
                 }}
