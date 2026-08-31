@@ -1,7 +1,7 @@
 /**
- * 手机辅助配网页（模块 2 · MOCK IOT）—— `/devices/bind/mobile/:token`
- * 独立于侧栏布局的移动端友好 Mock 页（PRD §1.4 / §4.2）。
- * 两态异常：Token 过期 / Token 重复使用（TTL 自然过期或 Mock 注入面板强制）。
+ * 手机 Wi-Fi 凭据代填页（模块 2 · MOCK IOT）—— `/devices/bind/mobile/:token`
+ * 不是绑定路径：不发现设备、不校验 SN、不 cloud-register、不下发 Job。
+ * 能力上限是提交一次 WiFi 凭据。
  */
 
 import { useState } from 'react';
@@ -58,6 +58,7 @@ export function MobileBind({ token }: { token: string }) {
           {t('auth.studioTitle')}
         </span>
         <span className="text-xs text-gray-500">{t('device.mobileBindTitle')}</span>
+        <p className="text-xs text-gray-500">{t('device.mobileWifiNotBindPath')}</p>
         <Badge variant="warning" className="text-[10px]">MOCK IOT</Badge>
       </header>
 

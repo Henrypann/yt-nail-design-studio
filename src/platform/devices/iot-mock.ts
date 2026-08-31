@@ -37,6 +37,11 @@ export const IOT_SCENARIOS = {
   reconnectFail: 'device.reconnectFail',
   unbindFail: 'device.unbindFail',
   concurrentBind: 'device.concurrentBind',
+  cloudRegisterFailed: 'device.cloudRegisterFailed',
+  snMismatch: 'device.snMismatch',
+  btPairFailed: 'device.btPairFailed',
+  usbNotFound: 'device.usbNotFound',
+  usbDenied: 'device.usbDenied',
 } as const;
 
 export const DEVICE_TYPE_LABEL: Record<DeviceType, string> = {
@@ -47,9 +52,7 @@ export const DEVICE_TYPE_LABEL: Record<DeviceType, string> = {
 
 export const BIND_PATH_LABEL: Record<BindPath, string> = {
   bluetooth: '蓝牙配网',
-  mobile: '手机辅助配网',
   usb: 'USB 数据线配网',
-  lan: '局域网发现',
 };
 
 const DEVICE_TYPES: readonly DeviceType[] = ['scanner', 'printer_3d', 'uv_printer'];
@@ -61,10 +64,17 @@ function randomHex(len: number): string {
   return out;
 }
 
-/** Mock 发现一台设备（后端就绪后替换为真实发现结果，UI 零改动） */
+/** Mock 发现一台设备（真实传输不可用时的同路径 demo 通道） */
 export function mockDiscoverDevice(path: BindPath): DiscoveredDevice {
   const type = DEVICE_TYPES[Math.floor(Math.random() * DEVICE_TYPES.length)];
-  return { deviceCode: `NS-${randomHex(6)}`, type, foundVia: path };
+  const codeSuffix = randomHex(6);
+  const serialSuffix = randomHex(8);
+  return {
+    deviceCode: `NS-${codeSuffix}`,
+    serialNumber: `SN-${serialSuffix}`,
+    type,
+    foundVia: path,
+  };
 }
 
 /** Mock 手机辅助 Token */

@@ -44,6 +44,11 @@ export const MOCK_SCENARIOS: readonly MockScenarioDef[] = [
   { key: 'device.reconnectFail', label: '设备重连失败', description: '设备无响应。请检查设备电源和网络', group: '设备' },
   { key: 'device.unbindFail', label: '设备解绑失败', description: '解绑失败：请重试', group: '设备' },
   { key: 'device.concurrentBind', label: '并发绑定同一设备', description: '设备正在被其他操作绑定中', group: '设备' },
+  { key: 'device.cloudRegisterFailed', label: '云端注册失败', description: '只重试 hop2，不重跑本地绑定', group: '设备' },
+  { key: 'device.snMismatch', label: '序列号不一致', description: '双显期望 SN 与实际 SN', group: '设备' },
+  { key: 'device.btPairFailed', label: '蓝牙配对失败', description: 'BIND_BT_PAIR_FAILED', group: '设备' },
+  { key: 'device.usbNotFound', label: '未找到 USB 设备', description: 'BIND_USB_NOT_FOUND', group: '设备' },
+  { key: 'device.usbDenied', label: 'USB 权限被拒绝', description: 'BIND_USB_DENIED', group: '设备' },
   // 会话
   { key: 'session.expired', label: 'Token 过期强制登出', description: '→ 跳转 /login', group: '会话' },
   // 登录/注册（模块 1 · 基础平台）

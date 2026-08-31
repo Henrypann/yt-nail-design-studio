@@ -9,6 +9,7 @@
 import { readData, readEnvelope, removeKey, writeEnvelope, StorageKeys, TAB_ID } from '@/lib/storage';
 import { IOT_TIMINGS } from './iot-mock';
 import type { BindLock, BindSession } from './types';
+import { isBindPath } from './types';
 
 /* ── 会话 ─────────────────────────────────────────────── */
 
@@ -16,11 +17,25 @@ export function saveBindSession(session: Omit<BindSession, 'updatedAt'>): void {
   writeEnvelope<BindSession>(StorageKeys.deviceBindSession, { ...session, updatedAt: Date.now() });
 }
 
-/** 读取有效会话；不存在或超过 5 分钟 TTL 返回 null（超时回到步骤 1） */
+function isUsableBindSession(session: BindSession): boolean {
+  if (session.path !== null && !isBindPath(session.path)) return false;
+  if (session.device) {
+    if (!isBindPath(session.device.foundVia)) return false;
+    if (typeof session.device.serialNumber !== 'string') return false;
+    if (typeof session.device.deviceCode !== 'string' || session.device.deviceCode.length === 0) return false;
+  }
+  return true;
+}
+
+/** 读取有效会话；不存在、超过 5 分钟 TTL、或含已移除的 lan/mobile 路径时返回 null */
 export function loadBindSession(): BindSession | null {
   const env = readEnvelope<BindSession>(StorageKeys.deviceBindSession);
   if (!env) return null;
   if (Date.now() - env.updatedAt > IOT_TIMINGS.bindSessionTtlMs) {
+    removeKey(StorageKeys.deviceBindSession);
+    return null;
+  }
+  if (!isUsableBindSession(env.data)) {
     removeKey(StorageKeys.deviceBindSession);
     return null;
   }
