@@ -131,6 +131,7 @@ export function AppLayout() {
         { to: designNewFresh(), label: t('app.newDesign') },
         { to: Routes.designs, label: t('app.myDesigns'), end: true },
         { to: Routes.designConfirmed, label: t('design.confirmedLooks'), end: true },
+        { to: Routes.jobs, label: t('jobs.placeholderTitle'), end: true },
       ],
     },
     {
