@@ -49,7 +49,7 @@ export function CommunityLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas" data-debug-id="community.layout">
-      <header className="sticky top-0 z-40 border-b border-gray-200/80 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-hairline bg-surface">
         <div className="mx-auto flex h-14 max-w-[1200px] items-center gap-3 px-4 sm:px-6">
           <button
             type="button"
@@ -171,7 +171,7 @@ export function CommunityLayout() {
           </nav>
         )}
       </header>
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6">
+      <main className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-8">
         <Outlet />
       </main>
       <footer className="border-t border-gray-200/70 py-3 text-center text-nano text-gray-400">

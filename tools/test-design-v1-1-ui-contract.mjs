@@ -34,4 +34,34 @@ assert.match(shell, /max-width: 1099px/);
 assert.match(shell, /max-width: 799px/);
 assert.doesNotMatch(shell, /w-\[380px\]/);
 
+const home = fs.readFileSync('src/app/pages/StudioHomePage.tsx', 'utf8');
+assert.doesNotMatch(home, /bg-gradient-to-br/);
+assert.doesNotMatch(home, /from-gray-950/);
+assert.doesNotMatch(home, /fuchsia/);
+
+assert.doesNotMatch(tokens.toLowerCase(), /#f2f2f7/, 'iOS grouped gray must not retarget global tokens');
+assert.doesNotMatch(tokens.toLowerCase(), /#007aff/, 'iOS primary must not retarget global tokens');
+
+const bind = fs.readFileSync('src/platform/devices/BindWizard.tsx', 'utf8');
+const bindCss = fs.readFileSync('src/platform/devices/workstation-bind.css', 'utf8');
+const bindPage = fs.readFileSync('src/app/pages/devices/DeviceBindPage.tsx', 'utf8');
+assert.match(bind, /data-surface=["']workstation-bind["']/);
+assert.match(bind, /device\.searchMachines/);
+assert.match(bind, /device\.bindWithCable/);
+assert.match(bind, /ws-bind-footnote/);
+assert.doesNotMatch(bind, /PATH_CARDS/);
+assert.doesNotMatch(bind, /grid-cols-2 gap-3/);
+assert.match(bindCss, /--ws-bind-primary/);
+assert.match(bindCss, /#007aff/i);
+assert.match(bindCss, /#f2f2f7/i);
+assert.match(bindCss, /\[data-surface=['"]workstation-bind['"]\]/);
+assert.match(bindPage, /BindWizard/);
+assert.doesNotMatch(bindPage, /Routes\.deviceBindMobile|WebBluetooth|WebUSB/);
+
+const button = fs.readFileSync('src/design-system/components/Button.tsx', 'utf8');
+assert.doesNotMatch(button, /007AFF|workstation|ios/i);
+
+const communityLayout = fs.readFileSync('src/app/layouts/CommunityLayout.tsx', 'utf8');
+assert.doesNotMatch(communityLayout, /backdrop-blur/);
+
 console.log('[design-v1.1] semantic tokens, typography, NailGrid and editor breakpoints: PASS');

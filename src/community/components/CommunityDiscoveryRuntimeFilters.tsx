@@ -287,7 +287,7 @@ export function CommunityDiscoveryRuntimeFilters({
             <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
             {t('app.filters')}
             {activeAuxCount > 0 && (
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-soft px-1 text-[10px] font-medium text-primary">
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-soft px-1 text-nano font-medium text-primary">
                 {activeAuxCount}
               </span>
             )}

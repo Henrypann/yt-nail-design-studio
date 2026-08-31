@@ -11,17 +11,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Bluetooth,
-  Check,
   CheckCircle2,
   Copy,
   Loader2,
-  Radar,
-  Smartphone,
-  Usb,
   Wifi,
 } from 'lucide-react';
-import { Badge, Button, Card, Input, Modal, Spinner, cx, useToast } from '@/design-system';
+import { Button, Input, Modal, Spinner, useToast } from '@/design-system';
+import './workstation-bind.css';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
@@ -41,7 +37,6 @@ import {
 } from './bind-session';
 import { createBoundDevice, useDevicesStore } from './device-store';
 import {
-  BIND_PATH_LABEL,
   DEVICE_TYPE_LABEL,
   IOT_SCENARIOS,
   IOT_TIMINGS,
@@ -61,12 +56,12 @@ type ErrorKind = BindWizardErrorCodeV1;
 
 const STEP_LABEL_KEYS = ['device.choosePath', 'device.discovered', 'device.wifiPassword', 'device.provisioning', 'device.deviceAlias', 'device.bindSuccess'] as const;
 
-const PATH_CARDS: { path: BindPath; icon: typeof Bluetooth; titleKey: 'device.bluetoothPath' | 'device.mobilePath' | 'device.usbPath' | 'device.lanPath'; descKey: 'device.bluetoothPathHint' | 'device.mobilePathHint' | 'device.usbPathHint' | 'device.lanPathHint' }[] = [
-  { path: 'bluetooth', icon: Bluetooth, titleKey: 'device.bluetoothPath', descKey: 'device.bluetoothPathHint' },
-  { path: 'mobile', icon: Smartphone, titleKey: 'device.mobilePath', descKey: 'device.mobilePathHint' },
-  { path: 'usb', icon: Usb, titleKey: 'device.usbPath', descKey: 'device.usbPathHint' },
-  { path: 'lan', icon: Radar, titleKey: 'device.lanPath', descKey: 'device.lanPathHint' },
-];
+const PATH_LABEL_KEY: Record<BindPath, 'device.bluetoothPath' | 'device.mobilePath' | 'device.usbPath' | 'device.lanPath'> = {
+  bluetooth: 'device.bluetoothPath',
+  mobile: 'device.mobilePath',
+  usb: 'device.usbPath',
+  lan: 'device.lanPath',
+};
 
 export function BindWizard() {
   const navigate = useNavigate();
@@ -328,107 +323,82 @@ export function BindWizard() {
     }
   };
 
+  const startPath = (next: BindPath) => {
+    setPath(next);
+    clearError();
+    setStep(2);
+  };
+
   /* ── 渲染 ───────────────────────────────────────────── */
 
   return (
-    <div className="flex flex-col gap-4" data-debug-id="app.devices.bind-wizard">
-      <header className="flex items-center gap-2">
-        <div>
-          <h1 className="text-lg font-semibold text-gray-900">{t('device.wizardTitle')}</h1>
-          <p className="mt-0.5 text-xs text-gray-500">
-            {t('device.wizardSubtitle')}
-          </p>
-        </div>
-        <Badge variant="warning" className="ml-1">MOCK IOT</Badge>
+    <div
+      className="ws-bind-root min-h-full flex-1"
+      data-surface="workstation-bind"
+      data-debug-id="app.devices.bind-wizard"
+    >
+      <div className="ws-bind-page">
+      <header>
+        <p className="ws-bind-kicker">MOCK IOT</p>
+        <h1 className="ws-bind-title">{t('device.wizardTitle')}</h1>
+        <p className="ws-bind-lede">{t('device.wizardSubtitle')}</p>
       </header>
 
-      {/* 步骤条 */}
-      <ol className="flex items-center gap-1">
-        {STEP_LABEL_KEYS.map((key, i) => { const label = t(key);
-          const n = (i + 1) as BindStep;
-          const done = n < step;
-          const current = n === step;
-          return (
-            <li key={label} className="flex min-w-0 flex-1 items-center gap-1">
-              <span
-                className={cx(
-                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold',
-                  'transition-colors duration-fast',
-                  done && 'bg-primary text-primary-foreground',
-                  current && 'border-2 border-primary bg-primary-soft text-primary',
-                  !done && !current && 'bg-gray-100 text-gray-400',
-                )}
-              >
-                {done ? <Check size={12} /> : n}
-              </span>
-              <span
-                className={cx(
-                  'truncate text-xs',
-                  current ? 'font-medium text-gray-900' : 'text-gray-400',
-                )}
-              >
-                {label}
-              </span>
-              {i < STEP_LABEL_KEYS.length - 1 && <span className="mx-1 h-px flex-1 bg-gray-200" />}
-            </li>
-          );
-        })}
-      </ol>
+      {step > 1 && (
+        <div className="ws-bind-progress">
+          <span className="ws-bind-progress-label">
+            {t('device.stepProgress', { step, total: 6 })}
+            {` · ${t(STEP_LABEL_KEYS[step - 1])}`}
+          </span>
+          <div className="ws-bind-progress-track">
+            <div className="ws-bind-progress-value" style={{ width: `${(step / 6) * 100}%` }} />
+          </div>
+        </div>
+      )}
 
-      <Card padding="lg" className="min-h-[320px]">
-        {/* Step 1 · 选择路径 */}
+      <section className="ws-bind-panel">
+        {/* Step 1 · 搜索机器（主路径）+ 数据线脚注；手机/局域网视觉降权 */}
         {step === 1 && (
           <div className="animate-fade-in">
-            <h2 className="text-sm font-semibold text-gray-900">{t('device.choosePath')}</h2>
-            <p className="mt-0.5 text-xs text-gray-500">{t('device.choosePathHint')}</p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {PATH_CARDS.map(({ path: p, icon: Icon, titleKey, descKey }) => (
-                <button
-                  key={p}
-                  onClick={() => {
-                    setPath(p);
-                    clearError();
-                    setStep(2);
-                  }}
-                  className={cx(
-                    'group flex flex-col items-start gap-2 rounded-card border border-gray-200 bg-white p-4 text-left',
-                    'transition-all duration-fast hover:border-primary hover:shadow-float',
-                  )}
-                >
-                  <span className="flex w-full items-center justify-between">
-                    <Icon size={20} className="text-gray-500 transition-colors duration-fast group-hover:text-primary" />
-                    <Badge variant="warning" className="text-[10px]">MOCK IOT</Badge>
-                  </span>
-                  <span className="text-sm font-medium text-gray-900">{t(titleKey)}</span>
-                  <span className="text-xs text-gray-500">{t(descKey)}</span>
-                </button>
-              ))}
-            </div>
+            <button type="button" className="ws-bind-primary" onClick={() => startPath('bluetooth')}>
+              {t('device.searchMachines')}
+            </button>
+            <button type="button" className="ws-bind-footnote" onClick={() => startPath('usb')}>
+              {t('device.bindWithCable')}
+            </button>
+            <p className="ws-bind-hint">{t('device.searchHint')}</p>
+            <p className="ws-bind-alt">
+              <button type="button" className="ws-bind-alt-link" onClick={() => startPath('mobile')}>
+                {t('device.mobileWifiHelper')}
+              </button>
+              <span aria-hidden="true">·</span>
+              <button type="button" className="ws-bind-alt-link" onClick={() => startPath('lan')}>
+                {t('device.lanJobFallback')}
+              </button>
+            </p>
           </div>
         )}
 
         {/* Step 2 · 发现设备 */}
         {step === 2 && (
-          <div className="flex animate-fade-in flex-col items-center gap-3 py-10 text-center">
+          <div className="ws-bind-center animate-fade-in">
             {errorAlias === 'discoverTimeout' ? (
               <>
-                <p className="text-sm font-medium text-gray-900">
-                  {t('device.discoverFailed')}
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
-                  <Button size="sm" variant="secondary" onClick={() => { clearError(); setStep(1); }}>
+                <p className="ws-bind-copy">{t('device.discoverFailed')}</p>
+                <div className="ws-bind-actions">
+                  <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
+                  <button type="button" className="ws-bind-footnote" onClick={() => { clearError(); setStep(1); }}>
                     {t('device.tryAnother')}
-                  </Button>
+                  </button>
                 </div>
               </>
             ) : (
               <>
                 <Spinner size={28} />
-                <p className="text-sm font-medium text-gray-900">
-                  {t('device.searching', { path: path ? BIND_PATH_LABEL[path] : '' })}
+                <p className="ws-bind-copy">
+                  {t('device.searching', { path: path ? t(PATH_LABEL_KEY[path]) : '' })}
                 </p>
-                <p className="text-xs text-gray-500">{t('device.discoveryHint')}</p>
+                <p className="ws-bind-muted">{t('device.discoveryHint')}</p>
               </>
             )}
           </div>
@@ -440,49 +410,38 @@ export function BindWizard() {
             <DeviceChip device={device} />
             {path === 'mobile' && !useLocalWifi ? (
               errorAlias === 'tokenExpired' ? (
-                <div className="mt-4 flex flex-col items-center gap-3 py-6 text-center">
-                  <p className="text-sm font-medium text-gray-900">
-                    {t('device.linkExpired')}
-                  </p>
-                  <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
+                <div className="ws-bind-center">
+                  <p className="ws-bind-copy">{t('device.linkExpired')}</p>
+                  <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
                 </div>
               ) : (
-                <div className="mt-4 flex flex-col items-center gap-3 py-4 text-center">
-                  <p className="text-sm font-medium text-gray-900">{t('device.openMobile')}</p>
-                  <div className="flex w-full max-w-[440px] items-center gap-2 rounded-panel border border-gray-200 bg-gray-50 px-3 py-2">
-                    <span className="min-w-0 flex-1 truncate text-left text-xs text-gray-600 tnum">
-                      {mobileUrl}
-                    </span>
+                <div className="ws-bind-center">
+                  <p className="ws-bind-copy">{t('device.openMobile')}</p>
+                  <div className="ws-bind-link-row">
+                    <span className="min-w-0 flex-1 truncate text-left tnum">{mobileUrl}</span>
                     <button
+                      type="button"
+                      className="ws-bind-text-btn"
                       onClick={copyMobileUrl}
-                      className="shrink-0 rounded-button p-1.5 text-gray-500 transition-colors duration-fast hover:bg-gray-200 hover:text-gray-800"
                       aria-label={t('app.copy')}
                     >
                       <Copy size={14} />
                     </button>
                   </div>
-                  <a
-                    href={mobileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-primary hover:underline"
-                  >
+                  <a href={mobileUrl} target="_blank" rel="noreferrer">
                     {t('device.openWindow')}
                   </a>
-                  <p className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <p className="ws-bind-muted flex items-center gap-1.5">
                     <Loader2 size={12} className="animate-spin-slow" />
                     {t('device.waitingMobile')}
                   </p>
-                  <button
-                    onClick={() => setUseLocalWifi(true)}
-                    className="text-xs text-gray-500 underline-offset-2 transition-colors duration-fast hover:text-gray-800 hover:underline"
-                  >
+                  <button type="button" className="ws-bind-footnote" onClick={() => setUseLocalWifi(true)}>
                     {t('device.switchComputer')}
                   </button>
                 </div>
               )
             ) : (
-              <div className="mt-4 flex max-w-[400px] flex-col gap-3">
+              <div className="ws-bind-field">
                 <Input
                   label={t('device.wifiName')}
                   value={ssid}
@@ -499,49 +458,40 @@ export function BindWizard() {
                   helper={t('device.wifiHelper')}
                   autoComplete="new-password"
                 />
-                {inlineError && <p className="text-xs text-error">{inlineError}</p>}
-                <div className="mt-1">
-                  <Button onClick={() => startProvisioning(ssid, password)}>{t('device.startProvision')}</Button>
-                </div>
+                {inlineError && <p className="ws-bind-error">{inlineError}</p>}
+                <button type="button" className="ws-bind-primary" onClick={() => startProvisioning(ssid, password)}>
+                  {t('device.startProvision')}
+                </button>
               </div>
             )}
             {errorAlias === 'concurrent' && (
-              <p className="mt-3 text-xs text-warning">
-                {t('device.concurrent')}
-              </p>
+              <p className="ws-bind-warn">{t('device.concurrent')}</p>
             )}
           </div>
         )}
 
         {/* Step 4 · 配网中 */}
         {step === 4 && (
-          <div className="flex animate-fade-in flex-col items-center gap-4 py-10 text-center">
+          <div className="ws-bind-center animate-fade-in">
             {errorAlias === 'wifiWrong' ? (
               <>
-                <p className="text-sm font-medium text-gray-900">{t('device.wifiWrong')}</p>
-                <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
+                <p className="ws-bind-copy">{t('device.wifiWrong')}</p>
+                <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
               </>
             ) : errorAlias === 'joinTimeout' ? (
               <>
-                <p className="text-sm font-medium text-gray-900">
-                  {t('device.joinTimeout')}
-                </p>
-                <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
+                <p className="ws-bind-copy">{t('device.joinTimeout')}</p>
+                <button type="button" className="ws-bind-primary" onClick={retryError}>{t('common.retry')}</button>
               </>
             ) : (
               <>
-                <div className="w-full max-w-[420px]">
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div
-                      className="h-full rounded-full bg-primary transition-[width] duration-fast ease-out"
-                      style={{ width: `${progress}%` }}
-                    />
+                <div className="w-full">
+                  <div className="ws-bind-meter">
+                    <span style={{ width: `${progress}%` }} />
                   </div>
-                  <p className="mt-2 text-sm font-medium text-gray-900 tnum">{progress}%</p>
+                  <p className="ws-bind-copy mt-2 tnum">{progress}%</p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {t('device.provisioning')}
-                </p>
+                <p className="ws-bind-muted">{t('device.provisioning')}</p>
               </>
             )}
           </div>
@@ -552,16 +502,14 @@ export function BindWizard() {
           <div className="animate-fade-in">
             <DeviceChip device={device} />
             {errorAlias === 'alreadyBound' ? (
-              <div className="mt-4 flex flex-col items-start gap-3 py-4">
-                <p className="text-sm font-medium text-error">
-                  {t('device.alreadyBound')}
-                </p>
-                <Button size="sm" variant="secondary" onClick={() => setCancelOpen(true)}>
+              <div className="ws-bind-field">
+                <p className="ws-bind-error">{t('device.alreadyBound')}</p>
+                <button type="button" className="ws-bind-footnote" onClick={() => setCancelOpen(true)}>
                   {t('device.cancelBind')}
-                </Button>
+                </button>
               </div>
             ) : (
-              <div className="mt-4 flex max-w-[400px] flex-col gap-3">
+              <div className="ws-bind-field">
                 <Input
                   label={t('device.deviceAlias')}
                   value={alias}
@@ -569,9 +517,9 @@ export function BindWizard() {
                   placeholder={`${DEVICE_TYPE_LABEL[device.type]}-${String(deviceCount + 1).padStart(2, '0')}`}
                   helper={t('device.aliasHelper')}
                 />
-                <div className="mt-1">
-                  <Button onClick={finalizeBind}>{t('device.finishBind')}</Button>
-                </div>
+                <button type="button" className="ws-bind-primary" onClick={finalizeBind}>
+                  {t('device.finishBind')}
+                </button>
               </div>
             )}
           </div>
@@ -579,18 +527,34 @@ export function BindWizard() {
 
         {/* Step 6 · 绑定完成 */}
         {step === 6 && device && (
-          <div className="flex animate-fade-in flex-col items-center gap-3 py-8 text-center">
-            <CheckCircle2 size={40} className="text-success" />
-            <p className="text-base font-semibold text-gray-900">{t('device.bindSuccess')}</p>
-            <Card className="w-full max-w-[360px] text-left" padding="md">
-              <dl className="flex flex-col gap-1.5 text-xs">
-                <Row k={t('device.deviceAlias')} v={alias} /><Row k={t('device.type')} v={DEVICE_TYPE_LABEL[device.type]} /><Row k={t('device.deviceCode')} v={device.deviceCode} mono /><Row k={t('device.bindMethod')} v={BIND_PATH_LABEL[device.foundVia]} />
-              </dl>
-            </Card>
-            <div className="mt-2 flex items-center gap-2">
-              <Button onClick={() => navigate(Routes.devices)}>{t('device.viewDevices')}</Button>
-              <Button
-                variant="secondary"
+          <div className="ws-bind-center animate-fade-in">
+            <CheckCircle2 size={40} className="ws-bind-success-icon" />
+            <p className="ws-bind-heading">{t('device.bindSuccess')}</p>
+            <dl className="ws-bind-dl w-full text-left">
+              <div>
+                <dt>{t('device.deviceAlias')}</dt>
+                <dd>{alias}</dd>
+              </div>
+              <div>
+                <dt>{t('device.type')}</dt>
+                <dd>{DEVICE_TYPE_LABEL[device.type]}</dd>
+              </div>
+              <div>
+                <dt>{t('device.deviceCode')}</dt>
+                <dd className="tnum">{device.deviceCode}</dd>
+              </div>
+              <div>
+                <dt>{t('device.bindMethod')}</dt>
+                <dd>{t(PATH_LABEL_KEY[device.foundVia])}</dd>
+              </div>
+            </dl>
+            <div className="ws-bind-actions">
+              <button type="button" className="ws-bind-primary" onClick={() => navigate(Routes.devices)}>
+                {t('device.viewDevices')}
+              </button>
+              <button
+                type="button"
+                className="ws-bind-footnote"
                 onClick={() => {
                   setStep(1);
                   setPath(null);
@@ -605,27 +569,27 @@ export function BindWizard() {
                 }}
               >
                 {t('device.bindAnother')}
-              </Button>
+              </button>
             </div>
           </div>
         )}
-      </Card>
+      </section>
 
-      {/* 底部操作：每步有上一步 / 取消（Step 6 已完成除外） */}
       {step < 6 && (
-        <div className="flex items-center justify-between">
+        <div className="ws-bind-footer">
           <div>
             {step > 1 && (
-              <Button variant="ghost" size="sm" onClick={goBack}>
+              <button type="button" className="ws-bind-text-btn" onClick={goBack}>
                 {t('device.backStep')}
-              </Button>
+              </button>
             )}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setCancelOpen(true)}>
-                {t('device.cancelBind')}
-          </Button>
+          <button type="button" className="ws-bind-text-btn is-muted" onClick={() => setCancelOpen(true)}>
+            {t('device.cancelBind')}
+          </button>
         </div>
       )}
+      </div>
 
       {/* 取消二次确认 */}
       <Modal
@@ -653,22 +617,13 @@ export function BindWizard() {
 function DeviceChip({ device }: { device: DiscoveredDevice }) {
   const { t } = useLocale();
   return (
-    <div className="flex items-center gap-2 rounded-panel border border-gray-200 bg-gray-50 px-3 py-2">
-      <Wifi size={14} className="text-success" />
-      <span className="text-xs text-gray-700">
+    <div className="ws-bind-chip">
+      <Wifi size={14} />
+      <span>
         {t('device.discovered')} <span className="font-medium tnum">{device.deviceCode}</span>
         （{DEVICE_TYPE_LABEL[device.type]}）
       </span>
-      <Badge variant="warning" className="ml-auto text-[10px]">MOCK IOT</Badge>
-    </div>
-  );
-}
-
-function Row({ k, v, mono }: { k: string; v: string; mono?: boolean }) {
-  return (
-    <div className="flex items-center justify-between">
-      <dt className="text-gray-500">{k}</dt>
-      <dd className={cx('font-medium text-gray-900', mono && 'tnum')}>{v}</dd>
+      <span className="ws-bind-mock ml-auto">MOCK IOT</span>
     </div>
   );
 }

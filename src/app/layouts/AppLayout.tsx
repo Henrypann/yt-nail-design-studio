@@ -86,6 +86,7 @@ export function AppLayout() {
 
   const workspaceNavOverlay = creativeWorkspace && workspaceNavOpen;
   const sidebarCollapsed = creativeWorkspace ? !workspaceNavOpen : collapsed || compactViewport;
+  const workstationBind = location.pathname === Routes.deviceBind;
 
   const toggleCollapsed = () => {
     if (creativeWorkspace) {
@@ -165,7 +166,7 @@ export function AppLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-canvas">
       {workspaceNavOverlay && (
         <button
           type="button"
@@ -298,7 +299,7 @@ export function AppLayout() {
             </button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-3 sm:p-6">
+        <main className={cx('min-w-0 flex-1', workstationBind ? 'flex flex-col p-0' : 'p-3 sm:p-6')}>
           <Outlet />
         </main>
       </div>

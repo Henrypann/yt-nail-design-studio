@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Monitor, Plus, RefreshCw, Unlink } from 'lucide-react';
-import { Badge, Button, Card, EmptyState, Modal, Spinner, cx, useToast } from '@/design-system';
+import { Button, Card, EmptyState, Modal, Spinner, cx, useToast } from '@/design-system';
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { Routes } from '@/app/routes';
 import { useDevicesStore } from '@/platform/devices/device-store';
@@ -73,14 +73,12 @@ export default function DeviceListPage() {
   return (
     <div className="flex flex-col gap-4" data-debug-id="app.devices.list">
       <header className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">{t('device.myDevices')}</h1>
-            <p className="mt-0.5 text-xs text-gray-500">
-              {t('device.statusLegend')}
-            </p>
-          </div>
-          <Badge variant="warning" className="ml-1">MOCK IOT</Badge>
+        <div>
+          <h1 className="text-h1 font-semibold text-ink">{t('device.myDevices')}</h1>
+          <p className="mt-1 text-caption text-mute">
+            {t('device.statusLegend')}
+            <span className="ml-2 text-faint">MOCK IOT</span>
+          </p>
         </div>
         <Button size="sm" onClick={() => navigate(Routes.deviceBind)}>
           <Plus size={14} />
@@ -102,9 +100,8 @@ export default function DeviceListPage() {
           className="min-h-[320px]"
         />
       ) : (
-        <Card padding="none" className="overflow-hidden">
-          {/* 表头 */}
-          <div className="grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2 text-nano font-semibold uppercase tracking-wide text-gray-400">
+        <Card padding="none" className="overflow-hidden border-hairline">
+          <div className="grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-hairline bg-surface-soft px-4 py-2 text-caption font-semibold text-mute">
             <span>{t('device.alias')}</span><span>{t('device.type')}</span><span>{t('device.status')}</span><span>{t('device.boundAt')}</span><span className="text-right">{t('device.actions')}</span>
           </div>
           {devices.map((device) => {
@@ -114,23 +111,23 @@ export default function DeviceListPage() {
               <div
                 key={device.id}
                 className={cx(
-                  'grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-gray-100 px-4 py-3',
-                  'transition-colors duration-fast last:border-b-0 hover:bg-gray-50',
+                  'grid grid-cols-[1.4fr_1fr_0.8fr_1fr_auto] items-center gap-3 border-b border-hairline px-4 py-3',
+                  'transition-colors duration-fast last:border-b-0 hover:bg-surface-soft',
                 )}
               >
                 <div className="flex min-w-0 items-center gap-2">
-                  <Monitor size={15} className="shrink-0 text-gray-400" />
-                  <span className="truncate text-sm font-medium text-gray-900">{device.alias}</span>
+                  <Monitor size={15} className="shrink-0 text-faint" />
+                  <span className="truncate text-sm font-medium text-ink">{device.alias}</span>
                   {device.type === 'scanner' && (
-                    <Badge variant="info" className="shrink-0 text-nano">{t('device.mesSync')}</Badge>
+                    <span className="shrink-0 text-nano text-mute">{t('device.mesSync')}</span>
                   )}
                 </div>
-                <span className="text-xs text-gray-600">{DEVICE_TYPE_LABEL[device.type]}</span>
-                <span className="flex items-center gap-1.5 text-xs text-gray-700">
+                <span className="text-xs text-body">{DEVICE_TYPE_LABEL[device.type]}</span>
+                <span className="flex items-center gap-1.5 text-xs text-body">
                   <span className={cx('h-2 w-2 rounded-full', meta.dot)} />
                   {t(meta.labelKey)}
                 </span>
-                <span className="text-xs text-gray-500 tnum">{formatBoundAt(device.boundAt)}</span>
+                <span className="text-xs text-mute tnum">{formatBoundAt(device.boundAt)}</span>
                 <span className="flex items-center justify-end gap-1">
                   <Button
                     variant="ghost"
@@ -173,7 +170,7 @@ export default function DeviceListPage() {
 
       {/* 底部快捷入口（空列表以外也可见） */}
       {devices.length > 0 && (
-        <p className="text-xs text-gray-400">
+        <p className="text-caption text-faint">
           {t('device.needNew')} <Link to={Routes.deviceBind} className="text-primary hover:underline">{t('device.openWizard')}</Link>
         </p>
       )}
