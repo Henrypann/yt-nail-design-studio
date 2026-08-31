@@ -19,6 +19,7 @@ export const Routes = {
   designNew: '/studio/design/new', // Studio Wizard（默认入口）
   designImport: '/studio/design/import', // Community canonical versioned import preflight
   designConfirmed: '/studio/design/confirmed', // Community-confirmed DesignVersion list
+  jobs: '/studio/jobs', // Hardware-coupled production Job placeholder
   designTemplates: '/studio/design/templates', // 选款页（甲型/长度确认后的模板选择）
   /** @deprecated 兼容旧链；replace → /official */
   designCommunity: '/studio/design/community',
