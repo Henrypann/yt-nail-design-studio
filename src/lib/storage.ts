@@ -33,6 +33,7 @@ export const TAB_ID: string = createClientId('tab-');
 export const StorageKeys = {
   session: 'session',
   customers: 'customers',
+  /** 设备列表。envelope v2 起每条含 serialNumber / storeId / activationState / nailProfileRef。 */
   devices: 'devices',
   designs: 'designs',
   /** 画布工作键（数据桥）：Editor/Wizard 高频写入先落这里 */
@@ -86,9 +87,9 @@ function fullKey(key: string): string {
 }
 
 /** 写入 envelope（同一标签页写同一 key 会刷新 updatedAt） */
-export function writeEnvelope<T>(key: string, data: T): StorageEnvelope<T> {
+export function writeEnvelope<T>(key: string, data: T, v: number = ENVELOPE_VERSION): StorageEnvelope<T> {
   const envelope: StorageEnvelope<T> = {
-    v: ENVELOPE_VERSION,
+    v,
     updatedAt: Date.now(),
     tabId: TAB_ID,
     data,
