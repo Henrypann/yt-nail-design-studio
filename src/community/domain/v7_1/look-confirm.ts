@@ -267,3 +267,35 @@ export function listConfirmedLookDesignVersionsV1(
   if (!loaded.ok) return loaded;
   return { ok: true, records: structuredClone(loaded.store.records) };
 }
+
+/**
+ * Studio 打开前校验：确认钉必须仍指向同一 Look 的同一 DesignVersion 身份。
+ * 不创建 EditorDoc，不改写确认记录。
+ */
+export function matchConfirmedLookToReleaseV1(
+  record: ConfirmedLookDesignVersionRefV1,
+  look: PublishedLookV1,
+  designVersion: DesignVersionV1,
+): { ok: true } | { ok: false; reason: LookConfirmReasonV1; message: string } {
+  const parsedRecord = parseConfirmedLookDesignVersionRefV1(record);
+  if (!parsedRecord) {
+    return { ok: false, reason: 'corrupted_store', message: 'confirmed look record failed its contract' };
+  }
+  const parsedVersion = parseDesignVersionV1(designVersion);
+  if (!parsedVersion.ok) {
+    return { ok: false, reason: 'invalid_release', message: 'DesignVersion failed its public contract' };
+  }
+  if (look.lookId !== parsedRecord.lookId || look.status !== 'PUBLISHED') {
+    return { ok: false, reason: 'look_unavailable', message: 'confirmed look is unavailable' };
+  }
+  if (
+    look.designVersionId !== parsedRecord.designVersionId
+    || look.designVersionId !== parsedVersion.value.designVersionId
+    || parsedRecord.revision !== parsedVersion.value.revision
+    || parsedRecord.editorDocSha256 !== parsedVersion.value.editorDocRef.sha256
+    || parsedRecord.designId !== parsedVersion.value.designId
+  ) {
+    return { ok: false, reason: 'version_mismatch', message: 'confirmed identity no longer matches the released DesignVersion' };
+  }
+  return { ok: true };
+}
