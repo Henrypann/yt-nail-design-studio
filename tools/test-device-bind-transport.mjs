@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
 import {
   BIND_ERROR_CODES_V1,
   BIND_ERROR_FALLBACK_V1,
@@ -359,5 +360,78 @@ assert.match(mobileSrc, /device\.mobileWifiNotBindPath/);
 const bindPage = fs.readFileSync('src/app/pages/devices/DeviceBindPage.tsx', 'utf8');
 assert.match(bindPage, /BindWizard/);
 assert.doesNotMatch(bindPage, /Routes\.deviceBindMobile/);
+
+/* ── 冻结：工作站绑定页强制同路径 mock，调用图不可达真实 BT/USB ── */
+assert.match(wizardSrc, /from ['"]\.\/transport\/mock-bind-transport['"]/);
+assert.match(wizardSrc, /createMockBindTransport/);
+assert.match(wizardSrc, /const \[usingMock, setUsingMock\] = useState\(true\)/);
+assert.doesNotMatch(wizardSrc, /setUsingMock\(false\)/);
+assert.doesNotMatch(wizardSrc, /selectBindTransportV1/);
+assert.doesNotMatch(wizardSrc, /allowMockWhenUnavailable/);
+assert.doesNotMatch(wizardSrc, /createWebBluetoothTransport|createWebUsbTransport/);
+assert.doesNotMatch(wizardSrc, /web-bluetooth-transport|web-usb-transport/);
+assert.doesNotMatch(wizardSrc, /from ['"]\.\/transport['"]/);
+
+const mockTransportSrc = fs.readFileSync('src/platform/devices/transport/mock-bind-transport.ts', 'utf8');
+assert.doesNotMatch(mockTransportSrc, /requestDevice/);
+assert.doesNotMatch(mockTransportSrc, /\.connect\(/);
+assert.doesNotMatch(mockTransportSrc, /\.open\(/);
+
+function resolveImportSpec(fromFile, spec) {
+  if (spec.startsWith('@/')) {
+    return path.resolve('src', spec.slice(2));
+  }
+  if (spec.startsWith('.')) {
+    return path.resolve(path.dirname(fromFile), spec);
+  }
+  return null;
+}
+
+function resolveLocalModule(fromFile, spec) {
+  const base = resolveImportSpec(fromFile, spec);
+  if (!base) return null;
+  const candidates = [
+    base,
+    `${base}.ts`,
+    `${base}.tsx`,
+    path.join(base, 'index.ts'),
+    path.join(base, 'index.tsx'),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null;
+}
+
+function walkBindPageImports(entry) {
+  const seen = new Set();
+  const queue = [path.resolve(entry)];
+  while (queue.length > 0) {
+    const file = queue.pop();
+    if (seen.has(file) || !/\.(?:ts|tsx)$/.test(file)) continue;
+    seen.add(file);
+    const src = fs.readFileSync(file, 'utf8');
+    for (const match of src.matchAll(/from ['"]([^'"]+)['"]/g)) {
+      const resolved = resolveLocalModule(file, match[1]);
+      if (!resolved) continue;
+      const rel = path.relative(process.cwd(), resolved).replaceAll('\\', '/');
+      if (rel.startsWith('src/platform/devices/') || rel.startsWith('src/app/pages/devices/')) {
+        queue.push(resolved);
+      }
+    }
+  }
+  return seen;
+}
+
+const bindGraph = walkBindPageImports('src/app/pages/devices/DeviceBindPage.tsx');
+const bindGraphFiles = [...bindGraph].map((file) => path.relative(process.cwd(), file).replaceAll('\\', '/'));
+assert.equal(bindGraphFiles.some((file) => file.endsWith('src/platform/devices/BindWizard.tsx')), true);
+assert.equal(bindGraphFiles.some((file) => file.endsWith('src/platform/devices/transport/mock-bind-transport.ts')), true);
+assert.equal(bindGraphFiles.some((file) => file.endsWith('src/platform/devices/transport/web-bluetooth-transport.ts')), false);
+assert.equal(bindGraphFiles.some((file) => file.endsWith('src/platform/devices/transport/web-usb-transport.ts')), false);
+assert.equal(bindGraphFiles.some((file) => file.endsWith('src/platform/devices/transport/index.ts')), false);
+for (const file of bindGraphFiles) {
+  const src = fs.readFileSync(file, 'utf8');
+  assert.doesNotMatch(src, /\.requestDevice\s*\(/);
+  assert.doesNotMatch(src, /gatt\.connect/);
+  assert.doesNotMatch(src, /raw\.open\s*\(/);
+}
 
 console.log('test-device-bind-transport: capability, no-UNMAPPED, no silent fallback, two-hop hop2-only retry PASS');
