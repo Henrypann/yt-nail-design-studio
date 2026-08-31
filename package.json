@@ -10,6 +10,7 @@
     "build:integration": "node tools/build-integration.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "test:device-bind-error-codes": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-device-bind-error-codes.mjs",
     "test:community-content": "node tools/validate-community-content.mjs",
     "test:community-taxonomy": "node tools/validate-community-taxonomy.mjs",
     "test:community-taxonomy-v2": "node --import ./tools/lib/register-node-vite.mjs --experimental-strip-types tools/test-community-taxonomy-v2.mjs",

@@ -91,12 +91,34 @@ export interface Customer {
 export type DeviceType = 'scanner' | 'printer_3d' | 'uv_printer';
 export type DeviceStatus = 'online' | 'offline' | 'busy';
 
+/** 设备激活态。PR1 只落字段，不改变 HardwareRegistrationGate（仍判已绑台数）。 */
+export type DeviceActivationStateV1 = 'not_activated' | 'activated';
+
+export const DEVICE_ACTIVATION_STATES_V1 = ['not_activated', 'activated'] as const;
+
 export interface Device {
   id: string;
   alias: string; // 绑定时设置的名称
   type: DeviceType;
   status: DeviceStatus;
-  deviceCode: string; // device_code 绑定
+  /**
+   * 绑定凭据（device_code）。并发锁、手机交接 token、会话恢复都以它为键。
+   * 与 serialNumber（出厂 SN）是两个标识，不得改名或互相冒充。
+   */
+  deviceCode: string;
+  /**
+   * 出厂序列号。BIND_SN_MISMATCH 双显与 SN 判重使用此字段，不是 deviceCode。
+   * 旧记录迁移缺省为空字符串。
+   */
+  serialNumber: string;
+  /**
+   * 绑定门店身份。BIND_SN_ALREADY_BOUND 同店=成功 / 异店拒绝 的依据。
+   * 当前原型以 session.email 作为门店键，直到独立 storeId 合同落地。
+   */
+  storeId: string;
+  activationState: DeviceActivationStateV1;
+  /** 机上 NailProfile 引用，保持可空。 */
+  nailProfileRef?: string | null;
   boundAt: string;
   lastSeenAt?: string;
 }

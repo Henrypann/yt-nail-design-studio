@@ -3,9 +3,9 @@
  * 依据：Studio-PRD §四 设备绑定；Device 基础类型复用 src/lib/types.ts。
  */
 
-import type { Device, DeviceStatus, DeviceType } from '@/lib/types';
+import type { Device, DeviceActivationStateV1, DeviceStatus, DeviceType } from '@/lib/types';
 
-export type { Device, DeviceStatus, DeviceType };
+export type { Device, DeviceActivationStateV1, DeviceStatus, DeviceType };
 
 /** 四条配网路径（PRD §4.2，全部标注 MOCK IOT） */
 export type BindPath = 'bluetooth' | 'mobile' | 'usb' | 'lan';

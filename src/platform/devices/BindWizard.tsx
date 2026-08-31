@@ -25,6 +25,13 @@ import { Badge, Button, Card, Input, Modal, Spinner, cx, useToast } from '@/desi
 import { isScenarioOn, useMockScenarios } from '@/lib/mock-panel';
 import { useLocale } from '@/lib/i18n';
 import { Routes } from '@/app/routes';
+import { getSession } from '@/platform/session';
+import {
+  mapWizardBindErrorV1,
+  resolveSnAlreadyBound,
+  type BindWizardErrorCodeV1,
+  type WizardBindErrorAliasV1,
+} from './bind-error-codes';
 import {
   acquireBindLock,
   clearBindSession,
@@ -49,13 +56,8 @@ import {
 } from './mobile-tokens';
 import type { BindPath, BindStep, DiscoveredDevice } from './types';
 
-type ErrorKind =
-  | 'discoverTimeout'
-  | 'wifiWrong'
-  | 'joinTimeout'
-  | 'alreadyBound'
-  | 'concurrent'
-  | 'tokenExpired';
+/** 冻结码子集。旧 6 项私有名见 WizardBindErrorAliasV1，经 mapWizardBindErrorV1 映射到此。 */
+type ErrorKind = BindWizardErrorCodeV1;
 
 const STEP_LABEL_KEYS = ['device.choosePath', 'device.discovered', 'device.wifiPassword', 'device.provisioning', 'device.deviceAlias', 'device.bindSuccess'] as const;
 
@@ -87,6 +89,16 @@ export function BindWizard() {
   const [mobileToken, setMobileToken] = useState(restored?.mobileToken ?? '');
   const [useLocalWifi, setUseLocalWifi] = useState(false); // 手机路径改用电脑输入
   const [error, setError] = useState<ErrorKind | null>(null);
+  const [errorAlias, setErrorAlias] = useState<WizardBindErrorAliasV1 | null>(null);
+
+  const reportError = (alias: WizardBindErrorAliasV1) => {
+    setError(mapWizardBindErrorV1(alias));
+    setErrorAlias(alias);
+  };
+  const clearError = () => {
+    setError(null);
+    setErrorAlias(null);
+  };
   const [progress, setProgress] = useState(0);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [provisionNonce, setProvisionNonce] = useState(0);
@@ -109,10 +121,10 @@ export function BindWizard() {
 
   /* Step 2 · 发现设备：正常 ~2.6s；Mock 发现超时时 15s 后报错 */
   useEffect(() => {
-    if (step !== 2 || !path || error === 'discoverTimeout') return;
+    if (step !== 2 || !path || errorAlias === 'discoverTimeout') return;
     if (isScenarioOn(flagsRef.current, IOT_SCENARIOS.discoverTimeout)) {
       const t = window.setTimeout(
-        () => setError('discoverTimeout'),
+        () => reportError('discoverTimeout'),
         IOT_TIMINGS.discoveryTimeoutMs,
       );
       return () => window.clearTimeout(t);
@@ -145,7 +157,7 @@ export function BindWizard() {
         isMobileTokenExpired(record)
       ) {
         window.clearInterval(timer);
-        setError('tokenExpired');
+        reportError('tokenExpired');
       }
     }, 2000);
     return () => window.clearInterval(timer);
@@ -163,7 +175,7 @@ export function BindWizard() {
         setProgress(Math.min(92, Math.round((elapsed / IOT_TIMINGS.joinTimeoutMs) * 100)));
         if (elapsed >= IOT_TIMINGS.joinTimeoutMs) {
           window.clearInterval(timer);
-          setError('joinTimeout');
+          reportError('joinTimeout');
         }
       }, 200);
       return () => window.clearInterval(timer);
@@ -178,12 +190,12 @@ export function BindWizard() {
         window.clearInterval(timer);
         setPassword(''); // 密码错误 → 清空重输
         setUseLocalWifi(path === 'mobile' ? true : false);
-        setError('wifiWrong');
+        reportError('wifiWrong');
         return;
       }
       if (pct >= 100) {
         window.clearInterval(timer);
-        setError(null);
+        clearError();
         setStep(5);
       }
     }, 100);
@@ -209,11 +221,11 @@ export function BindWizard() {
         isScenarioOn(flagsRef.current, IOT_SCENARIOS.concurrentBind) ||
         !acquireBindLock(device.deviceCode)
       ) {
-        setError('concurrent');
+        reportError('concurrent');
       toast.warning(t('device.concurrent'));
         return;
       }
-      setError(null);
+      clearError();
       setProgress(0);
       setStep(4);
     },
@@ -226,16 +238,32 @@ export function BindWizard() {
   const finalizeBind = () => {
     if (!device) return;
     if (isScenarioOn(flags, IOT_SCENARIOS.alreadyBound)) {
-      setError('alreadyBound');
-      return;
+      const resolution = resolveSnAlreadyBound({
+        incomingStoreId: getSession()?.email ?? '',
+        boundStoreId: '__other_store__',
+      });
+      if (resolution.outcome === 'reject') {
+        reportError('alreadyBound');
+        return;
+      }
     }
     const finalAlias =
       alias.trim() || `${DEVICE_TYPE_LABEL[device.type]}-${String(deviceCount + 1).padStart(2, '0')}`;
-    addDevice(createBoundDevice({ alias: finalAlias, type: device.type, deviceCode: device.deviceCode }));
+    addDevice(
+      createBoundDevice({
+        alias: finalAlias,
+        type: device.type,
+        deviceCode: device.deviceCode,
+        serialNumber: '',
+        storeId: getSession()?.email ?? '',
+        activationState: 'not_activated',
+        nailProfileRef: null,
+      }),
+    );
     clearBindSession();
     releaseBindLock();
     setAlias(finalAlias);
-    setError(null);
+    clearError();
     setStep(6);
     toast.success(t('device.boundAlias', { alias: finalAlias }));
   };
@@ -249,7 +277,7 @@ export function BindWizard() {
   };
 
   const goBack = () => {
-    setError(null);
+    clearError();
     setInlineError('');
     if (step === 2) setStep(1);
     else if (step === 3) {
@@ -260,29 +288,29 @@ export function BindWizard() {
   };
 
   const retryError = () => {
-    if (error === 'discoverTimeout') {
-      setError(null);
+    if (errorAlias === 'discoverTimeout') {
+      clearError();
       setStep(2); // effect 重新发现
       return;
     }
-    if (error === 'wifiWrong') {
-      setError(null);
+    if (errorAlias === 'wifiWrong') {
+      clearError();
       setStep(3);
       return;
     }
-    if (error === 'joinTimeout') {
-      setError(null);
+    if (errorAlias === 'joinTimeout') {
+      clearError();
       setProgress(0);
       setProvisionNonce((n) => n + 1); // 重启 Step 4
       return;
     }
-    if (error === 'concurrent') {
-      setError(null);
+    if (errorAlias === 'concurrent') {
+      clearError();
       startProvisioning(ssid, password);
       return;
     }
-    if (error === 'tokenExpired') {
-      setError(null);
+    if (errorAlias === 'tokenExpired') {
+      clearError();
       setMobileToken(''); // 重新生成链接
     }
   };
@@ -359,7 +387,7 @@ export function BindWizard() {
                   key={p}
                   onClick={() => {
                     setPath(p);
-                    setError(null);
+                    clearError();
                     setStep(2);
                   }}
                   className={cx(
@@ -382,14 +410,14 @@ export function BindWizard() {
         {/* Step 2 · 发现设备 */}
         {step === 2 && (
           <div className="flex animate-fade-in flex-col items-center gap-3 py-10 text-center">
-            {error === 'discoverTimeout' ? (
+            {errorAlias === 'discoverTimeout' ? (
               <>
                 <p className="text-sm font-medium text-gray-900">
                   {t('device.discoverFailed')}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
-                  <Button size="sm" variant="secondary" onClick={() => { setError(null); setStep(1); }}>
+                  <Button size="sm" variant="secondary" onClick={() => { clearError(); setStep(1); }}>
                     {t('device.tryAnother')}
                   </Button>
                 </div>
@@ -411,7 +439,7 @@ export function BindWizard() {
           <div className="animate-fade-in">
             <DeviceChip device={device} />
             {path === 'mobile' && !useLocalWifi ? (
-              error === 'tokenExpired' ? (
+              errorAlias === 'tokenExpired' ? (
                 <div className="mt-4 flex flex-col items-center gap-3 py-6 text-center">
                   <p className="text-sm font-medium text-gray-900">
                     {t('device.linkExpired')}
@@ -477,7 +505,7 @@ export function BindWizard() {
                 </div>
               </div>
             )}
-            {error === 'concurrent' && (
+            {errorAlias === 'concurrent' && (
               <p className="mt-3 text-xs text-warning">
                 {t('device.concurrent')}
               </p>
@@ -488,12 +516,12 @@ export function BindWizard() {
         {/* Step 4 · 配网中 */}
         {step === 4 && (
           <div className="flex animate-fade-in flex-col items-center gap-4 py-10 text-center">
-            {error === 'wifiWrong' ? (
+            {errorAlias === 'wifiWrong' ? (
               <>
                 <p className="text-sm font-medium text-gray-900">{t('device.wifiWrong')}</p>
                 <Button size="sm" onClick={retryError}>{t('common.retry')}</Button>
               </>
-            ) : error === 'joinTimeout' ? (
+            ) : errorAlias === 'joinTimeout' ? (
               <>
                 <p className="text-sm font-medium text-gray-900">
                   {t('device.joinTimeout')}
@@ -523,7 +551,7 @@ export function BindWizard() {
         {step === 5 && device && (
           <div className="animate-fade-in">
             <DeviceChip device={device} />
-            {error === 'alreadyBound' ? (
+            {errorAlias === 'alreadyBound' ? (
               <div className="mt-4 flex flex-col items-start gap-3 py-4">
                 <p className="text-sm font-medium text-error">
                   {t('device.alreadyBound')}
@@ -572,7 +600,7 @@ export function BindWizard() {
                   setAlias('');
                   setMobileToken('');
                   setUseLocalWifi(false);
-                  setError(null);
+                  clearError();
                   setProgress(0);
                 }}
               >
