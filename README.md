@@ -120,6 +120,7 @@ docs/             协议、架构与历史集成文档
 
 - [协作与架构边界](AGENTS.md)
 - [界面与交互设计规范](DESIGN.md)
+- [产品与需求基线镜像](docs/product-baseline/README.md)：当前同步至 2026-09-04；需求仍为 planned，不代表代码已经实现
 - [国际化协议](docs/architecture/I18N_PROTOCOL_V0_7_2.md)
 - [素材库说明](material-library/README.md)
 - [验证与交接材料](evidence/)

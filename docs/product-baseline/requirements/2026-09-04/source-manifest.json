@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "nextgen.source-manifest.v2",
+  "contract": {
+    "authority": "local_snapshot",
+    "cloudRuntimeDependency": false,
+    "automaticRefresh": false,
+    "replacementPolicy": "new_dated_snapshot_plus_explicit_promotion"
+  },
+  "snapshotDate": "2026-09-04",
+  "provenance": {
+    "sourceRole": "local_attached_drawio_only",
+    "externalAccessed": false
+  },
+  "files": {
+    "requirements": {
+      "file": "需求模块与功能清单_2026-09-04.xlsx",
+      "sha256": "0bccecf7947696b080604a184a3e3ab91703eda55eaa7655364069770b1800f8",
+      "normalizedFile": "需求模块与功能清单_2026-09-04.normalized.json",
+      "normalizedSha256": "f0af6b88fe1172735facb737e49e4494b4d3e1ce73c43fec606cb0b54fc5e8ae",
+      "sheetName": "需求模块与功能清单",
+      "recordCount": 130,
+      "fieldCount": 17,
+      "featureIdUniqueCount": 130,
+      "statusCounts": {
+        "产品已确认/待研发评审": 53,
+        "待评审": 65,
+        "后续待定": 9,
+        "deprecated": 3
+      },
+      "priorityCounts": {
+        "P0": 64,
+        "P1": 55,
+        "P2": 11
+      },
+      "bytes": 49404
+    },
+    "drawio": {
+      "file": "软件UserStory & Roadmap V1.0.7.drawio",
+      "sha256": "d07b43fe0540148a79e5d726e35355b6afa02693ca16e4d59efa44b6c98c5f49",
+      "bytes": 154849,
+      "nodesFile": "软件UserStory & Roadmap V1.0.7.nodes.json",
+      "nodesSha256": "4ea336b42d8c3d44a8c44e926497f08806ff41a0a08928bace47491920a1a956",
+      "diagramCount": 3,
+      "cellCount": 324,
+      "vertexCount": 255,
+      "labeledVertexCount": 231,
+      "edgeCount": 63,
+      "edgeLabelCount": 3
+    }
+  },
+  "validation": {
+    "allFeatureIdsPresent": true,
+    "allFeatureIdsUnique": true,
+    "generatedFromLocalFilesOnly": true
+  }
+}
