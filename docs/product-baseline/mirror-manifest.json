@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "nextgen.github-doc-mirror.v1",
+  "syncedAt": "2026-09-05",
+  "repository": {
+    "nameWithOwner": "Henrypann/yt-nail-design-studio",
+    "baseBranch": "main",
+    "baseCommit": "e6fdc8c49e641faad029c9b2254dfa027546e5bd",
+    "syncBranch": "docs/feat-baseline-2026-09-04"
+  },
+  "authority": {
+    "canonical": "local_vault_and_nextgen_beauty_requirements_current_pointer",
+    "githubRole": "downstream_mirror",
+    "cloudRuntimeDependency": false,
+    "preserveSourceBytes": true,
+    "plannedDoesNotMeanImplemented": true
+  },
+  "currentRequirements": {
+    "snapshotDate": "2026-09-04",
+    "productVersion": "v0.7.2",
+    "manifestSha256": "f2b8885fe2ec830627478adfa6c22f903cf8733ecec714f781bbc02f7d8242a5",
+    "recordCount": 130,
+    "fieldCount": 17,
+    "uniqueFeatureIdCount": 130,
+    "labeledDrawioNodeCount": 231,
+    "drawioEdgeCount": 63,
+    "labeledDrawioEdgeCount": 3
+  },
+  "files": [
+    {
+      "role": "historical_requirements_final",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/NextGen_Beauty_全域功能需求池_Final_2026-09-02.md",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-02/NextGen_Beauty_全域功能需求池_Final_2026-09-02.md",
+      "sha256": "e44bc564d29f710c05c16b4ac27aa04d41be02646e8fa8b3f40a6d7ad9cd859d",
+      "bytes": 97813
+    },
+    {
+      "role": "dedup_ledger",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/NextGen_Beauty_Drawio_需求去重映射_软件UserStory_Roadmap_V1.0.7_2026-09-04.json",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/NextGen_Beauty_Drawio_需求去重映射_软件UserStory_Roadmap_V1.0.7_2026-09-04.json",
+      "sha256": "b4916470713ef2950e35396a0ab2c5d226dab5b2029d7ed93295a396f512dc64",
+      "bytes": 219474
+    },
+    {
+      "role": "drawio_decisions",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/NextGen_Beauty_Drawio_需求去重裁决_软件UserStory_Roadmap_V1.0.7_2026-09-04.json",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/NextGen_Beauty_Drawio_需求去重裁决_软件UserStory_Roadmap_V1.0.7_2026-09-04.json",
+      "sha256": "2717478ce37d09ee3ecde6a12328b1d6248ae01db9389a5a1098ff25aa4f5547",
+      "bytes": 118738
+    },
+    {
+      "role": "current_requirements_final",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/NextGen_Beauty_全域功能需求池_Final_2026-09-04.md",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/NextGen_Beauty_全域功能需求池_Final_2026-09-04.md",
+      "sha256": "cebfc586b20c68f53910f8e3d53cda3f7519b095e4825f964849d6a355e1be4d",
+      "bytes": 42902
+    },
+    {
+      "role": "baseline_migration",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/NextGen_Beauty_需求基线迁移_2026-09-02_至_2026-09-04.md",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/NextGen_Beauty_需求基线迁移_2026-09-02_至_2026-09-04.md",
+      "sha256": "daef3d55c9b89cec130589c435d9eb19bd4d0371e34cc9aabb6e0e05be8869cd",
+      "bytes": 838
+    },
+    {
+      "role": "source_manifest",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/源文件/2026-09-04/source-manifest.json",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/source-manifest.json",
+      "sha256": "f2b8885fe2ec830627478adfa6c22f903cf8733ecec714f781bbc02f7d8242a5",
+      "bytes": 1775
+    },
+    {
+      "role": "drawio_source",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/源文件/2026-09-04/软件UserStory & Roadmap V1.0.7.drawio",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/软件UserStory & Roadmap V1.0.7.drawio",
+      "sha256": "d07b43fe0540148a79e5d726e35355b6afa02693ca16e4d59efa44b6c98c5f49",
+      "bytes": 154849
+    },
+    {
+      "role": "drawio_nodes",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/源文件/2026-09-04/软件UserStory & Roadmap V1.0.7.nodes.json",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/软件UserStory & Roadmap V1.0.7.nodes.json",
+      "sha256": "4ea336b42d8c3d44a8c44e926497f08806ff41a0a08928bace47491920a1a956",
+      "bytes": 110177
+    },
+    {
+      "role": "normalized_requirements",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/源文件/2026-09-04/需求模块与功能清单_2026-09-04.normalized.json",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/需求模块与功能清单_2026-09-04.normalized.json",
+      "sha256": "f0af6b88fe1172735facb737e49e4494b4d3e1ce73c43fec606cb0b54fc5e8ae",
+      "bytes": 212149
+    },
+    {
+      "role": "requirements_workbook",
+      "vaultPath": "工作记录_2026-W36_08-31至09-06/源文件/2026-09-04/需求模块与功能清单_2026-09-04.xlsx",
+      "repositoryPath": "docs/product-baseline/requirements/2026-09-04/需求模块与功能清单_2026-09-04.xlsx",
+      "sha256": "0bccecf7947696b080604a184a3e3ab91703eda55eaa7655364069770b1800f8",
+      "bytes": 49404
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "Community_V7.2_Roadmap_2026-08-12.md",
+      "repositoryPath": "docs/product-baseline/vault-core/Community_V7.2_Roadmap_2026-08-12.md",
+      "sha256": "277fc0dac5585a2a68c02ab13ed01654a931c1500621e254526546c530614bc5",
+      "bytes": 14453
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "NextGen_Beauty_Studio_V7.2_General_PRD_Brief_2026-08-12.md",
+      "repositoryPath": "docs/product-baseline/vault-core/NextGen_Beauty_Studio_V7.2_General_PRD_Brief_2026-08-12.md",
+      "sha256": "b877190ca2178e6ab8dd14d21201a4d45383a4ced14726c0e77d0e080b3f32d0",
+      "bytes": 33198
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "README_V7_系统架构总览与权威文档索引.md",
+      "repositoryPath": "docs/product-baseline/vault-core/README_V7_系统架构总览与权威文档索引.md",
+      "sha256": "e71a7b223f27840030ced8c2f6c050b44afc50d3f5f230d6ae8ffd5881292b73",
+      "bytes": 19058
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "Studio_Editor_V7.2_Roadmap_2026-08-12.md",
+      "repositoryPath": "docs/product-baseline/vault-core/Studio_Editor_V7.2_Roadmap_2026-08-12.md",
+      "sha256": "f210d8b4e4b18523960ac8508e6ee1876a4481bddab4f6d19e052fa456ac4e42",
+      "bytes": 22519
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "W33_PR合并进展表_2026-08-13.md",
+      "repositoryPath": "docs/product-baseline/vault-core/W33_PR合并进展表_2026-08-13.md",
+      "sha256": "1e8e939b5e0a8ceb2b85ec1eddd39b0cd2879a82a2f0169d7232706d9876b4dd",
+      "bytes": 22527
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "文档规则与索引.md",
+      "repositoryPath": "docs/product-baseline/vault-core/文档规则与索引.md",
+      "sha256": "f0df11bd5135f3a90e2597b3fbef1675f0bc88f2300a908251e37ec80bbe86f6",
+      "bytes": 14558
+    },
+    {
+      "role": "vault_core",
+      "vaultPath": "重要变更与PR基线记录.md",
+      "repositoryPath": "docs/product-baseline/vault-core/重要变更与PR基线记录.md",
+      "sha256": "be23007e1e0b18001acf7d69473edbee6972994fbd0a47b58667b98fe71d75fd",
+      "bytes": 40047
+    }
+  ]
+}

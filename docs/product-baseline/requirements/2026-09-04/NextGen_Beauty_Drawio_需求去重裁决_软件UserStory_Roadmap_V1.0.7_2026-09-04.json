@@ -1,0 +1,3448 @@
+{
+  "schemaVersion": "nextgen.drawio.decisions.v2",
+  "snapshotDate": "2026-09-04",
+  "entries": [
+    {
+      "seq": 1,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 2,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-2",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 3,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-3",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 4,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-4",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 5,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-24",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 6,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-31",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 7,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-32",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 8,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-33",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 9,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-35",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 10,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-36",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 11,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-37",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0105",
+        "FEAT-0107"
+      ],
+      "rationale": "Customer 单一归属与服务档案由现有 FEAT 承接；跨 User 另见 FEAT-0130。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 12,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-67",
+      "classification": "increment",
+      "matchedFeatureIds": [
+        "FEAT-0131",
+        "FEAT-0221"
+      ],
+      "rationale": "位置/品牌/联系信息并入可选 User 专业资料，不创建 Store 实体。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 13,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-74",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 14,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-9",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 15,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-38",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 16,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-39",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 17,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-40",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 18,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-49",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 19,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-153",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 20,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-41",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 21,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-42",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 22,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-43",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0105",
+        "FEAT-0107"
+      ],
+      "rationale": "Customer 单一归属与服务档案由现有 FEAT 承接；跨 User 另见 FEAT-0130。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 23,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-44",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0105",
+        "FEAT-0107"
+      ],
+      "rationale": "Customer 单一归属与服务档案由现有 FEAT 承接；跨 User 另见 FEAT-0130。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 24,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-45",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 25,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-89",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 26,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-47",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 27,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-144",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 28,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-53",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 29,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-145",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 30,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-46",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 31,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-54",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 32,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-55",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 33,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-70",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0414"
+      ],
+      "rationale": "自动标签分类为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 34,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-59",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 35,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-60",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 36,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-82",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 37,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-83",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 38,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-81",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 39,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-63",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 40,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-64",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 41,
+      "cellId": "BGxW3iIrsRmepJBDTubF-22",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 42,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-65",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 43,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-18",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 44,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-66",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 45,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-19",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 46,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-71",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 47,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-72",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 48,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-73",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 49,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-92",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 50,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-93",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 51,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-96",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 52,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-98",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 53,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-113",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 54,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-115",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 55,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-116",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 56,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-21",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 57,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-127",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 58,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-133",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 59,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-25",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 60,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-31",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0105"
+      ],
+      "rationale": "新建 Customer 档案由 User-owned Customer 需求承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 61,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-52",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 62,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-76",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 63,
+      "cellId": "AjI5ajCrkQR87gol3wgJ-134",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 64,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-15",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 65,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-31",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 66,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-32",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0406",
+        "FEAT-0407"
+      ],
+      "rationale": "自动修复只允许有限、签名的修复；产出新版本并重新确认、检查与放行。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 67,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-34",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 68,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-91",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 69,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-38",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 70,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-42",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0031"
+      ],
+      "rationale": "TP02 智能排产是 P2 后续项；MVP 只做 FEAT-0013～0018 的基础可解释排产。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 71,
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-43",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 72,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-2",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 73,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-6",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 74,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-18",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 75,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-7",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 76,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-14",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 77,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-17",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 78,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-24",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 79,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-32",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 80,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-33",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 81,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-34",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 82,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-37",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 83,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-38",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 84,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-39",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0309",
+        "FEAT-0413"
+      ],
+      "rationale": "2D 图层与基础工具由 FEAT-0202 承接；3D authoring 与 AI 生图均为后续待定，非 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 85,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-42",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0404"
+      ],
+      "rationale": "选择常规甲型应使用受控标准甲型来源与适用范围，由 FEAT-0404 承接；不属于智能排产。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 86,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-45",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 87,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-55",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 88,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-56",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 89,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-58",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0122",
+        "FEAT-0301"
+      ],
+      "rationale": "MVP 2D 编辑和只读 3D 预览；预览不作为精准数据或制造证据。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 90,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-59",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0122",
+        "FEAT-0301"
+      ],
+      "rationale": "MVP 2D 编辑和只读 3D 预览；预览不作为精准数据或制造证据。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 91,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-60",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 92,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-64",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 93,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-69",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 94,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-73",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 95,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-79",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 96,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-82",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 97,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-84",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 98,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-87",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 99,
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-89",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 100,
+      "cellId": "BGxW3iIrsRmepJBDTubF-3",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 101,
+      "cellId": "BGxW3iIrsRmepJBDTubF-6",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 102,
+      "cellId": "BGxW3iIrsRmepJBDTubF-7",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 103,
+      "cellId": "BGxW3iIrsRmepJBDTubF-12",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 104,
+      "cellId": "BGxW3iIrsRmepJBDTubF-13",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 105,
+      "cellId": "BGxW3iIrsRmepJBDTubF-17",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 106,
+      "cellId": "BGxW3iIrsRmepJBDTubF-14",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 107,
+      "cellId": "FD8wMF0tNUDsrMwd3THR-8",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 108,
+      "cellId": "FD8wMF0tNUDsrMwd3THR-10",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 109,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-1",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 110,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-3",
+      "classification": "increment",
+      "matchedFeatureIds": [
+        "FEAT-0130"
+      ],
+      "rationale": "跨 User 发送 CustomerID 与设计已落实为受控、原子业务包转移。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 111,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-5",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0414"
+      ],
+      "rationale": "自动标签分类为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 112,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-6",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 113,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-7",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 114,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-11",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 115,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-12",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0216",
+        "FEAT-0218",
+        "FEAT-0219"
+      ],
+      "rationale": "用户等级、发布限额、推荐权重和问题池不是 MVP；UGC 仅保留审核与官方库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 116,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-13",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0216",
+        "FEAT-0218",
+        "FEAT-0219"
+      ],
+      "rationale": "用户等级、发布限额、推荐权重和问题池不是 MVP；UGC 仅保留审核与官方库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 117,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-14",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0216",
+        "FEAT-0218",
+        "FEAT-0219"
+      ],
+      "rationale": "用户等级、发布限额、推荐权重和问题池不是 MVP；UGC 仅保留审核与官方库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 118,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-15",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 119,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-16",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 120,
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-17",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0415"
+      ],
+      "rationale": "AR/虚拟试戴为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 121,
+      "cellId": "hK2SgUetUaSExaoxBdzd-1",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0105",
+        "FEAT-0107"
+      ],
+      "rationale": "Customer 单一归属与服务档案由现有 FEAT 承接；跨 User 另见 FEAT-0130。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 122,
+      "cellId": "hK2SgUetUaSExaoxBdzd-2",
+      "classification": "conflict",
+      "matchedFeatureIds": [
+        "FEAT-0130"
+      ],
+      "rationale": "“不可迁移”与已确认的 Customer 受控单一所有权转移冲突；正式规则以 FEAT-0130 为准。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 123,
+      "cellId": "hK2SgUetUaSExaoxBdzd-3",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 124,
+      "cellId": "hK2SgUetUaSExaoxBdzd-4",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 125,
+      "cellId": "hK2SgUetUaSExaoxBdzd-5",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 126,
+      "cellId": "hK2SgUetUaSExaoxBdzd-6",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 127,
+      "cellId": "hK2SgUetUaSExaoxBdzd-7",
+      "classification": "conflict",
+      "matchedFeatureIds": [
+        "FEAT-0130",
+        "FEAT-0101"
+      ],
+      "rationale": "Customer/设计仅可按 FEAT-0130 受控转移；“设备共享”与单一 owner 规则冲突。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 128,
+      "cellId": "hK2SgUetUaSExaoxBdzd-8",
+      "classification": "conflict",
+      "matchedFeatureIds": [
+        "FEAT-0130",
+        "FEAT-0101"
+      ],
+      "rationale": "Customer/设计发送采用受控转移；设备授权共享不被采纳，必须显式解绑后换绑。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 129,
+      "cellId": "hK2SgUetUaSExaoxBdzd-9",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 130,
+      "cellId": "hK2SgUetUaSExaoxBdzd-11",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 131,
+      "cellId": "hK2SgUetUaSExaoxBdzd-12",
+      "classification": "increment",
+      "matchedFeatureIds": [
+        "FEAT-0223"
+      ],
+      "rationale": "virtual customer 被收敛为私有预置甲型设计测试对象，不建立真实 Customer 或生产资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 132,
+      "cellId": "hK2SgUetUaSExaoxBdzd-13",
+      "classification": "increment",
+      "matchedFeatureIds": [
+        "FEAT-0223"
+      ],
+      "rationale": "virtual customer 被收敛为私有预置甲型设计测试对象，不建立真实 Customer 或生产资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 133,
+      "cellId": "AcMRuD6REXZYilk8Ch4p-4",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 134,
+      "cellId": "AcMRuD6REXZYilk8Ch4p-8",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 135,
+      "cellId": "AcMRuD6REXZYilk8Ch4p-10",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 136,
+      "cellId": "AcMRuD6REXZYilk8Ch4p-11",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 137,
+      "cellId": "AcMRuD6REXZYilk8Ch4p-12",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 138,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 139,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-7",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 140,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-9",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "CES 是可重复端到端集成 Demo 目标，不代表 production-ready 或正式 FEAT。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 141,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-11",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 142,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-13",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 143,
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-15",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 144,
+      "cellId": "gM90Km4c31RjslbebsaV-1",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 145,
+      "cellId": "ed02dJyUD2DYFATCyv6s-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 146,
+      "cellId": "ed02dJyUD2DYFATCyv6s-2",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 147,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 148,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-3",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 149,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-4",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 150,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-5",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 151,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-6",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 152,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-7",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 153,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-8",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 154,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-9",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 155,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-10",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 156,
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-12",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 157,
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-9",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 158,
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-12",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 159,
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-14",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 160,
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-16",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 161,
+      "cellId": "tJVpETOogvd3eC4H2GfQ-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 162,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 163,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-2",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 164,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-3",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 165,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-5",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 166,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-7",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 167,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-8",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 168,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-9",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 169,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-18",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 170,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-22",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 171,
+      "cellId": "ESlqv98ED7_XCXOWtkyI-26",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 172,
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-3",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 173,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-1",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 174,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-2",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 175,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-3",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 176,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-4",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 177,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-5",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 178,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-6",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 179,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-7",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 180,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-8",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 181,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-9",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0415"
+      ],
+      "rationale": "AR/虚拟试戴为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 182,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-10",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 183,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-11",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 184,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-12",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 185,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-13",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 186,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-14",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 187,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-15",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 188,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-16",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 189,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-17",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 190,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-18",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 191,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-19",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 192,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-20",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0413"
+      ],
+      "rationale": "AI 创作/图像理解只保留研发候选，非 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 193,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-21",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 194,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-22",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0122",
+        "FEAT-0301"
+      ],
+      "rationale": "MVP 2D 编辑和只读 3D 预览；预览不作为精准数据或制造证据。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 195,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-23",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 196,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-24",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 197,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-25",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 198,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-26",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 199,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-27",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0406",
+        "FEAT-0407"
+      ],
+      "rationale": "自动修复只允许有限、签名的修复；产出新版本并重新确认、检查与放行。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 200,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-28",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 201,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-29",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0031"
+      ],
+      "rationale": "智能排产是 P2 后续项；MVP 只做 FEAT-0013～0018 的基础可解释排产。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 202,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-30",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 203,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-31",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 204,
+      "cellId": "Gi42hUTanYr8W1DQYbmn-32",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "共享数据域是信息架构结构标签，不独立形成主体、权限或功能需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 205,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-1",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 206,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-2",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 207,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-3",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 208,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-4",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 209,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-5",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 210,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-6",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 211,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-7",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0414"
+      ],
+      "rationale": "自动标签分类为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 212,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-8",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0415"
+      ],
+      "rationale": "AR/虚拟试戴为后续待定，不进入 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 213,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-9",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 214,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-10",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 215,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-11",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 216,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-12",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 217,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-13",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0102"
+      ],
+      "rationale": "统一 User 登录，所有注册 User 可建 Customer、进入 Studio 和设计。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 218,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-14",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0118",
+        "FEAT-0119",
+        "FEAT-0403"
+      ],
+      "rationale": "精准采集会话、版本和生产资格由既有 FEAT 承接；照片/手动尺寸只可近似预览。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 219,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-15",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0413"
+      ],
+      "rationale": "AI 创作/图像理解只保留研发候选，非 MVP。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 220,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-16",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0309"
+      ],
+      "rationale": "MVP 只承接 2D 编辑；3D authoring 不进入 MVP，0309 保留后续待定。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 221,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-17",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0202",
+        "FEAT-0309"
+      ],
+      "rationale": "MVP 只承接 2D 编辑；3D authoring 不进入 MVP，0309 保留后续待定。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 222,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-18",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0120",
+        "FEAT-0121",
+        "FEAT-0216",
+        "FEAT-0218"
+      ],
+      "rationale": "模板/社区进入 Studio 必为独立草稿；UGC 与官方素材库隔离。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 223,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-19",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 224,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-20",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0406",
+        "FEAT-0407"
+      ],
+      "rationale": "自动修复只允许有限、签名的修复；产出新版本并重新确认、检查与放行。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 225,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-21",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0406",
+        "FEAT-0407"
+      ],
+      "rationale": "自动修复只允许有限、签名的修复；产出新版本并重新确认、检查与放行。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 226,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-22",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 227,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-23",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0012",
+        "FEAT-0017",
+        "FEAT-0407",
+        "FEAT-0408"
+      ],
+      "rationale": "固定设计/精准甲面/TP01/设备/标定/材料/资源/制造包门禁共同决定制造资格。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 228,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-24",
+      "classification": "candidate",
+      "matchedFeatureIds": [
+        "FEAT-0031"
+      ],
+      "rationale": "智能排产是 P2 后续项；MVP 只做 FEAT-0013～0018 的基础可解释排产。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 229,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-25",
+      "classification": "pending",
+      "matchedFeatureIds": [],
+      "rationale": "结构、阶段或里程碑标签仅作为来源内容；月份为目标窗口，未机械转成正式需求。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 230,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-26",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    },
+    {
+      "seq": 231,
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-27",
+      "classification": "covered",
+      "matchedFeatureIds": [
+        "FEAT-0101",
+        "FEAT-0017",
+        "FEAT-0503"
+      ],
+      "rationale": "设备单一 owner、制造门禁和真实执行回传由既有 FEAT 承接。",
+      "vaultRefs": [
+        "NextGen_Beauty_全域功能需求池_Final_2026-09-04.md"
+      ],
+      "previousSnapshot": "2026-09-02",
+      "targetSnapshot": "2026-09-04",
+      "baselineAction": "new-formal-snapshot"
+    }
+  ]
+}

@@ -1,0 +1,3484 @@
+{
+  "schemaVersion": "nextgen.drawio.nodes.v1",
+  "snapshotDate": "2026-09-04",
+  "sourceFile": "软件UserStory & Roadmap V1.0.7.drawio",
+  "sourceSha256": "d07b43fe0540148a79e5d726e35355b6afa02693ca16e4d59efa44b6c98c5f49",
+  "diagramCount": 3,
+  "cellCount": 324,
+  "vertexCount": 255,
+  "labeledVertexCount": 231,
+  "edgeCount": 63,
+  "diagrams": [
+    {
+      "index": 1,
+      "name": "用户旅程及数据映射",
+      "id": "mEhUFmpvZtJHrFxhNuNa",
+      "cellCount": 192,
+      "vertexCount": 135,
+      "edgeCount": 55
+    },
+    {
+      "index": 2,
+      "name": "RoadMap",
+      "id": "L9JmwOTmAIpn2U9IWl7k",
+      "cellCount": 67,
+      "vertexCount": 61,
+      "edgeCount": 4
+    },
+    {
+      "index": 3,
+      "name": "产品功能总览（建设中）",
+      "id": "SBoEP-NjRBEr1ZQCuVsq",
+      "cellCount": 65,
+      "vertexCount": 59,
+      "edgeCount": 4
+    }
+  ],
+  "nodes": [
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-1",
+      "parent": "1",
+      "label": "用户形态2： 创作者",
+      "rawValue": "用户形态2： 创作者",
+      "geometry": {
+        "x": "630",
+        "y": "360",
+        "width": "20",
+        "height": "40"
+      },
+      "nodeId": "V107-001"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-2",
+      "parent": "1",
+      "label": "用户形态1：游客",
+      "rawValue": "用户形态1：游客",
+      "geometry": {
+        "x": "70",
+        "y": "300",
+        "width": "20",
+        "height": "40"
+      },
+      "nodeId": "V107-002"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-3",
+      "parent": "1",
+      "label": "用户形态3： 美甲制作者",
+      "rawValue": "用户形态3： 美甲制作者",
+      "geometry": {
+        "x": "1280",
+        "y": "360",
+        "width": "20",
+        "height": "40"
+      },
+      "nodeId": "V107-003"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-4",
+      "parent": "1",
+      "label": "灵感——内容社区\\nC/P 感知前端，交互 · 体验",
+      "rawValue": "<h1 style=\"margin-top: 0px;\">灵感——内容社区</h1><p>C/P 感知前端，交互 · 体验</p>",
+      "geometry": {
+        "x": "-190",
+        "y": "240",
+        "width": "200",
+        "height": "80"
+      },
+      "nodeId": "V107-004"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-24",
+      "parent": "1",
+      "label": "法务相关（隐私、协议、...）",
+      "rawValue": "法务相关（隐私、协议、...）",
+      "geometry": {
+        "x": "-13",
+        "y": "645",
+        "width": "230",
+        "height": "30"
+      },
+      "nodeId": "V107-005"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-31",
+      "parent": "1",
+      "label": "内容浏览（发现 & 搜索） G0",
+      "rawValue": "内容浏览（发现 &amp; 搜索） G0",
+      "geometry": {
+        "x": "-100",
+        "y": "360",
+        "width": "229",
+        "height": "60"
+      },
+      "nodeId": "V107-006"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-32",
+      "parent": "1",
+      "label": "用户登陆\\nA01",
+      "rawValue": "用户登陆<div>A01</div>",
+      "geometry": {
+        "x": "-100",
+        "y": "476",
+        "width": "90",
+        "height": "60"
+      },
+      "nodeId": "V107-007"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-33",
+      "parent": "1",
+      "label": "通知（Q&A、contact、消息...）",
+      "rawValue": "通知（Q&amp;A、contact、消息...）",
+      "geometry": {
+        "x": "-13",
+        "y": "615",
+        "width": "230",
+        "height": "30"
+      },
+      "nodeId": "V107-008"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-35",
+      "parent": "1",
+      "label": "A0. 用户信息数据库",
+      "rawValue": "A0. 用户信息数据库",
+      "geometry": {
+        "x": "-160",
+        "y": "890",
+        "width": "210",
+        "height": "182"
+      },
+      "nodeId": "V107-009"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-36",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A01. 基础账号功能 #唯一性",
+      "rawValue": "A01. 基础账号功能 #唯一性",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-010"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-37",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A02. 使用者信息数据",
+      "rawValue": "A02. 使用者信息数据",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-011"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-67",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A03. 店铺（位置）数据",
+      "rawValue": "A03. 店铺（位置）数据",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-012"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-74",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A04. 设备数据",
+      "rawValue": "A04. 设备数据",
+      "geometry": {
+        "y": "104",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-013"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-9",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A05. 用户等级标识",
+      "rawValue": "A05. 用户等级标识",
+      "geometry": {
+        "y": "130",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-014"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-38",
+      "parent": "AjI5ajCrkQR87gol3wgJ-35",
+      "label": "A06. 业务 / 经营数据【tbd】",
+      "rawValue": "A06. 业务 / 经营数据【tbd】",
+      "geometry": {
+        "y": "156",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-015"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-39",
+      "parent": "1",
+      "label": "C0. 指甲数据库",
+      "rawValue": "C0. 指甲数据库",
+      "geometry": {
+        "x": "457",
+        "y": "994",
+        "width": "210",
+        "height": "156"
+      },
+      "nodeId": "V107-016"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-40",
+      "parent": "AjI5ajCrkQR87gol3wgJ-39",
+      "label": "C01. 精准模型数据（点云数据）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">C01. </span>精准模型数据（点云数据）",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-017"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-49",
+      "parent": "AjI5ajCrkQR87gol3wgJ-39",
+      "label": "C02. 快速模型数据（手机照片测量）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">C02. </span>快速模型数据（手机照片测量）",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-018"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-153",
+      "parent": "AjI5ajCrkQR87gol3wgJ-39",
+      "label": "C02. 快速模型数据（手动输入尺寸）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">C02. </span>快速模型数据（手动输入尺寸）",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-019"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-41",
+      "parent": "AjI5ajCrkQR87gol3wgJ-39",
+      "label": "C03. 指甲序位信息",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">C03. </span>指甲序位信息",
+      "geometry": {
+        "y": "104",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-020"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-42",
+      "parent": "AjI5ajCrkQR87gol3wgJ-39",
+      "label": "C04. 手指（长度、肤色）信息【tbd】",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">C04. </span>手指（长度、肤色）信息【tbd】",
+      "geometry": {
+        "y": "130",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-021"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-43",
+      "parent": "1",
+      "label": "术语解释：\\n用户（User）：使用我们软件系统的人，不区分P端、B端和C端使用者（Customer） - 提供指甲数据 & 佩戴穿戴甲的人",
+      "rawValue": "<div>术语解释：</div><div><br></div><span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\"><b>用户（User）</b>：使用我们软件系统的人，不区分P端、B端和C端</span><br><span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\"><b>使用者（Customer）</b> - 提供指甲数据 &amp; 佩戴穿戴甲的人</span>",
+      "geometry": {
+        "x": "-190",
+        "y": "80",
+        "width": "360",
+        "height": "140"
+      },
+      "nodeId": "V107-022"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-44",
+      "parent": "1",
+      "label": "B0. 使用者信息数据库",
+      "rawValue": "B0. 使用者信息数据库",
+      "geometry": {
+        "x": "130",
+        "y": "930",
+        "width": "210",
+        "height": "222"
+      },
+      "nodeId": "V107-023"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-45",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B01. 使用者编号 #主键唯一，名称非唯一（允许重名）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B01. </span>使用者编号 #主键唯一，名称非唯一（允许重名）",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "40"
+      },
+      "nodeId": "V107-024"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-89",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B02. 指甲采集状态（快速 or 精准）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B02. </span>指甲采集状态（快速 or 精准）",
+      "geometry": {
+        "y": "66",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-025"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-47",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B03. 指甲数据",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B03. </span><span style=\"text-align: center; white-space: nowrap;\">指甲数据</span>",
+      "geometry": {
+        "y": "92",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-026"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-144",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B04. 设计方案信息",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B04. 设计方案信息</span><span style=\"text-align: center; white-space: nowrap;\">&nbsp;</span>",
+      "geometry": {
+        "y": "118",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-027"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-53",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B05. 生产工单信息",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B05. 生产</span><span style=\"white-space: nowrap; text-align: center;\">工单信息</span><span style=\"white-space: nowrap; text-align: center;\">&nbsp;</span>",
+      "geometry": {
+        "y": "144",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-028"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-145",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B06. 沟通 / 业务流程状态【tbd】",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B06. </span><span style=\"text-align: center; white-space: nowrap;\">沟通 / 业务流程状态【tbd】&nbsp;</span>",
+      "geometry": {
+        "y": "170",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-029"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-46",
+      "parent": "AjI5ajCrkQR87gol3wgJ-44",
+      "label": "B07. 偏好记录、标签数据【tbd】",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">B07. </span>偏好记录、标签数据【tbd】",
+      "geometry": {
+        "y": "196",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-030"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-54",
+      "parent": "1",
+      "label": "G0. 灵感数据库",
+      "rawValue": "G0. 灵感数据库",
+      "geometry": {
+        "x": "250",
+        "y": "1431",
+        "width": "210",
+        "height": "106"
+      },
+      "nodeId": "V107-031"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-55",
+      "parent": "AjI5ajCrkQR87gol3wgJ-54",
+      "label": "G01. 图片（实拍图、照片、AI图、设计图、海报）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">G01. </span>图片（实拍图、照片、AI图、设计图、海报<span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">）</span>",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "40"
+      },
+      "nodeId": "V107-032"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-70",
+      "parent": "AjI5ajCrkQR87gol3wgJ-54",
+      "label": "G02. 款式标签（自动或手动归类、定义）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">G02. </span>款式标签（自动或手动归类、定义<span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">）</span>",
+      "geometry": {
+        "y": "66",
+        "width": "210",
+        "height": "40"
+      },
+      "nodeId": "V107-033"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-59",
+      "parent": "1",
+      "label": "D0. 设计资产数据库",
+      "rawValue": "D0. 设计资产数据库",
+      "geometry": {
+        "x": "457",
+        "y": "1180",
+        "width": "210",
+        "height": "156"
+      },
+      "nodeId": "V107-034"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-60",
+      "parent": "AjI5ajCrkQR87gol3wgJ-59",
+      "label": "D011. 甲型库（基础款）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">D011. </span>甲型库（基础款）",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-035"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-82",
+      "parent": "AjI5ajCrkQR87gol3wgJ-59",
+      "label": "D012. 甲型库（特效款）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">D012. </span>甲型库（特效款）",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-036"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-83",
+      "parent": "AjI5ajCrkQR87gol3wgJ-59",
+      "label": "D021. 灵感库（可编辑2D元素）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">D021. </span>灵感库（可编辑2D元素）",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-037"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-81",
+      "parent": "AjI5ajCrkQR87gol3wgJ-59",
+      "label": "D022. 灵感库（2.5D的UV喷绘元素）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">D022. </span>灵感库（2.5D的UV喷绘元素）",
+      "geometry": {
+        "y": "104",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-038"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-63",
+      "parent": "AjI5ajCrkQR87gol3wgJ-59",
+      "label": "D023. 灵感库（3D 配件/ 附件）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">D023. </span>灵感库（3D 配件/ 附件）",
+      "geometry": {
+        "y": "130",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-039"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-64",
+      "parent": "1",
+      "label": "E0. 设计方案数据库",
+      "rawValue": "E0. 设计方案数据库",
+      "geometry": {
+        "x": "40",
+        "y": "1158",
+        "width": "210",
+        "height": "156"
+      },
+      "nodeId": "V107-040"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-22",
+      "parent": "AjI5ajCrkQR87gol3wgJ-64",
+      "label": "E01a. 客制化的设计方案",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">E01a. </span>客制化的设计方案",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-041"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-65",
+      "parent": "AjI5ajCrkQR87gol3wgJ-64",
+      "label": "E01b. 可复用的设计模板（成套）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">E01b.&nbsp;</span>可复用的设计模板（成套）",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-042"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-18",
+      "parent": "AjI5ajCrkQR87gol3wgJ-64",
+      "label": "E02. 设计方案状态（公开、隐私）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">E02. </span>设计方案状态（公开、隐私）",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-043"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-66",
+      "parent": "AjI5ajCrkQR87gol3wgJ-64",
+      "label": "E03. 设计单的生产状态",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">E03. 设计</span>单的生产状态",
+      "geometry": {
+        "y": "104",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-044"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-19",
+      "parent": "AjI5ajCrkQR87gol3wgJ-64",
+      "label": "E04. 设计方案版本信息【tbd】",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">E04. </span>设计方案版本信息【tbd】",
+      "geometry": {
+        "y": "130",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-045"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-71",
+      "parent": "1",
+      "label": "F0. 制造后台数据库",
+      "rawValue": "F0. 制造后台数据库",
+      "geometry": {
+        "x": "-177",
+        "y": "1330",
+        "width": "210",
+        "height": "144"
+      },
+      "nodeId": "V107-046"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-72",
+      "parent": "AjI5ajCrkQR87gol3wgJ-71",
+      "label": "F01. 设备生产任务单 #唯一性",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">F01. </span>设备生产任务单 #唯一性",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-047"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-73",
+      "parent": "AjI5ajCrkQR87gol3wgJ-71",
+      "label": "F02. 生产工艺参数 #设备一致性？",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">F02. </span>生产工艺参数 #设备一致性？",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-048"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-92",
+      "parent": "AjI5ajCrkQR87gol3wgJ-71",
+      "label": "F03. 耗材数据（用量、成本预测）",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">F03. </span>耗材数据（用量、成本预测）",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-049"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-93",
+      "parent": "AjI5ajCrkQR87gol3wgJ-71",
+      "label": "F04. 可制造数据（切片模型、RIP等）#长期保存，不保证可重复性",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">F04. </span>可制造数据（切片模型、RIP等）#长期保存，不保证可重复性",
+      "geometry": {
+        "y": "104",
+        "width": "210",
+        "height": "40"
+      },
+      "nodeId": "V107-050"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-96",
+      "parent": "1",
+      "label": "设计——DesignStudio\\nP端专业软件，设计 · 生意",
+      "rawValue": "<h1 style=\"margin-top: 0px;\">设计——DesignStudio</h1><p>P端专业软件，设计 · 生意</p>",
+      "geometry": {
+        "x": "433",
+        "y": "240",
+        "width": "290",
+        "height": "80"
+      },
+      "nodeId": "V107-051"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-98",
+      "parent": "1",
+      "label": "制造——软硬协同\\nM端软件，生产 · 执行",
+      "rawValue": "<h1 style=\"margin-top: 0px;\">制造——软硬协同</h1><p>M端软件，生产 · 执行</p>",
+      "geometry": {
+        "x": "1133",
+        "y": "240",
+        "width": "290",
+        "height": "80"
+      },
+      "nodeId": "V107-052"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-113",
+      "parent": "1",
+      "label": "灵感收藏夹 G0\\n（for virtual customer）",
+      "rawValue": "灵感收藏夹 G0<div>（for virtual customer）</div>",
+      "geometry": {
+        "x": "36",
+        "y": "450",
+        "width": "140",
+        "height": "30"
+      },
+      "nodeId": "V107-053"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-115",
+      "parent": "1",
+      "label": "信息入口\\nB0",
+      "rawValue": "<div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\"><font style=\"font-size: 10px;\">信息入口</font></span></div><div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\">B0</span></div>",
+      "geometry": {
+        "x": "723",
+        "y": "505",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-054"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-116",
+      "parent": "1",
+      "label": "指甲数据\\nC0",
+      "rawValue": "<div><span style=\"color: rgb(249, 255, 247);\"><font style=\"font-size: 10px;\">指甲数据</font></span></div><span style=\"color: rgb(249, 255, 247);\">C0</span>",
+      "geometry": {
+        "x": "797",
+        "y": "505",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-055"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-21",
+      "parent": "AjI5ajCrkQR87gol3wgJ-130",
+      "label": "发布 (公开或私人) / 下架",
+      "rawValue": "发布 (公开或私人)&nbsp; / 下架",
+      "geometry": {
+        "x": "0.7071",
+        "relative": "1"
+      },
+      "nodeId": "V107-056"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-127",
+      "parent": "1",
+      "label": "设计方案模板\\nE01",
+      "rawValue": "<div><font style=\"color: rgb(255, 255, 255); line-height: 100%;\">设计方案模板</font></div><font style=\"color: rgb(255, 255, 255); line-height: 100%;\">E01</font>",
+      "geometry": {
+        "x": "689.5",
+        "y": "740",
+        "width": "110",
+        "height": "60"
+      },
+      "nodeId": "V107-057"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-133",
+      "parent": "1",
+      "label": "信息出口：\\n社媒分享",
+      "rawValue": "信息出口：<div><span style=\"background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">社媒分享</span></div>",
+      "geometry": {
+        "x": "-430",
+        "y": "277",
+        "width": "99",
+        "height": "50"
+      },
+      "nodeId": "V107-058"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-25",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-23",
+      "label": "用户形态校验",
+      "rawValue": "用户形态校验",
+      "geometry": {
+        "x": "0.35",
+        "y": "1",
+        "relative": "1"
+      },
+      "nodeId": "V107-059"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-31",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-30",
+      "label": "新建Customer档案",
+      "rawValue": "新建Customer档案",
+      "geometry": {
+        "x": "-0.2333",
+        "y": "-2",
+        "relative": "1"
+      },
+      "nodeId": "V107-060"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-52",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-48",
+      "label": "新建设计方案",
+      "rawValue": "新建设计方案",
+      "geometry": {
+        "x": "-0.0099",
+        "y": "1",
+        "relative": "1"
+      },
+      "nodeId": "V107-061"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-76",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-75",
+      "label": "修改设计方案",
+      "rawValue": "修改设计方案",
+      "geometry": {
+        "x": "-0.3108",
+        "y": "3",
+        "relative": "1"
+      },
+      "nodeId": "V107-062"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "AjI5ajCrkQR87gol3wgJ-134",
+      "parent": "1",
+      "label": "无设备注册的用户形态\\nDashBoard A02+B04",
+      "rawValue": "<div>无设备注册的用户形态</div>DashBoard&nbsp; A02+B04",
+      "geometry": {
+        "x": "549.5",
+        "y": "420",
+        "width": "140",
+        "height": "60"
+      },
+      "nodeId": "V107-063"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-15",
+      "parent": "1",
+      "label": "形成客制化设计方案 E0",
+      "rawValue": "<font style=\"font-size: 10px;\">形成客制化设计方案&nbsp; E0</font>",
+      "geometry": {
+        "x": "1020",
+        "y": "578",
+        "width": "70",
+        "height": "50"
+      },
+      "nodeId": "V107-064"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-31",
+      "parent": "1",
+      "label": "TP01：可制造性检查",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP01：可制造性检查</span>",
+      "geometry": {
+        "x": "833",
+        "y": "874",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-065"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-32",
+      "parent": "Ck6FdHnIqsOK2ZLSTPjp-31",
+      "label": "+ 设计语言到工艺参数的映射\\n+ 图案从二维到三维的UV修正\\n+ 检查结果（错误码）及自动修复尝试",
+      "rawValue": "+ 设计语言到工艺参数的映射<div>+ 图案从二维到三维的UV修正</div><div>+ 检查结果（错误码）及自动修复尝试</div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-066"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-34",
+      "parent": "1",
+      "label": "设备已注册的用户形态\\nDashBoard A03/A04 + B05",
+      "rawValue": "<div>设备已注册的用户形态</div>DashBoard&nbsp; A03/A04 + B05",
+      "geometry": {
+        "x": "1170",
+        "y": "420",
+        "width": "180",
+        "height": "60"
+      },
+      "nodeId": "V107-067"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-91",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-90",
+      "label": "手工处理",
+      "rawValue": "手工处理",
+      "geometry": {
+        "x": "0.0829",
+        "y": "3",
+        "relative": "1"
+      },
+      "nodeId": "V107-068"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-38",
+      "parent": "1",
+      "label": "制造后台服务",
+      "rawValue": "制造后台服务",
+      "geometry": {
+        "x": "1680",
+        "y": "530",
+        "width": "120",
+        "height": "30"
+      },
+      "nodeId": "V107-069"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-42",
+      "parent": "1",
+      "label": "TP02：智能排产",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP02：智能排产</span>",
+      "geometry": {
+        "x": "833",
+        "y": "1029",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-070"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "Ck6FdHnIqsOK2ZLSTPjp-43",
+      "parent": "Ck6FdHnIqsOK2ZLSTPjp-42",
+      "label": "+ 多工单排产（考虑工艺限制，考虑用户标签信息）\\n+ 生产说明书（含制造信息说明、过程中的材料准备，以及后续人工处理工序）\\n+ 排产与设备状态（任务、资源、过程、异常）",
+      "rawValue": "+ 多工单排产（考虑工艺限制，考虑用户标签信息）<div>+ 生产说明书（含制造信息说明、过程中的材料准备，以及后续人工处理工序）</div><div>+&nbsp;<span style=\"text-align: center; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">排产与设备状态（</span><span style=\"font-size: 11px; text-align: center; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">任务、资源、过程、异常</span><span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); text-align: center;\">）</span></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-071"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-2",
+      "parent": "1",
+      "label": "用户入口",
+      "rawValue": "用户入口",
+      "geometry": {
+        "x": "-431",
+        "y": "364.5",
+        "width": "100",
+        "height": "50"
+      },
+      "nodeId": "V107-072"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-6",
+      "parent": "1",
+      "label": "系统信息",
+      "rawValue": "系统信息",
+      "geometry": {
+        "x": "-103",
+        "y": "585",
+        "width": "90",
+        "height": "90"
+      },
+      "nodeId": "V107-073"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-18",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-16",
+      "label": "自由设计",
+      "rawValue": "自由设计",
+      "geometry": {
+        "x": "-0.4802",
+        "y": "-2",
+        "relative": "1"
+      },
+      "nodeId": "V107-074"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-7",
+      "parent": "1",
+      "label": "设计入口",
+      "rawValue": "设计入口",
+      "geometry": {
+        "x": "36",
+        "y": "491",
+        "width": "140",
+        "height": "30"
+      },
+      "nodeId": "V107-075"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-14",
+      "parent": "1",
+      "label": "进入设计工作台",
+      "rawValue": "进入设计工作台",
+      "geometry": {
+        "x": "330",
+        "y": "475",
+        "width": "100",
+        "height": "60"
+      },
+      "nodeId": "V107-076"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-17",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-15",
+      "label": "一键复用",
+      "rawValue": "一键复用",
+      "geometry": {
+        "x": "-0.5183",
+        "y": "1",
+        "relative": "1"
+      },
+      "nodeId": "V107-077"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-24",
+      "parent": "1",
+      "label": "进入制造工作台",
+      "rawValue": "进入制造工作台",
+      "geometry": {
+        "x": "1030",
+        "y": "420",
+        "width": "100",
+        "height": "60"
+      },
+      "nodeId": "V107-078"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-32",
+      "parent": "1",
+      "label": "TP03",
+      "rawValue": "TP03",
+      "geometry": {
+        "x": "871.5",
+        "y": "505",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-079"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-33",
+      "parent": "1",
+      "label": "TP03：指甲数据完整性检查",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP03：指甲数据完整性检查</span>",
+      "geometry": {
+        "x": "833",
+        "y": "1184",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-080"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-34",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-33",
+      "label": "+ C0：数据标签与入库确认\\n+ 隐私 / 敏感信息(如指纹等生物信息) 抹除处理\\n+ 手部信息处理 & 储存",
+      "rawValue": "+ C0：数据标签与入库确认<div>+ 隐私 / 敏感信息(如指纹等生物信息) 抹除处理</div><div>+ 手部信息处理 &amp; 储存</div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-081"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-37",
+      "parent": "1",
+      "label": "选择C端用户\\nB0",
+      "rawValue": "<div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\"><font style=\"font-size: 10px;\">选择C端用户</font></span></div><div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\">B0</span></div>",
+      "geometry": {
+        "x": "581.75",
+        "y": "570",
+        "width": "75.5",
+        "height": "30"
+      },
+      "nodeId": "V107-082"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-38",
+      "parent": "1",
+      "label": "TP04：甲面设计",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP04：甲面设计</span>",
+      "geometry": {
+        "x": "1150",
+        "y": "874",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-083"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-39",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-38",
+      "label": "+ 设计图层与基础工具应用\\n+ 元素拖拽编辑（含2D与3D） D02\\n+ 文 / 图 / 草绘 生图 (CV)\\n+ 外部导入图片后的工序拆分（见参考图）",
+      "rawValue": "<font>+ 设计图层与基础工具应用</font><div><font>+&nbsp;<span style=\"background-color: rgb(255, 255, 255); white-space: nowrap; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">元素拖拽编辑（含2D与3D</span><span style=\"background-color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); white-space: nowrap;\">）&nbsp; D02</span></font></div><div><font>+&nbsp;<span style=\"background-color: rgb(255, 255, 255); white-space: nowrap; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">文 / 图 / 草绘 生图 (CV)</span></font></div><div><font><span style=\"background-color: rgb(255, 255, 255); white-space: nowrap; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">+&nbsp;</span><span style=\"background-color: rgb(255, 255, 255); white-space: nowrap; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">外部导入图片后的工序拆分（见参考图）</span></font></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-084"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-42",
+      "parent": "1",
+      "label": "选择常规甲型\\nD011 & D012",
+      "rawValue": "<div><span style=\"color: rgb(249, 255, 247);\"><font style=\"font-size: 10px;\">选择常规甲型</font></span></div><div><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\"><font style=\"font-size: 10px;\">D011 &amp; D012</font></span></div>",
+      "geometry": {
+        "x": "650",
+        "y": "615",
+        "width": "90",
+        "height": "30"
+      },
+      "nodeId": "V107-085"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-45",
+      "parent": "1",
+      "label": "TP04",
+      "rawValue": "TP04",
+      "geometry": {
+        "x": "850",
+        "y": "615",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-086"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-55",
+      "parent": "1",
+      "label": "档案入库\\nB0",
+      "rawValue": "<div><font color=\"#f9fff7\"><span style=\"font-size: 10px;\">档案入库</span></font></div><div><font color=\"#f9fff7\"><span style=\"font-size: 10px;\">B0</span></font></div>",
+      "geometry": {
+        "x": "940",
+        "y": "505",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-087"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-56",
+      "parent": "1",
+      "label": "选择Hero Effect\\nD012",
+      "rawValue": "<div><span style=\"color: rgb(249, 255, 247);\"><font style=\"font-size: 10px;\">选择Hero Effect</font></span></div><div><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\">D012</span></div>",
+      "geometry": {
+        "x": "684.5",
+        "y": "570",
+        "width": "90",
+        "height": "30"
+      },
+      "nodeId": "V107-088"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-58",
+      "parent": "1",
+      "label": "TP05：完成设计后的效果渲染 & 浏览",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP05：完成设计后的效果渲染 &amp; 浏览</span>",
+      "geometry": {
+        "x": "1150",
+        "y": "1030",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-089"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-59",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-58",
+      "label": "+ 2D渲染图浏览\\n+ 可旋转查看的3D渲染效果",
+      "rawValue": "<font>+ 2D渲染图浏览</font><div><font>+ 可旋转查看的<span style=\"text-wrap-mode: nowrap; background-color: rgb(255, 255, 255);\">3D渲染效果</span></font></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-090"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-60",
+      "parent": "1",
+      "label": "进入\\n设计工作台",
+      "rawValue": "<div><font color=\"#f9fff7\"><span style=\"font-size: 10px;\">进入</span></font></div><div><font color=\"#f9fff7\"><span style=\"font-size: 10px;\">设计工作台</span></font></div>",
+      "geometry": {
+        "x": "758",
+        "y": "615",
+        "width": "70",
+        "height": "30"
+      },
+      "nodeId": "V107-091"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-64",
+      "parent": "1",
+      "label": "TP05",
+      "rawValue": "TP05",
+      "geometry": {
+        "x": "950",
+        "y": "588",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-092"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-69",
+      "parent": "12kNu2aFKXC8U0Ivs1e3-68",
+      "label": "保存为模板",
+      "rawValue": "保存为模板",
+      "geometry": {
+        "x": "0.1932",
+        "y": "-16",
+        "relative": "1"
+      },
+      "nodeId": "V107-093"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-73",
+      "parent": "1",
+      "label": "选择客制化设计方案\\nB0",
+      "rawValue": "<div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\"><font style=\"font-size: 10px;\">选择</font></span><span style=\"font-size: 10px; background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));\">客制化设计方案</span></div><div style=\"\"><span style=\"color: light-dark(rgb(249, 255, 247), rgb(16, 21, 14)); background-color: transparent;\">B0</span></div>",
+      "geometry": {
+        "x": "574.5",
+        "y": "670",
+        "width": "110",
+        "height": "30"
+      },
+      "nodeId": "V107-094"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-79",
+      "parent": "1",
+      "label": "生产加工任务库\\nF0",
+      "rawValue": "<font style=\"font-size: 10px;\">生产加工任务库&nbsp;</font><div><font style=\"font-size: 10px;\">F0</font></div>",
+      "geometry": {
+        "x": "1310",
+        "y": "530",
+        "width": "90",
+        "height": "30"
+      },
+      "nodeId": "V107-095"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-82",
+      "parent": "1",
+      "label": "TP01",
+      "rawValue": "TP01",
+      "geometry": {
+        "x": "1170",
+        "y": "588",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-096"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-84",
+      "parent": "1",
+      "label": "TP02",
+      "rawValue": "TP02",
+      "geometry": {
+        "x": "1455",
+        "y": "530",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-097"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-87",
+      "parent": "1",
+      "label": "云端数据库",
+      "rawValue": "云端数据库",
+      "geometry": {
+        "x": "1880",
+        "y": "350",
+        "width": "60",
+        "height": "60"
+      },
+      "nodeId": "V107-098"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "12kNu2aFKXC8U0Ivs1e3-89",
+      "parent": "1",
+      "label": "美甲成品",
+      "rawValue": "美甲成品",
+      "geometry": {
+        "x": "1920",
+        "y": "525",
+        "width": "100",
+        "height": "40"
+      },
+      "nodeId": "V107-099"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-3",
+      "parent": "1",
+      "label": "设备状态管理",
+      "rawValue": "<span style=\"font-size: 10px;\">设备状态管理</span>",
+      "geometry": {
+        "x": "1390",
+        "y": "435",
+        "width": "75.5",
+        "height": "30"
+      },
+      "nodeId": "V107-100"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-6",
+      "parent": "1",
+      "label": "生产加工单",
+      "rawValue": "<span style=\"font-size: 10px;\">生产加工单</span>",
+      "geometry": {
+        "x": "1550",
+        "y": "530",
+        "width": "90",
+        "height": "30"
+      },
+      "nodeId": "V107-101"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-7",
+      "parent": "1",
+      "label": "生产说明书（材料、工序、人工处理要求）",
+      "rawValue": "<span style=\"font-size: 10px;\">生产说明书（</span><span style=\"background-color: transparent; font-size: 10px; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));\">材料、工序、人工处理要求）</span>",
+      "geometry": {
+        "x": "1550",
+        "y": "578",
+        "width": "90",
+        "height": "70"
+      },
+      "nodeId": "V107-102"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-12",
+      "parent": "1",
+      "label": "G0. 生产与设备记录",
+      "rawValue": "G0. 生产与设备记录",
+      "geometry": {
+        "x": "-177",
+        "y": "1510",
+        "width": "210",
+        "height": "104"
+      },
+      "nodeId": "V107-103"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-13",
+      "parent": "BGxW3iIrsRmepJBDTubF-12",
+      "label": "G01. 错误码",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">G01. 错误码</span>",
+      "geometry": {
+        "y": "26",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-104"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-17",
+      "parent": "BGxW3iIrsRmepJBDTubF-12",
+      "label": "G02. OTA升级信息",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">G02. OTA升级信息</span>",
+      "geometry": {
+        "y": "52",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-105"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "BGxW3iIrsRmepJBDTubF-14",
+      "parent": "BGxW3iIrsRmepJBDTubF-12",
+      "label": "...",
+      "rawValue": "<span style=\"text-align: center; white-space: nowrap;\">...</span>",
+      "geometry": {
+        "y": "78",
+        "width": "210",
+        "height": "26"
+      },
+      "nodeId": "V107-106"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "FD8wMF0tNUDsrMwd3THR-8",
+      "parent": "FD8wMF0tNUDsrMwd3THR-7",
+      "label": "用户注册",
+      "rawValue": "用户注册",
+      "geometry": {
+        "x": "0.0888",
+        "y": "9",
+        "relative": "1"
+      },
+      "nodeId": "V107-107"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "FD8wMF0tNUDsrMwd3THR-10",
+      "parent": "FD8wMF0tNUDsrMwd3THR-9",
+      "label": "设备注册",
+      "rawValue": "设备注册",
+      "geometry": {
+        "x": "-0.0503",
+        "y": "2",
+        "relative": "1"
+      },
+      "nodeId": "V107-108"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-1",
+      "parent": "1",
+      "label": "用户注册",
+      "rawValue": "用户注册",
+      "geometry": {
+        "x": "-13",
+        "y": "585",
+        "width": "230",
+        "height": "30"
+      },
+      "nodeId": "V107-109"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-3",
+      "parent": "1",
+      "label": "将CustomerID和设计方案发送给另一个有设备的用户",
+      "rawValue": "<div><span style=\"background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));\">将CustomerID和设计方案发送给另一个有设备的用户</span></div>",
+      "geometry": {
+        "x": "250",
+        "y": "540",
+        "width": "168",
+        "height": "60"
+      },
+      "nodeId": "V107-110"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-5",
+      "parent": "1",
+      "label": "TP06：标签自动分类识别",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">TP06：标签自动分类识别</span>",
+      "geometry": {
+        "x": "1150",
+        "y": "1184",
+        "width": "300",
+        "height": "140"
+      },
+      "nodeId": "V107-111"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-6",
+      "parent": "nYCefA4Zr1cWTN-4DUCK-5",
+      "label": "+ ...\\n+ ...",
+      "rawValue": "<font>+ ...</font><div><font>+ ...</font></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "90"
+      },
+      "nodeId": "V107-112"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-7",
+      "parent": "1",
+      "label": "TP06",
+      "rawValue": "TP06",
+      "geometry": {
+        "x": "570",
+        "y": "755",
+        "width": "50",
+        "height": "30"
+      },
+      "nodeId": "V107-113"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-11",
+      "parent": "1",
+      "label": "FP01",
+      "rawValue": "<font style=\"font-size: 13px;\">FP01</font>",
+      "geometry": {
+        "x": "1300",
+        "y": "340",
+        "width": "60",
+        "height": "40"
+      },
+      "nodeId": "V107-114"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-12",
+      "parent": "1",
+      "label": "FP01：用户等级设计",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP01：用户等级设计</span>",
+      "geometry": {
+        "x": "1580",
+        "y": "874",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-115"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-13",
+      "parent": "nYCefA4Zr1cWTN-4DUCK-12",
+      "label": "+ 等级定义：根据甲片生产完成数量定义\\n+ 等级定义：可以官方授权（pgc）以下为功能埋点（非MVP阶段工作）：+ 经营相关：MAP寻找门店\\n+ 经营相关：耗材价格折扣\\n+ 经营相关：报表功能\\n+ 法务风险相关：生物信息 / 隐私条例",
+      "rawValue": "<font>+ 等级定义：根据甲片生产完成数量定义</font><div><font>+ 等级定义：可以官方授权（pgc）<br><br><b>以下为功能埋点（非MVP阶段工作）：</b><br><br>+ 经营相关：MAP寻找门店</font><div>+ 经营相关：耗材价格折扣</div><div>+ 经营相关：报表功能</div><div><br></div><div>+ 法务风险相关：生物信息 / 隐私条例</div></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-116"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-14",
+      "parent": "1",
+      "label": "问题池\\n1. [done]设备共享？还是方案发送？\\n2. [后续解决，不影响]设备1的4次采集/拍照的2次采集，怎么关联到单一customer？\\n3. 【done】是否接收非官方设计资产？MVP暂不接受\\n4. 【done】设计方案是否注明官方【都行】？是否限制ugc【是的，数量限制，与等级挂钩】？如何评审pgc【自动等级，或授权顶级】？推荐算法，用户等级是非常重的权重。对于非官方的，需要引入发布内容的后台审核？社区平台的运营和营销成本，需要考虑被利润覆盖。（比如说，允许user发布方案的数量，与用户等级阶梯绑定。比如我是1级，只能发2个方案；2级的，发5个方案；0级的，1个方案）",
+      "rawValue": "<div style=\"text-align: center;\"><b style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">问题池</b></div><div>1. [done]设备共享？还是方案发送？</div><div>2. [后续解决，不影响]设备1的4次采集/拍照的2次采集，怎么关联到单一customer？</div><div>3. 【done】是否接收非官方设计资产？MVP暂不接受</div><div>4. 【done】设计方案是否注明官方【都行】？是否限制ugc【是的，数量限制，与等级挂钩】？如何评审pgc【自动等级，或授权顶级】？推荐算法，用户等级是非常重的权重。对于非官方的，需要引入发布内容的后台审核？社区平台的运营和营销成本，需要考虑被利润覆盖。（比如说，允许user发布方案的数量，与用户等级阶梯绑定。比如我是1级，只能发2个方案；2级的，发5个方案；0级的，1个方案）</div>",
+      "geometry": {
+        "x": "2000",
+        "y": "700",
+        "width": "420",
+        "height": "244"
+      },
+      "nodeId": "V107-117"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-15",
+      "parent": "1",
+      "label": "FP02",
+      "rawValue": "<font style=\"font-size: 13px;\">FP02</font>",
+      "geometry": {
+        "x": "-143",
+        "y": "655",
+        "width": "60",
+        "height": "40"
+      },
+      "nodeId": "V107-118"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-16",
+      "parent": "1",
+      "label": "FP02：社区交互功能",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP02：社区交互功能</span>",
+      "geometry": {
+        "x": "1580",
+        "y": "1112",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-119"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "nYCefA4Zr1cWTN-4DUCK-17",
+      "parent": "nYCefA4Zr1cWTN-4DUCK-16",
+      "label": "+ 关注以下为待计划项（非MVP阶段工作）：+ 使用设备 / DesignStudio的分享视频\\n+ 实时的AR试戴交互",
+      "rawValue": "<font>+ 关注<br><br><b>以下为待计划项（非MVP阶段工作）：</b><br><br>+ 使用设备 / DesignStudio的分享视频</font><div><font>+ 实时的AR试戴交互</font></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-120"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-1",
+      "parent": "1",
+      "label": "FP03：Customer的信息及甲片数据",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP03：Customer的信息及甲片数据</span>",
+      "geometry": {
+        "x": "1580",
+        "y": "1350",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-121"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-2",
+      "parent": "hK2SgUetUaSExaoxBdzd-1",
+      "label": "+ 使用门槛考虑，customer归集到user下面，不可迁移\\n以下为功能埋点（非MVP阶段工作）：+ 业务需求考虑，customer的数据可迁移",
+      "rawValue": "<font>+ 使用门槛考虑，customer归集到user下面，不可迁移</font><div><font><br><b>以下为功能埋点（非MVP阶段工作）：</b><br><br>+ 业务需求考虑，customer的数据可迁移<br></font></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-122"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-3",
+      "parent": "1",
+      "label": "FP04",
+      "rawValue": "<font style=\"font-size: 13px;\">FP04</font>",
+      "geometry": {
+        "x": "799.5",
+        "y": "465",
+        "width": "60",
+        "height": "40"
+      },
+      "nodeId": "V107-123"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-4",
+      "parent": "1",
+      "label": "FP04：Customer的信息和采集信息匹配整合",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP04：Customer的信息和采集信息匹配整合</span>",
+      "geometry": {
+        "x": "1190",
+        "y": "1360",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-124"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-5",
+      "parent": "hK2SgUetUaSExaoxBdzd-4",
+      "label": "+ ？？？",
+      "rawValue": "<font>+ ？？？</font>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-125"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-6",
+      "parent": "1",
+      "label": "FP05",
+      "rawValue": "<font style=\"font-size: 13px;\">FP05</font>",
+      "geometry": {
+        "x": "369",
+        "y": "575",
+        "width": "60",
+        "height": "40"
+      },
+      "nodeId": "V107-126"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-7",
+      "parent": "1",
+      "label": "FP05：关于设备共享 / Customer和设计方案共享",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP05：关于设备共享 / Customer和设计方案共享</span>",
+      "geometry": {
+        "x": "840",
+        "y": "1360",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-127"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-8",
+      "parent": "hK2SgUetUaSExaoxBdzd-7",
+      "label": "+ MVP阶段，仅实现Customer和设计方案的发送共享\\n以下为功能埋点（非MVP阶段工作）：\\n+ 出于经营目的的门店管理，需要设备授权共享。要注意任务排序和并发问题",
+      "rawValue": "<font>+ MVP阶段，仅实现Customer和设计方案的发送共享</font><div><font><br></font></div><div><font><br><b>以下为功能埋点（非MVP阶段工作）：</b></font></div><div><br></div><div><br>+ 出于经营目的的门店管理，需要设备授权共享。要注意任务排序和并发问题</div><div><br></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-128"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-9",
+      "parent": "1",
+      "label": "模板库保存\\n（for true customer）",
+      "rawValue": "模板库保存<div>（for true customer）</div>",
+      "geometry": {
+        "x": "36",
+        "y": "538",
+        "width": "140",
+        "height": "30"
+      },
+      "nodeId": "V107-129"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-11",
+      "parent": "1",
+      "label": "FP06",
+      "rawValue": "<font style=\"font-size: 13px;\">FP06</font>",
+      "geometry": {
+        "x": "684.5",
+        "y": "410",
+        "width": "60",
+        "height": "40"
+      },
+      "nodeId": "V107-130"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-12",
+      "parent": "1",
+      "label": "FP06：关于virtual customer",
+      "rawValue": "<span style=\"font-size: 12px; font-weight: 700;\">FP06：关于virtual customer</span>",
+      "geometry": {
+        "x": "840",
+        "y": "1600",
+        "width": "300",
+        "height": "212"
+      },
+      "nodeId": "V107-131"
+    },
+    {
+      "diagramIndex": 1,
+      "diagramName": "用户旅程及数据映射",
+      "cellId": "hK2SgUetUaSExaoxBdzd-13",
+      "parent": "hK2SgUetUaSExaoxBdzd-12",
+      "label": "+ 提供指甲信息已输入的一个虚拟customer，便于一键复用、一键修改、以及纯粹的样式设计。\\n+ 模板在user下面独立保存，用于真实custormer的复用",
+      "rawValue": "<font>+ 提供指甲信息已输入的一个虚拟customer，便于一键复用、一键修改、以及纯粹的样式设计。</font><div><br></div><div>+ 模板在user下面独立保存，用于真实custormer的复用<br><div><br></div></div>",
+      "geometry": {
+        "y": "50",
+        "width": "300",
+        "height": "162"
+      },
+      "nodeId": "V107-132"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "AcMRuD6REXZYilk8Ch4p-4",
+      "parent": "1",
+      "label": "2026-7 2026-8 2026-9 2026-10 2026-11 2026-12 2027-1 2027-2 2027-3 2027-4 2027-5",
+      "rawValue": "2026-7<span style=\"white-space: pre;\">\t<span style=\"white-space: pre;\">\t</span></span>2026-8<span style=\"white-space: pre;\"><span style=\"white-space: pre;\">\t</span></span><span style=\"white-space: pre;\">\t</span>2026-9<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2026-10<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2026-11<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2026-12<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\"><span style=\"white-space: pre;\">\t</span></span>2027-1<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2027-2<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2027-3<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2027-4<span style=\"white-space: pre;\">\t</span><span style=\"white-space: pre;\">\t</span>2027-5",
+      "geometry": {
+        "x": "90",
+        "y": "220",
+        "width": "1030",
+        "height": "30"
+      },
+      "nodeId": "V107-133"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "AcMRuD6REXZYilk8Ch4p-8",
+      "parent": "1",
+      "label": "产品开发",
+      "rawValue": "产品开发",
+      "geometry": {
+        "x": "110",
+        "y": "260",
+        "width": "335",
+        "height": "50"
+      },
+      "nodeId": "V107-134"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "AcMRuD6REXZYilk8Ch4p-10",
+      "parent": "1",
+      "label": "TINT项目总线",
+      "rawValue": "TINT项目总线",
+      "geometry": {
+        "x": "-40",
+        "y": "270",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-135"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "AcMRuD6REXZYilk8Ch4p-11",
+      "parent": "1",
+      "label": "工程验证",
+      "rawValue": "工程验证",
+      "geometry": {
+        "x": "445",
+        "y": "260",
+        "width": "255",
+        "height": "50"
+      },
+      "nodeId": "V107-136"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "AcMRuD6REXZYilk8Ch4p-12",
+      "parent": "1",
+      "label": "外部验证",
+      "rawValue": "外部验证",
+      "geometry": {
+        "x": "700",
+        "y": "260",
+        "width": "210",
+        "height": "50"
+      },
+      "nodeId": "V107-137"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-1",
+      "parent": "1",
+      "label": "数字化系统里程碑",
+      "rawValue": "数字化系统里程碑",
+      "geometry": {
+        "x": "-40",
+        "y": "346",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-138"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-7",
+      "parent": "1",
+      "label": "全流程BVT启动",
+      "rawValue": "全流程BVT启动",
+      "geometry": {
+        "x": "471",
+        "y": "340",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-139"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-9",
+      "parent": "1",
+      "label": "CES展示",
+      "rawValue": "CES展示",
+      "geometry": {
+        "x": "540",
+        "y": "340",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-140"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-11",
+      "parent": "1",
+      "label": "发布版本锁定",
+      "rawValue": "发布版本锁定",
+      "geometry": {
+        "x": "690",
+        "y": "336",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-141"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-13",
+      "parent": "1",
+      "label": "设备端联调验收",
+      "rawValue": "设备端联调验收",
+      "geometry": {
+        "x": "384",
+        "y": "340",
+        "width": "70",
+        "height": "30"
+      },
+      "nodeId": "V107-142"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "KD8ScPhyjzYhAHbTuvq6-15",
+      "parent": "1",
+      "label": "开发功能锁定",
+      "rawValue": "开发功能锁定",
+      "geometry": {
+        "x": "213",
+        "y": "340",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-143"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "gM90Km4c31RjslbebsaV-1",
+      "parent": "1",
+      "label": "MVP模块1 ：灵感\\n—— 内容社区",
+      "rawValue": "MVP模块1 ：灵感<div><div>—— 内容社区</div></div>",
+      "geometry": {
+        "x": "-40.5",
+        "y": "476",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-144"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ed02dJyUD2DYFATCyv6s-1",
+      "parent": "1",
+      "label": "MVP模块2 ：设计\\n—— DesignStudio",
+      "rawValue": "MVP模块2 ：设计<div>—— DesignStudio</div>",
+      "geometry": {
+        "x": "-40",
+        "y": "629.5",
+        "width": "170",
+        "height": "30"
+      },
+      "nodeId": "V107-145"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ed02dJyUD2DYFATCyv6s-2",
+      "parent": "1",
+      "label": "MVP模块3 ：制造\\n—— 设备协同",
+      "rawValue": "MVP模块3 ：制造<div>—— 设备协同</div>",
+      "geometry": {
+        "x": "-40.5",
+        "y": "798",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-146"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-1",
+      "parent": "1",
+      "label": "产品定义 & demo验证",
+      "rawValue": "产品定义 &amp; demo验证",
+      "geometry": {
+        "x": "170",
+        "y": "431",
+        "width": "93",
+        "height": "30"
+      },
+      "nodeId": "V107-147"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-3",
+      "parent": "1",
+      "label": "产品定义",
+      "rawValue": "产品定义&nbsp;",
+      "geometry": {
+        "x": "109.5",
+        "y": "738",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-148"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-4",
+      "parent": "1",
+      "label": "MES开发",
+      "rawValue": "MES开发",
+      "geometry": {
+        "x": "139.5",
+        "y": "768",
+        "width": "150",
+        "height": "30"
+      },
+      "nodeId": "V107-149"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-5",
+      "parent": "1",
+      "label": "设备工程软件开发验证",
+      "rawValue": "设备工程软件开发验证",
+      "geometry": {
+        "x": "139.5",
+        "y": "828",
+        "width": "255",
+        "height": "30"
+      },
+      "nodeId": "V107-150"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-6",
+      "parent": "1",
+      "label": "ioT开发验证",
+      "rawValue": "ioT<span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">开发验证</span>",
+      "geometry": {
+        "x": "169.5",
+        "y": "798",
+        "width": "190",
+        "height": "30"
+      },
+      "nodeId": "V107-151"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-7",
+      "parent": "1",
+      "label": "Mock联调",
+      "rawValue": "Mock联调",
+      "geometry": {
+        "x": "349.5",
+        "y": "858",
+        "width": "93",
+        "height": "30"
+      },
+      "nodeId": "V107-152"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-8",
+      "parent": "1",
+      "label": "软硬件\\n协同联调",
+      "rawValue": "软硬件<div>协同联调</div>",
+      "geometry": {
+        "x": "442.5",
+        "y": "858",
+        "width": "78",
+        "height": "30"
+      },
+      "nodeId": "V107-153"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-9",
+      "parent": "1",
+      "label": "产品定义 & demo验证",
+      "rawValue": "产品定义 &amp; demo验证",
+      "geometry": {
+        "x": "130",
+        "y": "554",
+        "width": "133",
+        "height": "30"
+      },
+      "nodeId": "V107-154"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-10",
+      "parent": "1",
+      "label": "功能技术点（交互部分）开发验证",
+      "rawValue": "功能技术点（交互部分）<span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">开发验证</span>",
+      "geometry": {
+        "x": "259",
+        "y": "584",
+        "width": "210",
+        "height": "30"
+      },
+      "nodeId": "V107-155"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "jCmQiwiuhCwtGp_nZ3i7-12",
+      "parent": "1",
+      "label": "后端开发",
+      "rawValue": "后端开发",
+      "geometry": {
+        "x": "290",
+        "y": "645",
+        "width": "275",
+        "height": "30"
+      },
+      "nodeId": "V107-156"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-9",
+      "parent": "1",
+      "label": "全流程联调",
+      "rawValue": "全流程联调",
+      "geometry": {
+        "x": "520.5",
+        "y": "431",
+        "width": "218",
+        "height": "457"
+      },
+      "nodeId": "V107-157"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-12",
+      "parent": "1",
+      "label": "功能技术点（CV部分）开发验证",
+      "rawValue": "功能技术点（CV部分）<span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">开发验证</span>",
+      "geometry": {
+        "x": "259",
+        "y": "614",
+        "width": "261",
+        "height": "30"
+      },
+      "nodeId": "V107-158"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-14",
+      "parent": "1",
+      "label": "后端开发",
+      "rawValue": "后端开发",
+      "geometry": {
+        "x": "290.5",
+        "y": "492",
+        "width": "274.5",
+        "height": "30"
+      },
+      "nodeId": "V107-159"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-16",
+      "parent": "1",
+      "label": "前端开发",
+      "rawValue": "前端开发",
+      "geometry": {
+        "x": "290",
+        "y": "522",
+        "width": "275",
+        "height": "30"
+      },
+      "nodeId": "V107-160"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "tJVpETOogvd3eC4H2GfQ-1",
+      "parent": "1",
+      "label": "功能技术点（CV部分）开发验证",
+      "rawValue": "功能技术点（CV部分）<span style=\"color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); background-color: transparent;\">开发验证</span>",
+      "geometry": {
+        "x": "259",
+        "y": "461",
+        "width": "201.25",
+        "height": "30"
+      },
+      "nodeId": "V107-161"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-1",
+      "parent": "1",
+      "label": "设计内容资产【阶段1】",
+      "rawValue": "设计内容资产【阶段1】",
+      "geometry": {
+        "x": "150",
+        "y": "706",
+        "width": "140",
+        "height": "30"
+      },
+      "nodeId": "V107-162"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-2",
+      "parent": "1",
+      "label": "设计内容资产【阶段2】",
+      "rawValue": "设计内容资产【阶段2】",
+      "geometry": {
+        "x": "290",
+        "y": "706",
+        "width": "150",
+        "height": "30"
+      },
+      "nodeId": "V107-163"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-3",
+      "parent": "1",
+      "label": "设计内容资产【阶段3】",
+      "rawValue": "设计内容资产【阶段3】",
+      "geometry": {
+        "x": "440",
+        "y": "706",
+        "width": "255",
+        "height": "30"
+      },
+      "nodeId": "V107-164"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-5",
+      "parent": "1",
+      "label": "设计内容资产【阶段4】",
+      "rawValue": "设计内容资产【阶段4】",
+      "geometry": {
+        "x": "695",
+        "y": "704",
+        "width": "255",
+        "height": "30"
+      },
+      "nodeId": "V107-165"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-7",
+      "parent": "1",
+      "label": "软件系统后续开发",
+      "rawValue": "软件系统后续开发",
+      "geometry": {
+        "x": "-40.5",
+        "y": "899",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-166"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-8",
+      "parent": "1",
+      "label": "产品定义 & demo验证",
+      "rawValue": "产品定义 &amp; demo验证",
+      "geometry": {
+        "x": "520",
+        "y": "899",
+        "width": "93",
+        "height": "30"
+      },
+      "nodeId": "V107-167"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-9",
+      "parent": "1",
+      "label": "市场共创与验证\\n（Spark Muse）",
+      "rawValue": "市场共创与验证<div>（Spark Muse）</div>",
+      "geometry": {
+        "x": "-40.5",
+        "y": "390",
+        "width": "160",
+        "height": "30"
+      },
+      "nodeId": "V107-168"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-18",
+      "parent": "ESlqv98ED7_XCXOWtkyI-19",
+      "label": "Shaper",
+      "rawValue": "<article class=\"4ever-article\"><span><strong>Shaper</strong></span></article>",
+      "geometry": {
+        "x": "15",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-169"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-22",
+      "parent": "ESlqv98ED7_XCXOWtkyI-20",
+      "label": "Luminaries",
+      "rawValue": "<article class=\"4ever-article\"><article class=\"4ever-article\"><span><strong>Luminaries</strong></span></article></article>",
+      "geometry": {
+        "x": "17",
+        "width": "75",
+        "height": "30"
+      },
+      "nodeId": "V107-170"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "ESlqv98ED7_XCXOWtkyI-26",
+      "parent": "ESlqv98ED7_XCXOWtkyI-24",
+      "label": "FirstMaker",
+      "rawValue": "<article class=\"4ever-article\"><article class=\"4ever-article\"><span><strong>FirstMaker</strong></span></article></article>",
+      "geometry": {
+        "x": "24",
+        "width": "60",
+        "height": "30"
+      },
+      "nodeId": "V107-171"
+    },
+    {
+      "diagramIndex": 2,
+      "diagramName": "RoadMap",
+      "cellId": "vUvu2gbfOfCLLEmFJbO6-3",
+      "parent": "1",
+      "label": "前端开发",
+      "rawValue": "前端开发",
+      "geometry": {
+        "x": "290",
+        "y": "675",
+        "width": "275",
+        "height": "30"
+      },
+      "nodeId": "V107-172"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-1",
+      "parent": "1",
+      "label": "产品 / 功能总览",
+      "rawValue": "产品 / 功能总览",
+      "geometry": {
+        "x": "50",
+        "y": "50",
+        "width": "500",
+        "height": "40"
+      },
+      "nodeId": "V107-173"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-2",
+      "parent": "1",
+      "label": "两个前台产品：社区、工作台；制造能力位于后台，为工作台提供制造承接和生产反馈",
+      "rawValue": "两个前台产品：社区、工作台；制造能力位于后台，为工作台提供制造承接和生产反馈",
+      "geometry": {
+        "x": "50",
+        "y": "94",
+        "width": "1000",
+        "height": "28"
+      },
+      "nodeId": "V107-174"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-3",
+      "parent": "1",
+      "label": "社区产品",
+      "rawValue": "社区产品",
+      "geometry": {
+        "x": "50",
+        "y": "156",
+        "width": "760",
+        "height": "320"
+      },
+      "nodeId": "V107-175"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-4",
+      "parent": "1",
+      "label": "工作台产品 / DesignStudio",
+      "rawValue": "工作台产品 / DesignStudio",
+      "geometry": {
+        "x": "850",
+        "y": "156",
+        "width": "760",
+        "height": "320"
+      },
+      "nodeId": "V107-176"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-5",
+      "parent": "1",
+      "label": "社区入口 / 首页",
+      "rawValue": "社区入口 / 首页",
+      "geometry": {
+        "x": "90",
+        "y": "222",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-177"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-6",
+      "parent": "1",
+      "label": "内容浏览发现 / 搜索 / 推荐",
+      "rawValue": "内容浏览<br><font style=\"font-size:11px\">发现 / 搜索 / 推荐</font>",
+      "geometry": {
+        "x": "320",
+        "y": "222",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-178"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-7",
+      "parent": "1",
+      "label": "灵感内容库实拍图 / AI 图 / 设计图 / 海报",
+      "rawValue": "灵感内容库<br><font style=\"font-size:11px\">实拍图 / AI 图 / 设计图 / 海报</font>",
+      "geometry": {
+        "x": "550",
+        "y": "222",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-179"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-8",
+      "parent": "1",
+      "label": "灵感收藏 / 分享",
+      "rawValue": "灵感收藏 / 分享",
+      "geometry": {
+        "x": "90",
+        "y": "308",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-180"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-9",
+      "parent": "1",
+      "label": "互动体验AR 试戴 / 反馈",
+      "rawValue": "互动体验<br><font style=\"font-size:11px\">AR 试戴 / 反馈</font>",
+      "geometry": {
+        "x": "320",
+        "y": "308",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-181"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-10",
+      "parent": "1",
+      "label": "通知与沟通问答 / 联系 / 消息",
+      "rawValue": "通知与沟通<br><font style=\"font-size:11px\">问答 / 联系 / 消息</font>",
+      "geometry": {
+        "x": "550",
+        "y": "308",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-182"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-11",
+      "parent": "1",
+      "label": "内容管理发布 / 标签 / 公开范围",
+      "rawValue": "内容管理<br><font style=\"font-size:11px\">发布 / 标签 / 公开范围</font>",
+      "geometry": {
+        "x": "90",
+        "y": "394",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-183"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-12",
+      "parent": "1",
+      "label": "基础规则隐私 / 协议 / 法务要求",
+      "rawValue": "基础规则<br><font style=\"font-size:11px\">隐私 / 协议 / 法务要求</font>",
+      "geometry": {
+        "x": "320",
+        "y": "394",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-184"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-13",
+      "parent": "1",
+      "label": "社区数据沉淀作品、标签、收藏、反馈",
+      "rawValue": "社区数据沉淀<br><font style=\"font-size:11px\">作品、标签、收藏、反馈</font>",
+      "geometry": {
+        "x": "550",
+        "y": "394",
+        "width": "200",
+        "height": "52"
+      },
+      "nodeId": "V107-185"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-14",
+      "parent": "1",
+      "label": "创作准备",
+      "rawValue": "创作准备",
+      "geometry": {
+        "x": "870",
+        "y": "222",
+        "width": "88",
+        "height": "52"
+      },
+      "nodeId": "V107-186"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-15",
+      "parent": "1",
+      "label": "设计创作",
+      "rawValue": "设计创作",
+      "geometry": {
+        "x": "870",
+        "y": "308",
+        "width": "88",
+        "height": "52"
+      },
+      "nodeId": "V107-187"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-16",
+      "parent": "1",
+      "label": "方案与制造",
+      "rawValue": "方案与制造",
+      "geometry": {
+        "x": "870",
+        "y": "394",
+        "width": "88",
+        "height": "52"
+      },
+      "nodeId": "V107-188"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-17",
+      "parent": "1",
+      "label": "个人入口账号 / 用户信息 / 通知",
+      "rawValue": "个人入口<br><font style=\"font-size:11px\">账号 / 用户信息 / 通知</font>",
+      "geometry": {
+        "x": "978",
+        "y": "222",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-189"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-18",
+      "parent": "1",
+      "label": "用户与指甲数据照片测量 / 手动尺寸 / 精准模型",
+      "rawValue": "用户与指甲数据<br><font style=\"font-size:11px\">照片测量 / 手动尺寸 / 精准模型</font>",
+      "geometry": {
+        "x": "1188",
+        "y": "222",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-190"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-19",
+      "parent": "1",
+      "label": "灵感与素材处理收藏引用 / 外部图片导入",
+      "rawValue": "灵感与素材处理<br><font style=\"font-size:11px\">收藏引用 / 外部图片导入</font>",
+      "geometry": {
+        "x": "1398",
+        "y": "222",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-191"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-20",
+      "parent": "1",
+      "label": "AI 创作文 / 图 / 草绘生图",
+      "rawValue": "AI 创作<br><font style=\"font-size:11px\">文 / 图 / 草绘生图</font>",
+      "geometry": {
+        "x": "978",
+        "y": "308",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-192"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-21",
+      "parent": "1",
+      "label": "设计编辑元素拖拽 / 图层 / 参数",
+      "rawValue": "设计编辑<br><font style=\"font-size:11px\">元素拖拽 / 图层 / 参数</font>",
+      "geometry": {
+        "x": "1188",
+        "y": "308",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-193"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-22",
+      "parent": "1",
+      "label": "效果预览2D / 3D / 渲染 / 浏览",
+      "rawValue": "效果预览<br><font style=\"font-size:11px\">2D / 3D / 渲染 / 浏览</font>",
+      "geometry": {
+        "x": "1398",
+        "y": "308",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-194"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-23",
+      "parent": "1",
+      "label": "设计方案管理保存 / 版本 / 模板 / 公开范围",
+      "rawValue": "设计方案管理<br><font style=\"font-size:11px\">保存 / 版本 / 模板 / 公开范围</font>",
+      "geometry": {
+        "x": "978",
+        "y": "394",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-195"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-24",
+      "parent": "1",
+      "label": "客制化模型生成设计方案 → 穿戴甲模型",
+      "rawValue": "客制化模型生成<br><font style=\"font-size:11px\">设计方案 → 穿戴甲模型</font>",
+      "geometry": {
+        "x": "1188",
+        "y": "394",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-196"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-25",
+      "parent": "1",
+      "label": "制造任务入口检查 / 加工单 / 状态查看",
+      "rawValue": "制造任务入口<br><font style=\"font-size:11px\">检查 / 加工单 / 状态查看</font>",
+      "geometry": {
+        "x": "1398",
+        "y": "394",
+        "width": "190",
+        "height": "52"
+      },
+      "nodeId": "V107-197"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-26",
+      "parent": "1",
+      "label": "制造后台能力（工作台的后台支撑）",
+      "rawValue": "制造后台能力（工作台的后台支撑）",
+      "geometry": {
+        "x": "50",
+        "y": "516",
+        "width": "1560",
+        "height": "170"
+      },
+      "nodeId": "V107-198"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-27",
+      "parent": "1",
+      "label": "可制造性检查设计语言 → 工艺参数；UV 修正",
+      "rawValue": "可制造性检查<br><font style=\"font-size:11px\">设计语言 → 工艺参数；UV 修正</font>",
+      "geometry": {
+        "x": "80",
+        "y": "582",
+        "width": "280",
+        "height": "56"
+      },
+      "nodeId": "V107-199"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-28",
+      "parent": "1",
+      "label": "加工单与生产说明材料、工序、人工处理要求",
+      "rawValue": "加工单与生产说明<br><font style=\"font-size:11px\">材料、工序、人工处理要求</font>",
+      "geometry": {
+        "x": "385",
+        "y": "582",
+        "width": "280",
+        "height": "56"
+      },
+      "nodeId": "V107-200"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-29",
+      "parent": "1",
+      "label": "智能排产工艺限制、任务顺序、资源安排",
+      "rawValue": "智能排产<br><font style=\"font-size:11px\">工艺限制、任务顺序、资源安排</font>",
+      "geometry": {
+        "x": "690",
+        "y": "582",
+        "width": "280",
+        "height": "56"
+      },
+      "nodeId": "V107-201"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-30",
+      "parent": "1",
+      "label": "制作过程监控机器 + 人工；状态与异常记录",
+      "rawValue": "制作过程监控<br><font style=\"font-size:11px\">机器 + 人工；状态与异常记录</font>",
+      "geometry": {
+        "x": "995",
+        "y": "582",
+        "width": "280",
+        "height": "56"
+      },
+      "nodeId": "V107-202"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-31",
+      "parent": "1",
+      "label": "生产结果回传",
+      "rawValue": "生产结果回传",
+      "geometry": {
+        "x": "1300",
+        "y": "582",
+        "width": "280",
+        "height": "56"
+      },
+      "nodeId": "V107-203"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-32",
+      "parent": "1",
+      "label": "共享数据域：用户信息｜灵感内容｜指甲模型｜设计资产｜设计方案｜生产与设备记录",
+      "rawValue": "共享数据域：用户信息｜灵感内容｜指甲模型｜设计资产｜设计方案｜生产与设备记录",
+      "geometry": {
+        "x": "50",
+        "y": "726",
+        "width": "1560",
+        "height": "48"
+      },
+      "nodeId": "V107-204"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-1",
+      "parent": "1",
+      "label": "社区产品",
+      "rawValue": "社区产品",
+      "geometry": {
+        "x": "140",
+        "y": "850",
+        "width": "420",
+        "height": "710"
+      },
+      "nodeId": "V107-205"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-2",
+      "parent": "1",
+      "label": "工作台产品 / DesignStudio",
+      "rawValue": "工作台产品 / DesignStudio",
+      "geometry": {
+        "x": "600",
+        "y": "850",
+        "width": "420",
+        "height": "710"
+      },
+      "nodeId": "V107-206"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-3",
+      "parent": "1",
+      "label": "制造后台能力",
+      "rawValue": "制造后台能力",
+      "geometry": {
+        "x": "1060",
+        "y": "850",
+        "width": "420",
+        "height": "710"
+      },
+      "nodeId": "V107-207"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-4",
+      "parent": "1",
+      "label": "社区入口 / 首页",
+      "rawValue": "社区入口 / 首页",
+      "geometry": {
+        "x": "170",
+        "y": "916",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-208"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-5",
+      "parent": "1",
+      "label": "内容浏览：发现、搜索、推荐",
+      "rawValue": "内容浏览：发现、搜索、推荐",
+      "geometry": {
+        "x": "170",
+        "y": "992",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-209"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-6",
+      "parent": "1",
+      "label": "灵感内容：实拍图、照片、AI 图、设计图、海报",
+      "rawValue": "灵感内容：实拍图、照片、AI 图、设计图、海报",
+      "geometry": {
+        "x": "170",
+        "y": "1068",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-210"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-7",
+      "parent": "1",
+      "label": "款式标签：自动 / 手动归类和定义",
+      "rawValue": "款式标签：自动 / 手动归类和定义",
+      "geometry": {
+        "x": "170",
+        "y": "1144",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-211"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-8",
+      "parent": "1",
+      "label": "收藏、分享、互动、AR 试戴",
+      "rawValue": "收藏、分享、互动、AR 试戴",
+      "geometry": {
+        "x": "170",
+        "y": "1220",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-212"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-9",
+      "parent": "1",
+      "label": "内容发布、通知、问答、联系和消息",
+      "rawValue": "内容发布、通知、问答、联系和消息",
+      "geometry": {
+        "x": "170",
+        "y": "1296",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-213"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-10",
+      "parent": "1",
+      "label": "隐私、协议和内容管理规则",
+      "rawValue": "隐私、协议和内容管理规则",
+      "geometry": {
+        "x": "170",
+        "y": "1372",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-214"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-11",
+      "parent": "1",
+      "label": "社区反馈进入设计灵感",
+      "rawValue": "社区反馈进入设计灵感",
+      "geometry": {
+        "x": "170",
+        "y": "1448",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-215"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-12",
+      "parent": "1",
+      "label": "个人入口：账号、个人信息、通知",
+      "rawValue": "个人入口：账号、个人信息、通知",
+      "geometry": {
+        "x": "630",
+        "y": "916",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-216"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-13",
+      "parent": "1",
+      "label": "C 端用户信息：编号、偏好、标签、沟通状态",
+      "rawValue": "C 端用户信息：编号、偏好、标签、沟通状态",
+      "geometry": {
+        "x": "630",
+        "y": "992",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-217"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-14",
+      "parent": "1",
+      "label": "指甲数据采集：手机照片、手动尺寸、精准模型",
+      "rawValue": "指甲数据采集：手机照片、手动尺寸、精准模型",
+      "geometry": {
+        "x": "630",
+        "y": "1068",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-218"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-15",
+      "parent": "1",
+      "label": "AI 创作：文字、图片、草绘生图；外部图片导入",
+      "rawValue": "AI 创作：文字、图片、草绘生图；外部图片导入",
+      "geometry": {
+        "x": "630",
+        "y": "1144",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-219"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-16",
+      "parent": "1",
+      "label": "设计编辑：甲型、2D 元素、UV 元素、3D 配件",
+      "rawValue": "设计编辑：甲型、2D 元素、UV 元素、3D 配件",
+      "geometry": {
+        "x": "630",
+        "y": "1220",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-220"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-17",
+      "parent": "1",
+      "label": "效果预览：元素编辑、2D / 3D 渲染、浏览",
+      "rawValue": "效果预览：元素编辑、2D / 3D 渲染、浏览",
+      "geometry": {
+        "x": "630",
+        "y": "1296",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-221"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-18",
+      "parent": "1",
+      "label": "设计方案：生成、模板、版本、公开 / 隐私状态",
+      "rawValue": "设计方案：生成、模板、版本、公开 / 隐私状态",
+      "geometry": {
+        "x": "630",
+        "y": "1372",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-222"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-19",
+      "parent": "1",
+      "label": "制造入口：可制造性检查、加工单、生产状态",
+      "rawValue": "制造入口：可制造性检查、加工单、生产状态",
+      "geometry": {
+        "x": "630",
+        "y": "1448",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-223"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-20",
+      "parent": "1",
+      "label": "设计语言 → 工艺参数映射",
+      "rawValue": "设计语言 → 工艺参数映射",
+      "geometry": {
+        "x": "1090",
+        "y": "916",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-224"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-21",
+      "parent": "1",
+      "label": "图案二维 → 三维 UV 修正",
+      "rawValue": "图案二维 → 三维 UV 修正",
+      "geometry": {
+        "x": "1090",
+        "y": "992",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-225"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-22",
+      "parent": "1",
+      "label": "可制造性检查与问题反馈",
+      "rawValue": "可制造性检查与问题反馈",
+      "geometry": {
+        "x": "1090",
+        "y": "1068",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-226"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-23",
+      "parent": "1",
+      "label": "加工单与生产说明：材料、工序、人工处理",
+      "rawValue": "加工单与生产说明：材料、工序、人工处理",
+      "geometry": {
+        "x": "1090",
+        "y": "1144",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-227"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-24",
+      "parent": "1",
+      "label": "智能排产：工艺限制、任务顺序、资源安排",
+      "rawValue": "智能排产：工艺限制、任务顺序、资源安排",
+      "geometry": {
+        "x": "1090",
+        "y": "1220",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-228"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-25",
+      "parent": "1",
+      "label": "制作过程监控：机器、人工、状态、异常",
+      "rawValue": "制作过程监控：机器、人工、状态、异常",
+      "geometry": {
+        "x": "1090",
+        "y": "1296",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-229"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-26",
+      "parent": "1",
+      "label": "生产结果回传与问题记录",
+      "rawValue": "生产结果回传与问题记录",
+      "geometry": {
+        "x": "1090",
+        "y": "1372",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-230"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "WBnJAw0-fWLt9eOFgqr_-27",
+      "parent": "1",
+      "label": "支撑数据：模型、工艺、设备、生产记录",
+      "rawValue": "支撑数据：模型、工艺、设备、生产记录",
+      "geometry": {
+        "x": "1090",
+        "y": "1448",
+        "width": "360",
+        "height": "48"
+      },
+      "nodeId": "V107-231"
+    }
+  ],
+  "edgeLabels": [
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-33",
+      "parent": "1",
+      "label": "灵感引用",
+      "rawValue": "灵感引用",
+      "geometry": {
+        "relative": "1"
+      },
+      "edgeLabelId": "REL-001",
+      "source": "Gi42hUTanYr8W1DQYbmn-7",
+      "target": "Gi42hUTanYr8W1DQYbmn-19"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-34",
+      "parent": "1",
+      "label": "方案提交",
+      "rawValue": "方案提交",
+      "geometry": {
+        "relative": "1"
+      },
+      "edgeLabelId": "REL-002",
+      "source": "Gi42hUTanYr8W1DQYbmn-25",
+      "target": "Gi42hUTanYr8W1DQYbmn-27"
+    },
+    {
+      "diagramIndex": 3,
+      "diagramName": "产品功能总览（建设中）",
+      "cellId": "Gi42hUTanYr8W1DQYbmn-35",
+      "parent": "1",
+      "label": "结果回传",
+      "rawValue": "结果回传",
+      "geometry": {
+        "relative": "1"
+      },
+      "edgeLabelId": "REL-003",
+      "source": "Gi42hUTanYr8W1DQYbmn-31",
+      "target": "Gi42hUTanYr8W1DQYbmn-25"
+    }
+  ]
+}
